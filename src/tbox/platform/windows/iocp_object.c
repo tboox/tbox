@@ -59,6 +59,8 @@ static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
 #   else
     return (tb_co_scheduler_self() || tb_lo_scheduler_self_())? tb_sockdata() : tb_null;
 #   endif
+#else
+    return tb_null;
 #endif
 }
 

@@ -31,6 +31,7 @@
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
 #include "interface/interface.h"
+#include "ntstatus.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -80,6 +81,9 @@ typedef struct __tb_iocp_func_t
 // the poller iocp type
 typedef struct __tb_poller_iocp_t
 {
+    // the maxn
+    tb_size_t               maxn;
+
     // the user private data
     tb_cpointer_t           priv;
 
@@ -88,6 +92,12 @@ typedef struct __tb_poller_iocp_t
 
     // the i/o completion port
     HANDLE                  port;
+
+    // the events
+    tb_OVERLAPPED_ENTRY_t*  events;
+
+    // the events count
+    tb_size_t               events_count;
 
 }tb_poller_iocp_t, *tb_poller_iocp_ref_t;
 
@@ -820,8 +830,77 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
 }
 static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
 {
-    tb_trace_d("wait_ex: ..");
-    return -1;
+    // clear error first
+    SetLastError(ERROR_SUCCESS);
+
+    // init events
+    tb_size_t grow = tb_align8((poller->maxn >> 3) + 1);
+    if (!poller->events)
+    {
+        poller->events_count = grow;
+        poller->events = tb_nalloc_type(poller->events_count, tb_OVERLAPPED_ENTRY_t);
+        tb_assert_and_check_return_val(poller->events, -1);
+    }
+
+    // wait events
+    DWORD events_count = 0;
+    BOOL  wait_ok = poller->func.GetQueuedCompletionStatusEx(poller->port, poller->events, (DWORD)poller->events_count, &events_count, (DWORD)(timeout < 0? INFINITE : timeout), FALSE);
+
+    // the last error
+    tb_size_t error = (tb_size_t)GetLastError();
+
+    // timeout?
+    if (!wait_ok && error == WAIT_TIMEOUT) return 0;
+
+    // error?
+    tb_assert_and_check_return_val(wait_ok, -1);
+
+    // grow it if events is full
+    if (events_count == poller->events_count)
+    {
+        // grow size
+        poller->events_count += grow;
+        if (poller->events_count > poller->maxn) poller->events_count = poller->maxn;
+
+        // grow data
+        poller->events = (tb_OVERLAPPED_ENTRY_t*)tb_ralloc(poller->events, poller->events_count * sizeof(tb_OVERLAPPED_ENTRY_t));
+        tb_assert_and_check_return_val(poller->events, -1);
+    }
+    tb_assert(events_count <= poller->events_count);
+
+    // limit 
+    events_count = tb_min(events_count, (DWORD)poller->maxn);
+
+    // handle events
+    tb_size_t               i = 0;
+    tb_size_t               wait = 0; 
+    tb_OVERLAPPED_ENTRY_t*  e = tb_null;
+    for (i = 0; i < events_count; i++)
+    {
+        // the iocp event
+        e = poller->events + i;
+
+        // get iocp object
+        LPOVERLAPPED olap = (LPOVERLAPPED)e->lpOverlapped;
+        tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)e->lpCompletionKey;
+        tb_assert_and_check_return_val(object && object->sock && olap, -1);
+
+        // get real transferred bytes
+        tb_size_t real = (tb_size_t)e->dwNumberOfBytesTransferred;
+
+        // get last error
+        error = tb_ntstatus_to_winerror((tb_size_t)e->Internal);
+
+        // trace
+        tb_trace_d("wait_ex[%p]: real: %u bytes, lasterror: %lu", object->sock, real, error);
+
+        // spark and update the events
+        if (tb_poller_iocp_event_spak(poller, func, object, real, error) > 0)
+            wait++;
+    }
+
+    // ok
+    return wait;
 }
 static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
 {
@@ -832,19 +911,19 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     DWORD                   real = 0;
     tb_iocp_object_ref_t    object = tb_null;
     LPOVERLAPPED            olap = tb_null;
-    BOOL                    wait = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
+    BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
 
     // the last error
     tb_size_t error = (tb_size_t)GetLastError();
 
     // timeout?
-    if (!wait && error == WAIT_TIMEOUT) return 0;
+    if (!wait_ok && error == WAIT_TIMEOUT) return 0;
 
     // check
     tb_assert_and_check_return_val(object && object->sock && olap, -1);
 
     // trace
-    tb_trace_d("wait[%p]: %d, real: %u, lasterror: %lu", object->sock, wait, real, error);
+    tb_trace_d("wait[%p]: %s, real: %u bytes, lasterror: %lu", object->sock, wait_ok? "ok" : "failed", real, error);
 
     // spark the events
     return tb_poller_iocp_event_spak(poller, func, object, real, error);
@@ -868,6 +947,9 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
         // make poller
         poller = tb_malloc0_type(tb_poller_iocp_t);
         tb_assert_and_check_break(poller);
+
+        // init maxn 
+        poller->maxn = 1 << 16;
 
         // init user private data
         poller->priv = priv;
@@ -923,6 +1005,11 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // exit port
     if (poller->port) CloseHandle(poller->port);
     poller->port = tb_null;
+
+    // exit events
+    if (poller->events) tb_free(poller->events);
+    poller->events          = tb_null;
+    poller->events_count    = 0;
 
     // free it
     tb_free(poller);
@@ -992,7 +1079,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // bind this socket and object to port
     if (!object->sock) 
     {
-        HANDLE port = CreateIoCompletionPort((HANDLE)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
+        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
         if (port != poller->port)
         {
             // trace
