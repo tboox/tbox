@@ -126,8 +126,15 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
         if (!object->buffer) object->buffer = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
         tb_assert_and_check_break(object->buffer);
 
+        // get bound address family
+        struct sockaddr_storage bound_addr;
+        socklen_t len = sizeof(bound_addr);
+        tb_size_t family = TB_IPADDR_FAMILY_IPV4;
+        if (getsockname((SOCKET)tb_sock2fd(sock), (struct sockaddr *)&bound_addr, &len) != -1 && bound_addr.ss_family == AF_INET6)
+            family = TB_IPADDR_FAMILY_IPV6;
+
         // make accept socket
-        object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4); // TODO family
+        object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, family);
         tb_assert_and_check_break(object->u.acpt.result);
         init_ok = tb_true;
 
