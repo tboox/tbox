@@ -881,9 +881,17 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
         e = poller->events + i;
 
         // get iocp object
-        LPOVERLAPPED olap = (LPOVERLAPPED)e->lpOverlapped;
         tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)e->lpCompletionKey;
-        tb_assert_and_check_return_val(object && object->sock && olap, -1);
+
+        // iocp port is killed?
+        tb_check_return_val(object, -1);
+
+        // spark notification? 
+        tb_check_continue(object != tb_u2p(1));
+
+        // get and check olap
+        LPOVERLAPPED olap = (LPOVERLAPPED)e->lpOverlapped;
+        tb_assert_and_check_return_val(object->sock && olap, -1);
 
         // get real transferred bytes
         tb_size_t real = (tb_size_t)e->dwNumberOfBytesTransferred;
@@ -916,11 +924,14 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     // the last error
     tb_size_t error = (tb_size_t)GetLastError();
 
-    // timeout?
-    if (!wait_ok && error == WAIT_TIMEOUT) return 0;
+    // timeout or spark?
+    if ((!wait_ok && error == WAIT_TIMEOUT) || (object == tb_u2p(1))) return 0;
+
+    // iocp port is killed?
+    tb_check_return_val(object, -1);
 
     // check
-    tb_assert_and_check_return_val(object && object->sock && olap, -1);
+    tb_assert_and_check_return_val(object->sock && olap, -1);
 
     // trace
     tb_trace_d("wait[%p]: %s, real: %u bytes, lasterror: %lu", object->sock, wait_ok? "ok" : "failed", real, error);
@@ -1033,8 +1044,8 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
 
-    // TODO
-    tb_trace_d("tb_poller_kill");
+    // post kill notification to iocp port
+    PostQueuedCompletionStatus(poller->port, 0, tb_null, tb_null);
 }
 tb_void_t tb_poller_spak(tb_poller_ref_t self)
 {
@@ -1042,8 +1053,8 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
 
-    // TODO
-    tb_trace_d("tb_poller_spak");
+    // post spark notification to iocp port
+    PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_u2p(1), tb_null);
 }
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
