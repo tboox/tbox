@@ -53,12 +53,8 @@ static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
 {
     // we only enable iocp in coroutine
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
-#   ifdef TB_CONFIG_MICRO_ENABLE
-    return (tb_lo_scheduler_self_())? tb_sockdata() : tb_null;
-#   else
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) && !defined(TB_CONFIG_MICRO_ENABLE)
     return (tb_co_scheduler_self() || tb_lo_scheduler_self_())? tb_sockdata() : tb_null;
-#   endif
 #else
     return tb_null;
 #endif

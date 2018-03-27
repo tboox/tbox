@@ -39,11 +39,10 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   ifdef TB_CONFIG_MICRO_ENABLE
-#       include "posix/poller_select.c"
+#   if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) && !defined(TB_CONFIG_MICRO_ENABLE)
+#       include "windows/poller_iocp.c"
 #   else
 #       include "posix/poller_select.c"
-//#       include "windows/poller_iocp.c"
 #   endif
 #elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
