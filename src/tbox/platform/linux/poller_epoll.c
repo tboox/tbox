@@ -168,22 +168,6 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // free it
     tb_free(poller);
 }
-tb_void_t tb_poller_clear(tb_poller_ref_t self)
-{
-    // check
-    tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
-    tb_assert_and_check_return(poller);
-
-    // clear socket data
-    tb_sockdata_clear(&poller->sockdata);
-
-    // close the previous epoll fd first
-    if (poller->epfd > 0) close(poller->epfd);
-
-    // recreate a new epoll
-    poller->epfd = epoll_create(poller->maxn);
-    tb_assert(poller->epfd > 0);
-}
 tb_size_t tb_poller_type(tb_poller_ref_t poller)
 {
     return TB_POLLER_TYPE_EPOLL;
@@ -219,9 +203,9 @@ tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
     // all supported events 
 #ifdef EPOLLONESHOT 
-    static tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
+    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
 #else
-    static tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR;
+    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR;
 #endif
 
     // is supported?

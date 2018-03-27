@@ -198,22 +198,6 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // free it
     tb_free(poller);
 }
-tb_void_t tb_poller_clear(tb_poller_ref_t self)
-{
-    // check
-    tb_poller_kqueue_ref_t poller = (tb_poller_kqueue_ref_t)self;
-    tb_assert_and_check_return(poller);
-
-    // clear socket data
-    tb_sockdata_clear(&poller->sockdata);
-
-    // close the previous kqueue fd first
-    if (poller->kqfd > 0) close(poller->kqfd);
-
-    // recreate a new kqueue
-    poller->kqfd = kqueue();
-    tb_assert(poller->kqfd > 0);
-}
 tb_size_t tb_poller_type(tb_poller_ref_t poller)
 {
     return TB_POLLER_TYPE_KQUEUE;
@@ -248,7 +232,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
     // all supported events 
-    static tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
+    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
 
     // is supported?
     return (events_supported & events) == events;

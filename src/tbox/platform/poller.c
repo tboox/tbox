@@ -42,8 +42,8 @@
 #   ifdef TB_CONFIG_MICRO_ENABLE
 #       include "posix/poller_select.c"
 #   else
-#       include "posix/poller_select.c"
-//#       include "windows/poller_iocp.c"
+//#       include "posix/poller_select.c"
+#       include "windows/poller_iocp.c"
 #   endif
 #elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
@@ -62,10 +62,6 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
     return tb_null;
 }
 tb_void_t tb_poller_exit(tb_poller_ref_t poller)
-{
-    tb_trace_noimpl();
-}
-tb_void_t tb_poller_clear(tb_poller_ref_t poller)
 {
     tb_trace_noimpl();
 }
