@@ -414,8 +414,10 @@ static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb
     tb_trace_d("post sendfile(%p, %lu) event: ..", sock, object->u.sendf.size);
 
     // do send file
-    tb_long_t ok = poller->func.TransmitFile((SOCKET)tb_sock2fd(sock), (HANDLE)object->u.sendf.file, (DWORD)object->u.sendf.size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
-    tb_trace_d("sending[%p]: TransmitFile: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+    object->olap.Offset = (DWORD)object->u.sendf.offset;
+    object->olap.OffsetHigh = (DWORD)(object->u.sendf.offset >> 32);
+    BOOL ok = poller->func.TransmitFile((SOCKET)tb_sock2fd(sock), (HANDLE)object->u.sendf.file, (DWORD)object->u.sendf.size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
+    tb_trace_d("sending[%p]: TransmitFile: %d, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 

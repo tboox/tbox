@@ -690,31 +690,28 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     // check
     tb_assert_and_check_return_val(sock && file && size, -1);
 
-    // the transmitfile func
-    tb_mswsock_TransmitFile_t pTransmitFile = tb_mswsock()->TransmitFile;
-    tb_assert_and_check_return_val(pTransmitFile, -1);
-
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to send file data if exists
     tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
     if (object) return tb_iocp_object_sendf(object, file, offset, size);
 #endif
 
-    // transmit it
-    OVERLAPPED  olap = {0}; olap.Offset = (DWORD)offset;
-    tb_hong_t   real = pTransmitFile((SOCKET)sock - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
+    // read data
+    tb_byte_t data[8192];
+    tb_long_t read = tb_file_pread(file, data, sizeof(data), offset);
+    tb_check_return_val(read > 0, read);
+
+    // send data
+    tb_size_t writ = 0;
+    while (writ < read)
+    {
+        tb_long_t real = tb_socket_send(sock, data + writ, read - writ);
+        if (real > 0) writ += real;
+        else break;
+    }
 
     // ok?
-    if (real >= 0) return real;
-
-    // errno
-    tb_long_t e = tb_ws2_32()->WSAGetLastError();
-
-    // continue?
-    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS || e == WSA_IO_PENDING) return 0;
-
-    // error
-    return -1;
+    return writ == read? writ : -1;
 }
 tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
 {
