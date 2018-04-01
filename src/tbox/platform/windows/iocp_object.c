@@ -24,6 +24,12 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME            "iocp_object"
+#define TB_TRACE_MODULE_DEBUG           (1)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "iocp_object.h"
@@ -113,7 +119,23 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
     tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
     if (object)
     {
+        // trace
+        tb_trace_d("sock(%p): removed, state: %s", sock, tb_state_cstr(object->state));
+
         // check state
+        if (object->state == TB_STATE_WAITING)
+        {
+            // trace
+            tb_trace_d("sock(%p): cancel io ..", sock);
+
+            // cancel io
+            if (!CancelIo((HANDLE)tb_sock2fd(sock)))
+            {
+                // trace
+                tb_trace_e("sock(%p): cancel io failed(%d)!", sock, GetLastError());
+            }
+            object->state = TB_STATE_OK;
+        }
         tb_assert(object->state == TB_STATE_OK || object->state == TB_STATE_FINISHED);
 
         // remove this object from the local socket data

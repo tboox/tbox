@@ -28,7 +28,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME        "dns_looker"
-#define TB_TRACE_MODULE_DEBUG       (0)
+#define TB_TRACE_MODULE_DEBUG       (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -485,8 +485,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipaddr_ref_t add
     while (1)
     {
         // read data
-        tb_long_t read = tb_socket_urecv(looker->sock, tb_null, rpkt, 4096);
-        //tb_trace_d("read %d", read);
+        tb_long_t read = tb_socket_urecv(looker->sock, tb_null, rpkt, sizeof(rpkt));
         tb_assert_and_check_return_val(read >= 0, -1);
 
         // no data? 

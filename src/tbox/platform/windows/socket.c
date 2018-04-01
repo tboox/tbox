@@ -613,20 +613,18 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel((tb_lo_scheduler_io_ref_t)scheduler_io, sock)) {}
 #endif
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // remove iocp object for this socket if exists
+    tb_iocp_object_remove(sock);
+#endif
+
     // close it
     tb_bool_t ok = !tb_ws2_32()->closesocket(tb_sock2fd(sock))? tb_true : tb_false;
-
-    // failed?
     if (!ok)
     {
         // trace
         tb_trace_e("close: %p failed, errno: %d", sock, GetLastError());
     }
-
-#ifndef TB_CONFIG_MICRO_ENABLE
-    // remove iocp object for this socket if exists
-    tb_iocp_object_remove(sock);
-#endif
 
     // ok?
     return ok;

@@ -34,6 +34,6 @@
 tb_long_t tb_sprintf(tb_char_t* s, tb_char_t const* fmt, ...)
 {
     tb_long_t ret = 0;
-    tb_vsnprintf_format(s, TB_MAXU32, fmt, &ret);
+    tb_vsnprintf_format(s, TB_MAXU16, fmt, &ret);
     return ret;
 }

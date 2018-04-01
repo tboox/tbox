@@ -28,7 +28,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME        "dns_server"
-#define TB_TRACE_MODULE_DEBUG       (0)
+#define TB_TRACE_MODULE_DEBUG       (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -246,7 +246,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
             tb_long_t r = tb_socket_urecv(sock, tb_null, rpkt + read, TB_DNS_RPKT_MAXN - read);
 
             // trace
-            tb_trace_d("read %d", r);
+            tb_trace_d("read %ld", r);
 
             // check
             tb_check_break(r >= 0);
@@ -261,7 +261,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
                 r = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
 
                 // trace
-                tb_trace_d("wait %d", r);
+                tb_trace_d("wait %ld", r);
 
                 // fail or timeout?
                 tb_check_break(r > 0);
