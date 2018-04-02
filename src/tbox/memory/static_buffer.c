@@ -73,7 +73,7 @@ tb_byte_t* tb_static_buffer_data(tb_static_buffer_ref_t buffer)
     tb_assert_and_check_return_val(buffer, tb_null);
 
     // the buffer data
-    return buffer->size? buffer->data : tb_null;
+    return buffer->data;
 }
 tb_size_t tb_static_buffer_size(tb_static_buffer_ref_t buffer)
 {

@@ -236,7 +236,6 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
     {
         // writ data
         tb_long_t writ = tb_socket_usend(looker->sock, addr, data + looker->size, size - looker->size);
-        //tb_trace_d("writ: %d", writ);
         tb_assert_and_check_return_val(writ >= 0, -1);
 
         // no data? 
@@ -481,11 +480,13 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipaddr_ref_t add
     looker->step &= ~TB_DNS_LOOKER_STEP_NEVT;
 
     // recv response data
-    tb_byte_t rpkt[4096];
-    while (1)
+    tb_size_t  size = tb_static_buffer_size(&looker->rpkt);
+    tb_size_t  maxn = tb_static_buffer_maxn(&looker->rpkt);
+    tb_byte_t* data = tb_static_buffer_data(&looker->rpkt);
+    while (size < maxn)
     {
         // read data
-        tb_long_t read = tb_socket_urecv(looker->sock, tb_null, rpkt, sizeof(rpkt));
+        tb_long_t read = tb_socket_urecv(looker->sock, tb_null, data + size, maxn - size);
         tb_assert_and_check_return_val(read >= 0, -1);
 
         // no data? 
@@ -505,8 +506,9 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipaddr_ref_t add
         }
         else looker->tryn = 0;
 
-        // copy data
-        tb_static_buffer_memncat(&looker->rpkt, rpkt, read);
+        // update buffer size
+        tb_static_buffer_resize(&looker->rpkt, size + read);
+        size = tb_static_buffer_size(&looker->rpkt);
     }
 
     // done

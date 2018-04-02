@@ -136,7 +136,6 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
             }
             object->state = TB_STATE_OK;
         }
-        tb_assert(object->state == TB_STATE_OK || object->state == TB_STATE_FINISHED);
 
         // remove this object from the local socket data
         tb_sockdata_remove(sockdata, sock);
