@@ -167,11 +167,11 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
         return object->u.acpt.result;
     }
 
+    // trace
+    tb_trace_d("accept(%p): %s ..", object->sock, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, tb_null);
-
-    // trace
-    tb_trace_d("accept(%p): pending ..", object->sock);
 
     // post a accept event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_ACPT;
@@ -199,11 +199,11 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
             return object->u.conn.result;
     }
 
+    // trace
+    tb_trace_d("connect(%p, %{ipaddr}): %s ..", object->sock, addr, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("connect(%p, %{ipaddr}): pending ..", object->sock, addr);
 
     // post a connection event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_CONN;
@@ -228,11 +228,11 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
         return object->u.recv.result;
     }
 
+    // trace
+    tb_trace_d("recv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("recv(%p, %lu): pending ..", object->sock, size);
 
     // post a recv event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_RECV;
@@ -257,11 +257,11 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
         return object->u.send.result;
     }
 
+    // trace
+    tb_trace_d("send(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("send(%p, %lu): pending ..", object->sock, size);
 
     // post a send event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_SEND;
@@ -287,11 +287,11 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
         return object->u.urecv.result;
     }
 
+    // trace
+    tb_trace_d("urecv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("urecv(%p, %lu): pending ..", object->sock, size);
 
     // post a urecv event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_URECV;
@@ -316,11 +316,11 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
         return object->u.usend.result;
     }
 
+    // trace
+    tb_trace_d("usend(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("usend(%p, %{ipaddr}, %lu): pending ..", object->sock, addr, size);
 
     // post a usend event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_USEND;
@@ -346,11 +346,11 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
         return object->u.sendf.result;
     }
 
+    // trace
+    tb_trace_d("sendfile(%p, %llu at %llu): %s ..", object->sock, size, offset, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("sendfile(%p, %llu at %llu): pending ..", object->sock, size, offset);
 
     // post a send event to wait it
     object->code           = TB_IOCP_OBJECT_CODE_SENDF;
@@ -377,11 +377,11 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
         return object->u.recvv.result;
     }
 
+    // trace
+    tb_trace_d("recvv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("recvv(%p, %lu): pending ..", object->sock, size);
 
     // post a recvv event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_RECVV;
@@ -406,11 +406,11 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
         return object->u.sendv.result;
     }
 
+    // trace
+    tb_trace_d("sendv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("sendv(%p, %lu): pending ..", object->sock, size);
 
     // post a sendv event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_SENDV;
@@ -436,11 +436,11 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
         return object->u.urecvv.result;
     }
 
+    // trace
+    tb_trace_d("urecvv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("urecvv(%p, %lu): pending ..", object->sock, size);
 
     // post a urecvv event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_URECVV;
@@ -465,11 +465,11 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
         return object->u.usendv.result;
     }
 
+    // trace
+    tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
+
     // check state
     tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
-
-    // trace
-    tb_trace_d("usendv(%p, %{ipaddr}, %lu): pending ..", object->sock, addr, size);
 
     // post a usendv event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_USENDV;
