@@ -127,9 +127,6 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
         // open stream
         if (!tb_stream_open(http->stream)) break;
 
-        // trace
-        tb_trace_d("connect: ok");
-
         // ok
         ok = tb_true;
 
@@ -138,6 +135,9 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 
     // failed? save state
     if (!ok) http->status.state = tb_stream_state(http->stream);
+
+    // trace
+    tb_trace_d("connect: %s, state: %s", ok? "ok" : "failed", tb_state_cstr(http->status.state));
 
     // ok?
     return ok;
@@ -662,6 +662,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 
     // done
     tb_size_t i = 0;
+    tb_bool_t ok = tb_true;
     for (i = 0; i < http->option.redirect && tb_string_size(&http->status.location); i++)
     {
         // read the redirect content
@@ -692,7 +693,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
         // switch to sstream
         http->stream = http->sstream;
 
-        // done location url
+        // get location url
         tb_char_t const* location = tb_string_cstr(&http->status.location);
         tb_assert_and_check_break(location);
 
@@ -716,17 +717,17 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
         }
 
         // connect it
-        if (!tb_http_connect(http)) break;
+        if (!(ok = tb_http_connect(http))) break;
 
         // request it
-        if (!tb_http_request(http)) break;
+        if (!(ok = tb_http_request(http))) break;
 
         // response it
-        if (!tb_http_response(http)) break;
+        if (!(ok = tb_http_response(http))) break;
     }
 
     // ok?
-    return (i < http->option.redirect && tb_string_size(&http->status.location))? tb_false : tb_true;
+    return ok && !tb_string_size(&http->status.location);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

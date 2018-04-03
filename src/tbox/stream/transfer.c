@@ -51,7 +51,7 @@ tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_
     
     // open it first if ostream have been not opened
     if (tb_stream_is_closed(ostream) && !tb_stream_open(ostream)) return -1;
-                
+
     // done func
     if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
 
