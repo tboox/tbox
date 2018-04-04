@@ -802,6 +802,9 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
 }
 static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_iocp_object_ref_t object, tb_size_t real, tb_size_t error)
 {
+    // trace
+    tb_trace_d("spak[%p]: code %u, state: %s ..", object->sock, object->code, tb_state_cstr(object->state));
+
     // check
     tb_assert_and_check_return_val(object->state == TB_STATE_WAITING || object->state == TB_STATE_FINISHED, -1);
 
@@ -822,9 +825,6 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
     ,   tb_poller_iocp_event_spak_iorw
     };
     tb_assert_and_check_return_val(object->code < tb_arrayn(s_spak), -1);
-
-    // trace
-    tb_trace_d("spak[%p]: code %u, state: %s ..", object->sock, object->code, tb_state_cstr(object->state));
 
     // spark event
     tb_long_t ok = (s_spak[object->code])? s_spak[object->code](poller, object, real, error) : -1;

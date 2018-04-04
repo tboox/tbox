@@ -289,6 +289,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     /* the object state
      *
      * TB_STATE_OK
+     * TB_STATE_KILLED
      * TB_STATE_PENDING
      * TB_STATE_WAITING
      * TB_STATE_FINISHED

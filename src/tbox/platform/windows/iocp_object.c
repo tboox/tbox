@@ -65,6 +65,26 @@ static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
     return tb_null;
 #endif
 }
+static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object)
+{
+    // check
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_WAITING && object->sock, tb_false);
+
+    // trace
+    tb_trace_d("sock(%p): cancel io ..", object->sock);
+
+    // cancel io
+    if (!CancelIo((HANDLE)tb_sock2fd(object->sock)))
+    {
+        // trace
+        tb_trace_e("sock(%p): cancel io failed(%d)!", object->sock, GetLastError());
+        return tb_false;
+    }
+    object->state = TB_STATE_KILLED;
+
+    // ok
+    return tb_true;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -124,18 +144,7 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
 
         // check state
         if (object->state == TB_STATE_WAITING)
-        {
-            // trace
-            tb_trace_d("sock(%p): cancel io ..", sock);
-
-            // cancel io
-            if (!CancelIo((HANDLE)tb_sock2fd(sock)))
-            {
-                // trace
-                tb_trace_e("sock(%p): cancel io failed(%d)!", sock, GetLastError());
-            }
-            object->state = TB_STATE_OK;
-        }
+            tb_iocp_object_cancel(object);
 
         // remove this object from the local socket data
         tb_sockdata_remove(sockdata, sock);
@@ -170,8 +179,11 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     // trace
     tb_trace_d("accept(%p): %s ..", object->sock, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return tb_null;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, tb_null);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, tb_null);
 
     // post a accept event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_ACPT;
@@ -202,8 +214,11 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     // trace
     tb_trace_d("connect(%p, %{ipaddr}): %s ..", object->sock, addr, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a connection event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_CONN;
@@ -231,8 +246,11 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     // trace
     tb_trace_d("recv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a recv event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_RECV;
@@ -255,13 +273,16 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
         // clear the previous object data first, but the result cannot be cleared
         tb_iocp_object_clear(object);
         return object->u.send.result;
-    }
+    }     
 
     // trace
     tb_trace_d("send(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a send event to wait it
     object->code        = TB_IOCP_OBJECT_CODE_SEND;
@@ -290,8 +311,11 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     // trace
     tb_trace_d("urecv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a urecv event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_URECV;
@@ -314,13 +338,16 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
         // clear the previous object data first, but the result cannot be cleared
         tb_iocp_object_clear(object);
         return object->u.usend.result;
-    }
+    }  
 
     // trace
     tb_trace_d("usend(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a usend event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_USEND;
@@ -349,8 +376,11 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     // trace
     tb_trace_d("sendfile(%p, %llu at %llu): %s ..", object->sock, size, offset, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a send event to wait it
     object->code           = TB_IOCP_OBJECT_CODE_SENDF;
@@ -380,8 +410,11 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     // trace
     tb_trace_d("recvv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a recvv event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_RECVV;
@@ -409,8 +442,11 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     // trace
     tb_trace_d("sendv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a sendv event to wait it
     object->code         = TB_IOCP_OBJECT_CODE_SENDV;
@@ -439,8 +475,11 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // trace
     tb_trace_d("urecvv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a urecvv event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_URECVV;
@@ -468,8 +507,11 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // trace
     tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
 
+    // waiting? cancel the previous io first
+    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
+
     // check state
-    tb_assert_and_check_return_val(object->state == TB_STATE_OK, -1);
+    tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // post a usendv event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_USENDV;
