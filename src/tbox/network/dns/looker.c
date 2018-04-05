@@ -656,6 +656,9 @@ tb_long_t tb_dns_looker_wait(tb_dns_looker_ref_t self, tb_long_t timeout)
     tb_long_t r = 0;
     if (e)
     {
+        // trace
+        tb_trace_d("waiting %p ..", looker->sock);
+
         // wait
         r = tb_socket_wait(looker->sock, e, timeout);
 

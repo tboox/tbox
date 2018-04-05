@@ -35,6 +35,7 @@
 #include "iocp_object.h"
 #include "../../libc/libc.h"
 #include "../impl/sockdata.h"
+#include "../posix/sockaddr.h"
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 #   include "../../coroutine/coroutine.h"
 #   include "../../coroutine/impl/impl.h"
@@ -52,9 +53,13 @@ static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
         object->buffer = tb_null;
     }
 
+    // trace
+    tb_trace_d("sock(%p): clear %s ..", object->sock, tb_state_cstr(object->state));
+
     // clear object code and state
     object->code  = TB_IOCP_OBJECT_CODE_NONE;
     object->state = TB_STATE_OK;
+
 }
 static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
 {
@@ -165,22 +170,29 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     tb_assert(object->code == TB_IOCP_OBJECT_CODE_NONE || object->code == TB_IOCP_OBJECT_CODE_ACPT);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_ACPT && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_ACPT)
     {
-        // trace
-        tb_trace_d("accept(%p): state: %s, result: %p", object->sock, tb_state_cstr(object->state), object->u.acpt.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("accept(%p): state: %s, result: %p", object->sock, tb_state_cstr(object->state), object->u.acpt.result);
 
-        // get result
-        object->state = TB_STATE_OK;
-        if (addr) tb_ipaddr_copy(addr, &object->u.acpt.addr);
-        return object->u.acpt.result;
+            // get result
+            object->state = TB_STATE_OK;
+            if (addr) tb_ipaddr_copy(addr, &object->u.acpt.addr);
+            return object->u.acpt.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // trace
+            tb_trace_d("accept(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return tb_null;
+        }
     }
 
     // trace
-    tb_trace_d("accept(%p): %s ..", object->sock, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return tb_null;
+    tb_trace_d("accept(%p): state: %s ..", object->sock, tb_state_cstr(object->state));
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, tb_null);
@@ -189,7 +201,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     object->code          = TB_IOCP_OBJECT_CODE_ACPT;
     object->state         = TB_STATE_PENDING;
     object->u.acpt.result = tb_null;
-    return 0;
+    return tb_null;
 }
 tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr)
 {
@@ -197,25 +209,32 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     tb_assert_and_check_return_val(object && addr, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_CONN && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_CONN)
     {
-        // trace
-        tb_trace_d("connect(%p): %{ipaddr}, state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.conn.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("connect(%p): %{ipaddr}, state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.conn.result);
 
-        /* clear the previous object data first
-         *
-         * @note conn.addr and conn.result cannot be cleared
-         */
-        tb_iocp_object_clear(object);
-        if (tb_ipaddr_is_equal(&object->u.conn.addr, addr))
-            return object->u.conn.result;
+            /* clear the previous object data first
+             *
+             * @note conn.addr and conn.result cannot be cleared
+             */
+            tb_iocp_object_clear(object);
+            if (tb_ipaddr_is_equal(&object->u.conn.addr, addr))
+                return object->u.conn.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING && tb_ipaddr_is_equal(&object->u.conn.addr, addr))
+        {
+            // trace
+            tb_trace_d("connect(%p, %{ipaddr}): %s, continue ..", object->sock, addr, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("connect(%p, %{ipaddr}): %s ..", object->sock, addr, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -232,22 +251,44 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     // check
     tb_assert_and_check_return_val(object && data && size, -1);
 
-    // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_RECV && object->state == TB_STATE_FINISHED)
+    // continue to the previous operation
+    if (object->code == TB_IOCP_OBJECT_CODE_RECV)
     {
-        // trace
-        tb_trace_d("recv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.recv.result);
+        // attempt to get the result if be finished
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("recv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.recv.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.recv.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.recv.result;
+        }
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.recv.data == data, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("recv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("recv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("recv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -265,21 +306,43 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     tb_assert_and_check_return_val(object && data, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_SEND && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_SEND)
     {
-        // trace
-        tb_trace_d("send(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.send.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("send(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.send.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.send.result;
-    }     
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.send.result;
+        }     
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.send.data == data, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("send(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("send(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
+    }
 
     // trace
     tb_trace_d("send(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -296,23 +359,49 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     // check
     tb_assert_and_check_return_val(object && data && size, -1);
 
-    // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_URECV && object->state == TB_STATE_FINISHED)
+    // continue to the previous operation
+    if (object->code == TB_IOCP_OBJECT_CODE_URECV)
     {
-        // trace
-        tb_trace_d("urecv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.urecv.result);
+        // attempt to get the result if be finished
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("urecv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.urecv.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        if (addr) tb_ipaddr_copy(addr, &object->u.urecv.addr);
-        return object->u.urecv.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            if (addr) tb_ipaddr_copy(addr, &object->u.urecv.addr);
+            return object->u.urecv.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.urecv.data == data, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("urecv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // save address
+                if (addr && object->buffer) tb_sockaddr_save(addr, (struct sockaddr_storage*)object->buffer);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("urecv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("urecv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -330,20 +419,45 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     tb_assert_and_check_return_val(object && addr && data, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_USEND && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_USEND)
     {
-        // trace
-        tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.usend.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.usend.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.usend.result;
-    }  
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.usend.result;
+        }  
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING && tb_ipaddr_is_equal(&object->u.usend.addr, addr))
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.usend.data == data, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %d", object->sock, addr, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("usend(%p, %{ipaddr}): state: %s, continue ..", object->sock, addr, tb_state_cstr(object->state));
+            return 0;
+        }
+    }
 
     // trace
     tb_trace_d("usend(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
 
-    // waiting? cancel the previous io first
+    // cancel the previous io (urecv) first
     if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
@@ -363,21 +477,44 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     tb_assert_and_check_return_val(object && file, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_SENDF && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_SENDF)
     {
-        // trace
-        tb_trace_d("sendfile(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.sendf.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("sendfile(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.sendf.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.sendf.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.sendf.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.sendf.file == file, -1);
+            tb_assert_and_check_return_val(object->u.sendf.offset == offset, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("sendfile(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("sendfile(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("sendfile(%p, %llu at %llu): %s ..", object->sock, size, offset, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -397,21 +534,42 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     tb_assert_and_check_return_val(object && list && size, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_RECVV && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_RECVV)
     {
-        // trace
-        tb_trace_d("recvv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.recvv.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("recvv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.recvv.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.recvv.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.recvv.result;
+        }
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.recvv.list == list, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("recvv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("recvv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("recvv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -429,21 +587,43 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     tb_assert_and_check_return_val(object && list && size, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_SENDV && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_SENDV)
     {
-        // trace
-        tb_trace_d("sendv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.sendv.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("sendv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.sendv.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.sendv.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.sendv.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.sendv.list == list, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("sendv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("sendv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("sendv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -461,22 +641,47 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     tb_assert_and_check_return_val(object && list && size, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_URECVV && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_URECVV)
     {
-        // trace
-        tb_trace_d("urecvv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.urecvv.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("urecvv(%p): state: %s, result: %ld", object->sock, tb_state_cstr(object->state), object->u.urecvv.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        if (addr) tb_ipaddr_copy(addr, &object->u.urecvv.addr);
-        return object->u.urecvv.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            if (addr) tb_ipaddr_copy(addr, &object->u.urecvv.addr);
+            return object->u.urecvv.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING)
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.urecvv.list == list, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("urecvv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
+
+                // save address
+                if (addr && object->buffer) tb_sockaddr_save(addr, (struct sockaddr_storage*)object->buffer);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("urecvv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("urecvv(%p, %lu): %s ..", object->sock, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -494,21 +699,43 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     tb_assert_and_check_return_val(object && addr && list, -1);
 
     // attempt to get the result if be finished
-    if (object->code == TB_IOCP_OBJECT_CODE_USENDV && object->state == TB_STATE_FINISHED)
+    if (object->code == TB_IOCP_OBJECT_CODE_USENDV)
     {
-        // trace
-        tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.usendv.result);
+        if (object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.usendv.result);
 
-        // clear the previous object data first, but the result cannot be cleared
-        tb_iocp_object_clear(object);
-        return object->u.usendv.result;
+            // clear the previous object data first, but the result cannot be cleared
+            tb_iocp_object_clear(object);
+            return object->u.usendv.result;
+        }
+        // waiting timeout before?
+        else if (object->state == TB_STATE_WAITING && tb_ipaddr_is_equal(&object->u.usendv.addr, addr))
+        {
+            // check
+            tb_assert_and_check_return_val(object->u.usendv.list == list, -1);
+
+            // io completed?
+            DWORD bytes = 0;
+            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
+            {
+                // trace
+                tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %d", object->sock, addr, tb_state_cstr(object->state), bytes);
+
+                // clear the previous object data
+                tb_iocp_object_clear(object);
+                return (tb_long_t)bytes;
+            }
+
+            // trace
+            tb_trace_d("usendv(%p, %{ipaddr}): state: %s, continue ..", object->sock, addr, tb_state_cstr(object->state));
+            return 0;
+        }
     }
 
     // trace
     tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
-
-    // waiting? cancel the previous io first
-    if (object->state == TB_STATE_WAITING && !tb_iocp_object_cancel(object)) return -1;
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);

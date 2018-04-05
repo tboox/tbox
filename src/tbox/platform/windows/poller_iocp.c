@@ -935,7 +935,7 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     tb_size_t error = (tb_size_t)GetLastError();
 
     // timeout or spark?
-    if ((!wait_ok && error == WAIT_TIMEOUT) || (object == tb_u2p(1))) return 0;
+    if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || (object == tb_u2p(1))) return 0;
 
     // iocp port is killed?
     tb_check_return_val(object, -1);
