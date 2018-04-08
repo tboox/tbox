@@ -269,6 +269,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
             // check
             tb_assert_and_check_return_val(object->u.recv.data == data, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -280,6 +281,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("recv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -323,6 +325,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
             // check
             tb_assert_and_check_return_val(object->u.send.data == data, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -334,6 +337,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("send(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -379,6 +383,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
             // check
             tb_assert_and_check_return_val(object->u.urecv.data == data, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -393,6 +398,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("urecv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -436,6 +442,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
             // check
             tb_assert_and_check_return_val(object->u.usend.data == data, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -447,6 +454,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("usend(%p, %{ipaddr}): state: %s, continue ..", object->sock, addr, tb_state_cstr(object->state));
@@ -495,6 +503,7 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
             tb_assert_and_check_return_val(object->u.sendf.file == file, -1);
             tb_assert_and_check_return_val(object->u.sendf.offset == offset, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -506,6 +515,7 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("sendfile(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -550,6 +560,7 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
             // check
             tb_assert_and_check_return_val(object->u.recvv.list == list, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -561,6 +572,7 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("recvv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -604,6 +616,7 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
             // check
             tb_assert_and_check_return_val(object->u.sendv.list == list, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -615,6 +628,7 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("sendv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -659,6 +673,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
             // check
             tb_assert_and_check_return_val(object->u.urecvv.list == list, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -673,6 +688,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("urecvv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -716,6 +732,7 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
             // check
             tb_assert_and_check_return_val(object->u.usendv.list == list, -1);
 
+#if 0
             // io completed?
             DWORD bytes = 0;
             if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
@@ -727,6 +744,7 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
                 tb_iocp_object_clear(object);
                 return (tb_long_t)bytes;
             }
+#endif
 
             // trace
             tb_trace_d("usendv(%p, %{ipaddr}): state: %s, continue ..", object->sock, addr, tb_state_cstr(object->state));

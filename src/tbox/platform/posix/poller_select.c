@@ -122,7 +122,7 @@ static tb_void_t tb_poller_list_set(tb_poller_select_ref_t poller, tb_socket_ref
         else
         {
             // insert the private data
-            if (i < n) tb_memmov(poller->list + i + 1, poller->list + i, (n - i) * sizeof(tb_poller_data_t));
+            if (i < n) tb_memmov_(poller->list + i + 1, poller->list + i, (n - i) * sizeof(tb_poller_data_t));
             poller->list[i].sock = sock;
             poller->list[i].priv = priv;
 
@@ -143,7 +143,7 @@ static tb_void_t tb_poller_list_del(tb_poller_select_ref_t poller, tb_socket_ref
         tb_size_t i = 0;
         tb_size_t n = poller->list_size;
         for (i = 0; i < n; i++) if (sock == poller->list[i].sock) break;
-        if (i + 1 < n) tb_memmov(poller->list + i, poller->list + i + 1, (n - i - 1) * sizeof(tb_poller_data_t));
+        if (i + 1 < n) tb_memmov_(poller->list + i, poller->list + i + 1, (n - i - 1) * sizeof(tb_poller_data_t));
 
         // update the list size
         poller->list_size--;
