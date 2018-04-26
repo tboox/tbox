@@ -103,9 +103,6 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
     stream_sock->read = 0;
     stream_sock->writ = 0;
 
-    // opened?
-    tb_check_return_val(!stream_sock->sock, tb_true);
-
     // the url
     tb_url_ref_t url = tb_stream_url(stream);
     tb_assert_and_check_return_val(url, tb_false);
@@ -153,7 +150,7 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
     else if (args && !tb_strnicmp(args, "tcp=", 4)) stream_sock->type = TB_SOCKET_TYPE_TCP;
 
     // make sock
-    stream_sock->sock = tb_socket_init(stream_sock->type, tb_ipaddr_family(addr));
+    if (!stream_sock->sock) stream_sock->sock = tb_socket_init(stream_sock->type, tb_ipaddr_family(addr));
     
     // open sock failed?
     if (!stream_sock->sock)
@@ -173,7 +170,7 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
     case TB_SOCKET_TYPE_TCP:
         {
             // trace
-            tb_trace_d("connect: %s[%{ipaddr}]: ..", tb_url_host(url), addr);
+            tb_trace_d("sock(%p): connect: %s[%{ipaddr}]: ..", stream_sock->sock, tb_url_host(url), addr);
 
             // connect it
             tb_long_t real = -1;
@@ -194,7 +191,7 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
             else tb_stream_state_set(stream, !real? TB_STATE_SOCK_CONNECT_TIMEOUT : TB_STATE_SOCK_CONNECT_FAILED);
 
             // trace
-            tb_trace_d("connect: %s", ok? "ok" : "no");
+            tb_trace_d("sock(%p): connect: %s", stream_sock->sock, ok? "ok" : "failed");
             
             // ok?
             if (ok)
@@ -226,7 +223,7 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
                     } while (0);
 
                     // trace
-                    tb_trace_d("ssl: %s", ok? "ok" : "no");
+                    tb_trace_d("sock(%p): ssl: %s", stream_sock->sock, ok? "ok" : "no");
             
                     // failed? save state
                     if (!ok) tb_stream_state_set(stream, stream_sock->hssl? tb_ssl_state(stream_sock->hssl) : TB_STATE_SOCK_SSL_FAILED);
@@ -358,7 +355,7 @@ static tb_long_t tb_stream_sock_read(tb_stream_ref_t stream, tb_byte_t* data, tb
                 real = tb_ssl_read(stream_sock->hssl, data, size);
 
                 // trace
-                tb_trace_d("read: %ld <? %lu", real, size);
+                tb_trace_d("sock(%p): read: %ld <? %lu", stream_sock->sock, real, size);
 
                 // failed or closed?
                 tb_check_return_val(real >= 0, -1);
@@ -370,7 +367,7 @@ static tb_long_t tb_stream_sock_read(tb_stream_ref_t stream, tb_byte_t* data, tb
                 real = tb_socket_recv(stream_sock->sock, data, size);
 
                 // trace
-                tb_trace_d("read: %ld <? %lu", real, size);
+                tb_trace_d("sock(%p): read: %ld <? %lu", stream_sock->sock, real, size);
 
                 // failed or closed?
                 tb_check_return_val(real >= 0, -1);
@@ -389,7 +386,7 @@ static tb_long_t tb_stream_sock_read(tb_stream_ref_t stream, tb_byte_t* data, tb
             real = tb_socket_urecv(stream_sock->sock, tb_null, data, size);
 
             // trace
-            tb_trace_d("read: %ld <? %lu", real, size);
+            tb_trace_d("sock(%p): read: %ld <? %lu", stream_sock->sock, real, size);
 
             // failed or closed?
             tb_check_return_val(real >= 0, -1);
@@ -445,7 +442,7 @@ static tb_long_t tb_stream_sock_writ(tb_stream_ref_t stream, tb_byte_t const* da
                 real = tb_ssl_writ(stream_sock->hssl, data, size);
 
                 // trace
-                tb_trace_d("writ: %ld <? %lu", real, size);
+                tb_trace_d("sock(%p): writ: %ld <? %lu", stream_sock->sock, real, size);
 
                 // failed or closed?
                 tb_check_return_val(real >= 0, -1);
@@ -457,7 +454,7 @@ static tb_long_t tb_stream_sock_writ(tb_stream_ref_t stream, tb_byte_t const* da
                 real = tb_socket_send(stream_sock->sock, data, size);
 
                 // trace
-                tb_trace_d("writ: %ld <? %lu", real, size);
+                tb_trace_d("sock(%p): writ: %ld <? %lu", stream_sock->sock, real, size);
 
                 // failed or closed?
                 tb_check_return_val(real >= 0, -1);
@@ -480,7 +477,7 @@ static tb_long_t tb_stream_sock_writ(tb_stream_ref_t stream, tb_byte_t const* da
             real = tb_socket_usend(stream_sock->sock, addr, data, size);
 
             // trace
-            tb_trace_d("writ: %ld <? %lu", real, size);
+            tb_trace_d("sock(%p): writ: %ld <? %lu", stream_sock->sock, real, size);
 
             // failed or closed?
             tb_check_return_val(real >= 0, -1);
@@ -534,7 +531,7 @@ static tb_long_t tb_stream_sock_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
     }
 
     // trace
-    tb_trace_d("wait: %ld", stream_sock->wait);
+    tb_trace_d("sock(%p): wait: %ld", stream_sock->sock, stream_sock->wait);
 
     // ok?
     return stream_sock->wait;
