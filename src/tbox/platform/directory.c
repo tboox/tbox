@@ -66,7 +66,7 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     tb_trace_noimpl();
     return 0;
 }
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
+tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
     tb_trace_noimpl();
 }

@@ -6,7 +6,7 @@
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
  * callback
  */ 
-#if 0
+#if 1
 static tb_bool_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
     // check
@@ -38,7 +38,7 @@ static tb_bool_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
  */ 
 tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
 {
-#if 1
+#if 0
     // home
     tb_char_t home[TB_PATH_MAXN] = {0};
     if (tb_directory_home(home, sizeof(home))) tb_trace_i("home: %s", home);
@@ -57,7 +57,7 @@ tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
     if (tb_directory_current(current, sizeof(current))) tb_trace_i("current: %s", current);
 
     // current
-    tb_directory_walk(argv[1]? argv[1] : current, tb_true, tb_true, tb_directory_walk_func, tb_null);
+    tb_directory_walk(argv[1]? argv[1] : current, -1, tb_true, tb_directory_walk_func, tb_null);
 #elif 0
     tb_directory_remove(argv[1]);
 #elif 0
@@ -65,7 +65,7 @@ tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
 #elif 0
     tb_directory_create(argv[1]);
 #else
-    tb_directory_walk(argv[1], tb_false, tb_true, tb_directory_walk_func, tb_null);
+    tb_directory_walk(argv[1], 1, tb_true, tb_directory_walk_func, tb_null);
 #endif
 
     return 0;
