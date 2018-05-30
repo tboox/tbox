@@ -40,11 +40,14 @@
 #       define TB_WORDS_BIGENDIAN
 #   endif
 #endif
+#if defined(MIPSEB) || defined(_MIPSEB) || defined(__MIPSEB__)
+#   define TB_WORDS_BIGENDIAN
+#endif
 
 // float endian
 #ifdef __FLOAT_WORD_ORDER__
 #   if __FLOAT_WORD_ORDER__ != __ORDER_LITTLE_ENDIAN__
-#   define TB_FLOAT_BIGENDIAN
+#       define TB_FLOAT_BIGENDIAN
 #   endif
 #endif
 
