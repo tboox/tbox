@@ -38,7 +38,6 @@
 #ifdef __BYTE_ORDER__
 #   if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
 #       define TB_WORDS_BIGENDIAN
-#       error check it
 #   endif
 #endif
 
@@ -46,7 +45,6 @@
 #ifdef __FLOAT_WORD_ORDER__
 #   if __FLOAT_WORD_ORDER__ != __ORDER_LITTLE_ENDIAN__
 #   define TB_FLOAT_BIGENDIAN
-#       error check it
 #   endif
 #endif
 
