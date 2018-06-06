@@ -29,9 +29,7 @@
 #include <sys/epoll.h>
 #include <fcntl.h>
 #include <errno.h>
-#ifndef TB_CONFIG_OS_ANDROID
-#   include <sys/unistd.h>
-#endif
+#include <unistd.h>
 #ifdef TB_CONFIG_POSIX_HAVE_GETRLIMIT
 #   include <sys/resource.h>
 #endif
