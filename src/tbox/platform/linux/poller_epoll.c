@@ -31,6 +31,9 @@
 #include <errno.h>
 #ifndef TB_CONFIG_OS_ANDROID
 #   include <sys/unistd.h>
+#else
+#	include <unistd.h>
+#	include <sys/sysconf.h>	
 #endif
 #ifdef TB_CONFIG_POSIX_HAVE_GETRLIMIT
 #   include <sys/resource.h>
