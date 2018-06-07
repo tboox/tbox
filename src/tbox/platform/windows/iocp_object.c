@@ -79,7 +79,7 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object)
     tb_trace_d("sock(%p): cancel io ..", object->sock);
 
     // cancel io
-    if (!CancelIo((HANDLE)tb_sock2fd(object->sock)))
+    if (!CancelIo((HANDLE)(tb_size_t)tb_sock2fd(object->sock)))
     {
         // trace
         tb_trace_e("sock(%p): cancel io failed(%d)!", object->sock, GetLastError());
