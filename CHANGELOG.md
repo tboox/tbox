@@ -16,6 +16,7 @@
 * Fix coroutine.sleep bug
 * Fix windows root path bug 
 * Fix thread local memory leak
+* Fix context bug for coroutine
 
 ## v1.6.2
 
@@ -168,6 +169,7 @@
 * 修复协程sleep超时覆写数据的bug
 * 修复windows根路径问题
 * 修复tls线程存储内存泄露问题
+* 修复context切换问题
 
 ## v1.6.2
 
