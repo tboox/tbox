@@ -240,7 +240,7 @@ __entry:
     ; patch return address: __end
     push ebp
 
-    ; jump to the return or function address(eip)
+    ; jump to the context function entry(eip)
     ;
     ;
     ;                           old-context
