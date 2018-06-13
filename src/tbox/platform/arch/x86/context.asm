@@ -117,11 +117,6 @@ _exit proto, value:sdword
 
 ; make context (refer to boost.context)
 ;
-; optimzation (jump context faster 30% than boost.context): 
-;    - adjust context stack layout (patch end behind eip)
-;    - remove trampoline and jump to context function directly
-;  
-; 
 ;             -----------------------------------------------------------------------------------------
 ; stackdata: |                                                          |         context        |||||||
 ;             -----------------------------------------------------------------------------------|-----
@@ -134,13 +129,13 @@ _exit proto, value:sdword
 ;            0         4         8         12        16                                      | seh chain for context function
 ;                                                                                            |
 ;                                                                                            |
-;                                                        func        arguments(from)        \|/
+;                                    func     __end    __entry        arguments(from)       \|/
 ;             -----------------------------------------------------------------------------------------------------------------------------------------
 ;            |   edi   |   esi   |   ebx   |   ebp   |   eip   | context |  priv  |  unused  | seh.prev (0xffffffff) | seh.handler | padding |
 ;             -----------------------------------------------------------------------------------------------------------------------------------------
 ;            20        24        28        32        36        40        44       48         52                     56             60                   
-;                                                              |         |
-;                                                              |      16-align
+;                                                              |         
+;                                                              | 16-align
 ;                                                              |
 ;                                                   esp when jump to function
 ;
@@ -165,7 +160,7 @@ tb_context_make proc
     and eax, -16
 
     ; reserve space for context-data on context-stack
-    lea eax, [eax - 44]
+    lea eax, [eax - 40]
 
     ; save top address of context stack as 'base'
     mov [eax + 12], ecx
