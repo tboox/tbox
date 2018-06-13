@@ -129,16 +129,16 @@ _exit proto, value:sdword
 ;
 ;
 ;             -------------------------------------------------
-; context:   |  fiber  | dealloc |  limit  |  base   |   seh   | ------------------------------------------ 
-;             -------------------------------------------------                                            |
-;            0         4         8         12        16                                                    | seh chain for context function
-;                                                                                                          |
-;                                                                                                          |
-;                                                        func     __end     arguments(from)               \|/
+; context:   |  fiber  | dealloc |  limit  |  base   |   seh   | ---------------------------- 
+;             -------------------------------------------------                              |
+;            0         4         8         12        16                                      | seh chain for context function
+;                                                                                            |
+;                                                                                            |
+;                                                        func        arguments(from)        \|/
 ;             -----------------------------------------------------------------------------------------------------------------------------------------
-;            |   edi   |   esi   |   ebx   |   ebp   |   eip   |   end   | context |  priv  |  unused  | seh.prev (0xffffffff) | seh.handler | padding |
+;            |   edi   |   esi   |   ebx   |   ebp   |   eip   | context |  priv  |  unused  | seh.prev (0xffffffff) | seh.handler | padding |
 ;             -----------------------------------------------------------------------------------------------------------------------------------------
-;            20        24        28        32        36        40        44        48       52         56                      60                   
+;            20        24        28        32        36        40        44       48         52                     56             60                   
 ;                                                              |         |
 ;                                                              |      16-align
 ;                                                              |
@@ -177,13 +177,21 @@ tb_context_make proc
     ; save bottom address of context-stack as 'dealloction stack'
     mov [eax + 4], ecx
 
-    ; context.eip = func
+    ; set fiber-storage as zero
+    xor ecx, ecx
+    mov [eax], ecx
+
+    ; context.ebx = func
     mov ecx, [esp + 12]
+    mov [eax + 28], ecx
+
+    ; context.eip = __entry
+    mov ecx, __entry
     mov [eax + 36], ecx
 
-    ; context.end = the address of label __end
+    ; context.ebp = the address of label __end
     mov ecx, __end
-    mov [eax + 40], ecx
+    mov [eax + 32], ecx
 
     ; install seh chain when enter into the context function
     ;
@@ -227,6 +235,29 @@ __found:
 
     ; return pointer to context-data
     ret 
+
+__entry:
+
+    ; pass old-context(context: eax, priv: edx) arguments to the context function
+    mov  [esp], eax
+    mov  [esp + 4], edx
+
+    ; patch return address: __end
+    push ebp
+
+    ; jump to the return or function address(eip)
+    ;
+    ;
+    ;                           old-context
+    ;              ------------------------------------------
+    ; context: .. |   end   | context |   priv   |    ...    |
+    ;              ------------------------------------------
+    ;             0         4    arguments 
+    ;             |         |
+    ;            esp     16-align 
+    ;           (now)
+    ;;
+    jmp ebx
 
 __end:
 
@@ -329,20 +360,16 @@ tb_context_jump proc
     ; 
     mov edx, [eax + 44]
 
-    ; pass old-context(context: eax, priv: edx) arguments to the context function
-    mov [esp + 4], eax
-    mov [esp + 8], edx
-
     ; jump to the return or function address(eip)
     ;
     ;
-    ;                           old-context
-    ;              ------------------------------------------
-    ; context: .. |   end   | context |   priv   |    ...    |
-    ;              ------------------------------------------
-    ;             0         4    arguments 
-    ;             |         |
-    ;            esp     16-align 
+    ;              old-context
+    ;              --------------------------------
+    ; context: .. | context |   priv   |    ...    |
+    ;              --------------------------------
+    ;             0     arguments 
+    ;             |         
+    ;            esp 
     ;           (now)
     ;;
     jmp ecx
