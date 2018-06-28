@@ -197,6 +197,11 @@ tb_bool_t tb_co_scheduler_yield(tb_co_scheduler_t* scheduler)
     // trace
     tb_trace_d("yield coroutine(%p)", scheduler->running);
 
+#ifdef __tb_debug__
+    // check it
+    tb_coroutine_check(scheduler->running);
+#endif
+
     // get the next ready coroutine
     tb_coroutine_t* coroutine_next = tb_co_scheduler_next_ready(scheduler);
     if (coroutine_next != scheduler->running)
@@ -255,6 +260,11 @@ tb_pointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t
     // trace
     tb_trace_d("suspend coroutine(%p)", scheduler->running);
 
+#ifdef __tb_debug__
+    // check it
+    tb_coroutine_check(scheduler->running);
+#endif
+
     // pass the private data to resume() first
     scheduler->running->rs_priv = priv;
 
@@ -290,6 +300,11 @@ tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
 
     // trace
     tb_trace_d("finish coroutine(%p)", scheduler->running);
+
+#ifdef __tb_debug__
+    // check it
+    tb_coroutine_check(scheduler->running);
+#endif
 
     // get the next ready coroutine first
     tb_coroutine_t* coroutine_next = tb_co_scheduler_next_ready(scheduler);

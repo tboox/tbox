@@ -234,7 +234,7 @@ tb_void_t tb_coroutine_exit(tb_coroutine_t* coroutine)
 tb_void_t tb_coroutine_check(tb_coroutine_t* coroutine)
 {
     // check
-    tb_assert(coroutine && coroutine->context);
+    tb_assert(coroutine);
 
     // this coroutine is original for scheduler?
     tb_check_return(!tb_coroutine_is_original(coroutine));
@@ -264,6 +264,9 @@ tb_void_t tb_coroutine_check(tb_coroutine_t* coroutine)
         // abort
         tb_abort();
     }
+
+    // check
+    tb_assert(coroutine->context);
 }
 #endif
 
