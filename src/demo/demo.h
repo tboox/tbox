@@ -201,6 +201,7 @@ TB_DEMO_MAIN_DECL(coroutine_lock);
 TB_DEMO_MAIN_DECL(coroutine_ping);
 TB_DEMO_MAIN_DECL(coroutine_sleep);
 TB_DEMO_MAIN_DECL(coroutine_spider);
+TB_DEMO_MAIN_DECL(coroutine_stream);
 TB_DEMO_MAIN_DECL(coroutine_switch);
 TB_DEMO_MAIN_DECL(coroutine_channel);
 TB_DEMO_MAIN_DECL(coroutine_semaphore);
