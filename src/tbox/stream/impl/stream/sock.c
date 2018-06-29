@@ -27,7 +27,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "stream_sock"
-#define TB_TRACE_MODULE_DEBUG           (1)
+#define TB_TRACE_MODULE_DEBUG           (0)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -225,7 +225,7 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
                     // trace
                     tb_trace_d("sock(%p): ssl: %s", stream_sock->sock, ok? "ok" : "no");
             
-                    // failed? save state
+                    // ssl failed? save state 
                     if (!ok) tb_stream_state_set(stream, stream_sock->hssl? tb_ssl_state(stream_sock->hssl) : TB_STATE_SOCK_SSL_FAILED);
 #endif
                 }
@@ -257,6 +257,20 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
             tb_trace_e("unknown socket type: %lu", stream_sock->type);
         }
         break;
+    }
+
+    // open failed? close ssl and socket
+    if (!ok)
+    {
+#ifdef TB_SSL_ENABLE
+        // exit ssl
+        if (stream_sock->hssl) tb_ssl_exit(stream_sock->hssl);
+        stream_sock->hssl = tb_null;
+#endif
+
+        // exit sock
+        if (stream_sock->sock) tb_socket_exit(stream_sock->sock);
+        stream_sock->sock = tb_null;
     }
 
     // ok?

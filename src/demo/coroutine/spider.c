@@ -175,7 +175,7 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_ref_t spider, tb_char_t
 
 	// format ourl
 	tb_long_t n = tb_snprintf(data, maxn, "%s/%s", spider->rootdir, p);
-    tb_assert_and_check_return_val(n > 0 && n < maxn, tb_false);
+    tb_check_return_val(n > 0 && n < maxn, tb_false);
 
     // no root? append '/'
     if (!tb_strchr(p, '/') && !tb_strchr(p, '\\')) data[n++] = '/';
