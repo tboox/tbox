@@ -517,7 +517,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
             }
 
             // trace
-//          tb_trace_d("<%s>", element);
+            tb_trace_d("<%s>", element);
         }
         // is text: <> text </>
         else if (*pc)
@@ -528,7 +528,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                 impl->event = TB_XML_READER_EVENT_TEXT;
 
             // trace
-//          tb_trace_d("%s", text);
+            tb_trace_d("%s", text);
         }
         else 
         {

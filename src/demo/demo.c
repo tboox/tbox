@@ -214,9 +214,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(coroutine_file_server)
 ,   TB_DEMO_MAIN_ITEM(coroutine_file_client)
 ,   TB_DEMO_MAIN_ITEM(coroutine_http_server)
-#   ifdef TB_CONFIG_MODULE_HAVE_XML
 ,   TB_DEMO_MAIN_ITEM(coroutine_spider)
-#   endif
 
     // stackless coroutine
 ,   TB_DEMO_MAIN_ITEM(lo_coroutine_nest)

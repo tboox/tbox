@@ -63,8 +63,20 @@ typedef struct __tb_demo_spider_parser_t
     // the stream
     tb_stream_ref_t         stream;
 
-    // the reader
-    tb_xml_reader_ref_t     reader;
+    // the data
+    tb_byte_t*              data;
+
+    // the data size
+    tb_size_t               size;
+
+    // the data maxn
+    tb_size_t               maxn;
+
+    // the data offset
+    tb_size_t               offset;
+
+    // the path buffer
+    tb_char_t               path[TB_PATH_MAXN];
 
     // the url
     tb_url_t                url;
@@ -248,7 +260,7 @@ static tb_bool_t tb_demo_spider_parser_open(tb_demo_spider_parser_ref_t parser, 
 
         // the stream size
         tb_hong_t size = tb_stream_size(parser->stream);
-        tb_check_break(size);
+        tb_check_break(size && size < 1024 * 1024);
 
         // prefetch some data
         tb_byte_t*  data = tb_null;
@@ -262,12 +274,27 @@ static tb_bool_t tb_demo_spider_parser_open(tb_demo_spider_parser_ref_t parser, 
             // set iurl
             if (!tb_url_cstr_set(&parser->url, iurl)) break;
 
-            // open reader
-            if (!tb_xml_reader_open(parser->reader, parser->stream, tb_false)) break;
+            // init data
+            if (!parser->data) 
+            {
+                parser->maxn = (tb_size_t)size + 1;
+                parser->data = tb_malloc_bytes(parser->maxn);
+            }
+            else if (size + 1 > parser->maxn) 
+            {
+                parser->maxn = size + 1;
+                parser->data = tb_ralloc_bytes(parser->data, parser->maxn);
+            }
 
-            // ok
-            ok = tb_true;
-            break;
+            // read data
+            if (parser->data && tb_stream_bread(parser->stream, parser->data, (tb_size_t)size))
+            {
+                // save data
+                parser->size = (tb_size_t)size;
+                parser->offset = 0;
+                parser->data[size] = '\0';
+                ok = tb_true;
+            }
         }
 
     } while (0);
@@ -283,8 +310,9 @@ static tb_void_t tb_demo_spider_parser_clos(tb_demo_spider_parser_ref_t parser)
     // check
     tb_assert_and_check_return(parser);
 
-    // close reader
-    if (parser->reader) tb_xml_reader_clos(parser->reader);
+    // reset data
+    parser->size = 0;
+    parser->offset = 0;
 
     // close stream
     if (parser->stream) tb_stream_clos(parser->stream);
@@ -292,70 +320,57 @@ static tb_void_t tb_demo_spider_parser_clos(tb_demo_spider_parser_ref_t parser)
 static tb_char_t const* tb_demo_spider_parser_read(tb_demo_spider_parser_ref_t parser)
 {
     // check
-    tb_assert_and_check_return_val(parser && parser->reader, tb_null);
+    tb_assert_and_check_return_val(parser && parser->data && parser->size, tb_null);
 
-    // done
-    tb_bool_t           ok = tb_false;
-    tb_size_t           event = TB_XML_READER_EVENT_NONE;
-    tb_xml_reader_ref_t reader = parser->reader;
-    while (!ok && (event = tb_xml_reader_next(reader)))
+    // end?
+    tb_check_return_val(parser->offset + 16 < parser->size, tb_null);
+
+    /* read the next url
+     *
+     * <a href="" />? 
+     * <link href="" /> 
+     * <img src="" />? 
+     * <script src="" />? 
+     * <source src="" />? 
+     * <frame src="" />? 
+     */
+    tb_bool_t ok = tb_false;
+    while (!ok && parser->offset + 16 < parser->size)
     {
-        switch (event)
+        tb_char_t const* b = (tb_char_t const*)parser->data + parser->offset;
+        tb_size_t        n = parser->size - parser->offset;
+        tb_char_t const* p = tb_strnistr(b, n, " href=");
+        if (!p) p = tb_strnistr(b, n, " src=");
+        if (p)
         {
-        case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
-        case TB_XML_READER_EVENT_ELEMENT_BEG: 
+            // seek to "url"
+            while (p < b + n && *p && *p != '\"') p++;
+            p++;
+
+            // get url
+            tb_char_t const* e = p;
+            while (e < b + n && *e && *e != '\"') e++;
+            if (p < e && e - p < sizeof(parser->path)) 
             {
-                // the element name
-                tb_char_t const* name = tb_xml_reader_element(reader);
-                tb_check_break(name);
+                // save path
+                tb_strncpy(parser->path, p, e - p);
+                parser->path[e - p] = '\0';
 
-                // <a href="" />? 
-                // <link href="" /> 
-                // <img src="" />? 
-                // <script src="" />? 
-                // <source src="" />? 
-                // <frame src="" />? 
-                if (    !tb_stricmp(name, "a")
-                    ||  !tb_stricmp(name, "link")
-                    ||  !tb_stricmp(name, "img")
-                    ||  !tb_stricmp(name, "frame")
-                    ||  !tb_stricmp(name, "source"))
+                // http?
+                tb_size_t protocol = tb_url_protocol_probe(parser->path);
+                if (protocol == TB_URL_PROTOCOL_HTTP)
+                    ok = tb_url_cstr_set(&parser->url, parser->path);
+                else if (protocol == TB_URL_PROTOCOL_FILE)
                 {
-                    // walk attributes
-                    tb_xml_node_ref_t attr = (tb_xml_node_ref_t)tb_xml_reader_attributes(reader); 
-                    for (; attr; attr = attr->next)
-                    {
-                        // href or src?
-                        if (    tb_string_size(&attr->data)
-                            &&  (   !tb_string_cstricmp(&attr->name, "href")
-                                ||  !tb_string_cstricmp(&attr->name, "src")))
-                        {
-                            // the url protocol
-                            tb_size_t protocol = tb_url_protocol_probe(tb_string_cstr(&attr->data));
-
-                            // http?
-                            if (protocol == TB_URL_PROTOCOL_HTTP)
-                            {
-                                // save url
-                                ok = tb_url_cstr_set(&parser->url, tb_string_cstr(&attr->data));
-                            }
-                            // file?
-                            else if (protocol == TB_URL_PROTOCOL_FILE)
-                            {
-                                // save path
-                                tb_url_path_set(&parser->url, tb_string_cstr(&attr->data));
-
-                                // ok
-                                ok = tb_true;
-                            }
-                        }
-                    }
+                    tb_url_path_set(&parser->url, parser->path);
+                    ok = tb_true;
                 }
             }
-            break;
-        default:
-            break;
+
+            // update offset
+            parser->offset = e - (tb_char_t const*)parser->data + 1;
         }
+        else break;
     }
 
     // ok?
@@ -373,9 +388,11 @@ static tb_void_t tb_demo_spider_parser_exit(tb_demo_spider_parser_ref_t parser)
     if (parser->stream) tb_stream_exit(parser->stream);
     parser->stream = tb_null;
 
-    // exit reader
-    if (parser->reader) tb_xml_reader_exit(parser->reader);
-    parser->reader = tb_null;
+    // exit data
+    if (parser->data) tb_free(parser->data);
+    parser->data = tb_null;
+    parser->size = 0;
+    parser->maxn = 0;
 
     // exit it
     tb_free(parser);
@@ -394,10 +411,6 @@ static tb_demo_spider_parser_ref_t tb_demo_spider_parser_init()
         // init stream
         parser->stream = tb_stream_init_file();
         tb_assert_and_check_break(parser->stream);
-
-        // init reader
-        parser->reader = tb_xml_reader_init();
-        tb_assert_and_check_break(parser->reader);
 
         // init url
         if (!tb_url_init(&parser->url)) break;
