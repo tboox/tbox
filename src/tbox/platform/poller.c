@@ -39,7 +39,7 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) && !defined(TB_CONFIG_MICRO_ENABLE)
+#   if 0//defined(TB_CONFIG_MODULE_HAVE_COROUTINE) && !defined(TB_CONFIG_MICRO_ENABLE)
 #       include "windows/poller_iocp.c"
 #   else
 #       include "posix/poller_select.c"

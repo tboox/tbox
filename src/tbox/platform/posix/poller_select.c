@@ -143,10 +143,13 @@ static tb_void_t tb_poller_list_del(tb_poller_select_ref_t poller, tb_socket_ref
         tb_size_t i = 0;
         tb_size_t n = poller->list_size;
         for (i = 0; i < n; i++) if (sock == poller->list[i].sock) break;
-        if (i + 1 < n) tb_memmov_(poller->list + i, poller->list + i + 1, (n - i - 1) * sizeof(tb_poller_data_t));
 
-        // update the list size
-        poller->list_size--;
+        // found and remove it
+        if (i < n)
+        {
+            if (i + 1 < n) tb_memmov_(poller->list + i, poller->list + i + 1, (n - i - 1) * sizeof(tb_poller_data_t));
+            poller->list_size--;
+        }
     }
 }
 
