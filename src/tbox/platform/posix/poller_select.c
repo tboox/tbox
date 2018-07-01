@@ -302,7 +302,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_poller_list_del(poller, sock);
 
     // update socket count
-    poller->count--;
+    if (poller->count > 0) poller->count--;
 
     // ok
     return tb_true;
