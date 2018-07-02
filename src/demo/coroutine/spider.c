@@ -282,7 +282,7 @@ static tb_bool_t tb_demo_spider_parser_open(tb_demo_spider_parser_ref_t parser, 
             }
             else if (size + 1 > parser->maxn) 
             {
-                parser->maxn = size + 1;
+                parser->maxn = (tb_size_t)size + 1;
                 parser->data = tb_ralloc_bytes(parser->data, parser->maxn);
             }
 
