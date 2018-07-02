@@ -469,6 +469,9 @@ tb_bool_t tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_so
             return tb_false;
         }
 
+        // clear waited socket
+        coroutine->rs.wait.sock = tb_null;
+
         // remove ok
         return tb_true;
     }
