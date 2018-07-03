@@ -122,7 +122,7 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         }
 
         // resume the coroutine and pass the events to suspend()
-        tb_co_scheduler_io_resume(scheduler, coroutine, (tb_cpointer_t)events);
+        tb_co_scheduler_io_resume(scheduler, coroutine, (tb_cpointer_t)((events & TB_POLLER_EVENT_ERROR)? -1 : events));
     }
     // cache this events
     else coroutine->rs.wait.events_cache = events;
@@ -361,6 +361,13 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
         tb_size_t events_cache  = coroutine->rs.wait.events_cache;
         if (events_cache && (events_prev & events))
         {
+            // check error?
+            if (events_cache & TB_POLLER_EVENT_ERROR)
+            {
+                coroutine->rs.wait.events_cache = 0;
+                return -1;
+            }
+
             // clear cache events
             coroutine->rs.wait.events_cache &= ~events;
 

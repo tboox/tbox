@@ -31,6 +31,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
     tb_trace_i("pull[%lu]: %s ..", args[1].ul, args[0].cstr);
 
     // done
+    tb_hize_t       read = 0;
     tb_stream_ref_t stream = tb_null;
     do
     {
@@ -43,7 +44,6 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
 
         // read data
         tb_byte_t data[TB_STREAM_BLOCK_MAXN];
-        tb_hize_t read = 0;
         tb_hize_t left = tb_stream_left(stream);
         do
         {
@@ -76,7 +76,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
     stream = tb_null;
 
     // trace
-    tb_trace_i("pull[%lu]: %s ok", args[1].ul, args[0].cstr);
+    tb_trace_i("pull[%lu]: %s %ld bytes", args[1].ul, args[0].cstr, read);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

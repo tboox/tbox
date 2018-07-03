@@ -73,6 +73,9 @@ typedef enum __tb_poller_event_e
      */
 ,   TB_POLLER_EVENT_EOF         = 0x0100
 
+    /// socket error after waiting
+,   TB_POLLER_EVENT_ERROR       = 0x0200
+
 }tb_poller_event_e;
 
 /// the poller ref type
