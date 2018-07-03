@@ -29,6 +29,7 @@
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "../windows/interface/interface.h"
 #else
+#   include <sys/socket.h>
 #   include <sys/select.h>
 #endif
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \

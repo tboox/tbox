@@ -49,8 +49,7 @@
 #   include "linux/poller_epoll.c"
 #elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/poller_kqueue.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_POLL) \
-    && !defined(TB_CONFIG_MICRO_ENABLE) /* TODO remove vector for supporting the micro mode */
+#elif defined(TB_CONFIG_POSIX_HAVE_POLL) && !defined(TB_CONFIG_MICRO_ENABLE) /* TODO remove vector for supporting the micro mode */
 #   include "posix/poller_poll.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
 #   include "posix/poller_select.c"

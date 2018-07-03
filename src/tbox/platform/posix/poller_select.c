@@ -31,6 +31,7 @@
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "../windows/interface/interface.h"
 #else
+#   include <sys/socket.h>
 #   include <sys/select.h>
 #endif
 
@@ -406,12 +407,13 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
             if (FD_ISSET(fd, &poller->wfdc)) events |= TB_POLLER_EVENT_SEND;
 
             // check socket error?
-            tb_int_t error = 0;
 #ifdef TB_CONFIG_OS_WINDOWS
+            tb_int_t error = 0;
             tb_int_t n = sizeof(tb_int_t);
             if (!tb_ws2_32()->getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&error, &n) && error)
                 events |= TB_POLLER_EVENT_ERROR;
 #else
+            tb_int_t error = 0;
             socklen_t n = sizeof(socklen_t);
             if (!getsockopt(fd, SOL_SOCKET, SO_ERROR, (tb_char_t*)&error, &n) && error)
                 events |= TB_POLLER_EVENT_ERROR;

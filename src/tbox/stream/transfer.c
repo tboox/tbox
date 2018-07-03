@@ -124,10 +124,7 @@ tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_
         {
             // wait
             tb_long_t wait = tb_stream_wait(istream, TB_STREAM_WAIT_READ, tb_stream_timeout(istream));
-            tb_assert_and_check_break(wait >= 0);
-
-            // timeout?
-            tb_check_break(wait);
+            tb_check_break(wait > 0);
 
             // has writ?
             tb_assert_and_check_break(wait & TB_STREAM_WAIT_READ);
