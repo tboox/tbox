@@ -350,7 +350,7 @@ static tb_char_t const* tb_demo_spider_parser_read(tb_demo_spider_parser_ref_t p
             // get url
             tb_char_t const* e = p;
             while (e < b + n && *e && *e != '\"') e++;
-            if (p < e && e - p < sizeof(parser->path)) 
+            if (p < e && e - p < sizeof(parser->path) && e - p > 16) 
             {
                 // save path
                 tb_strncpy(parser->path, p, e - p);

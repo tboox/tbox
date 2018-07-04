@@ -64,7 +64,7 @@ static tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
 {
     // we only enable iocp in coroutine
-#if 0//defined(TB_CONFIG_MODULE_HAVE_COROUTINE) && !defined(TB_CONFIG_MICRO_ENABLE)
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) && !defined(TB_CONFIG_MICRO_ENABLE)
     return (tb_co_scheduler_self() || tb_lo_scheduler_self_())? tb_sockdata() : tb_null;
 #else
     return tb_null;
@@ -269,20 +269,6 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
             // check
             tb_assert_and_check_return_val(object->u.recv.data == data, -1);
 
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("recv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
-
             // trace
             tb_trace_d("recv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
             return 0;
@@ -324,20 +310,6 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
         {
             // check
             tb_assert_and_check_return_val(object->u.send.data == data, -1);
-
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("send(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
 
             // trace
             tb_trace_d("send(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -383,23 +355,6 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
             // check
             tb_assert_and_check_return_val(object->u.urecv.data == data, -1);
 
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("urecv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // save address
-                if (addr && object->buffer) tb_sockaddr_save(addr, (struct sockaddr_storage*)object->buffer);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
-
             // trace
             tb_trace_d("urecv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
             return 0;
@@ -441,20 +396,6 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
         {
             // check
             tb_assert_and_check_return_val(object->u.usend.data == data, -1);
-
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %d", object->sock, addr, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
 
             // trace
             tb_trace_d("usend(%p, %{ipaddr}): state: %s, continue ..", object->sock, addr, tb_state_cstr(object->state));
@@ -503,20 +444,6 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
             tb_assert_and_check_return_val(object->u.sendf.file == file, -1);
             tb_assert_and_check_return_val(object->u.sendf.offset == offset, -1);
 
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("sendfile(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
-
             // trace
             tb_trace_d("sendfile(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
             return 0;
@@ -560,20 +487,6 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
             // check
             tb_assert_and_check_return_val(object->u.recvv.list == list, -1);
 
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("recvv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
-
             // trace
             tb_trace_d("recvv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
             return 0;
@@ -615,20 +528,6 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
         {
             // check
             tb_assert_and_check_return_val(object->u.sendv.list == list, -1);
-
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("sendv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
 
             // trace
             tb_trace_d("sendv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
@@ -673,23 +572,6 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
             // check
             tb_assert_and_check_return_val(object->u.urecvv.list == list, -1);
 
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("urecvv(%p): state: %s, result: %d", object->sock, tb_state_cstr(object->state), bytes);
-
-                // save address
-                if (addr && object->buffer) tb_sockaddr_save(addr, (struct sockaddr_storage*)object->buffer);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
-
             // trace
             tb_trace_d("urecvv(%p): state: %s, continue ..", object->sock, tb_state_cstr(object->state));
             return 0;
@@ -731,20 +613,6 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
         {
             // check
             tb_assert_and_check_return_val(object->u.usendv.list == list, -1);
-
-#if 0
-            // io completed?
-            DWORD bytes = 0;
-            if (GetOverlappedResult((HANDLE)tb_sock2fd(object->sock), &object->olap, &bytes, FALSE))
-            {
-                // trace
-                tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %d", object->sock, addr, tb_state_cstr(object->state), bytes);
-
-                // clear the previous object data
-                tb_iocp_object_clear(object);
-                return (tb_long_t)bytes;
-            }
-#endif
 
             // trace
             tb_trace_d("usendv(%p, %{ipaddr}): state: %s, continue ..", object->sock, addr, tb_state_cstr(object->state));

@@ -565,8 +565,9 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     // check
     tb_assert_and_check_return_val(events, tb_false);
 
-    // no pending event? return it directly
-    tb_check_return_val(object->state != TB_STATE_OK, tb_true);
+    // no pending event or waiting? return it directly
+    if (object->state == TB_STATE_OK || object->state == TB_STATE_WAITING)
+        return tb_true;
 
     // trace
     tb_trace_d("post events(%lx) for socket(%p), code: %u, state: %s ..", events, sock, object->code, tb_state_cstr(object->state));
