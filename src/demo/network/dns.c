@@ -15,17 +15,14 @@
  */
 static tb_void_t tb_dns_test_done(tb_char_t const* name)
 {
-    // time
-    tb_hong_t time = tb_mclock();
-
-    // done
     tb_ipaddr_t addr;
+    tb_hong_t   time = tb_mclock();
     if (tb_dns_looker_done(name, &addr))
     {
         time = tb_mclock() - time;
-        tb_trace_i("[demo]: %s => %{ipaddr}, %lld ms", name, &addr, time);
+        tb_trace_i("lookup: %s => %{ipaddr}, %lld ms", name, &addr, time);
     }
-    else tb_trace_i("[demo]: %s failed", name);
+    else tb_trace_i("lookup: %s failed", name);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

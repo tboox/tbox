@@ -79,7 +79,7 @@ tb_long_t           tb_dns_looker_wait(tb_dns_looker_ref_t looker, tb_long_t tim
  */
 tb_void_t           tb_dns_looker_exit(tb_dns_looker_ref_t looker);
 
-/*! look address from the host name, block
+/*! lookup address from the host name, block
  *
  * try to look it from cache first
  *

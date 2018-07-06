@@ -201,6 +201,7 @@ static tb_demo_t g_demo[] =
 
     // coroutine
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+,   TB_DEMO_MAIN_ITEM(coroutine_dns)
 ,   TB_DEMO_MAIN_ITEM(coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(coroutine_lock)
 ,   TB_DEMO_MAIN_ITEM(coroutine_ping)

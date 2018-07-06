@@ -196,6 +196,7 @@ TB_DEMO_MAIN_DECL(algorithm_find);
 TB_DEMO_MAIN_DECL(algorithm_sort);
 
 // coroutine
+TB_DEMO_MAIN_DECL(coroutine_dns);
 TB_DEMO_MAIN_DECL(coroutine_nest);
 TB_DEMO_MAIN_DECL(coroutine_lock);
 TB_DEMO_MAIN_DECL(coroutine_ping);
