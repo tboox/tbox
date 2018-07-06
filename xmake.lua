@@ -76,12 +76,14 @@ if is_mode("release", "profile") then
 
     -- small or micro?
     if is_option("small", "micro") then
- 
-        -- enable smallest optimization
         set_optimize("smallest")
     else
-        -- enable fastest optimization
         set_optimize("fastest")
+    end
+
+    -- disable stack protector for micro mode
+    if is_option("micro") then
+        add_cxflags("-fno-stack-protector")
     end
 end
 

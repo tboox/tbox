@@ -965,8 +965,9 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
     // check
     if (!n || !s || !fmt) return 0;
 
+    // init start and end pointer
     tb_char_t* pb = s;
-    tb_char_t* pe = s + n;
+    tb_char_t* pe = s + n - 1;
 
 #if 0
     // pe must be larger than pb
@@ -1115,6 +1116,9 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
             break;
         }
     }
+
+    // end
+    if (pb < s + n) *pb = '\0';
 
     // the trailing null byte doesn't count towards the total
     return (pb - s);

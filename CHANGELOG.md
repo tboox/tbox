@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* [#24](https://github.com/tboox/tbox/issues/24): Support IOCP for coroutine on windows
+
 ### Changes
 
 * Move docs directory to tbox-docs repo
@@ -17,6 +21,7 @@
 * Fix windows root path bug 
 * Fix thread local memory leak
 * Fix context bug for coroutine
+* Fix `tb_vsnprintf` overflow 
 
 ## v1.6.2
 
@@ -155,6 +160,10 @@
 
 ## master (开发中)
 
+### 新特性
+
+* [#24](https://github.com/tboox/tbox/issues/24): 针对windows平台下的协程处理，增加IOCP支持
+
 ### 改进
 
 * 移除docs目录，放置到独立tbox-docs仓库，减少tbox.zip包大小
@@ -170,6 +179,7 @@
 * 修复windows根路径问题
 * 修复tls线程存储内存泄露问题
 * 修复context切换问题
+* 修复`tb_vsnprintf`栈溢出问题
 
 ## v1.6.2
 
