@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../container/list_entry.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -256,6 +257,9 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     // the user private data
     tb_cpointer_t                   priv;
 
+    // the list entry
+    tb_list_entry_t                 entry;
+
     /* the private buffer for iocp poller
      *
      * acpt: sizeof(struct sockaddr_storage)) * 2
@@ -289,7 +293,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     /* the object state
      *
      * TB_STATE_OK
-     * TB_STATE_KILLED
+     * TB_STATE_KILLING
      * TB_STATE_PENDING
      * TB_STATE_WAITING
      * TB_STATE_FINISHED
@@ -325,6 +329,12 @@ tb_iocp_object_ref_t        tb_iocp_object_get(tb_socket_ref_t sock);
  * @param sock              the socket 
  */
 tb_void_t                   tb_iocp_object_remove(tb_socket_ref_t sock);
+
+/* clear iocp object state and buffer
+ *
+ * @param object            the iocp object 
+ */
+tb_void_t                   tb_iocp_object_clear(tb_iocp_object_ref_t object);
 
 /*! accept socket
  *

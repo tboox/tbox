@@ -900,6 +900,15 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
         // spark notification? 
         tb_check_continue(object != tb_u2p(1));
 
+        // this object is killing? ignore it directly
+        if (object->state == TB_STATE_KILLING)
+        {
+            // trace
+            tb_trace_d("wait_ex[%p]: ignore killing object", object->sock);
+            tb_iocp_object_clear(object);
+            continue ;
+        }
+
         // get and check olap
         LPOVERLAPPED olap = (LPOVERLAPPED)e->lpOverlapped;
         tb_assert_and_check_return_val(object->sock && olap, -1);
@@ -923,32 +932,45 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
 }
 static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
 {
-    // clear error first
-    SetLastError(ERROR_SUCCESS);
+    while (1)
+    {
+        // clear error first
+        SetLastError(ERROR_SUCCESS);
 
-    // wait event
-    DWORD                   real = 0;
-    tb_iocp_object_ref_t    object = tb_null;
-    LPOVERLAPPED            olap = tb_null;
-    BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
+        // wait event
+        DWORD                   real = 0;
+        tb_iocp_object_ref_t    object = tb_null;
+        LPOVERLAPPED            olap = tb_null;
+        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
 
-    // the last error
-    tb_size_t error = (tb_size_t)GetLastError();
+        // the last error
+        tb_size_t error = (tb_size_t)GetLastError();
 
-    // timeout or spark?
-    if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || (object == tb_u2p(1))) return 0;
+        // timeout or spark?
+        if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || (object == tb_u2p(1))) return 0;
 
-    // iocp port is killed?
-    tb_check_return_val(object, -1);
+        // iocp port is killed?
+        tb_check_return_val(object, -1);
 
-    // check
-    tb_assert_and_check_return_val(object->sock && olap, -1);
+        // this object is killing? ignore it directly
+        if (object->state == TB_STATE_KILLING)
+        {
+            // trace
+            tb_trace_d("wait[%p]: ignore killing object", object->sock);
+            tb_iocp_object_clear(object);
+            continue ;
+        }
 
-    // trace
-    tb_trace_d("wait[%p]: %s, real: %u bytes, lasterror: %lu", object->sock, wait_ok? "ok" : "failed", real, error);
+        // check
+        tb_assert_and_check_return_val(object->sock && olap, -1);
 
-    // spark the events
-    return tb_poller_iocp_event_spak(poller, func, object, real, error);
+        // trace
+        tb_trace_d("wait[%p]: %s, real: %u bytes, lasterror: %lu", object->sock, wait_ok? "ok" : "failed", real, error);
+
+        // spark the events
+        return tb_poller_iocp_event_spak(poller, func, object, real, error);
+    }
+    return -1;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
