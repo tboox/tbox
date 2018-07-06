@@ -62,7 +62,7 @@ tb_void_t tb_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb
         if (tb_distance(iterator, head, tail) > 100000) tb_heap_sort(iterator, head, tail, comp);
         else tb_quick_sort(iterator, head, tail, comp); //!< @note the recursive stack size is limit
     }
-    else tb_bubble_sort(iterator, head, tail, comp);
+    else tb_insert_sort(iterator, head, tail, comp);
 #endif
 }
 tb_void_t tb_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
