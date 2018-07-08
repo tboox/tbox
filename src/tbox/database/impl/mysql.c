@@ -1648,31 +1648,49 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
         mysql->base.statement_done  = tb_database_mysql_statement_done;
         mysql->base.statement_bind  = tb_database_mysql_statement_bind;
 
+        // init row operation
+        static tb_iterator_op_t row_op = 
+        {
+            tb_database_mysql_result_row_iterator_size
+        ,   tb_database_mysql_result_row_iterator_head
+        ,   tb_null
+        ,   tb_database_mysql_result_row_iterator_tail
+        ,   tb_database_mysql_result_row_iterator_prev
+        ,   tb_database_mysql_result_row_iterator_next
+        ,   tb_database_mysql_result_row_iterator_item
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        };
+
+        // init col operation
+        static tb_iterator_op_t col_op = 
+        {
+            tb_database_mysql_result_col_iterator_size
+        ,   tb_database_mysql_result_col_iterator_head
+        ,   tb_null
+        ,   tb_database_mysql_result_col_iterator_tail
+        ,   tb_database_mysql_result_col_iterator_prev
+        ,   tb_database_mysql_result_col_iterator_next
+        ,   tb_database_mysql_result_col_iterator_item
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        };
+
         // init result row iterator
         mysql->result.itor.mode     = TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
         mysql->result.itor.priv     = (tb_pointer_t)mysql;
         mysql->result.itor.step     = 0;
-        mysql->result.itor.size     = tb_database_mysql_result_row_iterator_size;
-        mysql->result.itor.head     = tb_database_mysql_result_row_iterator_head;
-        mysql->result.itor.tail     = tb_database_mysql_result_row_iterator_tail;
-        mysql->result.itor.prev     = tb_database_mysql_result_row_iterator_prev;
-        mysql->result.itor.next     = tb_database_mysql_result_row_iterator_next;
-        mysql->result.itor.item     = tb_database_mysql_result_row_iterator_item;
-        mysql->result.itor.copy     = tb_null;
-        mysql->result.itor.comp     = tb_null;
+        mysql->result.itor.op       = &row_op;
 
         // init result col iterator
         mysql->result.row.itor.mode = TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
         mysql->result.row.itor.priv = (tb_pointer_t)mysql;
         mysql->result.row.itor.step = 0;
-        mysql->result.row.itor.size = tb_database_mysql_result_col_iterator_size;
-        mysql->result.row.itor.head = tb_database_mysql_result_col_iterator_head;
-        mysql->result.row.itor.tail = tb_database_mysql_result_col_iterator_tail;
-        mysql->result.row.itor.prev = tb_database_mysql_result_col_iterator_prev;
-        mysql->result.row.itor.next = tb_database_mysql_result_col_iterator_next;
-        mysql->result.row.itor.item = tb_database_mysql_result_col_iterator_item;
-        mysql->result.row.itor.copy = tb_null;
-        mysql->result.row.itor.comp = tb_null;
+        mysql->result.row.itor.op   = &col_op;
 
         // init url
         if (!tb_url_init(&mysql->base.url)) break;

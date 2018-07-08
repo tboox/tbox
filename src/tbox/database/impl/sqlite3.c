@@ -881,31 +881,49 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
         sqlite->base.statement_done = tb_database_sqlite3_statement_done;
         sqlite->base.statement_bind = tb_database_sqlite3_statement_bind;
 
+        // init row operation
+        static tb_iterator_op_t row_op = 
+        {
+            tb_database_sqlite3_result_row_iterator_size
+        ,   tb_database_sqlite3_result_row_iterator_head
+        ,   tb_null
+        ,   tb_database_sqlite3_result_row_iterator_tail
+        ,   tb_database_sqlite3_result_row_iterator_prev
+        ,   tb_database_sqlite3_result_row_iterator_next
+        ,   tb_database_sqlite3_result_row_iterator_item
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        };
+
+        // init col operation
+        static tb_iterator_op_t col_op = 
+        {
+            tb_database_sqlite3_result_col_iterator_size
+        ,   tb_database_sqlite3_result_col_iterator_head
+        ,   tb_null
+        ,   tb_database_sqlite3_result_col_iterator_tail
+        ,   tb_database_sqlite3_result_col_iterator_prev
+        ,   tb_database_sqlite3_result_col_iterator_next
+        ,   tb_database_sqlite3_result_col_iterator_item
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        ,   tb_null
+        };
+
         // init result row iterator
-        sqlite->result.itor.mode    = 0;
-        sqlite->result.itor.priv    = (tb_pointer_t)sqlite;
-        sqlite->result.itor.step    = 0;
-        sqlite->result.itor.size    = tb_database_sqlite3_result_row_iterator_size;
-        sqlite->result.itor.head    = tb_database_sqlite3_result_row_iterator_head;
-        sqlite->result.itor.tail    = tb_database_sqlite3_result_row_iterator_tail;
-        sqlite->result.itor.prev    = tb_database_sqlite3_result_row_iterator_prev;
-        sqlite->result.itor.next    = tb_database_sqlite3_result_row_iterator_next;
-        sqlite->result.itor.item    = tb_database_sqlite3_result_row_iterator_item;
-        sqlite->result.itor.copy    = tb_null;
-        sqlite->result.itor.comp    = tb_null;
+        sqlite->result.itor.priv     = (tb_pointer_t)sqlite;
+        sqlite->result.itor.step     = 0;
+        sqlite->result.itor.mode     = 0;
+        sqlite->result.itor.op       = &row_op;
 
         // init result col iterator
-        sqlite->result.row.itor.mode = TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
         sqlite->result.row.itor.priv = (tb_pointer_t)sqlite;
         sqlite->result.row.itor.step = 0;
-        sqlite->result.row.itor.size = tb_database_sqlite3_result_col_iterator_size;
-        sqlite->result.row.itor.head = tb_database_sqlite3_result_col_iterator_head;
-        sqlite->result.row.itor.tail = tb_database_sqlite3_result_col_iterator_tail;
-        sqlite->result.row.itor.prev = tb_database_sqlite3_result_col_iterator_prev;
-        sqlite->result.row.itor.next = tb_database_sqlite3_result_col_iterator_next;
-        sqlite->result.row.itor.item = tb_database_sqlite3_result_col_iterator_item;
-        sqlite->result.row.itor.copy = tb_null;
-        sqlite->result.row.itor.comp = tb_null;
+        sqlite->result.row.itor.mode = TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_READONLY;
+        sqlite->result.row.itor.op   = &col_op;
 
         // init url
         if (!tb_url_init(&sqlite->base.url)) break;

@@ -113,7 +113,7 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
                 tb_size_t prev_tail = tb_iterator_tail(iterator);
 
                 // remove items
-                tb_iterator_remove_range(iterator, base, ok? next : itor, size);
+                tb_iterator_nremove(iterator, base, ok? next : itor, size);
 
                 // reset state
                 need = tb_false;
