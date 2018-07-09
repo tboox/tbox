@@ -11,6 +11,7 @@
 * Move docs directory to tbox-docs repo
 * Support tinyc compiler
 * Remove deprecated module (asio), please use coroutine module
+* Improve memory for container
 
 ### Bugs fixed
 
@@ -170,6 +171,7 @@
 * 移除docs目录，放置到独立tbox-docs仓库，减少tbox.zip包大小
 * 支持tinyc编译器
 * 移除被废弃的模块（asio模块，先用coroutine代替）
+* 精简优化容器库内存资源使用
 
 ### Bugs修复
 
