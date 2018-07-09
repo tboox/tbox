@@ -561,6 +561,9 @@ static tb_void_t tb_hash_map_test_walk_perf()
     tb_hash_map_ref_t hash = tb_hash_map_init(0, tb_element_long(), tb_element_long());
     tb_assert_and_check_return(hash);
 
+    // reset random
+    tb_random_reset(tb_true);
+
     // add items
     __tb_volatile__ tb_size_t n = 100000;
     while (n--) 

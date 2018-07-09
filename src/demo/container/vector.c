@@ -750,6 +750,9 @@ static tb_void_t tb_vector_test_itor_perf()
     tb_vector_ref_t    vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_size());
     tb_assert_and_check_return(vector);
 
+    // reset random
+    tb_random_reset(tb_true);
+
     // add items
     __tb_volatile__ tb_size_t n = 10000;
     while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_value()); 
@@ -804,6 +807,9 @@ static tb_void_t tb_vector_test_walk_perf()
     // init vector
     tb_vector_ref_t    vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_element_long());
     tb_assert_and_check_return(vector);
+
+    // reset random
+    tb_random_reset(tb_true);
 
     // add items
     __tb_volatile__ tb_size_t n = 10000;
