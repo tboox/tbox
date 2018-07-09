@@ -79,7 +79,7 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
     {
         // save next
         next = tb_iterator_next(iterator, itor);
-   
+
         // done predicate
         ok = pred(iterator, tb_iterator_item(iterator, itor), value, &is_break);
 
@@ -126,20 +126,16 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
                     prev = base;
 
                     // the body items are removed?
-                    if (base != prev_tail)
-                    {
-                        // the next itor
-                        itor = tb_iterator_next(iterator, base);
-
-                        // the last item be not removed? skip the last walked item
-                        if (!ok)
-                        {
-                            prev = itor;
-                            itor = tb_iterator_next(iterator, itor);
-                        }
-                    }
+                    if (base != prev_tail) itor = tb_iterator_next(iterator, base);
                     // the head items are removed?
                     else itor = tb_iterator_head(iterator);
+
+                    // the last item be not removed? skip the last walked item
+                    if (!ok)
+                    {
+                        prev = itor;
+                        itor = tb_iterator_next(iterator, itor);
+                    }
 
                     // break?
                     tb_check_break(!is_break);
