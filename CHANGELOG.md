@@ -22,6 +22,7 @@
 * Fix thread local memory leak
 * Fix context bug for coroutine
 * Fix `tb_vsnprintf` overflow 
+* [#43](https://github.com/tboox/tbox/issues/43): Fix read dns server and stream bug
 
 ## v1.6.2
 
@@ -180,6 +181,7 @@
 * 修复tls线程存储内存泄露问题
 * 修复context切换问题
 * 修复`tb_vsnprintf`栈溢出问题
+* [#43](https://github.com/tboox/tbox/issues/43): 修复读取dns服务器以及stream读取bug
 
 ## v1.6.2
 
