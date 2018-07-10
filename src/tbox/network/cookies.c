@@ -235,7 +235,7 @@ static tb_size_t tb_cookies_entry_hash(tb_element_ref_t element, tb_cpointer_t d
 {
     // check
     tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)data;
-    tb_assert_and_check_return_val(element && entry && entry->domain && entry->path && entry->name, 0);
+    tb_assert_and_check_return_val(element && entry && entry->domain, 0);
 
     // the cookies
     tb_cookies_t* cookies = (tb_cookies_t*)element->priv;
@@ -243,8 +243,8 @@ static tb_size_t tb_cookies_entry_hash(tb_element_ref_t element, tb_cpointer_t d
 
     // compute the three hash values
     tb_size_t v0 = cookies->string_element.hash(&cookies->string_element, entry->domain, mask, index);
-    tb_size_t v1 = cookies->string_element.hash(&cookies->string_element, entry->path, mask, index);
-    tb_size_t v2 = cookies->string_element.hash(&cookies->string_element, entry->name, mask, index);
+    tb_size_t v1 = entry->path? cookies->string_element.hash(&cookies->string_element, entry->path, mask, index) : 0;
+    tb_size_t v2 = entry->name? cookies->string_element.hash(&cookies->string_element, entry->name, mask, index) : 0;
 
     // the hash value
     return (v0 ^ v1 ^ v2) & mask;
@@ -291,7 +291,7 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_r
             tb_check_break(b);
 
             // trace
-            tb_trace_d("entry: %s: %s", b? b : "", v? v : "");
+            tb_trace_d("entry: %s => %s", b? b : "", v? v : "");
 
             // done value
             if (!tb_strnicmp(b, "expires", 7))
@@ -346,12 +346,8 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_r
             {
                 // must have value
                 tb_assert_and_check_return_val(v, tb_false);
-
             }   
-            else if (!tb_strnicmp(b, "secure", 6))
-            {
-                entry->secure = 1;
-            }
+            else if (!tb_strnicmp(b, "secure", 6)) entry->secure = 1;
             // ignore it
             else if (!tb_strnicmp(b, "HttpOnly", 8)) ;
             // key=value
@@ -374,6 +370,9 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_r
                     entry->value = tb_string_pool_insert(cookies->string_pool, data);
                     tb_assert_and_check_return_val(entry->value, tb_false);
                 }
+
+                // trace
+                tb_trace_d("set %s=%s", entry->name, entry->value? entry->value : "");
             }
 
             // next key-value pair
@@ -395,9 +394,6 @@ static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_r
         // next 
         else p++;
     }
-
-    // check name
-    tb_assert_and_check_return_val(entry->name, tb_false);
 
     // domain not exists? using the given domain
     if (!entry->domain && domain)
@@ -443,7 +439,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
 
     // the entry
     tb_cookies_entry_ref_t entry = (tb_cookies_entry_ref_t)item;
-    tb_assert(entry && entry->domain && entry->path && entry->name);
+    tb_assert(entry && entry->domain);
 
     // the domain
     tb_char_t const* domain = tuple[0].cstr;
@@ -462,7 +458,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
     if (entry->expires && tb_cache_time() >= entry->expires)
     {
         // trace
-        tb_trace_d("expired: %s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "");
+        tb_trace_d("expired: %s%s%s: %s = %s", entry->secure? "https://" : "http://", entry->domain, entry->path? entry->path : "", entry->name? entry->name : "", entry->value? entry->value : "");
 
         // remove it
         return tb_true;
@@ -470,6 +466,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
 
     // this cookies is at domain/path?
     if (    tb_cookies_is_child_domain(entry->domain, domain)
+        &&  entry->path && entry->name 
         &&  tb_cookies_is_child_path(entry->path, path)
         &&  entry->secure == secure)
     {
@@ -762,14 +759,14 @@ tb_void_t tb_cookies_dump(tb_cookies_ref_t self)
     tb_for_all_if (tb_cookies_entry_ref_t, entry, cookies->cookie_pool, entry)
     {
         // the entry
-        tb_assert_and_check_continue(entry->domain && entry->path && entry->name);
+        tb_assert_and_check_continue(entry->domain);
 
         // the date
         tb_tm_t date = {0};
         tb_gmtime(entry->expires, &date);
 
         // trace
-        tb_trace_i("%s%s%s: %s = %s, expires: %04ld-%02ld-%02ld %02ld:%02ld:%02ld GMT, week: %d", entry->secure? "https://" : "http://", entry->domain, entry->path, entry->name, entry->value? entry->value : "", date.year, date.month, date.mday, date.hour, date.minute, date.second, date.week);
+        tb_trace_i("%s%s%s: %s = %s, expires: %04ld-%02ld-%02ld %02ld:%02ld:%02ld GMT, week: %d", entry->secure? "https://" : "http://", entry->domain, entry->path? entry->path : "", entry->name? entry->name : "", entry->value? entry->value : "", date.year, date.month, date.mday, date.hour, date.minute, date.second, date.week);
     }
 
     // leave

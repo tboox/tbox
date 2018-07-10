@@ -149,6 +149,13 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
     if (args && !tb_strnicmp(args, "udp=", 4)) stream_sock->type = TB_SOCKET_TYPE_UDP;
     else if (args && !tb_strnicmp(args, "tcp=", 4)) stream_sock->type = TB_SOCKET_TYPE_TCP;
 
+    // exit sock first if not keep-alive
+    if (!stream_sock->balived && stream_sock->sock)
+    {
+        if (stream_sock->sock && !tb_socket_exit(stream_sock->sock)) return tb_false;
+        stream_sock->sock = tb_null;
+    }
+
     // make sock
     if (!stream_sock->sock) stream_sock->sock = tb_socket_init(stream_sock->type, tb_ipaddr_family(addr));
     

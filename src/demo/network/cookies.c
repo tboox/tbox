@@ -6,6 +6,7 @@
 tb_int_t tb_demo_network_cookies_main(tb_int_t argc, tb_char_t** argv)
 {
     // set cookies
+    tb_cookies_set(tb_cookies(), "www.baidu.com", "/", tb_false, "HttpOnly;Secure");
     tb_cookies_set(tb_cookies(), tb_null, tb_null, tb_false, "BAIDUID=0; max-age=946080000; expires=Sat, 06-Apr-41 03:21:53 GMT; domain=.baidu.com; path=/");
     tb_cookies_set(tb_cookies(), tb_null, tb_null, tb_true, "FG=1; max-age=946080000; expires=Sat, 06-Apr-2017 03:21:53 GMT; domain=.baidu.com; path=/; version=1");
     tb_cookies_set(tb_cookies(), tb_null, tb_null, tb_false, "BAIDUID=2; max-age=946080000; expires=Sat, 06-Apr-2016 03:21:53 GMT; domain=.baidu.com; path=/style; version=1");

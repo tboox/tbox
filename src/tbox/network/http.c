@@ -112,9 +112,12 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
         // trace
         tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
-        // ctrl stream
+        // set url and timeout
         if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_cstr(&http->option.url))) break;
         if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
+
+        // reset keep-alive and close socket first before connecting anthor host
+        if (host_changed && !tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, tb_false)) break;
 
         // dump option
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
