@@ -19,6 +19,7 @@ target("tbox")
     add_headers("../(tbox/prefix/**/prefix.S)")
     add_headers("../(tbox/math/impl/*.h)")
     add_headers("../(tbox/utils/impl/*.h)")
+    add_headers("$(buildir)/(tbox/tbox.config.h)")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
