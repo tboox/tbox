@@ -8,18 +8,18 @@ target("tbox")
     add_defines("__tb_prefix__=\"tbox\"")
 
     -- set the auto-generated config.h
-    set_config_header("$(buildir)/tbox/tbox.config.h", {prefix = "TB_CONFIG"})
+    set_config_header("$(buildir)/.include/tbox/tbox.config.h", {prefix = "TB_CONFIG"})
 
     -- add includes directory
     add_includedirs("$(buildir)")
-    add_includedirs("$(buildir)/tbox")
+    add_includedirs("$(buildir)/.include/tbox")
 
     -- add the header files for installing
     add_headers("../(tbox/**.h)|**/impl/**.h")
     add_headers("../(tbox/prefix/**/prefix.S)")
     add_headers("../(tbox/math/impl/*.h)")
     add_headers("../(tbox/utils/impl/*.h)")
-    add_headers("$(buildir)/(tbox/tbox.config.h)")
+    add_headers("$(buildir)/.include/(tbox/tbox.config.h)")
 
     -- add packages
     add_options("zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre")
