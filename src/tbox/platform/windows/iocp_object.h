@@ -251,6 +251,9 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     // the overlapped data
     OVERLAPPED                      olap;
 
+    // the bound iocp port
+    HANDLE                          port;
+
     // the socket
     tb_socket_ref_t                 sock;
 

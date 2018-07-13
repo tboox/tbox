@@ -159,7 +159,7 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
 
         // accepted? finished
         object->state = TB_STATE_FINISHED;
-        if (!PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) break;
+        if (!PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap)) break;
 
         // ok
         ok = tb_true;
@@ -184,7 +184,7 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
 
             // finished
             object->state = TB_STATE_FINISHED;
-            if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) ok = tb_true;
+            if (PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap)) ok = tb_true;
         }
     }
 
@@ -250,7 +250,7 @@ static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_
         // connected, post result directly
         object->state = TB_STATE_FINISHED;
         object->u.conn.result = 1;
-        if (!PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) break;
+        if (!PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap)) break;
 
         // ok
         ok = tb_true;
@@ -271,7 +271,7 @@ static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_
         {
             object->state = TB_STATE_FINISHED;
             object->u.conn.result = poller->func.WSAGetLastError() == WSAEISCONN? 1 : -1;
-            if (PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap)) ok = tb_true;
+            if (PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap)) ok = tb_true;
         }
     }
 
@@ -304,7 +304,7 @@ static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.recv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -331,7 +331,7 @@ static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.send.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_urecv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -370,7 +370,7 @@ static tb_bool_t tb_poller_iocp_event_post_urecv(tb_poller_iocp_ref_t poller, tb
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.urecv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_usend(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -381,7 +381,7 @@ static tb_bool_t tb_poller_iocp_event_post_usend(tb_poller_iocp_ref_t poller, tb
     // trace
     tb_trace_d("post usend(%p, %{ipaddr}, %lu) event: ..", sock, &object->u.usend.addr, object->u.usend.size);
 
-    // load addr
+    // load address
     tb_size_t               n = 0;
 	struct sockaddr_storage d = {0};
     if (!(n = tb_sockaddr_load(&d, &object->u.usend.addr))) return tb_false;
@@ -402,7 +402,7 @@ static tb_bool_t tb_poller_iocp_event_post_usend(tb_poller_iocp_ref_t poller, tb
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.usend.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -430,9 +430,8 @@ static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.sendf.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
-#ifndef TB_CONFIG_MICRO_ENABLE
 static tb_bool_t tb_poller_iocp_event_post_recvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -459,7 +458,7 @@ static tb_bool_t tb_poller_iocp_event_post_recvv(tb_poller_iocp_ref_t poller, tb
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.recvv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_sendv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -486,7 +485,7 @@ static tb_bool_t tb_poller_iocp_event_post_sendv(tb_poller_iocp_ref_t poller, tb
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.sendv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_urecvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -525,7 +524,7 @@ static tb_bool_t tb_poller_iocp_event_post_urecvv(tb_poller_iocp_ref_t poller, t
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.urecvv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
 static tb_bool_t tb_poller_iocp_event_post_usendv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -557,9 +556,8 @@ static tb_bool_t tb_poller_iocp_event_post_usendv(tb_poller_iocp_ref_t poller, t
     // error? finished
     object->state = TB_STATE_FINISHED;
     object->u.usendv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)object, (LPOVERLAPPED)&object->olap);
+    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
-#endif
 static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -582,17 +580,10 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     ,   tb_poller_iocp_event_post_send
     ,   tb_poller_iocp_event_post_urecv 
     ,   tb_poller_iocp_event_post_usend 
-#ifndef TB_CONFIG_MICRO_ENABLE
     ,   tb_poller_iocp_event_post_recvv
     ,   tb_poller_iocp_event_post_sendv
     ,   tb_poller_iocp_event_post_urecvv
     ,   tb_poller_iocp_event_post_usendv
-#else
-    ,   tb_null 
-    ,   tb_null 
-    ,   tb_null
-    ,   tb_null 
-#endif
     ,   tb_poller_iocp_event_post_sendf 
     };
     tb_assert_and_check_return_val(object->code < tb_arrayn(s_post), tb_false);
@@ -892,13 +883,13 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
         e = poller->events + i;
 
         // get iocp object
-        tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)e->lpCompletionKey;
+        tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)e->lpOverlapped;
 
         // iocp port is killed?
         tb_check_return_val(object, -1);
 
-        // spark notification? 
-        tb_check_continue(object != tb_u2p(1));
+        // spark notification, is 1? 
+        tb_check_continue(!e->lpCompletionKey);
 
         // this object is killing? ignore it directly
         if (object->state == TB_STATE_KILLING)
@@ -909,9 +900,8 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
             continue ;
         }
 
-        // get and check olap
-        LPOVERLAPPED olap = (LPOVERLAPPED)e->lpOverlapped;
-        tb_assert_and_check_return_val(object->sock && olap, -1);
+        // check socket
+        tb_assert_and_check_return_val(object->sock, -1);
 
         // get real transferred bytes
         tb_size_t real = (tb_size_t)e->dwNumberOfBytesTransferred;
@@ -949,15 +939,15 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
 
         // wait event
         DWORD                   real = 0;
+        tb_pointer_t            pkey = tb_null;
         tb_iocp_object_ref_t    object = tb_null;
-        LPOVERLAPPED            olap = tb_null;
-        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(leftime < 0? INFINITE : (tb_size_t)leftime));
+        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&object, (DWORD)(leftime < 0? INFINITE : (tb_size_t)leftime));
 
         // the last error
         tb_size_t error = (tb_size_t)GetLastError();
 
         // timeout or spark?
-        if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || (object == tb_u2p(1))) break;
+        if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || pkey) break;
 
         // iocp port is killed?
         tb_check_return_val(object, -1);
@@ -972,7 +962,7 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         }
 
         // check
-        tb_assert_and_check_return_val(object->sock && olap, -1);
+        tb_assert_and_check_return_val(object->sock, -1);
 
         // trace
         tb_trace_d("wait[%p]: %s, real: %u bytes, lasterror: %lu", object->sock, wait_ok? "ok" : "failed", real, error);
@@ -1124,9 +1114,9 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     object->priv = priv;
 
     // bind this socket and object to port
-    if (!object->sock) 
+    if (!object->port) 
     {
-        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(sock), poller->port, (ULONG_PTR)object, 0);
+        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(sock), poller->port, tb_null, 0);
         if (port != poller->port)
         {
             // trace
@@ -1135,7 +1125,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
         }
 
         // bind ok
-        object->sock = sock;
+        object->port = port;
     }
 
     // post events
