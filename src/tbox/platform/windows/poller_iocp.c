@@ -933,8 +933,18 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
 }
 static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
 {
+    tb_size_t wait = 0;
+    tb_hong_t startime = tb_mclock();
     while (1)
     {
+        // compute the left timeout
+        tb_hong_t leftime = -1;
+        if (timeout >= 0)
+        {
+            leftime = timeout - (tb_long_t)(tb_mclock() - startime);
+            if (leftime <= 0) break;
+        }
+
         // clear error first
         SetLastError(ERROR_SUCCESS);
 
@@ -942,13 +952,13 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         DWORD                   real = 0;
         tb_iocp_object_ref_t    object = tb_null;
         LPOVERLAPPED            olap = tb_null;
-        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(timeout < 0? INFINITE : timeout));
+        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&object, (LPOVERLAPPED*)&olap, (DWORD)(leftime < 0? INFINITE : (tb_size_t)leftime));
 
         // the last error
         tb_size_t error = (tb_size_t)GetLastError();
 
         // timeout or spark?
-        if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || (object == tb_u2p(1))) return 0;
+        if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || (object == tb_u2p(1))) break;
 
         // iocp port is killed?
         tb_check_return_val(object, -1);
@@ -968,10 +978,13 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         // trace
         tb_trace_d("wait[%p]: %s, real: %u bytes, lasterror: %lu", object->sock, wait_ok? "ok" : "failed", real, error);
 
-        // spark the events
-        return tb_poller_iocp_event_spak(poller, func, object, real, error);
+        // spark and update the events
+        if (tb_poller_iocp_event_spak(poller, func, object, real, error) > 0)
+            wait++;
     }
-    return -1;
+
+    // ok
+    return wait;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
