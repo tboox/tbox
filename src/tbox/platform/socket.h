@@ -221,6 +221,26 @@ tb_long_t           tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_siz
  */
 tb_long_t           tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t size);
 
+/*! recv the socket data for tcp with block mode
+ *
+ * @param sock      the socket 
+ * @param data      the data
+ * @param size      the size
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size);
+
+/*! send the socket data for tcp with block mode
+ *
+ * @param sock      the socket 
+ * @param data      the data
+ * @param size      the size
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_socket_bsend(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t size);
+
 /*! recvv the socket data for tcp
  * 
  * @param sock      the socket 

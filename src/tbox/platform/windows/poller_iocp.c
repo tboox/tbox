@@ -289,10 +289,11 @@ static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_
 
     // do recv
     DWORD flag = 0;
-    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&object->olap, tb_null);
+    DWORD real = 0;
+    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.recv, 1, &real, &flag, (LPOVERLAPPED)&object->olap, tb_null);
 
     // trace
-    tb_trace_d("recving[%p]: WSARecv: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
+    tb_trace_d("recving[%p]: WSARecv: %ld, %u bytes, lasterror: %d", sock, ok, real, poller->func.WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
@@ -1141,6 +1142,9 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return_val(poller && func, -1);
+
+    // trace
+    tb_trace_d("waiting with timeout(%ld) ..", timeout);
 
     // does use GetQueuedCompletionStatusEx to wait events?
     if (poller->func.GetQueuedCompletionStatusEx)
