@@ -668,10 +668,28 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
     case ERROR_IO_PENDING:
         {
             // update the accept context, otherwise shutdown and getsockname will be failed
+            SOCKET fd = tb_sock2fd(object->u.acpt.result);
             SOCKET acpt = (SOCKET)tb_sock2fd(object->sock);
-            tb_long_t update_ok = setsockopt(tb_sock2fd(object->u.acpt.result), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
-            tb_assert(!update_ok); tb_used(update_ok);
-      
+            setsockopt(fd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
+
+            // non-block
+            ULONG nb = 1;
+            tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb);
+
+            /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
+             *
+             * 40ms is the tcp ack delay, which indicates that you are likely 
+             * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+             *
+             * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
+             * whereas the other two must be set at the appropriate times during the life of the connection 
+             * and can therefore be trickier to use.
+             * 
+             * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
+             */
+            tb_int_t enable = 1;
+            setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
+
             // get accept socket addresses
             INT                         server_size = 0;
             INT                         client_size = 0;

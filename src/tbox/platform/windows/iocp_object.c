@@ -365,6 +365,60 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, tb_null);
 
+    // done
+    tb_bool_t       ok = tb_false;
+    tb_socket_ref_t acpt = tb_null;
+    do
+    {
+        // done  
+        struct sockaddr_storage d = {0};
+        tb_int_t                n = sizeof(d);
+        SOCKET                  fd = tb_ws2_32()->accept(tb_sock2fd(object->sock), (struct sockaddr *)&d, &n);
+
+        // no client?
+        tb_check_break(fd >= 0 && fd != INVALID_SOCKET);
+
+        // save sock
+        acpt = tb_fd2sock(fd);
+
+        // non-block
+        ULONG nb = 1;
+        if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
+
+        /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
+         *
+         * 40ms is the tcp ack delay, which indicates that you are likely 
+         * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+         *
+         * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
+         * whereas the other two must be set at the appropriate times during the life of the connection 
+         * and can therefore be trickier to use.
+         * 
+         * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
+         */
+        tb_int_t enable = 1;
+        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
+
+        // save address
+        if (addr) tb_sockaddr_save(addr, &d);
+        
+        // trace
+        tb_trace_d("accept(%p): %p, state: finished directly", object->sock, acpt);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // accept ok?
+    if (ok) return acpt;
+    else
+    {
+        // exit it
+        if (acpt) tb_socket_exit(acpt);
+        acpt = tb_null;
+    }
+
     // post a accept event to wait it
     object->code          = TB_IOCP_OBJECT_CODE_ACPT;
     object->state         = TB_STATE_PENDING;
@@ -746,11 +800,24 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
-    // post a recvv event to wait it
-    object->code         = TB_IOCP_OBJECT_CODE_RECVV;
-    object->state        = TB_STATE_PENDING;
+    // attach buffer data
     object->u.recvv.list = list;
     object->u.recvv.size = (tb_iovec_size_t)size;
+
+    // attempt to send data directly
+    DWORD flag = 0;
+    DWORD real = 0;
+    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.recvv.list, (DWORD)object->u.recvv.size, &real, &flag, tb_null, tb_null);
+    if (!ok && real)
+    {
+        // trace
+        tb_trace_d("recvv(%p): WSARecv: %u bytes, state: finished directly", object->sock, real);
+        return (tb_long_t)real;
+    }
+
+    // post a recvv event to wait it
+    object->code  = TB_IOCP_OBJECT_CODE_RECVV;
+    object->state = TB_STATE_PENDING;
     return 0;
 }
 tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size)
@@ -788,11 +855,23 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
-    // post a sendv event to wait it
-    object->code         = TB_IOCP_OBJECT_CODE_SENDV;
-    object->state        = TB_STATE_PENDING;
+    // attach buffer data
     object->u.sendv.list = list;
     object->u.sendv.size = (tb_iovec_size_t)size;
+
+    // attempt to send data directly
+    DWORD real = 0;
+    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.sendv.list, (DWORD)object->u.sendv.size, &real, 0, tb_null, tb_null);
+    if (!ok && real)
+    {
+        // trace
+        tb_trace_d("sendv(%p): WSASend: %u bytes, state: finished directly", object->sock, real);
+        return (tb_long_t)real;
+    }
+
+    // post a sendv event to wait it
+    object->code  = TB_IOCP_OBJECT_CODE_SENDV;
+    object->state = TB_STATE_PENDING;
     return 0;
 }
 tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
@@ -831,11 +910,35 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
-    // post a urecvv event to wait it
-    object->code          = TB_IOCP_OBJECT_CODE_URECVV;
-    object->state         = TB_STATE_PENDING;
+    // attach buffer data
     object->u.urecvv.list = list;
     object->u.urecvv.size = (tb_iovec_size_t)size;
+
+    // make buffer for address, size and flags
+    if (!object->buffer) object->buffer = tb_malloc0(sizeof(struct sockaddr_storage) + sizeof(tb_int_t) + sizeof(DWORD));
+    tb_assert_and_check_return_val(object->buffer, tb_false);
+
+    // init size
+    tb_int_t* psize = (tb_int_t*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage));
+    *psize = sizeof(struct sockaddr_storage);
+
+    // init flag
+    DWORD* pflag = (DWORD*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
+    *pflag = 0;
+
+    // attempt to recv data directly
+    DWORD real = 0;
+    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.urecvv.list, (DWORD)object->u.urecvv.size, &real, pflag, (struct sockaddr*)object->buffer, psize, tb_null, tb_null);
+    if (!ok && real)
+    {
+        // trace
+        tb_trace_d("urecv(%p): WSARecvFrom: %u bytes, state: finished directly", object->sock, real);
+        return (tb_long_t)real;
+    }
+
+    // post a urecvv event to wait it
+    object->code  = TB_IOCP_OBJECT_CODE_URECVV;
+    object->state = TB_STATE_PENDING;
     return 0;
 }
 tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
@@ -870,14 +973,48 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // trace
     tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
 
+    // has waiting io?
+    if (object->state == TB_STATE_WAITING)
+    {
+        // get bound iocp port
+        HANDLE port = object->port;
+
+        // cancel the previous io (urecv) first
+        if (!tb_iocp_object_cancel(object)) return -1;
+
+        // create a new iocp object
+        object = tb_iocp_object_get_or_new(object->sock);
+        tb_assert_and_check_return_val(object, -1);
+
+        // restore the previous bound iocp port
+        object->port = port;
+    }
+
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
-    // post a usendv event to wait it
-    object->code          = TB_IOCP_OBJECT_CODE_USENDV;
-    object->state         = TB_STATE_PENDING;
+    // attach buffer data and address
     object->u.usendv.addr = *addr;
     object->u.usendv.list = list;
     object->u.usendv.size = (tb_iovec_size_t)size;
+
+    // load address
+    tb_size_t               n = 0;
+	struct sockaddr_storage d = {0};
+    if (!(n = tb_sockaddr_load(&d, &object->u.usendv.addr))) return -1;
+
+    // attempt to send data directly
+    DWORD real = 0;
+    tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.usendv.list, (DWORD)object->u.usendv.size, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
+    if (!ok && real)
+    {
+        // trace
+        tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", object->sock, addr, real);
+        return (tb_long_t)real;
+    }
+
+    // post a usendv event to wait it
+    object->code  = TB_IOCP_OBJECT_CODE_USENDV;
+    object->state = TB_STATE_PENDING;
     return 0;
 }

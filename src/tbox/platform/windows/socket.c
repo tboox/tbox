@@ -307,10 +307,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             // enable the nagle's algorithm
             tb_int_t enable = (tb_int_t)tb_va_arg(args, tb_bool_t);
             if (!tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable)))
-            {
-                // ok
                 ok = tb_true;
-            }
         }
         break;
     case TB_SOCKET_CTRL_GET_TCP_NODELAY:
@@ -341,10 +338,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             // set the recv buffer size
             tb_int_t real = (tb_int_t)buff_size;
             if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (tb_char_t*)&real, sizeof(real)))
-            {
-                // ok
                 ok = tb_true;
-            }
         }
         break;
     case TB_SOCKET_CTRL_GET_RECV_BUFF_SIZE:
@@ -375,10 +369,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             // set the send buffer size
             tb_int_t real = (tb_int_t)buff_size;
             if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (tb_char_t*)&real, sizeof(real)))
-            {
-                // ok
                 ok = tb_true;
-            }
         }
         break;
     case TB_SOCKET_CTRL_GET_SEND_BUFF_SIZE:
@@ -527,6 +518,20 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
         // non-block
         ULONG nb = 1;
         if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
+
+        /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
+         *
+         * 40ms is the tcp ack delay, which indicates that you are likely 
+         * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+         *
+         * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
+         * whereas the other two must be set at the appropriate times during the life of the connection 
+         * and can therefore be trickier to use.
+         * 
+         * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
+         */
+        tb_int_t enable = 1;
+        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
         // save address
         if (addr) tb_sockaddr_save(addr, &d);
