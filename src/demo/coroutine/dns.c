@@ -25,14 +25,14 @@ static tb_void_t tb_demo_coroutine_dns(tb_cpointer_t priv)
 tb_int_t tb_demo_coroutine_dns_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
-    tb_assert_and_check_return_val(argc == 2 && argv[1], -1);
+    tb_assert_and_check_return_val(argc >= 2 && argv[1], -1);
 
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start dns
-        tb_size_t n = 100; 
+        tb_size_t n = argv[2]? (tb_size_t)tb_atoi(argv[2]) : 10; 
         while (n--)
         {
             // start it
