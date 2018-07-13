@@ -3,6 +3,7 @@
  */ 
 #include "../demo.h"
 
+#if 0
 static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
 {
     // check
@@ -69,12 +70,14 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
     if (sock) tb_socket_exit(sock);
     sock = tb_null;
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 {
+#if 0
     // init listen address
     tb_ipaddr_t addr;
     tb_ipaddr_set(&addr, "127.0.0.1", 9001, TB_IPADDR_FAMILY_IPV4);
@@ -92,5 +95,6 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
         // exit scheduler
 	    tb_co_scheduler_exit(scheduler);
     }
+#endif
     return 0;
 }

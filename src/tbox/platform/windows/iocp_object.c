@@ -33,6 +33,7 @@
  * includes
  */
 #include "iocp_object.h"
+#include "interface/interface.h"
 #include "../thread_local.h"
 #include "../impl/sockdata.h"
 #include "../posix/sockaddr.h"
