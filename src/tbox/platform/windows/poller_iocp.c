@@ -289,11 +289,10 @@ static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_
 
     // do recv
     DWORD flag = 0;
-    DWORD real = 0;
-    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.recv, 1, &real, &flag, (LPOVERLAPPED)&object->olap, tb_null);
+    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&object->olap, tb_null);
 
     // trace
-    tb_trace_d("recving[%p]: WSARecv: %ld, %u bytes, lasterror: %d", sock, ok, real, poller->func.WSAGetLastError());
+    tb_trace_d("recving[%p]: WSARecv: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
