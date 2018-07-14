@@ -254,19 +254,19 @@ static tb_long_t tb_cookies_entry_comp(tb_element_ref_t element, tb_cpointer_t l
     // check
     tb_cookies_entry_ref_t lentry = (tb_cookies_entry_ref_t)ldata;
     tb_cookies_entry_ref_t rentry = (tb_cookies_entry_ref_t)rdata;
-    tb_assert_and_check_return_val(lentry && lentry->domain && lentry->path && lentry->name, 0);
-    tb_assert_and_check_return_val(rentry && rentry->domain && rentry->path && rentry->name, 0);
+    tb_assert_and_check_return_val(lentry && lentry->domain, 0);
+    tb_assert_and_check_return_val(rentry && rentry->domain, 0);
 
     // compare domain
     tb_long_t ok = tb_strcmp(lentry->domain, rentry->domain);
     tb_check_return_val(!ok, ok);
 
     // compare domain
-    ok = tb_strcmp(lentry->path, rentry->path);
+    ok = tb_strcmp(lentry->path? lentry->path : "", rentry->path? rentry->path : "");
     tb_check_return_val(!ok, ok);
 
     // compare name
-    return tb_strcmp(lentry->name, rentry->name);
+    return tb_strcmp(lentry->name? lentry->name : "", rentry->name? rentry->name : "");
 }
 static tb_bool_t tb_cookies_entry_init(tb_cookies_t* cookies, tb_cookies_entry_ref_t entry, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
 {

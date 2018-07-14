@@ -3,7 +3,7 @@
  */ 
 #include "../demo.h"
 
-#if 0
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
 {
     // check
@@ -77,7 +77,7 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
  */
 tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 {
-#if 0
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // init listen address
     tb_ipaddr_t addr;
     tb_ipaddr_set(&addr, "127.0.0.1", 9001, TB_IPADDR_FAMILY_IPV4);
