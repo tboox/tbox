@@ -31,6 +31,15 @@
 #include "../../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef __tb_small__ 
+#   define TB_SOCKDATA_GROW     (64)
+#else
+#   define TB_SOCKDATA_GROW     (256)
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
 
@@ -126,6 +135,7 @@ tb_void_t tb_sockdata_insert(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, t
         if (!sockdata->data)
         {
             // init data
+            need += TB_SOCKDATA_GROW;
             sockdata->data = tb_nalloc0_type(need, tb_cpointer_t);
             tb_assert_and_check_return(sockdata->data);
 
@@ -135,6 +145,7 @@ tb_void_t tb_sockdata_insert(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, t
         else if (need > sockdata->maxn)
         {
             // grow data
+            need += TB_SOCKDATA_GROW;
             sockdata->data = (tb_cpointer_t*)tb_ralloc(sockdata->data, need * sizeof(tb_cpointer_t));
             tb_assert_and_check_return(sockdata->data);
 
