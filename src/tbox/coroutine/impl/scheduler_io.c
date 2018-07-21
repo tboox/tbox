@@ -28,7 +28,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "scheduler_io"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -178,10 +178,13 @@ static tb_void_t tb_co_scheduler_io_loop(tb_cpointer_t priv)
         tb_size_t ldelay = tb_ltimer_delay(scheduler_io->ltimer);
 
         // trace
-        tb_trace_d("loop: wait %lu ms ..", tb_min(delay, ldelay));
+        tb_trace_d("loop: wait %lu ms, %lu pending coroutines ..", tb_min(delay, ldelay), tb_co_scheduler_suspend_count(scheduler));
 
         // no more ready coroutines? wait io events and timers
         if (tb_poller_wait(poller, tb_co_scheduler_io_events, tb_min(delay, ldelay)) < 0) break;
+
+        // trace
+        tb_trace_d("loop: wait ok, left %lu pending coroutines ..", tb_co_scheduler_suspend_count(scheduler));
 
         // spak timer
         if (!tb_co_scheduler_io_timer_spak(scheduler_io)) break;

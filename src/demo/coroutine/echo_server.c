@@ -8,7 +8,7 @@
  */ 
 
 // port
-#define TB_DEMO_PORT        (9090)
+#define TB_DEMO_PORT        (9001)
 
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
@@ -22,30 +22,22 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
     tb_socket_ref_t sock = (tb_socket_ref_t)priv;
     tb_assert_and_check_return(sock);
 
-    // read data
-    tb_char_t data[64] = {0};
-    tb_size_t read = 0;
-    tb_size_t size = sizeof(data) - 1;
-    tb_long_t wait = 0;
-    while (read < size)
+    // loop
+    tb_byte_t data[8192] = {0};
+    tb_size_t size = 13;
+    while (1)
     {
-        // read it
-        tb_long_t real = tb_socket_recv(sock, (tb_byte_t*)data + read, size - read);
-
-        // has data?
-        if (real > 0) 
+        // recv data
+        if (tb_socket_brecv(sock, data, size))
         {
-            read += real;
-            wait = 0;
+            // send data
+            if (!tb_socket_bsend(sock, data, size))
+            {
+                // error
+                tb_trace_e("send error!");
+                break;
+            }
         }
-        // no data? wait it
-        else if (!real && !wait)
-        {
-            // wait it
-            wait = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
-            tb_assert_and_check_break(wait >= 0);
-        }
-        // failed or end?
         else break;
     }
 
