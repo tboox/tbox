@@ -82,7 +82,7 @@ tb_bool_t           tb_trace_mode_set(tb_size_t mode);
  *
  * @return          the trace file handle
  */
-tb_handle_t         tb_trace_file(tb_noarg_t);
+tb_file_ref_t       tb_trace_file(tb_noarg_t);
 
 /*! set the trace file 
  *

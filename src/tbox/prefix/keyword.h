@@ -271,7 +271,7 @@
  * @endcode
  * 
  */
-#define __tb_typeref__(object)                              struct __tb_##object##_dummy_t{tb_int_t dummy;}* tb_##object##_ref_t
+#define __tb_typeref__(object)                              struct __tb_##object##_dummy_t{tb_int_t dummy;} const* tb_##object##_ref_t
 
 // macros
 #define __tb_mstring__(x)                                   #x

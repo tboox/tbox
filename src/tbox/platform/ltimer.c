@@ -563,7 +563,7 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
             tb_spinlock_enter(&timer->lock);
 
             // exit the expired task
-            tb_pointer_t data[2]; data[0] = self; data[1] = &now;
+            tb_pointer_t data[2]; data[0] = (tb_pointer_t)self; data[1] = &now;
             tb_walk_all(list, tb_ltimer_expired_task_exit, data);
 
             // leave

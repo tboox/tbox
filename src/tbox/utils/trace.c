@@ -128,13 +128,13 @@ tb_bool_t tb_trace_mode_set(tb_size_t mode)
     return tb_true;
 }
 #ifndef TB_CONFIG_MICRO_ENABLE
-tb_handle_t tb_trace_file()
+tb_file_ref_t tb_trace_file()
 {
     // enter
     tb_spinlock_enter_without_profiler(&g_lock);
 
     // the file
-    tb_handle_t file = g_file;
+    tb_file_ref_t file = g_file;
 
     // leave
     tb_spinlock_leave(&g_lock);

@@ -483,7 +483,7 @@ static tb_bool_t tb_cookies_entry_walk(tb_iterator_ref_t iterator, tb_cpointer_t
  */
 static tb_handle_t tb_cookies_instance_init(tb_cpointer_t* ppriv)
 {
-    return tb_cookies_init();
+    return (tb_handle_t)tb_cookies_init();
 }
 static tb_void_t tb_cookies_instance_exit(tb_handle_t cookies, tb_cpointer_t priv)
 {

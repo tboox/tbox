@@ -42,7 +42,7 @@
 static tb_handle_t tb_ifaddrs_instance_init(tb_cpointer_t* ppriv)
 {
     // init it
-    return tb_ifaddrs_init();
+    return (tb_handle_t)tb_ifaddrs_init();
 }
 static tb_void_t tb_ifaddrs_instance_exit(tb_handle_t ifaddrs, tb_cpointer_t priv)
 {

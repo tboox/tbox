@@ -40,7 +40,7 @@ static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance, tb_cpointer_t pr
 
     // the dbghelp module
     HANDLE module = GetModuleHandleA("dbghelp.dll");
-    if (!module) module = tb_dynamic_init("dbghelp.dll");
+    if (!module) module = (HANDLE)tb_dynamic_init("dbghelp.dll");
     tb_check_return_val(module, tb_false);
 
     // init interfaces

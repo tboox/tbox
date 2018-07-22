@@ -71,7 +71,6 @@ if is_mode("release", "profile") then
         -- enable gprof
         add_cxflags("-pg")
         add_ldflags("-pg")
-
     end
 
     -- small or micro?

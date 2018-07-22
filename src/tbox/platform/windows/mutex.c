@@ -41,7 +41,7 @@ tb_mutex_ref_t tb_mutex_init()
 }
 tb_void_t tb_mutex_exit(tb_mutex_ref_t mutex)
 {
-    if (mutex) CloseHandle(mutex);
+    if (mutex) CloseHandle((HANDLE)mutex);
 }
 tb_bool_t tb_mutex_enter(tb_mutex_ref_t mutex)
 {

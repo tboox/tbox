@@ -40,7 +40,7 @@ static tb_bool_t tb_shell32_instance_init(tb_handle_t instance, tb_cpointer_t pr
 
     // the shell32 module
     HANDLE module = GetModuleHandleA("shell32.dll");
-    if (!module) module = tb_dynamic_init("shell32.dll");
+    if (!module) module = (HANDLE)tb_dynamic_init("shell32.dll");
     tb_check_return_val(module, tb_false);
 
     // init interfaces

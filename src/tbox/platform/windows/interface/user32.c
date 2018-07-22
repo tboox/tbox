@@ -40,7 +40,7 @@ static tb_bool_t tb_user32_instance_init(tb_handle_t instance, tb_cpointer_t pri
 
     // the user32 module
     HANDLE module = GetModuleHandleA("user32.dll");
-    if (!module) module = tb_dynamic_init("user32.dll");
+    if (!module) module = (HANDLE)tb_dynamic_init("user32.dll");
     tb_assert_and_check_return_val(module, tb_false);
 
     // init interfaces

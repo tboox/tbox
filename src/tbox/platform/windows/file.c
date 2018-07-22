@@ -136,7 +136,7 @@ tb_bool_t tb_file_exit(tb_file_ref_t file)
     tb_assert_and_check_return_val(file, tb_false);
 
     // close it
-    return CloseHandle(file)? tb_true : tb_false;
+    return CloseHandle((HANDLE)file)? tb_true : tb_false;
 }
 tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
@@ -148,7 +148,7 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 
     // read
     DWORD real_size = 0;
-    return ReadFile(file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    return ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
@@ -160,7 +160,7 @@ tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size
 
     // writ
     DWORD real_size = 0;
-    return WriteFile(file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    return WriteFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {
@@ -350,7 +350,7 @@ tb_bool_t tb_file_sync(tb_file_ref_t file)
     tb_assert_and_check_return_val(file, tb_false);
 
     // sync it
-    return FlushFileBuffers(file)? tb_true : tb_false;
+    return FlushFileBuffers((HANDLE)file)? tb_true : tb_false;
 }
 tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
 {
@@ -361,7 +361,7 @@ tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
     LARGE_INTEGER o = {{0}};
     LARGE_INTEGER p = {{0}};
     o.QuadPart = (LONGLONG)offset;
-    return SetFilePointerEx(file, o, &p, (DWORD)mode)? (tb_hong_t)p.QuadPart : -1;
+    return SetFilePointerEx((HANDLE)file, o, &p, (DWORD)mode)? (tb_hong_t)p.QuadPart : -1;
 }
 tb_hong_t tb_file_offset(tb_file_ref_t file)
 {
@@ -382,7 +382,7 @@ tb_hize_t tb_file_size(tb_file_ref_t file)
 
     // the file size
     LARGE_INTEGER p = {{0}};
-    return pGetFileSizeEx(file, &p)? (tb_hong_t)p.QuadPart : 0;
+    return pGetFileSizeEx((HANDLE)file, &p)? (tb_hong_t)p.QuadPart : 0;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
