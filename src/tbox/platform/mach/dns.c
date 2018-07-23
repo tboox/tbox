@@ -50,8 +50,8 @@ typedef tb_int_t (*tb_dns_res_ninit_func_t)(res_state);
 tb_bool_t tb_dns_init_env()
 {
     // done
-    tb_size_t   count = 0;
-    tb_handle_t library = tb_dynamic_init("libresolv.dylib");
+    tb_size_t           count = 0;
+    tb_dynamic_ref_t    library = tb_dynamic_init("libresolv.dylib");
     if (library) 
     {
         // the res_ninit func
