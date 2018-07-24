@@ -64,7 +64,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
         }
 
         // trace
-        tb_trace_i("send(%p): %s %s", sock, data, count <= 0? "ok" : "failed");
+        tb_trace_d("send(%p): %s %s", sock, data, count <= 0? "ok" : "failed");
 
     } while (0);
 

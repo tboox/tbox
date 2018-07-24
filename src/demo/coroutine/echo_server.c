@@ -42,7 +42,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
     }
 
     // trace
-    tb_trace_i("echo: %s", data);
+    tb_trace_d("echo: %s", data);
 
     // exit socket
     tb_socket_exit(sock);
