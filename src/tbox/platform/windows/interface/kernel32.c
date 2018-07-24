@@ -27,6 +27,7 @@
  * includes
  */
 #include "kernel32.h"
+#include "ws2_32.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -59,6 +60,7 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance, tb_cpointer_t p
     TB_INTERFACE_LOAD(kernel32, GetEnvironmentStringsW);
     TB_INTERFACE_LOAD(kernel32, FreeEnvironmentStringsW);
     TB_INTERFACE_LOAD(kernel32, SetHandleInformation);
+    TB_INTERFACE_LOAD(kernel32, SetFileCompletionNotificationModes);
 
     // ok
     return tb_true;
@@ -79,4 +81,50 @@ tb_kernel32_ref_t tb_kernel32()
 
     // ok
     return &s_kernel32;
+}
+tb_bool_t tb_kernel32_has_SetFileCompletionNotificationModes()
+{
+    static tb_long_t s_ok = 0;
+    if (!s_ok)
+    {
+        LPWSAPROTOCOL_INFOW lpProtocolInfo = tb_null;
+        do
+        {
+            // no this interface?
+            if (!tb_kernel32()->SetFileCompletionNotificationModes)
+                break;
+
+            // allocate a 16K buffer to retrieve all the protocol providers
+            DWORD dwBufferLen = 16384;
+            lpProtocolInfo = (LPWSAPROTOCOL_INFOW)tb_malloc(dwBufferLen);
+            tb_assert_and_check_break(lpProtocolInfo);
+
+            // get protocol info
+            tb_int_t iNuminfo = tb_ws2_32()->WSAEnumProtocolsW(tb_null, lpProtocolInfo, &dwBufferLen);
+            tb_check_break(iNuminfo != SOCKET_ERROR);
+
+            // has XP1_IFS_HANDLES? see https://support.microsoft.com/kb/2568167 for details
+            tb_int_t i = 0;
+            for (i = 0; i < iNuminfo; i++) 
+            {
+                if (!(lpProtocolInfo[i].dwServiceFlags1 & XP1_IFS_HANDLES))
+                    break;
+            }
+            tb_check_break(i == iNuminfo);
+
+            // ok
+            s_ok = 1;
+
+        } while (0);
+
+        // free protocol info
+        if (lpProtocolInfo) tb_free(lpProtocolInfo);
+        lpProtocolInfo = tb_null;
+
+        // failed
+        if (!s_ok) s_ok = -1;
+    }
+
+    // ok?
+    return s_ok == 1;
 }

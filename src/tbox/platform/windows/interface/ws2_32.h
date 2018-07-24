@@ -51,6 +51,9 @@ typedef SOCKET (WSAAPI* tb_ws2_32_WSASocketA_t)(tb_int_t af, tb_int_t type, tb_i
 // the WSAGetLastError func type
 typedef tb_int_t (WSAAPI* tb_ws2_32_WSAGetLastError_t)(tb_void_t);
 
+// the WSAEnumProtocolsW func type
+typedef tb_int_t (WSAAPI* tb_ws2_32_WSAEnumProtocolsW_t)(LPINT lpiProtocols, LPWSAPROTOCOL_INFOW lpProtocolBuffer, LPDWORD lpdwBufferLength);
+
 // the WSAIoctl func type
 typedef tb_int_t (WSAAPI* tb_ws2_32_WSAIoctl_t)(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer, DWORD cbInBuffer, LPVOID lpvOutBuffer, DWORD cbOutBuffer, LPDWORD lpcbBytesReturned, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
 
@@ -149,6 +152,9 @@ typedef struct __tb_ws2_32_t
  
     // WSAGetLastError
     tb_ws2_32_WSAGetLastError_t     WSAGetLastError;
+
+    // WSAEnumProtocolsW
+    tb_ws2_32_WSAEnumProtocolsW_t   WSAEnumProtocolsW;
 
     // WSASend
     tb_ws2_32_WSASend_t             WSASend;

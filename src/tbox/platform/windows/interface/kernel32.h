@@ -100,56 +100,62 @@ typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironm
 // the SetHandleInformation func type
 typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
 
+// the SetFileCompletionNotificationModes func type
+typedef BOOL (*tb_kernel32_SetFileCompletionNotificationModes_t)(HANDLE FileHandle, UCHAR Flags);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
     // CaptureStackBackTrace
-    tb_kernel32_RtlCaptureStackBackTrace_t      RtlCaptureStackBackTrace;
+    tb_kernel32_RtlCaptureStackBackTrace_t              RtlCaptureStackBackTrace;
 
     // GetFileSizeEx
-    tb_kernel32_GetFileSizeEx_t                 GetFileSizeEx;
+    tb_kernel32_GetFileSizeEx_t                         GetFileSizeEx;
 
     // GetQueuedCompletionStatusEx
-    tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
+    tb_kernel32_GetQueuedCompletionStatusEx_t           GetQueuedCompletionStatusEx;
 
     // InterlockedCompareExchange64
-    tb_kernel32_InterlockedCompareExchange64_t  InterlockedCompareExchange64;
+    tb_kernel32_InterlockedCompareExchange64_t          InterlockedCompareExchange64;
 
     // GetEnvironmentVariableW
-    tb_kernel32_GetEnvironmentVariableW_t       GetEnvironmentVariableW;
+    tb_kernel32_GetEnvironmentVariableW_t               GetEnvironmentVariableW;
 
     // SetEnvironmentVariableW
-    tb_kernel32_SetEnvironmentVariableW_t       SetEnvironmentVariableW;
+    tb_kernel32_SetEnvironmentVariableW_t               SetEnvironmentVariableW;
 
     // CreateProcessW
-    tb_kernel32_CreateProcessW_t                CreateProcessW;
+    tb_kernel32_CreateProcessW_t                        CreateProcessW;
 
     // WaitForSingleObject
-    tb_kernel32_WaitForSingleObject_t           WaitForSingleObject;
+    tb_kernel32_WaitForSingleObject_t                   WaitForSingleObject;
 
     // WaitForMultipleObjects
-    tb_kernel32_WaitForMultipleObjects_t        WaitForMultipleObjects;
+    tb_kernel32_WaitForMultipleObjects_t                WaitForMultipleObjects;
 
     // GetExitCodeProcess
-    tb_kernel32_GetExitCodeProcess_t            GetExitCodeProcess;
+    tb_kernel32_GetExitCodeProcess_t                    GetExitCodeProcess;
 
     // TerminateProcess
-    tb_kernel32_TerminateProcess_t              TerminateProcess;
+    tb_kernel32_TerminateProcess_t                      TerminateProcess;
 
     // SuspendThread
-    tb_kernel32_SuspendThread_t                 SuspendThread;
+    tb_kernel32_SuspendThread_t                         SuspendThread;
 
     // ResumeThread
-    tb_kernel32_ResumeThread_t                  ResumeThread;
+    tb_kernel32_ResumeThread_t                          ResumeThread;
 
     // GetEnvironmentStringsW
-    tb_kernel32_GetEnvironmentStringsW_t        GetEnvironmentStringsW;
+    tb_kernel32_GetEnvironmentStringsW_t                GetEnvironmentStringsW;
 
     // FreeEnvironmentStringsW
-    tb_kernel32_FreeEnvironmentStringsW_t       FreeEnvironmentStringsW;
+    tb_kernel32_FreeEnvironmentStringsW_t               FreeEnvironmentStringsW;
 
     // SetHandleInformation
-    tb_kernel32_SetHandleInformation_t          SetHandleInformation;
+    tb_kernel32_SetHandleInformation_t                  SetHandleInformation;
+
+    // SetFileCompletionNotificationModes
+    tb_kernel32_SetFileCompletionNotificationModes_t    SetFileCompletionNotificationModes;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 
@@ -162,6 +168,21 @@ typedef struct __tb_kernel32_t
  * @return          the kernel32 interfaces pointer
  */
 tb_kernel32_ref_t   tb_kernel32(tb_noarg_t);
+
+/* has SetFileCompletionNotificationModes?
+ *
+ * Verifies that SetFileCompletionNotificationModes Windows API is present on the system 
+ * and is safe to use. 
+ *
+ * We can uses the SetFileCompletionNotificationModes Windows API to skip calling GetQueuedCompletionStatus 
+ * if an IO operation completes synchronously. 
+ *
+ * There is a known bug where SetFileCompletionNotificationModes crashes on some systems 
+ * (see https://support.microsoft.com/kb/2568167 for details).
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_kernel32_has_SetFileCompletionNotificationModes();
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

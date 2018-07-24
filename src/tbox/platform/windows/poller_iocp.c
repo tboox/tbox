@@ -670,7 +670,7 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
             // update the accept context, otherwise shutdown and getsockname will be failed
             SOCKET fd = tb_sock2fd(object->u.acpt.result);
             SOCKET acpt = (SOCKET)tb_sock2fd(object->sock);
-            setsockopt(fd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
+            tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
 
             // non-block
             ULONG nb = 1;
@@ -688,7 +688,7 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
              * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
              */
             tb_int_t enable = 1;
-            setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
+            tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
             // get accept socket addresses
             INT                         server_size = 0;

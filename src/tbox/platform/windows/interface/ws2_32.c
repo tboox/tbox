@@ -30,6 +30,11 @@
 #include "../../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * pragma
+ */
+#pragma comment(lib, "Ws2_32.lib")
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance, tb_cpointer_t priv)
@@ -49,6 +54,7 @@ static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance, tb_cpointer_t pri
     TB_INTERFACE_LOAD(ws2_32, WSASocketA);
     TB_INTERFACE_LOAD(ws2_32, WSAIoctl);
     TB_INTERFACE_LOAD(ws2_32, WSAGetLastError);
+    TB_INTERFACE_LOAD(ws2_32, WSAEnumProtocolsW);
     TB_INTERFACE_LOAD(ws2_32, WSASend);
     TB_INTERFACE_LOAD(ws2_32, WSARecv);
     TB_INTERFACE_LOAD(ws2_32, WSASendTo);

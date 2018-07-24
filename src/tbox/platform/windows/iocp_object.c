@@ -398,7 +398,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
          * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
          */
         tb_int_t enable = 1;
-        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
+        tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
         // save address
         if (addr) tb_sockaddr_save(addr, &d);
