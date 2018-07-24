@@ -334,7 +334,7 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpoin
 static tb_size_t tb_heap_itor_size(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap, 0);
 
     // size
@@ -343,7 +343,7 @@ static tb_size_t tb_heap_itor_size(tb_iterator_ref_t iterator)
 static tb_size_t tb_heap_itor_head(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap, 0);
 
     // head
@@ -352,7 +352,7 @@ static tb_size_t tb_heap_itor_head(tb_iterator_ref_t iterator)
 static tb_size_t tb_heap_itor_last(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap, 0);
 
     // last
@@ -361,7 +361,7 @@ static tb_size_t tb_heap_itor_last(tb_iterator_ref_t iterator)
 static tb_size_t tb_heap_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap, 0);
 
     // tail
@@ -370,7 +370,7 @@ static tb_size_t tb_heap_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_heap_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap, 0);
     tb_assert_and_check_return_val(itor < heap->size, heap->size);
 
@@ -380,7 +380,7 @@ static tb_size_t tb_heap_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 static tb_size_t tb_heap_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap, 0);
     tb_assert_and_check_return_val(itor && itor < heap->size, 0);
 
@@ -390,7 +390,7 @@ static tb_size_t tb_heap_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 static tb_pointer_t tb_heap_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap && itor < heap->size, tb_null);
     
     // data
@@ -399,7 +399,7 @@ static tb_pointer_t tb_heap_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
 static tb_void_t tb_heap_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return(heap);
 
     // copy
@@ -408,7 +408,7 @@ static tb_void_t tb_heap_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, t
 static tb_long_t tb_heap_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap && heap->element.comp, 0);
 
     // comp
@@ -417,7 +417,7 @@ static tb_long_t tb_heap_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t lit
 static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)iterator;
+    tb_heap_t*const heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return(heap && heap->data && heap->size && itor < heap->size);
 
     // check the element function
@@ -542,7 +542,7 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
 tb_void_t tb_heap_exit(tb_heap_ref_t self)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_heap_t*const heap = (tb_heap_t*)self;
     tb_assert_and_check_return(heap);
 
     // clear data
@@ -558,7 +558,7 @@ tb_void_t tb_heap_exit(tb_heap_ref_t self)
 tb_void_t tb_heap_clear(tb_heap_ref_t self)
 {   
     // check
-    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_heap_t*const heap = (tb_heap_t*)self;
     tb_assert_and_check_return(heap);
 
     // free data
@@ -593,7 +593,7 @@ tb_pointer_t tb_heap_top(tb_heap_ref_t self)
 tb_void_t tb_heap_put(tb_heap_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_heap_t*const heap = (tb_heap_t*)self;
     tb_assert_and_check_return(heap && heap->element.dupl && heap->data);
 
     // no enough? grow it
@@ -638,7 +638,7 @@ tb_void_t tb_heap_put(tb_heap_ref_t self, tb_cpointer_t data)
 tb_void_t tb_heap_pop(tb_heap_ref_t self)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_heap_t*const heap = (tb_heap_t*)self;
     tb_assert_and_check_return(heap && heap->data && heap->size);
 
     // free the top item first
@@ -681,7 +681,7 @@ tb_void_t tb_heap_remove(tb_heap_ref_t self, tb_size_t itor)
 tb_void_t tb_heap_dump(tb_heap_ref_t self)
 {
     // check
-    tb_heap_t* heap = (tb_heap_t*)self;
+    tb_heap_t*const heap = (tb_heap_t*)self;
     tb_assert_and_check_return(heap);
 
     // trace

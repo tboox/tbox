@@ -92,7 +92,7 @@ static tb_size_t tb_single_list_itor_size(tb_iterator_ref_t iterator)
 static tb_size_t tb_single_list_itor_head(tb_iterator_ref_t iterator)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)iterator;
+    tb_single_list_t*const list = (tb_single_list_t*)iterator;
     tb_assert(list);
 
     // head
@@ -101,7 +101,7 @@ static tb_size_t tb_single_list_itor_head(tb_iterator_ref_t iterator)
 static tb_size_t tb_single_list_itor_last(tb_iterator_ref_t iterator)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)iterator;
+    tb_single_list_t*const list = (tb_single_list_t*)iterator;
     tb_assert(list);
 
     // last
@@ -110,7 +110,7 @@ static tb_size_t tb_single_list_itor_last(tb_iterator_ref_t iterator)
 static tb_size_t tb_single_list_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)iterator;
+    tb_single_list_t*const list = (tb_single_list_t*)iterator;
     tb_assert(list);
 
     // tail
@@ -127,7 +127,7 @@ static tb_size_t tb_single_list_itor_next(tb_iterator_ref_t iterator, tb_size_t 
 static tb_pointer_t tb_single_list_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)iterator;
+    tb_single_list_t*const list = (tb_single_list_t*)iterator;
     tb_assert(list && itor);
 
     // data
@@ -136,7 +136,7 @@ static tb_pointer_t tb_single_list_itor_item(tb_iterator_ref_t iterator, tb_size
 static tb_void_t tb_single_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)iterator;
+    tb_single_list_t*const list = (tb_single_list_t*)iterator;
     tb_assert(list && itor);
 
     // copy
@@ -145,7 +145,7 @@ static tb_void_t tb_single_list_itor_copy(tb_iterator_ref_t iterator, tb_size_t 
 static tb_long_t tb_single_list_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)iterator;
+    tb_single_list_t*const list = (tb_single_list_t*)iterator;
     tb_assert(list && list->element.comp);
 
     // comp
@@ -186,7 +186,7 @@ static tb_void_t tb_single_list_itor_nremove(tb_iterator_ref_t iterator, tb_size
 static tb_void_t tb_single_list_item_exit(tb_pointer_t data, tb_cpointer_t priv)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)priv;
+    tb_single_list_t*const list = (tb_single_list_t*)priv;
     tb_assert_and_check_return(list);
 
     // free data
@@ -264,7 +264,7 @@ tb_single_list_ref_t tb_single_list_init(tb_size_t grow, tb_element_t element)
 tb_void_t tb_single_list_exit(tb_single_list_ref_t self)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list);
    
     // clear data
@@ -279,7 +279,7 @@ tb_void_t tb_single_list_exit(tb_single_list_ref_t self)
 tb_void_t tb_single_list_clear(tb_single_list_ref_t self)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list);
 
     // clear pool
@@ -299,7 +299,7 @@ tb_pointer_t tb_single_list_last(tb_single_list_ref_t self)
 tb_size_t tb_single_list_size(tb_single_list_ref_t self)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return_val(list && list->pool, 0);
     tb_assert(tb_single_list_entry_size(&list->head) == tb_fixed_pool_size(list->pool));
 
@@ -314,7 +314,7 @@ tb_size_t tb_single_list_maxn(tb_single_list_ref_t self)
 tb_size_t tb_single_list_insert_next(tb_single_list_ref_t self, tb_size_t itor, tb_cpointer_t data)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return_val(list && list->element.dupl && list->pool, 0);
 
     // full?
@@ -340,7 +340,7 @@ tb_size_t tb_single_list_insert_next(tb_single_list_ref_t self, tb_size_t itor, 
 tb_size_t tb_single_list_insert_head(tb_single_list_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return_val(list && list->element.dupl && list->pool, 0);
 
     // full?
@@ -362,7 +362,7 @@ tb_size_t tb_single_list_insert_head(tb_single_list_ref_t self, tb_cpointer_t da
 tb_size_t tb_single_list_insert_tail(tb_single_list_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return_val(list && list->element.dupl && list->pool, 0);
 
     // full?
@@ -384,7 +384,7 @@ tb_size_t tb_single_list_insert_tail(tb_single_list_ref_t self, tb_cpointer_t da
 tb_void_t tb_single_list_replace(tb_single_list_ref_t self, tb_size_t itor, tb_cpointer_t data)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list && list->element.repl && itor);
 
     // the node
@@ -405,7 +405,7 @@ tb_void_t tb_single_list_replace_last(tb_single_list_ref_t self, tb_cpointer_t d
 tb_void_t tb_single_list_remove_next(tb_single_list_ref_t self, tb_size_t itor)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list && list->pool && itor);
 
     // the node
@@ -425,7 +425,7 @@ tb_void_t tb_single_list_remove_next(tb_single_list_ref_t self, tb_size_t itor)
 tb_void_t tb_single_list_remove_head(tb_single_list_ref_t self)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list && list->pool);
 
     // the node
@@ -442,7 +442,7 @@ tb_void_t tb_single_list_remove_head(tb_single_list_ref_t self)
 tb_void_t tb_single_list_dump(tb_single_list_ref_t self)
 {
     // check
-    tb_single_list_t* list = (tb_single_list_t*)self;
+    tb_single_list_t*const list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list);
 
     // trace

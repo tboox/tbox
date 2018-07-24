@@ -241,7 +241,7 @@ static tb_bool_t tb_hash_map_item_at(tb_hash_map_t* hash_map, tb_size_t buck, tb
 static tb_size_t tb_hash_map_itor_size(tb_iterator_ref_t iterator)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map);
 
     // the size
@@ -250,7 +250,7 @@ static tb_size_t tb_hash_map_itor_size(tb_iterator_ref_t iterator)
 static tb_size_t tb_hash_map_itor_head(tb_iterator_ref_t iterator)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map);
 
     // find the head
@@ -270,7 +270,7 @@ static tb_size_t tb_hash_map_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_hash_map_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->hash_list && hash_map->hash_size);
 
     // the current buck and item
@@ -301,7 +301,7 @@ static tb_size_t tb_hash_map_itor_next(tb_iterator_ref_t iterator, tb_size_t ito
 static tb_pointer_t tb_hash_map_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && itor);
 
     // get the buck and item
@@ -317,7 +317,7 @@ static tb_pointer_t tb_hash_map_itor_item(tb_iterator_ref_t iterator, tb_size_t 
 static tb_void_t tb_hash_map_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->hash_list && hash_map->hash_size);
     
     // the buck and item
@@ -340,7 +340,7 @@ static tb_void_t tb_hash_map_itor_copy(tb_iterator_ref_t iterator, tb_size_t ito
 static tb_long_t tb_hash_map_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t lelement, tb_cpointer_t relement)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->element_name.comp && lelement && relement);
     
     // done
@@ -349,7 +349,7 @@ static tb_long_t tb_hash_map_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t
 static tb_void_t tb_hash_map_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->hash_list && hash_map->hash_size);
     
     // buck & item
@@ -395,7 +395,7 @@ static tb_void_t tb_hash_map_itor_remove(tb_iterator_ref_t iterator, tb_size_t i
 static tb_void_t tb_hash_map_itor_nremove(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->hash_list && hash_map->hash_size);
 
     // no size
@@ -557,7 +557,7 @@ tb_hash_map_ref_t tb_hash_map_init(tb_size_t bucket_size, tb_element_t element_n
 tb_void_t tb_hash_map_exit(tb_hash_map_ref_t self)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return(hash_map);
 
     // clear it
@@ -572,7 +572,7 @@ tb_void_t tb_hash_map_exit(tb_hash_map_ref_t self)
 tb_void_t tb_hash_map_clear(tb_hash_map_ref_t self)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return(hash_map && hash_map->hash_list);
 
     // step
@@ -614,7 +614,7 @@ tb_void_t tb_hash_map_clear(tb_hash_map_ref_t self)
 tb_pointer_t tb_hash_map_get(tb_hash_map_ref_t self, tb_cpointer_t name)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return_val(hash_map, tb_null);
 
     // find it
@@ -629,7 +629,7 @@ tb_pointer_t tb_hash_map_get(tb_hash_map_ref_t self, tb_cpointer_t name)
 tb_size_t tb_hash_map_find(tb_hash_map_ref_t self, tb_cpointer_t name)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return_val(hash_map, 0);
 
     // find
@@ -640,7 +640,7 @@ tb_size_t tb_hash_map_find(tb_hash_map_ref_t self, tb_cpointer_t name)
 tb_size_t tb_hash_map_insert(tb_hash_map_ref_t self, tb_cpointer_t name, tb_cpointer_t data)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return_val(hash_map, 0);
 
     // the step
@@ -740,7 +740,7 @@ tb_size_t tb_hash_map_insert(tb_hash_map_ref_t self, tb_cpointer_t name, tb_cpoi
 tb_void_t tb_hash_map_remove(tb_hash_map_ref_t self, tb_cpointer_t name)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return(hash_map);
 
     // find it
@@ -752,7 +752,7 @@ tb_void_t tb_hash_map_remove(tb_hash_map_ref_t self, tb_cpointer_t name)
 tb_size_t tb_hash_map_size(tb_hash_map_ref_t self)
 {
     // check
-    tb_hash_map_t const* hash_map = (tb_hash_map_t const*)self;
+    tb_hash_map_t const*const hash_map = (tb_hash_map_t const*)self;
     tb_assert_and_check_return_val(hash_map, 0);
 
     // the size
@@ -761,7 +761,7 @@ tb_size_t tb_hash_map_size(tb_hash_map_ref_t self)
 tb_size_t tb_hash_map_maxn(tb_hash_map_ref_t self)
 {
     // check
-    tb_hash_map_t const* hash_map = (tb_hash_map_t const*)self;
+    tb_hash_map_t const*const hash_map = (tb_hash_map_t const*)self;
     tb_assert_and_check_return_val(hash_map, 0);
 
     // the maxn
@@ -771,7 +771,7 @@ tb_size_t tb_hash_map_maxn(tb_hash_map_ref_t self)
 tb_void_t tb_hash_map_dump(tb_hash_map_ref_t self)
 {
     // check
-    tb_hash_map_t* hash_map = (tb_hash_map_t*)self;
+    tb_hash_map_t*const hash_map = (tb_hash_map_t*)self;
     tb_assert_and_check_return(hash_map && hash_map->hash_list);
 
     // the step

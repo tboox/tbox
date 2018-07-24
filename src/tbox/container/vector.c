@@ -92,7 +92,7 @@ typedef struct __tb_vector_t
 static tb_size_t tb_vector_itor_size(tb_iterator_ref_t iterator)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
 
     // size
@@ -106,7 +106,7 @@ static tb_size_t tb_vector_itor_head(tb_iterator_ref_t iterator)
 static tb_size_t tb_vector_itor_last(tb_iterator_ref_t iterator)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
 
     // last
@@ -115,7 +115,7 @@ static tb_size_t tb_vector_itor_last(tb_iterator_ref_t iterator)
 static tb_size_t tb_vector_itor_tail(tb_iterator_ref_t iterator)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
 
     // tail
@@ -124,7 +124,7 @@ static tb_size_t tb_vector_itor_tail(tb_iterator_ref_t iterator)
 static tb_size_t tb_vector_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
     tb_assert_and_check_return_val(itor < vector->size, vector->size);
 
@@ -134,7 +134,7 @@ static tb_size_t tb_vector_itor_next(tb_iterator_ref_t iterator, tb_size_t itor)
 static tb_size_t tb_vector_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
     tb_assert_and_check_return_val(itor && itor <= vector->size, 0);
 
@@ -144,7 +144,7 @@ static tb_size_t tb_vector_itor_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 static tb_pointer_t tb_vector_itor_item(tb_iterator_ref_t iterator, tb_size_t itor)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert_and_check_return_val(vector && itor < vector->size, tb_null);
     
     // data
@@ -153,7 +153,7 @@ static tb_pointer_t tb_vector_itor_item(tb_iterator_ref_t iterator, tb_size_t it
 static tb_void_t tb_vector_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
 
     // copy
@@ -162,7 +162,7 @@ static tb_void_t tb_vector_itor_copy(tb_iterator_ref_t iterator, tb_size_t itor,
 static tb_long_t tb_vector_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t litem, tb_cpointer_t ritem)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector && vector->element.comp);
 
     // comp
@@ -176,7 +176,7 @@ static tb_void_t tb_vector_itor_remove(tb_iterator_ref_t iterator, tb_size_t ito
 static tb_void_t tb_vector_itor_nremove(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)iterator;
+    tb_vector_t*const vector = (tb_vector_t*)iterator;
     tb_assert(vector);
 
     // remove the items
@@ -271,7 +271,7 @@ tb_void_t tb_vector_exit(tb_vector_ref_t self)
 tb_void_t tb_vector_clear(tb_vector_ref_t self)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector);
 
     // free data
@@ -284,8 +284,8 @@ tb_void_t tb_vector_clear(tb_vector_ref_t self)
 tb_void_t tb_vector_copy(tb_vector_ref_t self, tb_vector_ref_t copy)
 {
     // check
-    tb_vector_t*       vector = (tb_vector_t*)self;
-    tb_vector_t const* vector_copy = (tb_vector_t const*)copy;
+    tb_vector_t*       const vector = (tb_vector_t*)self;
+    tb_vector_t const* const vector_copy = (tb_vector_t const*)copy;
     tb_assert_and_check_return(vector && vector_copy);
 
     // check element
@@ -332,7 +332,7 @@ tb_pointer_t tb_vector_last(tb_vector_ref_t self)
 tb_size_t tb_vector_size(tb_vector_ref_t self)
 {
     // check
-    tb_vector_t const* vector = (tb_vector_t const*)self;
+    tb_vector_t const*const vector = (tb_vector_t const*)self;
     tb_assert_and_check_return_val(vector, 0);
 
     // size
@@ -341,7 +341,7 @@ tb_size_t tb_vector_size(tb_vector_ref_t self)
 tb_size_t tb_vector_grow(tb_vector_ref_t self)
 {
     // check
-    tb_vector_t const* vector = (tb_vector_t const*)self;
+    tb_vector_t const*const vector = (tb_vector_t const*)self;
     tb_assert_and_check_return_val(vector, 0);
 
     // grow
@@ -350,7 +350,7 @@ tb_size_t tb_vector_grow(tb_vector_ref_t self)
 tb_size_t tb_vector_maxn(tb_vector_ref_t self)
 {
     // check
-    tb_vector_t const* vector = (tb_vector_t const*)self;
+    tb_vector_t const*const vector = (tb_vector_t const*)self;
     tb_assert_and_check_return_val(vector, 0);
 
     // maxn
@@ -359,7 +359,7 @@ tb_size_t tb_vector_maxn(tb_vector_ref_t self)
 tb_bool_t tb_vector_resize(tb_vector_ref_t self, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return_val(vector, tb_false);
     
     // free items if the vector is decreased
@@ -397,7 +397,7 @@ tb_bool_t tb_vector_resize(tb_vector_ref_t self, tb_size_t size)
 tb_void_t tb_vector_insert_prev(tb_vector_ref_t self, tb_size_t itor, tb_cpointer_t data)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && vector->data && vector->element.size && itor <= vector->size);
 
     // save size
@@ -431,7 +431,7 @@ tb_void_t tb_vector_insert_tail(tb_vector_ref_t self, tb_cpointer_t data)
 tb_void_t tb_vector_ninsert_prev(tb_vector_ref_t self, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && vector->data && size && itor <= vector->size);
 
     // save size
@@ -465,7 +465,7 @@ tb_void_t tb_vector_ninsert_tail(tb_vector_ref_t self, tb_cpointer_t data, tb_si
 tb_void_t tb_vector_replace(tb_vector_ref_t self, tb_size_t itor, tb_cpointer_t data)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && vector->data && itor <= vector->size);
 
     // replace data
@@ -478,7 +478,7 @@ tb_void_t tb_vector_replace_head(tb_vector_ref_t self, tb_cpointer_t data)
 tb_void_t tb_vector_replace_last(tb_vector_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && vector->size);
 
     // replace
@@ -487,7 +487,7 @@ tb_void_t tb_vector_replace_last(tb_vector_ref_t self, tb_cpointer_t data)
 tb_void_t tb_vector_nreplace(tb_vector_ref_t self, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && vector->data && vector->size && itor <= vector->size && size);
 
     // strip size
@@ -503,7 +503,7 @@ tb_void_t tb_vector_nreplace_head(tb_vector_ref_t self, tb_cpointer_t data, tb_s
 tb_void_t tb_vector_nreplace_last(tb_vector_ref_t self, tb_cpointer_t data, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && vector->size && size);
 
     // replace
@@ -512,7 +512,7 @@ tb_void_t tb_vector_nreplace_last(tb_vector_ref_t self, tb_cpointer_t data, tb_s
 tb_void_t tb_vector_remove(tb_vector_ref_t self, tb_size_t itor)
 {   
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && itor < vector->size);
 
     if (vector->size)
@@ -534,7 +534,7 @@ tb_void_t tb_vector_remove_head(tb_vector_ref_t self)
 tb_void_t tb_vector_remove_last(tb_vector_ref_t self)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector);
 
     if (vector->size)
@@ -549,7 +549,7 @@ tb_void_t tb_vector_remove_last(tb_vector_ref_t self)
 tb_void_t tb_vector_nremove(tb_vector_ref_t self, tb_size_t itor, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && size && itor < vector->size);
 
     // clear it
@@ -583,7 +583,7 @@ tb_void_t tb_vector_nremove(tb_vector_ref_t self, tb_size_t itor, tb_size_t size
 tb_void_t tb_vector_nremove_head(tb_vector_ref_t self, tb_size_t size)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && size);
 
     // clear it
@@ -599,7 +599,7 @@ tb_void_t tb_vector_nremove_head(tb_vector_ref_t self, tb_size_t size)
 tb_void_t tb_vector_nremove_last(tb_vector_ref_t self, tb_size_t size)
 {   
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && size);
 
     // clear it
@@ -616,7 +616,7 @@ tb_void_t tb_vector_nremove_last(tb_vector_ref_t self, tb_size_t size)
 tb_void_t tb_vector_dump(tb_vector_ref_t self)
 {
     // check
-    tb_vector_t* vector = (tb_vector_t*)self;
+    tb_vector_t*const vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector);
 
     // trace

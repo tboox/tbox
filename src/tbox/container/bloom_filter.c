@@ -225,7 +225,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
 tb_void_t tb_bloom_filter_exit(tb_bloom_filter_ref_t self)
 {
     // check
-    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_bloom_filter_t*const filter = (tb_bloom_filter_t*)self;
     tb_assert_and_check_return(filter);
 
     // exit data
@@ -238,7 +238,7 @@ tb_void_t tb_bloom_filter_exit(tb_bloom_filter_ref_t self)
 tb_void_t tb_bloom_filter_clear(tb_bloom_filter_ref_t self)
 {
     // check
-    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_bloom_filter_t*const filter = (tb_bloom_filter_t*)self;
     tb_assert_and_check_return(filter);
 
     // clear it
@@ -247,7 +247,7 @@ tb_void_t tb_bloom_filter_clear(tb_bloom_filter_ref_t self)
 tb_bool_t tb_bloom_filter_set(tb_bloom_filter_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_bloom_filter_t*const filter = (tb_bloom_filter_t*)self;
     tb_assert_and_check_return_val(filter, tb_false);
 
     // walk
@@ -277,7 +277,7 @@ tb_bool_t tb_bloom_filter_set(tb_bloom_filter_ref_t self, tb_cpointer_t data)
 tb_bool_t tb_bloom_filter_get(tb_bloom_filter_ref_t self, tb_cpointer_t data)
 {
     // check
-    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_bloom_filter_t*const filter = (tb_bloom_filter_t*)self;
     tb_assert_and_check_return_val(filter, tb_false);
 
     // walk
