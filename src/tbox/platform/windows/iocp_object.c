@@ -552,7 +552,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     {
         // trace
         tb_trace_d("recv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", object->sock, real, object->skip_cpos);
-        return (tb_long_t)real;
+        return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
@@ -621,7 +621,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     {
         // trace
         tb_trace_d("send(%p): WSASend: %u bytes, skip: %d, state: finished directly", object->sock, real, object->skip_cpos);
-        return (tb_long_t)real;
+        return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
@@ -820,13 +820,33 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
-    // post a send event to wait it
-    object->code           = TB_IOCP_OBJECT_CODE_SENDF;
-    object->state          = TB_STATE_PENDING;
-    object->u.sendf.file   = file;
-    object->u.sendf.size   = size;
-    object->u.sendf.offset = offset;
-    return 0;
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
+    // attach file and offset
+    object->u.sendf.file    = file;
+    object->u.sendf.offset  = offset;
+    object->u.sendf.size    = size;
+    object->olap.Offset     = (DWORD)offset;
+    object->olap.OffsetHigh = (DWORD)(offset >> 32);
+
+    // do send file
+    BOOL ok = tb_mswsock()->TransmitFile((SOCKET)tb_sock2fd(object->sock), (HANDLE)file, (DWORD)size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
+
+    // trace
+    tb_trace_d("sendfile(%p): TransmitFile: %d, lasterror: %d", object->sock, ok, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_SENDF;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size)
 {
@@ -866,21 +886,36 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     object->u.recvv.list = list;
     object->u.recvv.size = (tb_iovec_size_t)size;
 
-    // attempt to send data directly
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
+    // attempt to recv data directly
     DWORD flag = 0;
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.recvv.list, (DWORD)object->u.recvv.size, &real, &flag, tb_null, tb_null);
-    if (!ok && real)
+    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.recvv.list, (DWORD)object->u.recvv.size, &real, &flag, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // finished and skip iocp notification? return it directly
+    if (!ok && object->skip_cpos)
     {
         // trace
-        tb_trace_d("recvv(%p): WSARecv: %u bytes, state: finished directly", object->sock, real);
-        return (tb_long_t)real;
+        tb_trace_d("recvv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", object->sock, real, object->skip_cpos);
+        return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
-    // post a recvv event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_RECVV;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // trace
+    tb_trace_d("recvv(%p): WSARecv: %ld, skip: %d, lasterror: %d", object->sock, ok, object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue to wait it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_RECVV;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size)
 {
@@ -921,20 +956,35 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     object->u.sendv.list = list;
     object->u.sendv.size = (tb_iovec_size_t)size;
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attempt to send data directly
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.sendv.list, (DWORD)object->u.sendv.size, &real, 0, tb_null, tb_null);
-    if (!ok && real)
+    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.sendv.list, (DWORD)object->u.sendv.size, &real, 0, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // finished and skip iocp notification? return it directly
+    if (!ok && object->skip_cpos)
     {
         // trace
-        tb_trace_d("sendv(%p): WSASend: %u bytes, state: finished directly", object->sock, real);
-        return (tb_long_t)real;
+        tb_trace_d("sendv(%p): WSASend: %u bytes, skip: %d, state: finished directly", object->sock, real, object->skip_cpos);
+        return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
-    // post a sendv event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_SENDV;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // trace
+    tb_trace_d("sendv(%p): WSASend: %ld, skip: %d, lasterror: %d", object->sock, ok, object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue to wait it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_SENDV;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {

@@ -428,6 +428,7 @@ static tb_bool_t tb_poller_iocp_event_post_usend(tb_poller_iocp_ref_t poller, tb
 }
 static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
+#if 0
     // check
     tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
@@ -453,9 +454,13 @@ static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb
     object->state = TB_STATE_FINISHED;
     object->u.sendf.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
+#else
+    return tb_true;
+#endif
 }
 static tb_bool_t tb_poller_iocp_event_post_recvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
+#if 0
     // check
     tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
@@ -481,9 +486,13 @@ static tb_bool_t tb_poller_iocp_event_post_recvv(tb_poller_iocp_ref_t poller, tb
     object->state = TB_STATE_FINISHED;
     object->u.recvv.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
+#else
+    return tb_true;
+#endif
 }
 static tb_bool_t tb_poller_iocp_event_post_sendv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
+#if 0
     // check
     tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
@@ -508,6 +517,9 @@ static tb_bool_t tb_poller_iocp_event_post_sendv(tb_poller_iocp_ref_t poller, tb
     object->state = TB_STATE_FINISHED;
     object->u.sendv.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
+#else
+    return tb_true;
+#endif
 }
 static tb_bool_t tb_poller_iocp_event_post_urecvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
