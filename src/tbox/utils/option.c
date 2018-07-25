@@ -75,8 +75,8 @@ static __tb_inline__ tb_bool_t tb_option_is_integer(tb_char_t const* data)
     // init
     tb_char_t const* p = data;
 
-    // skip '-'
-    if (*p == '-') p++;
+    // skip '-' & '+'
+    if (*p == '-' || *p == '+') p++;
 
     // walk
     for (; *p && tb_isdigit(*p); p++);
