@@ -57,6 +57,16 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private declaration
+ */
+__tb_extern_c_enter__
+
+// bind iocp port for object
+tb_bool_t tb_poller_iocp_bind_object(tb_poller_ref_t poller, tb_iocp_object_ref_t object);
+
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
 
@@ -400,6 +410,17 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
         tb_int_t enable = 1;
         tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
+        // skip the completion notification on success
+        if (tb_kernel32_has_SetFileCompletionNotificationModes())
+        {
+            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+            {
+                tb_iocp_object_ref_t client_object = tb_iocp_object_get_or_new(acpt);
+                if (client_object)
+                    client_object->skip_cpos = 1;
+            }
+        }
+
         // save address
         if (addr) tb_sockaddr_save(addr, &d);
         
@@ -436,16 +457,26 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     {
         if (object->state == TB_STATE_FINISHED)
         {
-            // trace
-            tb_trace_d("connect(%p): %{ipaddr}, state: %s, result: %ld", object->sock, addr, tb_state_cstr(object->state), object->u.conn.result);
-
             /* clear the previous object data first
              *
              * @note conn.addr and conn.result cannot be cleared
              */
             tb_iocp_object_clear(object);
             if (tb_ipaddr_is_equal(&object->u.conn.addr, addr))
+            {
+                // skip the completion notification on success
+                if (tb_kernel32_has_SetFileCompletionNotificationModes())
+                {
+                    if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(object->sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+                        object->skip_cpos = 1;
+                }
+
+                // trace
+                tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: %s, result: %ld", object->sock, addr, object->skip_cpos, tb_state_cstr(object->state), object->u.conn.result);
+
+                // ok
                 return object->u.conn.result;
+            }
         }
         // waiting timeout before?
         else if (object->state == TB_STATE_WAITING && tb_ipaddr_is_equal(&object->u.conn.addr, addr))
@@ -508,21 +539,36 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     object->u.recv.data = data;
     object->u.recv.size = (tb_iovec_size_t)size;
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attempt to recv data directly
     DWORD flag = 0;
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.recv, 1, &real, &flag, tb_null, tb_null);
-    if (!ok && real)
+    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.recv, 1, &real, &flag, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // finished and skip iocp notification? return it directly
+    if (!ok && object->skip_cpos)
     {
         // trace
-        tb_trace_d("recv(%p): WSARecv: %u bytes, state: finished directly", object->sock, real);
+        tb_trace_d("recv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", object->sock, real, object->skip_cpos);
         return (tb_long_t)real;
     }
 
-    // post a recv event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_RECV;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // trace
+    tb_trace_d("recv(%p): WSARecv: %ld, skip: %d, lasterror: %d", object->sock, ok, object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue to wait it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_RECV;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size)
 {
@@ -563,20 +609,35 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     object->u.send.data = data;
     object->u.send.size = (tb_iovec_size_t)size;
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attempt to send data directly
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.send, 1, &real, 0, tb_null, tb_null);
-    if (!ok && real)
+    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.send, 1, &real, 0, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // finished and skip iocp notification? return it directly
+    if (!ok && object->skip_cpos)
     {
         // trace
-        tb_trace_d("send(%p): WSASend: %u bytes, state: finished directly", object->sock, real);
+        tb_trace_d("send(%p): WSASend: %u bytes, skip: %d, state: finished directly", object->sock, real, object->skip_cpos);
         return (tb_long_t)real;
     }
 
-    // post a send event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_SEND;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // trace
+    tb_trace_d("send(%p): WSASend: %ld, skip: %d, lasterror: %d", object->sock, ok, object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue to wait it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_SEND;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
 {

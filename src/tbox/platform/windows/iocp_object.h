@@ -303,6 +303,12 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
      */
     tb_uint8_t                      state;
 
+    /* skip completion port on success? 
+     *
+     * SetFileCompletionNotificationModes(fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS)
+     */
+    tb_uint8_t                      skip_cpos;
+
 }tb_iocp_object_t, *tb_iocp_object_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

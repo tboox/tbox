@@ -33,6 +33,10 @@
 #include "../../algorithm/algorithm.h"
 #include "interface/interface.h"
 #include "ntstatus.h"
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -101,6 +105,16 @@ typedef struct __tb_poller_iocp_t
     tb_size_t               events_count;
 
 }tb_poller_iocp_t, *tb_poller_iocp_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private declaration
+ */
+__tb_extern_c_enter__
+
+// bind iocp port for object
+tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object);
+
+__tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -280,6 +294,7 @@ static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_
 }
 static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
+#if 0
     // check
     tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
@@ -305,9 +320,13 @@ static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_
     object->state = TB_STATE_FINISHED;
     object->u.recv.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
+#else
+    return tb_true;
+#endif
 }
 static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
+#if 0
     // check
     tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
     tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
@@ -332,6 +351,9 @@ static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_
     object->state = TB_STATE_FINISHED;
     object->u.send.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
+#else
+    return tb_true;
+#endif
 }
 static tb_bool_t tb_poller_iocp_event_post_urecv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -690,6 +712,17 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
             tb_int_t enable = 1;
             tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
+            // skip the completion notification on success
+            if (tb_kernel32_has_SetFileCompletionNotificationModes())
+            {
+                if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+                {
+                    tb_iocp_object_ref_t client_object = tb_iocp_object_get_or_new(object->u.acpt.result);
+                    if (client_object)
+                        client_object->skip_cpos = 1;
+                }
+            }
+
             // get accept socket addresses
             INT                         server_size = 0;
             INT                         client_size = 0;
@@ -993,6 +1026,45 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     // ok
     return wait;
 }
+tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object)
+{
+    // check
+    tb_assert(object);
+
+    // bind this socket and object to port
+    if (!object->port) 
+    {
+        // get the poller of the current coroutin scheduler
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+        if (!poller) 
+        {
+            tb_co_scheduler_io_ref_t co_scheduler_io = tb_co_scheduler_io_self();
+            if (co_scheduler_io) poller = (tb_poller_iocp_ref_t)co_scheduler_io->poller;
+            else
+            {
+                tb_lo_scheduler_io_ref_t lo_scheduler_io = tb_lo_scheduler_io_self();
+                if (lo_scheduler_io) poller = (tb_poller_iocp_ref_t)lo_scheduler_io->poller;
+            }
+        }   
+#endif
+        tb_assert_and_check_return_val(poller, tb_false);
+
+        // bind iocp port
+        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(object->sock), poller->port, tb_null, 0);
+        if (port != poller->port)
+        {
+            // trace
+            tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), object->sock);
+            return tb_false;
+        }
+
+        // bind ok
+        object->port = port;
+    }
+
+    // ok
+    return tb_true;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -1132,19 +1204,8 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     object->priv = priv;
 
     // bind this socket and object to port
-    if (!object->port) 
-    {
-        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(sock), poller->port, tb_null, 0);
-        if (port != poller->port)
-        {
-            // trace
-            tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), sock);
-            return tb_false;
-        }
-
-        // bind ok
-        object->port = port;
-    }
+    if (!tb_poller_iocp_bind_object(poller, object))
+        return tb_false;
 
     // post events
     return tb_poller_iocp_event_post(poller, sock, object, events);

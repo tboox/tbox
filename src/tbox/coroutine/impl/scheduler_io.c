@@ -497,3 +497,4 @@ tb_co_scheduler_io_ref_t tb_co_scheduler_io_self()
     // get the current io scheduler
     return scheduler? (tb_co_scheduler_io_ref_t)scheduler->scheduler_io : tb_null;
 }
+

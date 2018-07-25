@@ -101,7 +101,7 @@ typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironm
 typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
 
 // the SetFileCompletionNotificationModes func type
-typedef BOOL (*tb_kernel32_SetFileCompletionNotificationModes_t)(HANDLE FileHandle, UCHAR Flags);
+typedef BOOL (WINAPI* tb_kernel32_SetFileCompletionNotificationModes_t)(HANDLE FileHandle, UCHAR Flags);
 
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t

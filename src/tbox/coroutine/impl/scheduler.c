@@ -384,3 +384,4 @@ tb_long_t tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_socket_ref_t soc
     // sleep it
     return tb_co_scheduler_io_wait(scheduler->scheduler_io, sock, events, timeout);
 }
+
