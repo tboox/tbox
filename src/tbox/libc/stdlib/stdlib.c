@@ -48,6 +48,8 @@ tb_uint64_t tb_s2tou64(tb_char_t const* s)
         sign = 1;
         s++;
     }
+    // skip '+'
+    else if (*s == '+') s++;
 
     // skip "0b"
     if (s[0] == '0' && (s[1] == 'b' || s[1] == 'B'))
@@ -89,9 +91,8 @@ tb_uint64_t tb_s8tou64(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // skip '0'
     while ((*s) == '0') s++;
@@ -129,9 +130,8 @@ tb_uint64_t tb_s10tou64(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // skip '0'
     while ((*s) == '0') s++;
@@ -169,9 +169,8 @@ tb_uint64_t tb_s16tou64(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // skip "0x"
     if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
@@ -272,9 +271,8 @@ tb_double_t tb_s2tod(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // nan?
     if (s[0] == 'n' && s[1] == 'a' && s[2] == 'n')
@@ -362,9 +360,8 @@ tb_double_t tb_s8tod(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // nan?
     if (s[0] == 'n' && s[1] == 'a' && s[2] == 'n')
@@ -452,9 +449,8 @@ tb_double_t tb_s10tod(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // nan?
     if (s[0] == 'n' && s[1] == 'a' && s[2] == 'n')
@@ -542,9 +538,8 @@ tb_double_t tb_s16tod(tb_char_t const* s)
         sign = 1;
         s++;
     }
-
-    if (*s == '+')
-        s++;
+    // skip '+'
+    else if (*s == '+') s++;
 
     // nan?
     if (s[0] == 'n' && s[1] == 'a' && s[2] == 'n')
