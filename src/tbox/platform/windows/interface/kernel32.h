@@ -180,6 +180,11 @@ tb_kernel32_ref_t   tb_kernel32(tb_noarg_t);
  * There is a known bug where SetFileCompletionNotificationModes crashes on some systems 
  * (see https://support.microsoft.com/kb/2568167 for details).
  *
+ * It's not safe to skip completion notifications for UDP:
+ * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
+ *
+ * So we can only use it to skip tcp completion notifications.
+ *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_kernel32_has_SetFileCompletionNotificationModes();

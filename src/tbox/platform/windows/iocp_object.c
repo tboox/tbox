@@ -493,12 +493,90 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
-    // post a connection event to wait it
-    object->code          = TB_IOCP_OBJECT_CODE_CONN;
-    object->state         = TB_STATE_PENDING;
-    object->u.conn.addr   = *addr;
-    object->u.conn.result = 0;
-    return 0;
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
+    // post a connection event 
+    tb_long_t ok = -1;
+    tb_bool_t init_ok = tb_false;
+    tb_bool_t ConnectEx_ok = tb_false;
+    do
+    {
+        // init olap
+        tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
+
+        // load client address
+        tb_size_t               caddr_size = 0;
+        struct sockaddr_storage caddr_data = {0};
+        if (!(caddr_size = tb_sockaddr_load(&caddr_data, addr))) break;
+
+        // load local address
+        tb_size_t               laddr_size = 0;
+        struct sockaddr_storage laddr_data = {0};
+        tb_ipaddr_t             laddr;
+        if (!tb_ipaddr_set(&laddr, tb_null, 0, (tb_uint8_t)tb_ipaddr_family(addr))) break;
+        if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
+
+        // bind it first for ConnectEx
+        if (SOCKET_ERROR == tb_ws2_32()->bind((SOCKET)tb_sock2fd(object->sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
+        {
+            // trace
+            tb_trace_e("connect(%p, %{ipaddr}): bind failed, error: %u", object->sock, addr, GetLastError());
+            break;
+        }
+        init_ok = tb_true;
+
+        /* do ConnectEx
+         *
+         * @note this socket have been bound to local address in tb_socket_connect()
+         */
+        DWORD real = 0;
+        ConnectEx_ok = tb_mswsock()->ConnectEx( (SOCKET)tb_sock2fd(object->sock)
+                                            ,   (struct sockaddr const*)&caddr_data
+                                            ,   (tb_int_t)caddr_size
+                                            ,   tb_null
+                                            ,   0
+                                            ,   &real
+                                            ,   (LPOVERLAPPED)&object->olap)? tb_true : tb_false;
+
+        // trace
+        tb_trace_d("connect(%p): ConnectEx: %d, lasterror: %d", object->sock, ConnectEx_ok, tb_ws2_32()->WSAGetLastError());
+        tb_check_break(ConnectEx_ok);
+
+        // skip the completion notification on success
+        if (tb_kernel32_has_SetFileCompletionNotificationModes())
+        {
+            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(object->sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+                object->skip_cpos = 1;
+        }
+
+        // trace
+        tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: finished directly", object->sock, addr, object->skip_cpos);
+
+        // ok
+        ok = 1;
+
+    } while (0);
+
+    // ConnectEx failed?
+    if (ok < 0)
+    {
+        // pending? continue to wait it
+        if (init_ok && WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()) 
+        {
+            ok = 0;
+            object->code          = TB_IOCP_OBJECT_CODE_CONN;
+            object->state         = TB_STATE_WAITING;
+            object->u.conn.addr   = *addr;
+            object->u.conn.result = -1;
+        }
+        // already connected?
+        else if (tb_ws2_32()->WSAGetLastError() == WSAEISCONN) ok = 1;
+    }
+
+    // failed?
+    if (ok < 0) tb_iocp_object_clear(object);
+    return ok;
 }
 tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_size_t size)
 {
@@ -823,14 +901,9 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     // bind iocp object first 
     if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
 
-    // attach file and offset
-    object->u.sendf.file    = file;
-    object->u.sendf.offset  = offset;
-    object->u.sendf.size    = size;
+    // do send file
     object->olap.Offset     = (DWORD)offset;
     object->olap.OffsetHigh = (DWORD)(offset >> 32);
-
-    // do send file
     BOOL ok = tb_mswsock()->TransmitFile((SOCKET)tb_sock2fd(object->sock), (HANDLE)file, (DWORD)size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
 
     // trace
@@ -841,6 +914,9 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     {
         object->code  = TB_IOCP_OBJECT_CODE_SENDF;
         object->state = TB_STATE_WAITING;
+        object->u.sendf.file    = file;
+        object->u.sendf.offset  = offset;
+        object->u.sendf.size    = size;
         return 0;
     }
 

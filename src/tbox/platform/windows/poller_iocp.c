@@ -205,156 +205,6 @@ static tb_bool_t tb_poller_iocp_event_post_acpt(tb_poller_iocp_ref_t poller, tb_
     // ok?
     return ok;
 }
-static tb_bool_t tb_poller_iocp_event_post_conn(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
-{
-    // check
-    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
-
-    // trace
-    tb_trace_d("post connect(%p, %{ipaddr}) event: ..", sock, &object->u.conn.addr);
-
-    // post a connection event 
-    tb_bool_t ok = tb_false;
-    tb_bool_t init_ok = tb_false;
-    tb_bool_t ConnectEx_ok = tb_false;
-    do
-    {
-        // init olap
-        tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
-
-        // load client address
-        tb_size_t               caddr_size = 0;
-        struct sockaddr_storage caddr_data = {0};
-        if (!(caddr_size = tb_sockaddr_load(&caddr_data, &object->u.conn.addr))) break;
-
-        // load local address
-        tb_size_t               laddr_size = 0;
-        struct sockaddr_storage laddr_data = {0};
-        tb_ipaddr_t             laddr;
-        if (!tb_ipaddr_set(&laddr, tb_null, 0, (tb_uint8_t)tb_ipaddr_family(&object->u.conn.addr))) break;
-        if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
-
-        // bind it first for ConnectEx
-        if (SOCKET_ERROR == poller->func.bind((SOCKET)tb_sock2fd(sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
-        {
-            // trace
-            tb_trace_e("connect[%p]: bind failed, error: %u", sock, GetLastError());
-            break;
-        }
-        init_ok = tb_true;
-
-        /* do ConnectEx
-         *
-         * @note this socket have been bound to local address in tb_socket_connect()
-         */
-        DWORD real = 0;
-        ConnectEx_ok = poller->func.ConnectEx(  (SOCKET)tb_sock2fd(sock)
-                                            ,   (struct sockaddr const*)&caddr_data
-                                            ,   (tb_int_t)caddr_size
-                                            ,   tb_null
-                                            ,   0
-                                            ,   &real
-                                            ,   (LPOVERLAPPED)&object->olap)? tb_true : tb_false;
-
-        // trace
-        tb_trace_d("connecting[%p]: ConnectEx: %d, lasterror: %d", sock, ConnectEx_ok, poller->func.WSAGetLastError());
-        tb_check_break(ConnectEx_ok);
-
-        // connected, post result directly
-        object->state = TB_STATE_FINISHED;
-        object->u.conn.result = 1;
-        if (!PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap)) break;
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // ConnectEx failed?
-    if (!ok)
-    {
-        // pending? continue it
-        if (init_ok && WSA_IO_PENDING == poller->func.WSAGetLastError()) 
-        {
-            ok = tb_true;
-            object->state = TB_STATE_WAITING;
-        }
-        // already connected or failed?
-        else
-        {
-            object->state = TB_STATE_FINISHED;
-            object->u.conn.result = poller->func.WSAGetLastError() == WSAEISCONN? 1 : -1;
-            if (PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap)) ok = tb_true;
-        }
-    }
-
-    // ok?
-    return ok;
-}
-static tb_bool_t tb_poller_iocp_event_post_recv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
-{
-#if 0
-    // check
-    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
-
-    // trace
-    tb_trace_d("post recv(%p, %lu) event: ..", sock, object->u.recv.size);
-
-    // do recv
-    DWORD flag = 0;
-    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.recv, 1, tb_null, &flag, (LPOVERLAPPED)&object->olap, tb_null);
-
-    // trace
-    tb_trace_d("recving[%p]: WSARecv: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
-
-    // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
-    {
-        object->state = TB_STATE_WAITING;
-        return tb_true;
-    }
-
-    // error? finished
-    object->state = TB_STATE_FINISHED;
-    object->u.recv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
-#else
-    return tb_true;
-#endif
-}
-static tb_bool_t tb_poller_iocp_event_post_send(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
-{
-#if 0
-    // check
-    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
-
-    // trace
-    tb_trace_d("post send(%p, %lu) event: ..", sock, object->u.send.size);
-
-    // do send
-    tb_long_t ok = poller->func.WSASend((SOCKET)tb_sock2fd(sock), (WSABUF*)&object->u.send, 1, tb_null, 0, (LPOVERLAPPED)&object->olap, tb_null);
-
-    // trace
-    tb_trace_d("sending[%p]: WSASend: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
-
-    // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
-    {
-        object->state = TB_STATE_WAITING;
-        return tb_true;
-    }
-
-    // error? finished
-    object->state = TB_STATE_FINISHED;
-    object->u.send.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
-#else
-    return tb_true;
-#endif
-}
 static tb_bool_t tb_poller_iocp_event_post_urecv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -425,101 +275,6 @@ static tb_bool_t tb_poller_iocp_event_post_usend(tb_poller_iocp_ref_t poller, tb
     object->state = TB_STATE_FINISHED;
     object->u.usend.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
-}
-static tb_bool_t tb_poller_iocp_event_post_sendf(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
-{
-#if 0
-    // check
-    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
-    tb_assert_and_check_return_val(poller->func.TransmitFile, tb_false);
-
-    // trace
-    tb_trace_d("post sendfile(%p, %lu) event: ..", sock, object->u.sendf.size);
-
-    // do send file
-    object->olap.Offset = (DWORD)object->u.sendf.offset;
-    object->olap.OffsetHigh = (DWORD)(object->u.sendf.offset >> 32);
-    BOOL ok = poller->func.TransmitFile((SOCKET)tb_sock2fd(sock), (HANDLE)object->u.sendf.file, (DWORD)object->u.sendf.size, (1 << 16), (LPOVERLAPPED)&object->olap, tb_null, 0);
-    tb_trace_d("sending[%p]: TransmitFile: %d, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
-
-    // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
-    {
-        object->state = TB_STATE_WAITING;
-        return tb_true;
-    }
-
-    // error? finished
-    object->state = TB_STATE_FINISHED;
-    object->u.sendf.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
-#else
-    return tb_true;
-#endif
-}
-static tb_bool_t tb_poller_iocp_event_post_recvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
-{
-#if 0
-    // check
-    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_RECV, tb_false);
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
-
-    // trace
-    tb_trace_d("post recvv(%p, %lu) event: ..", sock, object->u.recvv.size);
-
-    // do recv
-    DWORD flag = 0;
-    tb_long_t ok = poller->func.WSARecv((SOCKET)tb_sock2fd(sock), (WSABUF*)object->u.recvv.list, (DWORD)object->u.recvv.size, tb_null, &flag, (LPOVERLAPPED)&object->olap, tb_null);
-
-    // trace
-    tb_trace_d("recving[%p]: WSARecv: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
-
-    // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
-    {
-        object->state = TB_STATE_WAITING;
-        return tb_true;
-    }
-
-    // error? finished
-    object->state = TB_STATE_FINISHED;
-    object->u.recvv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
-#else
-    return tb_true;
-#endif
-}
-static tb_bool_t tb_poller_iocp_event_post_sendv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
-{
-#if 0
-    // check
-    tb_assert_and_check_return_val(events & TB_POLLER_EVENT_SEND, tb_false);
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_PENDING, tb_false);
-
-    // trace
-    tb_trace_d("post sendv(%p, %lu) event: ..", sock, object->u.sendv.size);
-
-    // do send
-    tb_long_t ok = poller->func.WSASend((SOCKET)tb_sock2fd(sock), (WSABUF*)object->u.sendv.list, (DWORD)object->u.sendv.size, tb_null, 0, (LPOVERLAPPED)&object->olap, tb_null);
-
-    // trace
-    tb_trace_d("sending[%p]: WSASend: %ld, lasterror: %d", sock, ok, poller->func.WSAGetLastError());
-
-    // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == poller->func.WSAGetLastError()))) 
-    {
-        object->state = TB_STATE_WAITING;
-        return tb_true;
-    }
-
-    // error? finished
-    object->state = TB_STATE_FINISHED;
-    object->u.sendv.result = -1;
-    return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
-#else
-    return tb_true;
-#endif
 }
 static tb_bool_t tb_poller_iocp_event_post_urecvv(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
@@ -592,6 +347,10 @@ static tb_bool_t tb_poller_iocp_event_post_usendv(tb_poller_iocp_ref_t poller, t
     object->u.usendv.result = -1;
     return PostQueuedCompletionStatus(poller->port, 0, tb_null, (LPOVERLAPPED)&object->olap);
 }
+static tb_bool_t tb_poller_iocp_event_post_stub(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
+{
+    return tb_true;
+}
 static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socket_ref_t sock, tb_iocp_object_ref_t object, tb_size_t events)
 {
     // check
@@ -609,16 +368,16 @@ static tb_bool_t tb_poller_iocp_event_post(tb_poller_iocp_ref_t poller, tb_socke
     {
         tb_null
     ,   tb_poller_iocp_event_post_acpt 
-    ,   tb_poller_iocp_event_post_conn
-    ,   tb_poller_iocp_event_post_recv
-    ,   tb_poller_iocp_event_post_send
+    ,   tb_poller_iocp_event_post_stub      // conn
+    ,   tb_poller_iocp_event_post_stub      // recv
+    ,   tb_poller_iocp_event_post_stub      // send
     ,   tb_poller_iocp_event_post_urecv 
     ,   tb_poller_iocp_event_post_usend 
-    ,   tb_poller_iocp_event_post_recvv
-    ,   tb_poller_iocp_event_post_sendv
+    ,   tb_poller_iocp_event_post_stub      // recvv
+    ,   tb_poller_iocp_event_post_stub      // sendv
     ,   tb_poller_iocp_event_post_urecvv
     ,   tb_poller_iocp_event_post_usendv
-    ,   tb_poller_iocp_event_post_sendf 
+    ,   tb_poller_iocp_event_post_stub      // sendf
     };
     tb_assert_and_check_return_val(object->code < tb_arrayn(s_post), tb_false);
 
@@ -1050,11 +809,11 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
         if (!poller) 
         {
-            tb_co_scheduler_io_ref_t co_scheduler_io = tb_co_scheduler_io_self();
+            tb_co_scheduler_io_ref_t co_scheduler_io = tb_co_scheduler_io_need(tb_null);
             if (co_scheduler_io) poller = (tb_poller_iocp_ref_t)co_scheduler_io->poller;
             else
             {
-                tb_lo_scheduler_io_ref_t lo_scheduler_io = tb_lo_scheduler_io_self();
+                tb_lo_scheduler_io_ref_t lo_scheduler_io = tb_lo_scheduler_io_need(tb_null);
                 if (lo_scheduler_io) poller = (tb_poller_iocp_ref_t)lo_scheduler_io->poller;
             }
         }   
