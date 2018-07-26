@@ -384,7 +384,7 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
         }
 
         // modify socket from poller for waiting events if the waiting events has been changed 
-        if ((events_prev != events || tb_poller_type(poller) == TB_POLLER_TYPE_IOCP) && !tb_poller_modify(poller, sock, events, coroutine))
+        if (events_prev != events && !tb_poller_modify(poller, sock, events, coroutine))
         {
             // trace
             tb_trace_e("failed to modify sock(%p) to poller on coroutine(%p)!", sock, coroutine);

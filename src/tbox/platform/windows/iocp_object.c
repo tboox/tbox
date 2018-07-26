@@ -376,25 +376,62 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, tb_null);
 
-    // done
-    tb_bool_t       ok = tb_false;
-    tb_socket_ref_t acpt = tb_null;
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return tb_null;
+
+    // post a accept event 
+    tb_bool_t ok = tb_false;
+    tb_bool_t init_ok = tb_false;
+    tb_bool_t AcceptEx_ok = tb_false;
     do
     {
-        // done  
-        struct sockaddr_storage d = {0};
-        tb_int_t                n = sizeof(d);
-        SOCKET                  fd = tb_ws2_32()->accept(tb_sock2fd(object->sock), (struct sockaddr *)&d, &n);
+        // init olap
+        tb_memset(&object->olap, 0, sizeof(OVERLAPPED));
 
-        // no client?
-        tb_check_break(fd >= 0 && fd != INVALID_SOCKET);
+        // make address buffer
+        if (!object->buffer) object->buffer = tb_malloc0(((sizeof(struct sockaddr_storage)) << 1));
+        tb_assert_and_check_break(object->buffer);
 
-        // save sock
-        acpt = tb_fd2sock(fd);
+        // get bound address family
+        struct sockaddr_storage bound_addr;
+        socklen_t len = sizeof(bound_addr);
+        tb_size_t family = TB_IPADDR_FAMILY_IPV4;
+        if (getsockname((SOCKET)tb_sock2fd(object->sock), (struct sockaddr *)&bound_addr, &len) != -1 && bound_addr.ss_family == AF_INET6)
+            family = TB_IPADDR_FAMILY_IPV6;
+
+        // make accept socket
+        object->u.acpt.result = tb_socket_init(TB_SOCKET_TYPE_TCP, family);
+        tb_assert_and_check_break(object->u.acpt.result);
+        init_ok = tb_true;
+
+        // the client fd
+        SOCKET clientfd = tb_sock2fd(object->u.acpt.result);
+
+        /* do AcceptEx
+         *
+         * @note this socket have been bound to local address in tb_socket_connect()
+         */
+        DWORD real = 0;
+        AcceptEx_ok = tb_mswsock()->AcceptEx(   (SOCKET)tb_sock2fd(object->sock)
+                                            ,   clientfd
+                                            ,   (tb_byte_t*)object->buffer
+                                            ,   0
+                                            ,   sizeof(struct sockaddr_storage)
+                                            ,   sizeof(struct sockaddr_storage)
+                                            ,   &real
+                                            ,   (LPOVERLAPPED)&object->olap)? tb_true : tb_false;
+
+        // trace
+        tb_trace_d("accept(%p): AcceptEx: %d, lasterror: %d", object->sock, AcceptEx_ok, tb_ws2_32()->WSAGetLastError());
+        tb_check_break(AcceptEx_ok);
+
+        // update the accept context, otherwise shutdown and getsockname will be failed
+        SOCKET acceptfd = (SOCKET)tb_sock2fd(object->sock);
+        tb_ws2_32()->setsockopt(clientfd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acceptfd, sizeof(acceptfd));
 
         // non-block
         ULONG nb = 1;
-        if (tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb) == SOCKET_ERROR) break;
+        tb_ws2_32()->ioctlsocket(clientfd, FIONBIO, &nb);
 
         /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
          *
@@ -408,44 +445,78 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
          * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
          */
         tb_int_t enable = 1;
-        tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
+        tb_ws2_32()->setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
         // skip the completion notification on success
         if (tb_kernel32_has_SetFileCompletionNotificationModes())
         {
-            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)clientfd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
             {
-                tb_iocp_object_ref_t client_object = tb_iocp_object_get_or_new(acpt);
+                tb_iocp_object_ref_t client_object = tb_iocp_object_get_or_new(object->u.acpt.result);
                 if (client_object)
                     client_object->skip_cpos = 1;
             }
         }
 
-        // save address
-        if (addr) tb_sockaddr_save(addr, &d);
-        
+        // get accept socket addresses
+        INT                         server_size = 0;
+        INT                         client_size = 0;
+        struct sockaddr_storage*    server_addr = tb_null;
+        struct sockaddr_storage*    client_addr = tb_null;
+        if (addr && tb_mswsock()->GetAcceptExSockaddrs)
+        {
+            // check
+            tb_assert(object->buffer);
+
+            // get server and client addresses
+            tb_mswsock()->GetAcceptExSockaddrs( (tb_byte_t*)object->buffer
+                                            ,   0
+                                            ,   sizeof(struct sockaddr_storage)
+                                            ,   sizeof(struct sockaddr_storage)
+                                            ,   (LPSOCKADDR*)&server_addr
+                                            ,   &server_size
+                                            ,   (LPSOCKADDR*)&client_addr
+                                            ,   &client_size);
+
+            // exists client address?
+            if (client_addr)
+            {
+                // save address
+                tb_sockaddr_save(addr, client_addr);
+
+                // trace
+                tb_trace_d("accept(%p): client address: %{ipaddr}", object->sock, addr);
+            }
+        }
+
         // trace
-        tb_trace_d("accept(%p): %p, state: finished directly", object->sock, acpt);
+        tb_trace_d("accept(%p): result: %p, state: finished directly", object->sock, object->u.acpt.result);
 
         // ok
         ok = tb_true;
 
     } while (0);
 
-    // accept ok?
-    if (ok) return acpt;
-    else
+    // AcceptEx failed?
+    if (!ok)
     {
-        // exit it
-        if (acpt) tb_socket_exit(acpt);
-        acpt = tb_null;
+        // pending? continue it
+        if (init_ok && WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()) 
+        {
+            object->code  = TB_IOCP_OBJECT_CODE_ACPT;
+            object->state = TB_STATE_WAITING;
+        }
+        // failed?
+        else
+        {
+            // free result socket
+            if (object->u.acpt.result) tb_socket_exit(object->u.acpt.result);
+            object->u.acpt.result = tb_null;
+        }
     }
 
-    // post a accept event to wait it
-    object->code          = TB_IOCP_OBJECT_CODE_ACPT;
-    object->state         = TB_STATE_PENDING;
-    object->u.acpt.result = tb_null;
-    return tb_null;
+    // ok?
+    return ok? object->u.acpt.result : tb_null;
 }
 tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr)
 {
@@ -613,12 +684,12 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data
     object->u.recv.data = data;
     object->u.recv.size = (tb_iovec_size_t)size;
-
-    // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
 
     // attempt to recv data directly
     DWORD flag = 0;
@@ -683,12 +754,12 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attempt buffer data
     object->u.send.data = data;
     object->u.send.size = (tb_iovec_size_t)size;
-
-    // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
 
     // attempt to send data directly
     DWORD real = 0;
@@ -754,6 +825,9 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data
     object->u.urecv.data = data;
     object->u.urecv.size = (tb_iovec_size_t)size;
@@ -770,20 +844,27 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     DWORD* pflag = (DWORD*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
     *pflag = 0;
 
-    // attempt to recv data directly
-    DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.urecv, 1, &real, pflag, (struct sockaddr*)object->buffer, psize, tb_null, tb_null);
-    if (!ok && real)
+    /* post to recv event 
+     *
+     * It's not safe to skip completion notifications for UDP:
+     * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
+     */
+    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.urecv, 1, tb_null, pflag, (struct sockaddr*)object->buffer, psize, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("urecv(%p): WSARecvFrom: %ld, lasterror: %d", object->sock, ok, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
     {
-        // trace
-        tb_trace_d("urecv(%p): WSARecvFrom: %u bytes, state: finished directly", object->sock, real);
-        return (tb_long_t)real;
+        object->code  = TB_IOCP_OBJECT_CODE_URECV;
+        object->state = TB_STATE_WAITING;
+        return 0;
     }
 
-    // post a urecv event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_URECV;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size)
 {
@@ -837,6 +918,9 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data and address
     object->u.usend.addr = *addr;
     object->u.usend.data = data;
@@ -847,7 +931,13 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
 	struct sockaddr_storage d = {0};
     if (!(n = tb_sockaddr_load(&d, &object->u.usend.addr))) return tb_false;
 
-    // attempt to send data directly
+    /* attempt to send data directly
+     *
+     * It's not safe to skip completion notifications for UDP:
+     * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
+     *
+     * So we attempt to send data firstly without overlapped.
+     */
     DWORD real = 0;
     tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.usend, 1, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
     if (!ok && real)
@@ -857,10 +947,23 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
         return (tb_long_t)real;
     }
 
-    // post a usend event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_USEND;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // post a send event
+    ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.usend, 1, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", object->sock, addr, ok, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_USEND;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
 {
@@ -958,12 +1061,12 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data
     object->u.recvv.list = list;
     object->u.recvv.size = (tb_iovec_size_t)size;
-
-    // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
 
     // attempt to recv data directly
     DWORD flag = 0;
@@ -1028,12 +1131,12 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data
     object->u.sendv.list = list;
     object->u.sendv.size = (tb_iovec_size_t)size;
-
-    // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
 
     // attempt to send data directly
     DWORD real = 0;
@@ -1098,6 +1201,9 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data
     object->u.urecvv.list = list;
     object->u.urecvv.size = (tb_iovec_size_t)size;
@@ -1114,20 +1220,27 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     DWORD* pflag = (DWORD*)((tb_byte_t*)object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
     *pflag = 0;
 
-    // attempt to recv data directly
-    DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.urecvv.list, (DWORD)object->u.urecvv.size, &real, pflag, (struct sockaddr*)object->buffer, psize, tb_null, tb_null);
-    if (!ok && real)
+    /* post to recv event 
+     *
+     * It's not safe to skip completion notifications for UDP:
+     * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
+     */
+    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.urecvv.list, (DWORD)object->u.urecvv.size, tb_null, pflag, (struct sockaddr*)object->buffer, psize, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("urecvv(%p): WSARecvFrom: %ld, lasterror: %d", object->sock, ok, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
     {
-        // trace
-        tb_trace_d("urecv(%p): WSARecvFrom: %u bytes, state: finished directly", object->sock, real);
-        return (tb_long_t)real;
+        object->code  = TB_IOCP_OBJECT_CODE_URECVV;
+        object->state = TB_STATE_WAITING;
+        return 0;
     }
 
-    // post a urecvv event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_URECVV;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
 tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size)
 {
@@ -1181,6 +1294,9 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_null, object)) return -1;
+
     // attach buffer data and address
     object->u.usendv.addr = *addr;
     object->u.usendv.list = list;
@@ -1191,18 +1307,37 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
 	struct sockaddr_storage d = {0};
     if (!(n = tb_sockaddr_load(&d, &object->u.usendv.addr))) return -1;
 
-    // attempt to send data directly
+    /* attempt to send data directly
+     *
+     * It's not safe to skip completion notifications for UDP:
+     * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
+     *
+     * So we attempt to send data firstly without overlapped.
+     */
     DWORD real = 0;
     tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(object->sock), (WSABUF*)object->u.usendv.list, (DWORD)object->u.usendv.size, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
     if (!ok && real)
     {
         // trace
-        tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", object->sock, addr, real);
+        tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", object->sock, addr, real);
         return (tb_long_t)real;
     }
 
-    // post a usendv event to wait it
-    object->code  = TB_IOCP_OBJECT_CODE_USENDV;
-    object->state = TB_STATE_PENDING;
-    return 0;
+    // post a send event
+    ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(object->sock), (WSABUF*)&object->u.usendv.list, (DWORD)object->u.usendv.size, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&object->olap, tb_null);
+
+    // trace
+    tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", object->sock, addr, ok, tb_ws2_32()->WSAGetLastError());
+
+    // ok or pending? continue it
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    {
+        object->code  = TB_IOCP_OBJECT_CODE_USENDV;
+        object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(object);
+    return -1;
 }
