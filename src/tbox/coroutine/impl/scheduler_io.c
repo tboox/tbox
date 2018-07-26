@@ -101,7 +101,7 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
 {
     // check
     tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
-    tb_assert(coroutine && poller && sock && priv);
+    tb_assert(coroutine && poller && sock);
 
     // get scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_coroutine_scheduler(coroutine);

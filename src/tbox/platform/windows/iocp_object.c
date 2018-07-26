@@ -120,6 +120,9 @@ static tb_void_t tb_iocp_object_cache_free(tb_cpointer_t priv)
                 // trace
                 tb_trace_d("exit %s object(%p) in cache", tb_state_cstr(object->state), object->sock);
 
+                // clear object first
+                tb_iocp_object_clear(object);
+
                 // free object
                 tb_free(object);
             }
@@ -901,8 +904,9 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     // has waiting io?
     if (object->state == TB_STATE_WAITING)
     {
-        // get bound iocp port
+        // get bound iocp port and user private data
         HANDLE port = object->port;
+        tb_cpointer_t priv = object->priv;
 
         // cancel the previous io (urecv) first
         if (!tb_iocp_object_cancel(object)) return -1;
@@ -911,8 +915,9 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
         object = tb_iocp_object_get_or_new(object->sock);
         tb_assert_and_check_return_val(object, -1);
 
-        // restore the previous bound iocp port
+        // restore the previous bound iocp port and user private data
         object->port = port;
+        object->priv = priv;
     }
 
     // check state
@@ -1277,8 +1282,9 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     // has waiting io?
     if (object->state == TB_STATE_WAITING)
     {
-        // get bound iocp port
+        // get bound iocp port and user private data
         HANDLE port = object->port;
+        tb_cpointer_t priv = object->priv;
 
         // cancel the previous io (urecv) first
         if (!tb_iocp_object_cancel(object)) return -1;
@@ -1287,8 +1293,9 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
         object = tb_iocp_object_get_or_new(object->sock);
         tb_assert_and_check_return_val(object, -1);
 
-        // restore the previous bound iocp port
+        // restore the previous bound iocp port and user private data
         object->port = port;
+        object->priv = priv;
     }
 
     // check state
