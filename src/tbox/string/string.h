@@ -112,6 +112,8 @@ tb_char_t const*        tb_string_ltrim(tb_string_ref_t string);
  */
 tb_char_t const*        tb_string_rtrim(tb_string_ref_t string);
 
+#define tb_string_at(string ,p) (((tb_char_t*)tb_string_cstr(string))[p])
+
 /*! get the charactor at the given position
  *
  * @param string        the string
