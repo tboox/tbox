@@ -23,8 +23,8 @@ add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(arch)")
 
--- the debug or check or coverage mode
-if is_mode("debug", "check", "coverage") then
+-- the debug, sanitize or coverage mode
+if is_mode("debug", "sanitize", "coverage") then
     
     -- enable the debug symbols
     set_symbols("debug")
@@ -35,8 +35,8 @@ if is_mode("debug", "check", "coverage") then
     -- add defines for debug
     add_defines("__tb_debug__")
 
-    -- attempt to enable some checkers for pc
-    if is_mode("check") and is_arch("i386", "x86_64") then
+    -- attempt to enable sanitize-address for pc
+    if is_mode("sanitize") and is_arch("i386", "x86_64") then
         add_cxflags("-fsanitize=address", "-ftrapv")
         add_mxflags("-fsanitize=address", "-ftrapv")
         add_ldflags("-fsanitize=address")
@@ -50,8 +50,8 @@ if is_mode("debug", "check", "coverage") then
     end
 end
 
--- the release or profile mode
-if is_mode("release", "profile") then
+-- the release, profile or valgrind mode
+if is_mode("release", "profile", "valgrind") then
 
     -- the release mode
     if is_mode("release") then
@@ -62,7 +62,7 @@ if is_mode("release", "profile") then
         -- strip all symbols
         set_strip("all")
 
-    -- the profile mode
+    -- the profile/valgrind mode
     else
     
         -- enable the debug symbols
@@ -71,6 +71,11 @@ if is_mode("release", "profile") then
         -- enable gprof
         add_cxflags("-pg")
         add_ldflags("-pg")
+
+        -- add defines for valgrind
+        if is_mode("valgrind") then
+            add_defines("__tb_valgrind__")
+        end
     end
 
     -- small or micro?
