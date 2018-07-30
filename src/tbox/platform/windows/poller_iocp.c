@@ -77,6 +77,9 @@ typedef struct __tb_poller_iocp_t
     // the events count
     tb_size_t               events_count;
 
+    // the last wait count
+    tb_size_t               lastwait_count;
+
 }tb_poller_iocp_t, *tb_poller_iocp_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -675,9 +678,18 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // trace
     tb_trace_d("waiting with timeout(%ld) ..", timeout);
 
-    // does use GetQueuedCompletionStatusEx to wait events?
-    if (poller->func.GetQueuedCompletionStatusEx)
-        return tb_poller_iocp_event_wait_ex(poller, func, timeout);
-    else return tb_poller_iocp_event_wait(poller, func, timeout);
+    /* we can use GetQueuedCompletionStatusEx() to increase performance, perhaps, 
+     * but we may end up lowering perf if you max out only one I/O thread.
+     */
+    tb_long_t wait = -1;
+    if (poller->lastwait_count > 1 && poller->func.GetQueuedCompletionStatusEx)
+        wait = tb_poller_iocp_event_wait_ex(poller, func, timeout);
+    else wait = tb_poller_iocp_event_wait(poller, func, timeout);
+
+    // save the last wait count
+    poller->lastwait_count = wait;
+
+    // wait ok
+    return wait;
 }
 
