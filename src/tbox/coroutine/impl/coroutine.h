@@ -126,6 +126,11 @@ typedef struct __tb_coroutine_t
     // the guard
     tb_uint16_t                     guard;
 
+#ifdef TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER
+    // the valgrind stack id, helo valgrind to understand coroutine
+    tb_uint_t                       valgrind_stack_id;
+#endif
+
 }tb_coroutine_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////

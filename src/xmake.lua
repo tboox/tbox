@@ -216,6 +216,9 @@ function check_interfaces()
 
     -- add the interfaces for systemv
     add_cfuncs("systemv", nil,      {"sys/sem.h", "sys/ipc.h"},         "semget", "semtimedop")
+
+    -- add the interfaces for valgrind
+    add_cfuncs("valgrind", nil,     "valgrind/valgrind.h",              "VALGRIND_STACK_REGISTER(0, 0)")
 end
 
 -- include project directories

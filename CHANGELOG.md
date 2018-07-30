@@ -12,6 +12,7 @@
 * Support tinyc compiler
 * Remove deprecated module (asio), please use coroutine module
 * Improve memory for container
+* Help valgrind to understand coroutines
 
 ### Bugs fixed
 

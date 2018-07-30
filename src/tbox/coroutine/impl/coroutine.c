@@ -35,6 +35,9 @@
  */
 #include "coroutine.h"
 #include "scheduler.h"
+#ifdef TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER
+#   include "valgrind/valgrind.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -139,6 +142,11 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
         coroutine->context = tb_context_make(coroutine->stackbase - stacksize, stacksize, tb_coroutine_entry);
         tb_assert_and_check_break(coroutine->context);
 
+#ifdef TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER
+        // register valgrind stack 
+        coroutine->valgrind_stack_id = VALGRIND_STACK_REGISTER(coroutine->stackbase - stacksize, coroutine->stackbase);
+#endif
+
         // ok
         ok = tb_true;
 
@@ -178,6 +186,11 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
         tb_coroutine_check(coroutine);
 #endif
 
+#ifdef TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER
+        // deregister valgrind stack 
+        VALGRIND_STACK_DEREGISTER(coroutine->valgrind_stack_id);
+#endif
+
         // remake coroutine
         if (stacksize > coroutine->stacksize)
             coroutine = (tb_coroutine_t*)tb_ralloc_bytes(coroutine, sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
@@ -199,6 +212,11 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
         // make context
         coroutine->context = tb_context_make(coroutine->stackbase - stacksize, stacksize, tb_coroutine_entry);
         tb_assert_and_check_break(coroutine->context);
+
+#ifdef TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER
+        // re-register valgrind stack 
+        coroutine->valgrind_stack_id = VALGRIND_STACK_REGISTER(coroutine->stackbase - stacksize, coroutine->stackbase);
+#endif
 
         // ok
         ok = tb_true;
@@ -225,6 +243,11 @@ tb_void_t tb_coroutine_exit(tb_coroutine_t* coroutine)
 #ifdef __tb_debug__
     // check it
     tb_coroutine_check(coroutine);
+#endif
+
+#ifdef TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER
+    // deregister valgrind stack 
+    VALGRIND_STACK_DEREGISTER(coroutine->valgrind_stack_id);
 #endif
 
     // exit it
