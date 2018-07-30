@@ -450,16 +450,10 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
 static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
 {
     tb_size_t wait = 0;
-    tb_hong_t startime = tb_mclock();
     while (1)
     {
-        // compute the left timeout
-        tb_hong_t leftime = -1;
-        if (timeout >= 0)
-        {
-            leftime = timeout - (tb_long_t)(tb_mclock() - startime);
-            if (leftime <= 0) break;
-        }
+        // compute the timeout
+        if (wait) timeout = 0;
 
         // clear error first
         SetLastError(ERROR_SUCCESS);
@@ -468,7 +462,7 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         DWORD                   real = 0;
         tb_pointer_t            pkey = tb_null;
         tb_iocp_object_ref_t    object = tb_null;
-        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&object, (DWORD)(leftime < 0? INFINITE : (tb_size_t)leftime));
+        BOOL                    wait_ok = GetQueuedCompletionStatus(poller->port, (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&object, (DWORD)(timeout < 0? INFINITE : timeout));
 
         // the last error
         tb_size_t error = (tb_size_t)GetLastError();
