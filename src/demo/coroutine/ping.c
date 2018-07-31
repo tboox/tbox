@@ -126,7 +126,7 @@ static tb_uint16_t tb_calculate_checksum(tb_uint16_t* data, tb_long_t size)
 static tb_bool_t tb_ping_send(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_uint16_t seq)
 {
     // init echo 
-    tb_icmp_echo_request_t echo = {0};
+    tb_icmp_echo_request_t echo = {{0}};
     echo.icmp.type              = TB_ICMP_ECHOREQ;
     echo.icmp.code              = 0;
     echo.icmp.checksum          = 0;
