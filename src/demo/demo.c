@@ -238,13 +238,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
     // init tbox
 #if 0
-    if (!tb_init(tb_null, tb_default_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return 0;
+    if (!tb_init(tb_null, tb_default_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return -1;
 #elif 0
-    if (!tb_init(tb_null, tb_static_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return 0;
-#elif defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
-    if (!tb_init(tb_null, tb_native_allocator())) return 0;
+    if (!tb_init(tb_null, tb_static_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return -1;
+#elif (defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)) \
+        || defined(__tb_sanitize_address__) || defined(__tb_sanitize_thread__)
+    if (!tb_init(tb_null, tb_native_allocator())) return -1;
 #else
-    if (!tb_init(tb_null, tb_null)) return 0;
+    if (!tb_init(tb_null, tb_null)) return -1;
 #endif
 
     // find the main func from the first argument

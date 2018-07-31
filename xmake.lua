@@ -23,8 +23,8 @@ add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(arch)")
 
--- the debug, sanitize or coverage mode
-if is_mode("debug", "sanitize", "coverage") then
+-- the debug, coverage, valgrind or sanitize-address/thread mode
+if is_mode("debug", "coverage", "valgrind", "asan", "tsan") then
     
     -- enable the debug symbols
     set_symbols("debug")
@@ -33,13 +33,29 @@ if is_mode("debug", "sanitize", "coverage") then
     set_optimize("none")
 
     -- add defines for debug
-    add_defines("__tb_debug__")
+    if is_mode("debug") then
+        add_defines("__tb_debug__")
+    end
 
-    -- attempt to enable sanitize-address for pc
-    if is_mode("sanitize") and is_arch("i386", "x86_64") then
+    -- add defines for valgrind
+    if is_mode("valgrind") then
+        add_defines("__tb_valgrind__")
+    end
+
+    -- attempt to enable sanitize-address 
+    if is_mode("asan") then
         add_cxflags("-fsanitize=address", "-ftrapv")
         add_mxflags("-fsanitize=address", "-ftrapv")
         add_ldflags("-fsanitize=address")
+        add_defines("__tb_sanitize_address__")
+    end
+
+    -- attempt to enable sanitize-thread 
+    if is_mode("tsan") then
+        add_cxflags("-fsanitize=thread")
+        add_mxflags("-fsanitize=thread")
+        add_ldflags("-fsanitize=thread")
+        add_defines("__tb_sanitize_thread__")
     end
 
     -- enable coverage
@@ -50,8 +66,8 @@ if is_mode("debug", "sanitize", "coverage") then
     end
 end
 
--- the release, profile or valgrind mode
-if is_mode("release", "profile", "valgrind") then
+-- the release, profile mode
+if is_mode("release", "profile") then
 
     -- the release mode
     if is_mode("release") then
@@ -62,7 +78,7 @@ if is_mode("release", "profile", "valgrind") then
         -- strip all symbols
         set_strip("all")
 
-    -- the profile/valgrind mode
+    -- the profile mode
     else
     
         -- enable the debug symbols
@@ -71,11 +87,6 @@ if is_mode("release", "profile", "valgrind") then
         -- enable gprof
         add_cxflags("-pg")
         add_ldflags("-pg")
-
-        -- add defines for valgrind
-        if is_mode("valgrind") then
-            add_defines("__tb_valgrind__")
-        end
     end
 
     -- small or micro?
