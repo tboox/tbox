@@ -132,10 +132,9 @@ static tb_bool_t tb_stream_sock_open(tb_stream_ref_t stream)
     if (tb_ipaddr_ip_is_empty(addr))
     {
         // look ip 
-        tb_ipaddr_t ip_addr;
+        tb_ipaddr_t ip_addr = {0};
         if (!tb_addrinfo_addr(tb_url_host(url), &ip_addr)) 
         {
-            // failed
             tb_stream_state_set(stream, TB_STATE_SOCK_DNS_FAILED);
             return tb_false;
         }
