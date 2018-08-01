@@ -173,6 +173,7 @@
 * 支持tinyc编译器
 * 移除被废弃的模块（asio模块，先用coroutine代替）
 * 精简优化容器库内存资源使用
+* 帮助valgrind更好的理解coroutine
 
 ### Bugs修复
 

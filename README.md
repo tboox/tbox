@@ -87,6 +87,7 @@ If you want to know more, please refer to:
 - Supports io socket and stream operation in coroutine
 - Provides some io servers (http ..) using coroutine
 - Provides stackfull and stackless coroutines
+* Support epoll, kqueue, poll, select and IOCP
 
 #### The database library
 
@@ -188,100 +189,103 @@ If you want to know more, please refer to:
 
 Some projects using tbox:
 
-* [gbox](https://github.com/waruqi/gbox)
-* [vm86](https://github.com/waruqi/vm86)
+* [gbox](https://github.com/tboox/gbox)
+* [vm86](https://github.com/tboox/vm86)
 * [xmake](http://www.xmake.io)
-* [itrace](https://github.com/waruqi/itrace)
-* [more](https://github.com/waruqi/tbox/wiki/tbox-projects)
+* [itrace](https://github.com/tboox/itrace)
+* [more](https://github.com/tboox/tbox/wiki/tbox-projects)
 
 ## Build
 
-Please install xmake first: [xmake](https://github.com/waruqi/xmake)
+Please install xmake first: [xmake](https://github.com/tboox/xmake)
 
-    # build for the host platform
-    cd ./tbox
-    xmake
+```console
+# build for the host platform
+$ cd ./tbox
+$ xmake
 
-    # build for the mingw platform
-    cd ./tbox
-    xmake f -p mingw --sdk=/home/mingwsdk 
-    xmake
-    
-    # build for the iphoneos platform
-    cd ./tbox
-    xmake f -p iphoneos 
-    xmake
-    
-    # build for the android platform
-    cd ./tbox
-    xmake f -p android --ndk=xxxxx
-    xmake
-    
-    # build for the linux cross-platform
-    cd ./tbox
-    xmake f -p linux --sdk=/home/sdk # --toolchains=/home/sdk/bin
-    xmake
+# build for the mingw platform
+$ cd ./tbox
+$ xmake f -p mingw --sdk=/home/mingwsdk 
+$ xmake
 
+# build for the iphoneos platform
+$ cd ./tbox
+$ xmake f -p iphoneos 
+$ xmake
+
+# build for the android platform
+$ cd ./tbox
+$ xmake f -p android --ndk=xxxxx
+$ xmake
+
+# build for the linux cross-platform
+$ cd ./tbox
+$ xmake f -p linux --sdk=/home/sdk # --bin=/home/sdk/bin
+$ xmake
+```
     
 ## Example
 
-    #include "tbox/tbox.h"
+```c
+#include "tbox/tbox.h"
 
-    int main(int argc, char** argv)
+int main(int argc, char** argv)
+{
+    // init tbox
+    if (!tb_init(tb_null, tb_null)) return 0;
+
+    // trace
+    tb_trace_i("hello tbox");
+
+    // init vector
+    tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
+    if (vector)
     {
-        // init tbox
-        if (!tb_init(tb_null, tb_null)) return 0;
+        // insert item
+        tb_vector_insert_tail(vector, "hello");
+        tb_vector_insert_tail(vector, "tbox");
 
-        // trace
-        tb_trace_i("hello tbox");
-
-        // init vector
-        tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
-        if (vector)
+        // dump all items
+        tb_for_all (tb_char_t const*, cstr, vector)
         {
-            // insert item
-            tb_vector_insert_tail(vector, "hello");
-            tb_vector_insert_tail(vector, "tbox");
+            // trace
+            tb_trace_i("%s", cstr);
+        }
 
-            // dump all items
-            tb_for_all (tb_char_t const*, cstr, vector)
+        // exit vector
+        tb_vector_exit(vector);
+    }
+
+    // init stream
+    tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxx.com/file.txt");
+    if (stream)
+    {
+        // open stream
+        if (tb_stream_open(stream))
+        {
+            // read line
+            tb_long_t size = 0;
+            tb_char_t line[TB_STREAM_BLOCK_MAXN];
+            while ((size = tb_stream_bread_line(stream, line, sizeof(line))) >= 0)
             {
                 // trace
-                tb_trace_i("%s", cstr);
+                tb_trace_i("line: %s", line);
             }
-
-            // exit vector
-            tb_vector_exit(vector);
         }
 
-        // init stream
-        tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxx.com/file.txt");
-        if (stream)
-        {
-            // open stream
-            if (tb_stream_open(stream))
-            {
-                // read line
-                tb_long_t size = 0;
-                tb_char_t line[TB_STREAM_BLOCK_MAXN];
-                while ((size = tb_stream_bread_line(stream, line, sizeof(line))) >= 0)
-                {
-                    // trace
-                    tb_trace_i("line: %s", line);
-                }
-            }
-
-            // exit stream
-            tb_stream_exit(stream);
-        }
-
-        // wait some time
-        getchar();
-
-        // exit tbox
-        tb_exit();
-        return 0;
+        // exit stream
+        tb_stream_exit(stream);
     }
+
+    // wait 
+    getchar();
+
+    // exit tbox
+    tb_exit();
+    return 0;
+}
+```
 
 ## Contacts
 

@@ -91,6 +91,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - socket、stream都模块原生支持协程，并且可在线程和协程间进行无缝切换
 - 提供http、file等基于协程的简单服务器实例，只需几百行代码，就可以从socket开始写个高性能io服务器，代码逻辑比异步回调模式更加清晰
 - 同时提供stackfull, stackless两种协程模式支持，stackless协程更加的轻量（每个协程只占用几十个bytes），切换更快（会牺牲部分易用性）
+* 支持epoll, kqueue, poll, select 和 IOCP
 
 #### 数据库
 
@@ -195,100 +196,103 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 ## 一些使用tbox的项目：
 
-* [gbox](https://github.com/waruqi/gbox)
-* [vm86](https://github.com/waruqi/vm86)
+* [gbox](https://github.com/tboox/gbox)
+* [vm86](https://github.com/tboox/vm86)
 * [xmake](http://www.xmake.io/cn)
-* [itrace](https://github.com/waruqi/itrace)
-* [更多项目](https://github.com/waruqi/tbox/wiki/%E4%BD%BF%E7%94%A8tbox%E7%9A%84%E5%BC%80%E6%BA%90%E5%BA%93)
+* [itrace](https://github.com/tboox/itrace)
+* [更多项目](https://github.com/tboox/tbox/wiki/%E4%BD%BF%E7%94%A8tbox%E7%9A%84%E5%BC%80%E6%BA%90%E5%BA%93)
 
 ## 编译 
 
-请先安装: [xmake](https://github.com/waruqi/xmake)
+请先安装: [xmake](https://github.com/tboox/xmake)
 
-    # 默认直接编译当前主机平台
-    cd ./tbox
-    xmake
+```console
+# 默认直接编译当前主机平台
+$ cd ./tbox
+$ xmake
 
-    # 编译mingw平台
-    cd ./tbox
-    xmake f -p mingw --sdk=/home/mingwsdk 
-    xmake
+# 编译mingw平台
+$ cd ./tbox
+$ xmake f -p mingw --sdk=/home/mingwsdk 
+$ xmake
 
-    # 编译iphoneos平台
-    cd ./tbox
-    xmake f -p iphoneos 
-    xmake
-    
-    # 编译android平台
-    cd ./tbox
-    xmake f -p android --ndk=xxxxx
-    xmake
-    
-    # 交叉编译
-    cd ./tbox
-    xmake f -p linux --sdk=/home/sdk #--toolchains=/home/sdk/bin
-    xmake
+# 编译iphoneos平台
+$ cd ./tbox
+$ xmake f -p iphoneos 
+$ xmake
 
+# 编译android平台
+$ cd ./tbox
+$ xmake f -p android --ndk=xxxxx
+$ xmake
+
+# 交叉编译
+$ cd ./tbox
+$ xmake f -p linux --sdk=/home/sdk #--bin=/home/sdk/bin
+$ xmake
+```
 
 ## 例子
 
-    #include "tbox/tbox.h"
+```c
+#include "tbox/tbox.h"
 
-    int main(int argc, char** argv)
+int main(int argc, char** argv)
+{
+    // init tbox
+    if (!tb_init(tb_null, tb_null)) return 0;
+
+    // trace
+    tb_trace_i("hello tbox");
+
+    // init vector
+    tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
+    if (vector)
     {
-        // init tbox
-        if (!tb_init(tb_null, tb_null)) return 0;
+        // insert item
+        tb_vector_insert_tail(vector, "hello");
+        tb_vector_insert_tail(vector, "tbox");
 
-        // trace
-        tb_trace_i("hello tbox");
-
-        // init vector
-        tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
-        if (vector)
+        // dump all items
+        tb_for_all (tb_char_t const*, cstr, vector)
         {
-            // insert item
-            tb_vector_insert_tail(vector, "hello");
-            tb_vector_insert_tail(vector, "tbox");
+            // trace
+            tb_trace_i("%s", cstr);
+        }
 
-            // dump all items
-            tb_for_all (tb_char_t const*, cstr, vector)
+        // exit vector
+        tb_vector_exit(vector);
+    }
+
+    // init stream
+    tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxx.com/file.txt");
+    if (stream)
+    {
+        // open stream
+        if (tb_stream_open(stream))
+        {
+            // read line
+            tb_long_t size = 0;
+            tb_char_t line[TB_STREAM_BLOCK_MAXN];
+            while ((size = tb_stream_bread_line(stream, line, sizeof(line))) >= 0)
             {
                 // trace
-                tb_trace_i("%s", cstr);
+                tb_trace_i("line: %s", line);
             }
-
-            // exit vector
-            tb_vector_exit(vector);
         }
 
-        // init stream
-        tb_stream_ref_t stream = tb_stream_init_from_url("http://www.xxx.com/file.txt");
-        if (stream)
-        {
-            // open stream
-            if (tb_stream_open(stream))
-            {
-                // read line
-                tb_long_t size = 0;
-                tb_char_t line[TB_STREAM_BLOCK_MAXN];
-                while ((size = tb_stream_bread_line(stream, line, sizeof(line))) >= 0)
-                {
-                    // trace
-                    tb_trace_i("line: %s", line);
-                }
-            }
-
-            // exit stream
-            tb_stream_exit(stream);
-        }
-
-        // wait some time
-        getchar();
-
-        // exit tbox
-        tb_exit();
-        return 0;
+        // exit stream
+        tb_stream_exit(stream);
     }
+
+    // wait 
+    getchar();
+
+    // exit tbox
+    tb_exit();
+    return 0;
+}
+```
 
 ## 联系方式
 
