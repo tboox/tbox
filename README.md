@@ -87,7 +87,7 @@ If you want to know more, please refer to:
 - Supports io socket and stream operation in coroutine
 - Provides some io servers (http ..) using coroutine
 - Provides stackfull and stackless coroutines
-* Support epoll, kqueue, poll, select and IOCP
+- Support epoll, kqueue, poll, select and IOCP
 
 #### The database library
 
