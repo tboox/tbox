@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.6.3
+
 ### New features
 
 * [#24](https://github.com/tboox/tbox/issues/24): Support IOCP for coroutine on windows
@@ -162,6 +164,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.6.3
 
 ### 新特性
 
