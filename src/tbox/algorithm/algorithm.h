@@ -55,5 +55,6 @@
 #include "remove_if.h"
 #include "remove_first.h"
 #include "remove_first_if.h"
+#include "kmp.h"
 
 #endif
