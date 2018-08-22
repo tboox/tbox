@@ -301,21 +301,21 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_ref
     else if (sqlite->result.statement)
     {
         // init name
-        tb_database_sql_value_name_set(&row->value, sqlite3_column_name(sqlite->result.statement, itor));
+        tb_database_sql_value_name_set(&row->value, sqlite3_column_name(sqlite->result.statement, (tb_int_t)itor));
 
         // init type
-        tb_size_t type = sqlite3_column_type(sqlite->result.statement, itor);
+        tb_size_t type = sqlite3_column_type(sqlite->result.statement, (tb_int_t)itor);
         switch (type)
         {
         case SQLITE_INTEGER:
-            tb_database_sql_value_set_int32(&row->value, sqlite3_column_int(sqlite->result.statement, itor));
+            tb_database_sql_value_set_int32(&row->value, sqlite3_column_int(sqlite->result.statement, (tb_int_t)itor));
             break;
         case SQLITE_TEXT:
-            tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.statement, itor), sqlite3_column_bytes(sqlite->result.statement, itor));
+            tb_database_sql_value_set_text(&row->value, (tb_char_t const*)sqlite3_column_text(sqlite->result.statement, (tb_int_t)itor), sqlite3_column_bytes(sqlite->result.statement, (tb_int_t)itor));
             break;
         case SQLITE_FLOAT:
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-            tb_database_sql_value_set_double(&row->value, sqlite3_column_double(sqlite->result.statement, itor));
+            tb_database_sql_value_set_double(&row->value, sqlite3_column_double(sqlite->result.statement, (tb_int_t)itor));
             break;
 #else
             // trace
@@ -323,7 +323,7 @@ static tb_pointer_t tb_database_sqlite3_result_col_iterator_item(tb_iterator_ref
             return tb_null;
 #endif
         case SQLITE_BLOB:
-            tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)sqlite3_column_blob(sqlite->result.statement, itor), sqlite3_column_bytes(sqlite->result.statement, itor), tb_null);
+            tb_database_sql_value_set_blob32(&row->value, (tb_byte_t const*)sqlite3_column_blob(sqlite->result.statement, (tb_int_t)itor), sqlite3_column_bytes(sqlite->result.statement, (tb_int_t)itor), tb_null);
             break;
         case SQLITE_NULL:
             tb_database_sql_value_set_null(&row->value);

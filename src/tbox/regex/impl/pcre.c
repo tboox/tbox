@@ -176,7 +176,7 @@ tb_long_t tb_regex_match(tb_regex_ref_t self, tb_char_t const* cstr, tb_size_t s
 
         // match it
         tb_long_t count = -1;
-        while (!(count = pcre_exec(regex->code, tb_null, cstr, size, start, options, regex->ovector_data, regex->ovector_maxn)))
+        while (!(count = pcre_exec(regex->code, tb_null, cstr, (tb_int_t)size, (tb_int_t)start, (tb_int_t)options, regex->ovector_data, (tb_int_t)regex->ovector_maxn)))
         {
             // grow ovector
             regex->ovector_maxn <<= 1;
