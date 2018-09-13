@@ -78,10 +78,5 @@ script:
       xmake r demo platform_thread_pool > ./error.txt;
     fi
 
-after_success:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      bash <(curl -s https://codecov.io/bash);
-    fi
-
 after_failure:
   - cat ./error.txt

@@ -8,9 +8,6 @@
     <a href="https://ci.appveyor.com/project/waruqi/tbox/branch/master">
       <img src="https://img.shields.io/appveyor/ci/waruqi/tbox/master.svg?style=flat-square" alt="appveyor-ci" />
     </a>
-    <a href="https://codecov.io/gh/tboox/tbox">
-      <img src="https://img.shields.io/codecov/c/github/tboox/tbox/master.svg?style=flat-square" alt="Coverage" />
-    </a>
     <a href="https://github.com/tboox/tbox/releases">
       <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
     </a>
