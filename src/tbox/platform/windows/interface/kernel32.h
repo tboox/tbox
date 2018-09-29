@@ -103,6 +103,9 @@ typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD 
 // the SetFileCompletionNotificationModes func type
 typedef BOOL (WINAPI* tb_kernel32_SetFileCompletionNotificationModes_t)(HANDLE FileHandle, UCHAR Flags);
 
+// the CreateSymbolicLinkW func type
+typedef BOOLEAN (WINAPI* tb_kernel32_CreateSymbolicLinkW_t)(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -156,6 +159,9 @@ typedef struct __tb_kernel32_t
 
     // SetFileCompletionNotificationModes
     tb_kernel32_SetFileCompletionNotificationModes_t    SetFileCompletionNotificationModes;
+
+    // CreateSymbolicLinkW
+    tb_kernel32_CreateSymbolicLinkW_t                   CreateSymbolicLinkW;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 

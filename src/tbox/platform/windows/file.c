@@ -33,6 +33,17 @@
 #include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifndef SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
+#   define SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE (0x2)
+#endif
+
+#ifndef SYMBOLIC_LINK_FLAG_DIRECTORY
+#   define SYMBOLIC_LINK_FLAG_DIRECTORY                 (0x1)
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_void_t tb_file_mkdir(tb_wchar_t const* path)
@@ -503,9 +514,16 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 }
 tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 {
-#if 0
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
+
+    // support symbolic link? >= vista
+    tb_kernel32_CreateSymbolicLinkW_t pCreateSymbolicLinkW = tb_kernel32()->CreateSymbolicLinkW;
+    tb_check_return_val(pCreateSymbolicLinkW, tb_false);
+
+    // not exists?
+    tb_file_info_t info = {0};
+    if (!tb_file_info(path, &info)) return tb_false;
 
     // the full path
     tb_wchar_t full0[TB_PATH_MAXN];
@@ -515,14 +533,14 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     tb_wchar_t full1[TB_PATH_MAXN];
     if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
-    // not exists?
-    tb_file_info_t info = {0};
-    if (!tb_file_info(full0, &info)) return tb_false;
+    // make directory
+    tb_file_mkdir(full1);
 
-    // symlink, supported: >= vista
-    return !CreateSymbolicLinkW(full1, full0, info.bdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0)? tb_true : tb_false;
-#else
-    tb_trace_noimpl();
-    return tb_false;
-#endif
+    // attempt to link it directly without admin privilege.
+    tb_bool_t isdir = (info.type == TB_FILE_TYPE_DIRECTORY);
+    if (pCreateSymbolicLinkW(full1, full0, (isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0) | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE))
+        return tb_true;
+
+    // attempt to link it directly with admin privilege
+    return (tb_bool_t)pCreateSymbolicLinkW(full1, full0, isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
 }

@@ -61,6 +61,7 @@ static tb_bool_t tb_kernel32_instance_init(tb_handle_t instance, tb_cpointer_t p
     TB_INTERFACE_LOAD(kernel32, FreeEnvironmentStringsW);
     TB_INTERFACE_LOAD(kernel32, SetHandleInformation);
     TB_INTERFACE_LOAD(kernel32, SetFileCompletionNotificationModes);
+    TB_INTERFACE_LOAD(kernel32, CreateSymbolicLinkW);
 
     // ok
     return tb_true;
