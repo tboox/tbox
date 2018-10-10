@@ -135,7 +135,7 @@ if is_plat("windows") then
     end
 
     -- no msvcrt.lib
-    add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
+    add_ldflags("-nodefaultlib:msvcrt.lib")
 end
 
 -- include project sources
