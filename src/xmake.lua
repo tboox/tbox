@@ -93,20 +93,15 @@ option("base")
     elseif is_os("android") then add_links("m", "c") 
     else add_links("pthread", "dl", "m", "c") end
 
--- add packages
-for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre"}) do
-    option(name)
-        set_showmenu(true)
-        set_category("package")
-        set_description(format("The %s package", name))
-        add_deps("small", "micro")
-        add_defines_h(format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
-        before_check(function (option)
-            import("lib.detect.find_package")
-            if not option:dep("small"):enabled() and not option:dep("micro"):enabled() then
-                option:add(find_package(name, {packagedirs = path.join(os.projectdir(), "pkg")}))
+-- add requires
+if not has_config("small", "micro") then
+    for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre"}) do
+        add_requires(name, {optional = true, option = {deps = {"small", "micro"}, defines_h = format("$(prefix)_PACKAGE_HAVE_%s", name:upper()), before_check = function (option)
+            if option:dep("small"):enabled() or option:dep("micro"):enabled() then
+                option:enable(false)
             end
-        end)
+        end}})
+    end
 end
 
 -- check interfaces
@@ -222,7 +217,7 @@ function check_interfaces()
 end
 
 -- include project directories
-includes(format("tbox/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
-if is_option("demo") then 
-    includes(format("demo/%s.lua", ifelse(is_option("micro"), "micro", "xmake"))) 
+includes(format("tbox/%s.lua", ifelse(has_config("micro"), "micro", "xmake"))) 
+if has_config("demo") then 
+    includes(format("demo/%s.lua", ifelse(has_config("micro"), "micro", "xmake"))) 
 end

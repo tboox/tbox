@@ -90,20 +90,20 @@ if is_mode("release", "profile") then
     end
 
     -- small or micro?
-    if is_option("small", "micro") then
+    if has_config("small", "micro") then
         set_optimize("smallest")
     else
         set_optimize("fastest")
     end
 
     -- disable stack protector for micro mode
-    if is_option("micro") then
+    if has_config("micro") then
         add_cxflags("-fno-stack-protector")
     end
 end
 
 -- small or micro?
-if is_option("small", "micro") then
+if has_config("small", "micro") then
 
     -- add defines for small
     add_defines("__tb_small__")
