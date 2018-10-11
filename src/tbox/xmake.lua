@@ -23,18 +23,18 @@ target("tbox")
 
     -- add packages
     if has_config("mbedtls") then
-        add_options("mbedtls")
+        add_packages("mbedtls")
     elseif has_config("polarssl") then
-        add_options("polarssl")
+        add_packages("polarssl")
     elseif has_config("openssl") then
-        add_options("openssl")
+        add_packages("openssl")
     end
     if has_config("pcre2") then
-        add_options("pcre2")
+        add_packages("pcre2")
     elseif has_config("pcre") then
-        add_options("pcre")
+        add_packages("pcre")
     end
-    add_options("zlib", "mysql", "sqlite3")
+    add_packages("zlib", "mysql", "sqlite3")
 
     -- add options
     add_options("info", "float", "wchar", "exception")
