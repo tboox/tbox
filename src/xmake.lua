@@ -95,7 +95,7 @@ option("base")
 
 -- add requires
 if not has_config("small", "micro") then
-    for _, require_name in ipairs({"zlib", "mysql", "sqlite3", "openssl 1.1.*", "polarssl", "mbedtls", "pcre2", "pcre"}) do
+    for _, require_name in ipairs({"zlib", "mysql", "sqlite3", "openssl 1.1.*", "polarssl", "mbedtls 2.13.*", "pcre2", "pcre"}) do
         local name = require_name:split('%s')[1]
         add_requires(require_name, {optional = true, option = {deps = {"small", "micro"}, defines_h = format("$(prefix)_PACKAGE_HAVE_%s", name:upper()), before_check = function (option)
             if option:dep("small"):enabled() or option:dep("micro"):enabled() then
