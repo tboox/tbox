@@ -98,13 +98,13 @@ tb_void_t tb_thread_local_walk(tb_walk_func_t func, tb_cpointer_t priv)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETSPECIFIC) && \
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/thread_local.c"
+#elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETSPECIFIC) && \
     defined(TB_CONFIG_POSIX_HAVE_PTHREAD_GETSPECIFIC) && \
     defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_CREATE) && \
     defined(TB_CONFIG_POSIX_HAVE_PTHREAD_KEY_DELETE)
 #   include "posix/thread_local.c"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/thread_local.c"
 #else
 tb_bool_t tb_thread_local_init(tb_thread_local_ref_t local, tb_thread_local_free_t func)
 {

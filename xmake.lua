@@ -19,10 +19,6 @@ add_defines_h("_GNU_SOURCE=1", "_REENTRANT")
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 
--- set the object files directory
-set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-set_targetdir("$(buildir)/$(mode)/$(arch)")
-
 -- the debug, coverage, valgrind or sanitize-address/thread mode
 if is_mode("debug", "coverage", "valgrind", "asan", "tsan") then
     

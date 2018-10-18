@@ -131,6 +131,9 @@
 // gnu c/c++ 
 #elif defined(__GNUC__)
 #   define TB_COMPILER_IS_GCC
+#   if defined(__MINGW32__) || defined(__MINGW64__) 
+#       define TB_COMPILER_IS_MINGW
+#   endif
 #   define TB_COMPILER_VERSION_BT(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) > ((major) * 100 + (minor)))
 #   define TB_COMPILER_VERSION_BE(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) >= ((major) * 100 + (minor)))
 #   define TB_COMPILER_VERSION_EQ(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) == ((major) * 100 + (minor)))

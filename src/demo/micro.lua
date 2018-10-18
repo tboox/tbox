@@ -11,10 +11,6 @@ target("demo")
     -- add defines
     add_defines("__tb_prefix__=\"demo\"")
 
-    -- set the object files directory
-    set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-    set_targetdir("$(buildir)/$(mode)/$(arch)")
-
     -- add packages
     add_packages("base")
 

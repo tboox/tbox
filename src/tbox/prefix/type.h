@@ -111,7 +111,7 @@ typedef tb_int32_t                  tb_wchar_t;
 #if defined(TB_COMPILER_IS_MSVC)
 typedef __int64                     tb_int64_t;
 typedef unsigned __int64            tb_uint64_t;
-#elif (TB_CPU_BITSIZE == 64)
+#elif (TB_CPU_BITSIZE == 64) && !defined(TB_COMPILER_IS_MINGW)
 typedef signed long                 tb_int64_t;
 typedef unsigned long               tb_uint64_t;
 #else
