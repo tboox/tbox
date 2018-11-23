@@ -86,11 +86,6 @@ for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "data
         end)
 end
 
--- add system links
-if is_os("windows") then add_syslinks("ws2_32") 
-elseif is_os("android") then add_syslinks("m", "c") 
-else add_syslinks("pthread", "dl", "m", "c") end
-
 -- define options for package
 for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre"}) do
     option(name)
@@ -107,14 +102,20 @@ for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedt
 end
 
 -- add requires
-for _, require_name in ipairs({"zlib", "mysql", "sqlite3", "openssl 1.1.*", "polarssl", "mbedtls 2.13.*", "pcre2", "pcre"}) do
+local groups = {nil, nil, nil, "ssl", "ssl", "ssl", "pcre", "pcre"}
+for idx, require_name in ipairs({"zlib", "sqlite3", "mysql", "mbedtls 2.13.*", "openssl 1.1.*", "polarssl", "pcre2", "pcre"}) do
     local name = require_name:split('%s')[1]
     if has_config(name) then
-        add_requires(require_name, {optional = true, on_load = function (package)
+        add_requires(require_name, {optional = true, group = groups[idx], on_load = function (package)
             package:add("defines_h", format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
         end})
     end
 end
+
+-- add system links
+if is_os("windows") then add_syslinks("ws2_32") 
+elseif is_os("android") then add_syslinks("m", "c") 
+else add_syslinks("pthread", "dl", "m", "c") end
 
 -- check interfaces
 function check_interfaces()

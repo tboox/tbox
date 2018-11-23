@@ -22,19 +22,7 @@ target("tbox")
     add_headers("$(buildir)/.include/(tbox/tbox.config.h)")
 
     -- add packages
-    if has_package("mbedtls") then
-        add_packages("mbedtls")
-    elseif has_package("polarssl") then
-        add_packages("polarssl")
-    elseif has_package("openssl") then
-        add_packages("openssl")
-    end
-    if has_package("pcre2") then
-        add_packages("pcre2")
-    elseif has_package("pcre") then
-        add_packages("pcre")
-    end
-    add_packages("zlib", "mysql", "sqlite3")
+    add_packages("mbedtls", "polarssl", "openssl", "pcre2", "pcre", "zlib", "mysql", "sqlite3")
 
     -- add options
     add_options("info", "float", "wchar", "exception")
