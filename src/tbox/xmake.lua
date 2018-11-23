@@ -22,16 +22,16 @@ target("tbox")
     add_headers("$(buildir)/.include/(tbox/tbox.config.h)")
 
     -- add packages
-    if has_config("mbedtls") then
+    if has_package("mbedtls") then
         add_packages("mbedtls")
-    elseif has_config("polarssl") then
+    elseif has_package("polarssl") then
         add_packages("polarssl")
-    elseif has_config("openssl") then
+    elseif has_package("openssl") then
         add_packages("openssl")
     end
-    if has_config("pcre2") then
+    if has_package("pcre2") then
         add_packages("pcre2")
-    elseif has_config("pcre") then
+    elseif has_package("pcre") then
         add_packages("pcre")
     end
     add_packages("zlib", "mysql", "sqlite3")
@@ -129,14 +129,14 @@ target("tbox")
     -- add the source files for the database module
     if has_config("database") then 
         add_files("database/*.c")
-        if has_config("mysql") then add_files("database/impl/mysql.c") end
-        if has_config("sqlite3") then add_files("database/impl/sqlite3.c") end
+        if has_package("mysql") then add_files("database/impl/mysql.c") end
+        if has_package("sqlite3") then add_files("database/impl/sqlite3.c") end
     end
 
     -- add the source files for the ssl package
-    if has_config("mbedtls") then add_files("network/impl/ssl/mbedtls.c")
-    elseif has_config("polarssl") then add_files("network/impl/ssl/polarssl.c") 
-    elseif has_config("openssl") then add_files("network/impl/ssl/openssl.c") end
+    if has_package("mbedtls") then add_files("network/impl/ssl/mbedtls.c")
+    elseif has_package("polarssl") then add_files("network/impl/ssl/polarssl.c") 
+    elseif has_package("openssl") then add_files("network/impl/ssl/openssl.c") end
 
     -- add the source for the windows 
     if is_os("windows") then

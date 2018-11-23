@@ -11,9 +11,6 @@ target("demo")
     -- add defines
     add_defines("__tb_prefix__=\"demo\"")
 
-    -- add packages
-    add_packages("base")
-
     -- add the source file
     add_files("micro.c") 
     add_files("libc/stdlib.c") 
@@ -24,7 +21,7 @@ target("demo")
     add_files("container/single_list_entry.c") 
 
     -- add the source files for coroutine
-    if is_option("coroutine") then
+    if has_config("coroutine") then
         add_files("coroutine/stackless/*.c") 
     end
 

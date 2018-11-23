@@ -86,22 +86,33 @@ for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "data
         end)
 end
 
--- the base package
-option("base")
-    set_default(true)
-    if is_os("windows") then add_links("ws2_32") 
-    elseif is_os("android") then add_links("m", "c") 
-    else add_links("pthread", "dl", "m", "c") end
+-- add system links
+if is_os("windows") then add_syslinks("ws2_32") 
+elseif is_os("android") then add_syslinks("m", "c") 
+else add_syslinks("pthread", "dl", "m", "c") end
 
--- add requires
-if not has_config("small", "micro") then
-    for _, require_name in ipairs({"zlib", "mysql", "sqlite3", "openssl 1.1.*", "polarssl", "mbedtls 2.13.*", "pcre2", "pcre"}) do
-        local name = require_name:split('%s')[1]
-        add_requires(require_name, {optional = true, option = {deps = {"small", "micro"}, defines_h = format("$(prefix)_PACKAGE_HAVE_%s", name:upper()), before_check = function (option)
+-- define options for package
+for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedtls", "pcre2", "pcre"}) do
+    option(name)
+        add_deps("small", "micro")
+        set_default(true)
+        set_showmenu(true)
+        set_description("Enable the " .. name .. " package.")
+        before_check(function (option)
             if option:dep("small"):enabled() or option:dep("micro"):enabled() then
                 option:enable(false)
             end
-        end}})
+        end)
+    option_end()
+end
+
+-- add requires
+for _, require_name in ipairs({"zlib", "mysql", "sqlite3", "openssl 1.1.*", "polarssl", "mbedtls 2.13.*", "pcre2", "pcre"}) do
+    local name = require_name:split('%s')[1]
+    if has_config(name) then
+        add_requires(require_name, {optional = true, on_load = function (package)
+            package:add("defines_h", format("$(prefix)_PACKAGE_HAVE_%s", name:upper()))
+        end})
     end
 end
 

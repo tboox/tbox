@@ -11,9 +11,6 @@ target("demo")
     -- add defines
     add_defines("__tb_prefix__=\"demo\"")
 
-    -- add options
-    add_options("base")
-
     -- add the source files
     add_files("demo.c") 
     add_files("libc/*.c") 

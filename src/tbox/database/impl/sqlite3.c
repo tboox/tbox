@@ -950,4 +950,3 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
     // ok?
     return (tb_database_sql_ref_t)sqlite;
 }
-

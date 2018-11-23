@@ -20,9 +20,6 @@ target("tbox")
     add_headers("../(tbox/math/impl/*.h)")
     add_headers("../(tbox/utils/impl/*.h)")
 
-    -- add packages
-    add_packages("base")
-
     -- add options
     add_options("info", "float", "wchar", "micro", "coroutine")
 
@@ -86,7 +83,7 @@ target("tbox")
     end
 
     -- add the source files for float 
-    if is_option("float") then
+    if has_config("float") then
         add_files("libm/isinf.c") 
         add_files("libm/isinff.c") 
         add_files("libm/isnan.c") 
@@ -106,7 +103,7 @@ target("tbox")
     end
 
     -- add the source files for coroutine
-    if is_option("coroutine") then
+    if has_config("coroutine") then
         add_files("coroutine/stackless/*.c") 
         add_files("coroutine/impl/stackless/*.c") 
     end
