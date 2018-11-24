@@ -4,6 +4,7 @@ option("demo")
     set_showmenu(true)
     set_category("option")
     set_description("Enable or disable the demo module")
+option_end()
 
 -- option: micro
 option("micro")
@@ -12,6 +13,7 @@ option("micro")
     set_category("option")
     set_description("Compile micro core library for the embed system.")
     add_defines_h("$(prefix)_MICRO_ENABLE")
+option_end()
 
 -- option: small
 option("small")
@@ -19,11 +21,13 @@ option("small")
     set_showmenu(true)
     set_category("option")
     set_description("Enable the small compile mode and disable all modules.")
+option_end()
 
 -- option: wchar
 option("wchar")
     add_ctypes("wchar_t")
     add_defines_h("$(prefix)_TYPE_HAVE_WCHAR")
+option_end()
 
 -- option: float
 option("float")
@@ -38,6 +42,7 @@ option("float")
             option:enable(false)
         end
     end)
+option_end()
 
 -- option: info
 option("info")
@@ -53,6 +58,7 @@ option("info")
             option:enable(false)
         end
     end)
+option_end()
 
 -- option: exception
 option("exception")
@@ -61,6 +67,7 @@ option("exception")
     set_category("option")
     set_description("Enable or disable the exception.")
     add_defines_h("$(prefix)_EXCEPTION_ENABLE")
+option_end()
 
 -- option: deprecated
 option("deprecated")
@@ -69,6 +76,7 @@ option("deprecated")
     set_category("option")
     set_description("Enable or disable the deprecated interfaces.")
     add_defines_h("$(prefix)_API_HAVE_DEPRECATED")
+option_end()
 
 -- add modules
 for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
@@ -84,6 +92,7 @@ for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "data
                 option:enable(false)
             end
         end)
+    option_end()
 end
 
 -- define options for package
@@ -111,11 +120,6 @@ for idx, require_name in ipairs({"zlib", "sqlite3", "mysql", "mbedtls 2.13.*", "
         end})
     end
 end
-
--- add system links
-if is_os("windows") then add_syslinks("ws2_32") 
-elseif is_os("android") then add_syslinks("m", "c") 
-else add_syslinks("pthread", "dl", "m", "c") end
 
 -- check interfaces
 function check_interfaces()

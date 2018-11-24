@@ -132,6 +132,12 @@ if is_plat("windows") then
 
     -- no msvcrt.lib
     add_ldflags("-nodefaultlib:msvcrt.lib")
+    add_syslinks("ws2_32") 
+
+elseif is_plat("android") then
+    add_syslinks("m", "c") 
+else 
+    add_syslinks("pthread", "dl", "m", "c") 
 end
 
 -- include project sources
