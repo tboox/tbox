@@ -152,6 +152,8 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
 #   include "posix/socket_select.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_POLL)
 #   include "posix/socket_poll.c"
+#elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
+#   include "posix/socket_select.c"
 #else
 tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
