@@ -344,6 +344,16 @@ tb_stream_ref_t         tb_stream_init_from_file(tb_char_t const* path, tb_size_
  */
 tb_stream_ref_t         tb_stream_init_from_sock(tb_char_t const* host, tb_uint16_t port, tb_size_t type, tb_bool_t bssl);
 
+/*! init stream from sock reference
+ *
+ * @param sock          the socket 
+ * @param type          the socket type, tcp or udp
+ * @param bssl          enable ssl?
+ *
+ * @return              the stream
+ */
+tb_stream_ref_t         tb_stream_init_from_sock_ref(tb_socket_ref_t sock, tb_size_t type, tb_bool_t bssl);
+
 /*! init stream from http or https
  *
  * @param host          the host
