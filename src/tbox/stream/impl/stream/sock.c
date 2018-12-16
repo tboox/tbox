@@ -816,7 +816,7 @@ tb_stream_ref_t tb_stream_init_from_sock_ref(tb_socket_ref_t sock, tb_size_t typ
         tb_assert_and_check_break(stream);
 
         // ctrl stream
-        if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_HOST, "ref")) break;
+        if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_HOST, "fd")) break;
         if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_PORT, (tb_uint16_t)tb_sock2fd(sock))) break;
         if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_SSL, bssl)) break;
         if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) break;
