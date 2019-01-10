@@ -76,7 +76,8 @@ static tb_bool_t tb_native_allocator_instance_init(tb_handle_t instance, tb_cpoi
     if (!tb_native_memory_init()) return tb_false;
 
     // init allocator
-    allocator->type         = TB_ALLOCATOR_NATIVE;
+    allocator->type         = TB_ALLOCATOR_TYPE_NATIVE;
+    allocator->flag         = TB_ALLOCATOR_FLAG_NOLOCK;
     allocator->malloc       = tb_native_allocator_malloc;
     allocator->ralloc       = tb_native_allocator_ralloc;
     allocator->free         = tb_native_allocator_free;

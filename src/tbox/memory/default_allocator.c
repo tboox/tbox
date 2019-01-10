@@ -320,7 +320,8 @@ tb_allocator_ref_t tb_default_allocator_init(tb_allocator_ref_t large_allocator)
         tb_assert_and_check_break(allocator);
 
         // init base
-        allocator->base.type            = TB_ALLOCATOR_DEFAULT;
+        allocator->base.type            = TB_ALLOCATOR_TYPE_DEFAULT;
+        allocator->base.flag            = TB_ALLOCATOR_FLAG_NONE;
         allocator->base.malloc          = tb_default_allocator_malloc;
         allocator->base.ralloc          = tb_default_allocator_ralloc;
         allocator->base.free            = tb_default_allocator_free;

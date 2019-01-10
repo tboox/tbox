@@ -440,7 +440,8 @@ tb_allocator_ref_t tb_small_allocator_init(tb_allocator_ref_t large_allocator)
         allocator->large_allocator      = large_allocator;
 
         // init base
-        allocator->base.type            = TB_ALLOCATOR_SMALL;
+        allocator->base.type            = TB_ALLOCATOR_TYPE_SMALL;
+        allocator->base.flag            = TB_ALLOCATOR_FLAG_NONE;
         allocator->base.malloc          = tb_small_allocator_malloc;
         allocator->base.ralloc          = tb_small_allocator_ralloc;
         allocator->base.free            = tb_small_allocator_free;

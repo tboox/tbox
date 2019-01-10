@@ -606,7 +606,8 @@ tb_allocator_ref_t tb_native_large_allocator_init()
         tb_assert_and_check_break(allocator);
 
         // init base
-        allocator->base.type             = TB_ALLOCATOR_LARGE;
+        allocator->base.type             = TB_ALLOCATOR_TYPE_LARGE;
+        allocator->base.flag             = TB_ALLOCATOR_FLAG_NONE;
         allocator->base.large_malloc     = tb_native_large_allocator_malloc;
         allocator->base.large_ralloc     = tb_native_large_allocator_ralloc;
         allocator->base.large_free       = tb_native_large_allocator_free;

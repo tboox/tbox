@@ -90,7 +90,7 @@ tb_allocator_ref_t tb_static_allocator_init(tb_byte_t* data, tb_size_t size)
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // init type
-    allocator->type = TB_ALLOCATOR_STATIC;
+    allocator->type = TB_ALLOCATOR_TYPE_STATIC;
 
     // ok
     return allocator;
