@@ -67,7 +67,7 @@ tb_pointer_t tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size _
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // malloc it
@@ -130,7 +130,7 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // ralloc it
@@ -171,7 +171,7 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
     tb_assert_and_check_return_val(allocator, tb_false);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // trace
@@ -209,7 +209,7 @@ tb_pointer_t tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t 
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // malloc it
@@ -278,7 +278,7 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
     tb_assert_and_check_return_val(allocator, tb_null);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // ralloc it
@@ -325,7 +325,7 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
     tb_assert_and_check_return_val(allocator, tb_false);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // trace
@@ -478,7 +478,7 @@ tb_void_t tb_allocator_clear(tb_allocator_ref_t allocator)
     tb_assert_and_check_return(allocator);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // clear it
@@ -505,7 +505,7 @@ tb_void_t tb_allocator_dump(tb_allocator_ref_t allocator)
     tb_assert_and_check_return(allocator);
 
     // enter
-    tb_bool_t lockit = !(allocator->type & TB_ALLOCATOR_FLAG_NOLOCK);
+    tb_bool_t lockit = !(allocator->flag & TB_ALLOCATOR_FLAG_NOLOCK);
     if (lockit) tb_spinlock_enter(&allocator->lock);
 
     // dump it
