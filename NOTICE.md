@@ -1,5 +1,5 @@
 The Treasure Box Library
-Copyright 2009-2018 The TBOOX Open Source Group
+Copyright 2009 - 2019 The TBOOX Open Source Group
 
 This product includes software developed by The TBOOX Open Source Group (http://www.tboox.org/).
 
