@@ -178,15 +178,15 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_ref_t spider, tb_char_t
     tb_assert_and_check_return_val(spider && url && data && maxn, tb_false);
 
     // skip protocol
-	tb_char_t* p = (tb_char_t*)url;
-	if (!tb_strnicmp(p, "http://", 7)) p += 7;
-	else if (!tb_strnicmp(p, "https://", 8)) p += 8;
+    tb_char_t* p = (tb_char_t*)url;
+    if (!tb_strnicmp(p, "http://", 7)) p += 7;
+    else if (!tb_strnicmp(p, "https://", 8)) p += 8;
 
     // skip space
     while (*p && tb_isspace(*p)) p++;
 
-	// format ourl
-	tb_long_t n = tb_snprintf(data, maxn, "%s/%s", spider->rootdir, p);
+    // format ourl
+    tb_long_t n = tb_snprintf(data, maxn, "%s/%s", spider->rootdir, p);
     tb_check_return_val(n > 0 && n < maxn, tb_false);
 
     // no root? append '/'
@@ -201,7 +201,7 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_ref_t spider, tb_char_t
     tb_assert_and_check_return_val(n > 0 && n < maxn, tb_false);
 
     // end
-	data[n] = '\0';
+    data[n] = '\0';
 
     // replace '?' => '_'
     p = data;
@@ -214,11 +214,11 @@ static tb_bool_t tb_demo_spider_make_ourl(tb_demo_spider_ref_t spider, tb_char_t
         p++;
     }
 
-	// trace
-	tb_trace_d("make: %s => %s", url, data);
+    // trace
+    tb_trace_d("make: %s => %s", url, data);
 
-	// ok?
-	return n > 0? tb_true : tb_false;
+    // ok?
+    return n > 0? tb_true : tb_false;
 }
 static tb_bool_t tb_demo_spider_parser_open(tb_demo_spider_parser_ref_t parser, tb_char_t const* iurl, tb_char_t const* ourl)
 {
