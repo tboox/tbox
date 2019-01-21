@@ -98,6 +98,7 @@ static tb_demo_t g_demo[] =
 
     // other
 ,   TB_DEMO_MAIN_ITEM(other_test)
+,   TB_DEMO_MAIN_ITEM(other_test_cpp)
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 ,   TB_DEMO_MAIN_ITEM(other_charset)
 #endif

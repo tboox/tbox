@@ -42,6 +42,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+__tb_extern_c_enter__
 
 // database
 TB_DEMO_MAIN_DECL(database_sql);
@@ -95,6 +96,7 @@ TB_DEMO_MAIN_DECL(hash_benchmark);
 
 // other
 TB_DEMO_MAIN_DECL(other_test);
+TB_DEMO_MAIN_DECL(other_test_cpp);
 TB_DEMO_MAIN_DECL(other_charset);
 
 // object
@@ -222,6 +224,8 @@ TB_DEMO_MAIN_DECL(lo_coroutine_echo_client);
 TB_DEMO_MAIN_DECL(lo_coroutine_file_server);
 TB_DEMO_MAIN_DECL(lo_coroutine_file_client);
 TB_DEMO_MAIN_DECL(lo_coroutine_http_server);
+
+__tb_extern_c_leave__
 
 #endif
 

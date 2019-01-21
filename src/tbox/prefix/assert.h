@@ -251,6 +251,8 @@ __tb_extern_c_enter__
  */
 #if __tb_has_feature__(c_static_assert)
 #   define tb_assert_static(x)      _Static_assert(x, "")
+#elif defined(__cpp_static_assert)
+#   define tb_assert_static(x)      static_assert(x, "")
 #elif defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(4, 6)
 #   define tb_assert_static(x)      _Static_assert(x, "")
 #else
