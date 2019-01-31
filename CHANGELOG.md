@@ -6,6 +6,10 @@
 
 * [#70](https://github.com/tboox/tbox/issues/70): Add `tb_stream_init_from_sock_ref()` to open a given socket as stream
 
+### Changes
+
+* Optimize queue_buffer module
+
 ## v1.6.3
 
 ### New features
@@ -172,6 +176,10 @@
 ### 新特性
 
 * [#70](https://github.com/tboox/tbox/issues/70): 添加`tb_stream_init_from_sock_ref()`接口去直接打开一个socket作为stream去读取数据。
+
+### 改进
+
+* 优化queue_buffer模块
 
 ## v1.6.3
 
