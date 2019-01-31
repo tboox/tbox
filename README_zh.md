@@ -28,7 +28,7 @@
     <a href="https://jq.qq.com/?_wv=1027&k=5hpwWFv">
       <img src="https://img.shields.io/badge/chat-on%20QQ-ff69b4.svg?style=flat-square" alt="QQ" />
     </a>
-    <a href="http://tboox.org/donation/">
+    <a href="https://tboox.org/donation/">
       <img src="https://img.shields.io/badge/donate-us-orange.svg?style=flat-square" alt="Donate" />
     </a>
   </div>
@@ -61,7 +61,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 如果你想了解更多，请参考：
 
-* [项目主页](http://www.tboox.org/cn)
+* [项目主页](https://www.tboox.org/cn)
 * [在线文档](https://github.com/tboox/tbox/wiki/%E7%9B%AE%E5%BD%95)
 * [Github](https://github.com/tboox/tbox)
 * [Gitee](https://gitee.com/tboox/tbox)
@@ -81,7 +81,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 #### 协程库
 
-- 快速高效的协程切换支持（具体性能参考：[基准测试报告](http://tboox.org/cn/2016/10/28/benchbox-coroutine/)）
+- 快速高效的协程切换支持（具体性能参考：[基准测试报告](https://tboox.org/cn/2016/10/28/benchbox-coroutine/)）
 - 提供跨平台支持，核心切换算法参考boost，并且对其进行重写和优化，目前支持架构：x86, x86_64, arm, arm64, mips32
 - 提供channel协程间数据通信支持，基于生产、消费者模型
 - 提供信号量、协程锁支持
@@ -294,7 +294,7 @@ int main(int argc, char** argv)
 ## 联系方式
 
 * 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
-* 主页：[TBOOX开源工程](http://www.tboox.org/cn)
+* 主页：[TBOOX开源工程](https://www.tboox.org/cn)
 * 社区：[Reddit论坛](https://www.reddit.com/r/tboox/)
 * QQ群：343118190
 * 微信公众号：tboox-os
