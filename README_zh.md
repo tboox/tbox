@@ -61,7 +61,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 如果你想了解更多，请参考：
 
-* [项目主页](https://www.tboox.org/cn)
+* [项目主页](https://tboox.org/cn)
 * [在线文档](https://github.com/tboox/tbox/wiki/%E7%9B%AE%E5%BD%95)
 * [Github](https://github.com/tboox/tbox)
 * [Gitee](https://gitee.com/tboox/tbox)
@@ -294,7 +294,7 @@ int main(int argc, char** argv)
 ## 联系方式
 
 * 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
-* 主页：[TBOOX开源工程](https://www.tboox.org/cn)
+* 主页：[TBOOX开源工程](https://tboox.org/cn)
 * 社区：[Reddit论坛](https://www.reddit.com/r/tboox/)
 * QQ群：343118190
 * 微信公众号：tboox-os
