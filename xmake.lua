@@ -1,9 +1,11 @@
 -- project
 set_project("tbox")
 
--- version
-set_version("1.6.3")
+-- set xmake minimum version
 set_xmakever("2.2.2")
+
+-- set project version
+set_version("1.6.3", {build = "%Y%m%d%H%M"})
 
 -- set warning all as error
 set_warnings("all", "error")
@@ -12,8 +14,8 @@ set_warnings("all", "error")
 set_languages("c99", "cxx11")
 
 -- add defines to config.h
-add_defines_h("$(prefix)_OS_$(os:upper)")
-add_defines_h("_GNU_SOURCE=1", "_REENTRANT")
+set_configvar("_GNU_SOURCE", 1)
+set_configvar("_REENTRANT", 1)
 
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
@@ -105,7 +107,7 @@ if has_config("small", "micro") then
     add_defines("__tb_small__")
 
     -- add defines to config.h
-    add_defines_h("$(prefix)_SMALL")
+    set_configvar("TB_CONFIG_SMALL", 1)
 end
 
 -- for the windows platform (msvc)
