@@ -194,7 +194,7 @@ Some projects using tbox:
 
 ## Build
 
-Please install xmake first: [xmake](https://github.com/tboox/xmake)
+Please install xmake first: [xmake](https://github.com/xmake-io/xmake)
 
 ```console
 # build for the host platform

@@ -18,7 +18,7 @@ uninstall: build/.xmake/bin/xmake .null
 
 build/.xmake/bin/xmake: 
 	if [ ! -d build/.xmake ]; then mkdir -p build/.xmake; fi
-	if [ ! -f build/.xmake/xmake.zip ]; then wget https://github.com/tboox/xmake/archive/master.zip -O build/.xmake/xmake.zip; fi
+	if [ ! -f build/.xmake/xmake.zip ]; then wget https://github.com/xmake-io/xmake/archive/master.zip -O build/.xmake/xmake.zip; fi
 	if [ ! -f build/.xmake/xmake.zip ]; then wget https://gitlab.com/tboox/xmake/-/archive/master/xmake-master.zip -O build/.xmake/xmake.zip; fi
 	cd build/.xmake; unzip xmake.zip; cd xmake-master; ./install `pwd`/..
 

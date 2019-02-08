@@ -201,7 +201,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 ## 编译 
 
-请先安装: [xmake](https://github.com/tboox/xmake)
+请先安装: [xmake](https://github.com/xmake-io/xmake)
 
 ```console
 # 默认直接编译当前主机平台
