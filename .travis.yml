@@ -8,7 +8,7 @@ compiler:
   - clang
 
 install:
-  - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
+  - git clone --branch=dev https://github.com/xmake-io/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
   - cd -
