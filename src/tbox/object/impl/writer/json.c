@@ -57,10 +57,10 @@ static tb_bool_t tb_oc_json_writer_func_array(tb_oc_json_writer_t* writer, tb_ob
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write array
     if (tb_oc_array_size(object))
     {
-        // writ beg
+        // write begin
         if (tb_stream_printf(writer->stream, "[") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
@@ -74,22 +74,22 @@ static tb_bool_t tb_oc_json_writer_func_array(tb_oc_json_writer_t* writer, tb_ob
                 tb_oc_json_writer_func_t func = tb_oc_json_writer_func(item->type);
                 tb_assert_and_check_continue(func);
 
-                // writ tab
+                // write tab
                 if (item_itor != item_head)
                 {
-                    if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+                    if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level, 2)) return tb_false;
                     if (tb_stream_printf(writer->stream, ",") < 0) return tb_false;
-                    if (!tb_oc_writer_tab(writer->stream, writer->deflate, 1)) return tb_false;
+                    if (!tb_oc_writer_spaces(writer->stream, writer->deflate, 1, 1)) return tb_false;
                 }
-                else if (!tb_oc_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
+                else if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level + 1, 2)) return tb_false;
 
-                // writ
+                // write
                 if (!func(writer, item, level + 1)) return tb_false;
             }
         }
 
-        // writ end
-        if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+        // write end
+        if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level, 2)) return tb_false;
         if (tb_stream_printf(writer->stream, "]") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
@@ -212,11 +212,11 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
                 // writ tab
                 if (item_itor != item_head)
                 {
-                    if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+                    if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level, 2)) return tb_false;
                     if (tb_stream_printf(writer->stream, ",") < 0) return tb_false;
-                    if (!tb_oc_writer_tab(writer->stream, writer->deflate, 1)) return tb_false;
+                    if (!tb_oc_writer_spaces(writer->stream, writer->deflate, 1, 1)) return tb_false;
                 }
-                else if (!tb_oc_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
+                else if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level + 1, 2)) return tb_false;
 
                 // writ key
                 if (tb_stream_printf(writer->stream, "\"%s\":", item->key) < 0) return tb_false;
@@ -226,7 +226,7 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
                 if (item->val->type == TB_OBJECT_TYPE_DICTIONARY || item->val->type == TB_OBJECT_TYPE_ARRAY)
                 {
                     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
-                    if (!tb_oc_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
+                    if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level + 1, 2)) return tb_false;
                 }
 
                 // writ val
@@ -234,8 +234,8 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
             }
         }
 
-        // writ end
-        if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+        // write end
+        if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level, 2)) return tb_false;
         if (tb_stream_printf(writer->stream, "}") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }

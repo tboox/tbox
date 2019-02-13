@@ -45,6 +45,18 @@ static __tb_inline__ tb_bool_t tb_oc_writer_tab(tb_stream_ref_t stream, tb_bool_
     // ok
     return tb_true;
 }
+static __tb_inline__ tb_bool_t tb_oc_writer_spaces(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab, tb_size_t width)
+{
+    // writ tab
+    if (!deflate) 
+    {
+        tb_size_t spaces = tab * width;
+        while (spaces--) if (tb_stream_printf(stream, " ") < 0) return tb_false;
+    }
+
+    // ok
+    return tb_true;
+}
 static __tb_inline__ tb_bool_t tb_oc_writer_newline(tb_stream_ref_t stream, tb_bool_t deflate)
 {
     // writ newline

@@ -107,6 +107,7 @@ TB_DEMO_MAIN_DECL(object_xml);
 TB_DEMO_MAIN_DECL(object_xplist);
 TB_DEMO_MAIN_DECL(object_bplist);
 TB_DEMO_MAIN_DECL(object_dump);
+TB_DEMO_MAIN_DECL(object_writer);
 
 // stream
 TB_DEMO_MAIN_DECL(stream_transfer_pool);
