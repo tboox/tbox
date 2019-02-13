@@ -45,7 +45,7 @@ static tb_bool_t tb_oc_xml_writer_func_null(tb_oc_xml_writer_t* writer, tb_objec
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
     if (tb_stream_printf(writer->stream, "<null/>") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -62,11 +62,11 @@ static tb_bool_t tb_oc_xml_writer_func_date(tb_oc_xml_writer_t* writer, tb_objec
     tb_time_t time = tb_oc_date_time(object);
     if (time > 0)
     {
-        // writ beg
+        // write begin
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<date>") < 0) return tb_false;
 
-        // writ date
+        // write date
         tb_tm_t date = {0};
         if (tb_localtime(time, &date))
         {
@@ -79,13 +79,13 @@ static tb_bool_t tb_oc_xml_writer_func_date(tb_oc_xml_writer_t* writer, tb_objec
                                 ,   date.second) < 0) return tb_false;
         }
                     
-        // writ end
+        // write end
         if (tb_stream_printf(writer->stream, "</date>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
-        // writ
+        // write
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<date/>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -102,7 +102,7 @@ static tb_bool_t tb_oc_xml_writer_func_data(tb_oc_xml_writer_t* writer, tb_objec
     // no empty?
     if (tb_oc_data_size(object))
     {
-        // writ beg
+        // write begin
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<data>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -116,7 +116,7 @@ static tb_bool_t tb_oc_xml_writer_func_data(tb_oc_xml_writer_t* writer, tb_objec
         on = tb_base64_encode(ib, in, ob, on);
         tb_trace_d("base64: %u => %u", in, on);
 
-        // writ data
+        // write data
         tb_char_t const*    p = ob;
         tb_char_t const*    e = ob + on;
         tb_size_t           n = 0;
@@ -136,17 +136,17 @@ static tb_bool_t tb_oc_xml_writer_func_data(tb_oc_xml_writer_t* writer, tb_objec
         // check
         tb_check_return_val(p == e, tb_false);
 
-        // writ newline
+        // write newline
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
      
-        // writ end
+        // write end
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "</data>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
     else 
     {
-        // writ
+        // write
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<data/>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -160,10 +160,10 @@ static tb_bool_t tb_oc_xml_writer_func_array(tb_oc_xml_writer_t* writer, tb_obje
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (tb_oc_array_size(object))
     {
-        // writ beg
+        // write begin
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<array>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -178,12 +178,12 @@ static tb_bool_t tb_oc_xml_writer_func_array(tb_oc_xml_writer_t* writer, tb_obje
                 tb_oc_xml_writer_func_t func = tb_oc_xml_writer_func(item->type);
                 tb_assert_and_check_continue(func);
 
-                // writ
+                // write
                 if (!func(writer, item, level + 1)) return tb_false;
             }
         }
 
-        // writ end
+        // write end
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "</array>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -203,7 +203,7 @@ static tb_bool_t tb_oc_xml_writer_func_string(tb_oc_xml_writer_t* writer, tb_obj
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
     if (tb_oc_string_size(object))
     {
@@ -220,7 +220,7 @@ static tb_bool_t tb_oc_xml_writer_func_number(tb_oc_xml_writer_t* writer, tb_obj
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     switch (tb_oc_number_type(object))
     {
     case TB_OC_NUMBER_TYPE_UINT64:
@@ -287,7 +287,7 @@ static tb_bool_t tb_oc_xml_writer_func_boolean(tb_oc_xml_writer_t* writer, tb_ob
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
     if (tb_stream_printf(writer->stream, "<%s/>", tb_oc_boolean_bool(object)? "true" : "false") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -300,10 +300,10 @@ static tb_bool_t tb_oc_xml_writer_func_dictionary(tb_oc_xml_writer_t* writer, tb
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (tb_oc_dictionary_size(object))
     {
-        // writ beg
+        // write begin
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<dict>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -318,17 +318,17 @@ static tb_bool_t tb_oc_xml_writer_func_dictionary(tb_oc_xml_writer_t* writer, tb
                 tb_oc_xml_writer_func_t func = tb_oc_xml_writer_func(item->val->type);
                 tb_assert_and_check_continue(func);
 
-                // writ key
+                // write key
                 if (!tb_oc_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
                 if (tb_stream_printf(writer->stream, "<key>%s</key>", item->key) < 0) return tb_false;
                 if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
-                // writ val
+                // write value
                 if (!func(writer, item->val, level + 1)) return tb_false;
             }
         }
 
-        // writ end
+        // write end
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "</dict>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
@@ -360,11 +360,11 @@ static tb_long_t tb_oc_xml_writer_done(tb_stream_ref_t stream, tb_object_ref_t o
     // the begin offset
     tb_hize_t bof = tb_stream_offset(stream);
 
-    // writ xml header
+    // write xml header
     if (tb_stream_printf(stream, "<?xml version=\"2.0\" encoding=\"utf-8\"?>") < 0) return -1;
     if (!tb_oc_writer_newline(stream, deflate)) return -1;
 
-    // writ
+    // write
     if (!func(&writer, object, 0)) return -1;
 
     // sync

@@ -45,7 +45,7 @@ static tb_bool_t tb_oc_json_writer_func_null(tb_oc_json_writer_t* writer, tb_obj
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (tb_stream_printf(writer->stream, "null") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
@@ -107,7 +107,7 @@ static tb_bool_t tb_oc_json_writer_func_string(tb_oc_json_writer_t* writer, tb_o
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (tb_oc_string_size(object))
     {
         if (tb_stream_printf(writer->stream, "\"%s\"", tb_oc_string_cstr(object)) < 0) return tb_false;
@@ -123,7 +123,7 @@ static tb_bool_t tb_oc_json_writer_func_number(tb_oc_json_writer_t* writer, tb_o
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     switch (tb_oc_number_type(object))
     {
     case TB_OC_NUMBER_TYPE_UINT64:
@@ -180,7 +180,7 @@ static tb_bool_t tb_oc_json_writer_func_boolean(tb_oc_json_writer_t* writer, tb_
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (tb_stream_printf(writer->stream, "%s", tb_oc_boolean_bool(object)? "true" : "false") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
@@ -192,10 +192,10 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // writ
+    // write
     if (tb_oc_dictionary_size(object))
     {
-        // writ beg
+        // write beg
         if (tb_stream_printf(writer->stream, "{") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
@@ -209,7 +209,7 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
                 tb_oc_json_writer_func_t func = tb_oc_json_writer_func(item->val->type);
                 tb_assert_and_check_continue(func);
 
-                // writ tab
+                // write tab
                 if (item_itor != item_head)
                 {
                     if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level, 2)) return tb_false;
@@ -218,10 +218,10 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
                 }
                 else if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level + 1, 2)) return tb_false;
 
-                // writ key
+                // write key
                 if (tb_stream_printf(writer->stream, "\"%s\":", item->key) < 0) return tb_false;
 
-                // writ spaces
+                // write spaces
                 if (!writer->deflate) if (tb_stream_printf(writer->stream, " ") < 0) return tb_false;
                 if (item->val->type == TB_OBJECT_TYPE_DICTIONARY || item->val->type == TB_OBJECT_TYPE_ARRAY)
                 {
@@ -229,7 +229,7 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
                     if (!tb_oc_writer_spaces(writer->stream, writer->deflate, level + 1, 2)) return tb_false;
                 }
 
-                // writ val
+                // write value
                 if (!func(writer, item->val, level + 1)) return tb_false;
             }
         }
@@ -265,7 +265,7 @@ static tb_long_t tb_oc_json_writer_done(tb_stream_ref_t stream, tb_object_ref_t 
     // the begin offset
     tb_hize_t bof = tb_stream_offset(stream);
 
-    // writ
+    // write
     if (!func(&writer, object, 0)) return -1;
 
     // sync
