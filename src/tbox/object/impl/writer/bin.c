@@ -45,7 +45,7 @@ static tb_bool_t tb_oc_bin_writer_func_null(tb_oc_bin_writer_t* writer, tb_objec
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
 
-    // writ type & null
+    // write type & null
     return tb_oc_writer_bin_type_size(writer->stream, object->type, 0);
 }
 static tb_bool_t tb_oc_bin_writer_func_date(tb_oc_bin_writer_t* writer, tb_object_ref_t object)
@@ -53,7 +53,7 @@ static tb_bool_t tb_oc_bin_writer_func_date(tb_oc_bin_writer_t* writer, tb_objec
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
 
-    // writ type & time
+    // write type & time
     return tb_oc_writer_bin_type_size(writer->stream, object->type, (tb_uint64_t)tb_oc_date_time(object));
 }
 static tb_bool_t tb_oc_bin_writer_func_data(tb_oc_bin_writer_t* writer, tb_object_ref_t object)
@@ -65,7 +65,7 @@ static tb_bool_t tb_oc_bin_writer_func_data(tb_oc_bin_writer_t* writer, tb_objec
     tb_byte_t const*    data = (tb_byte_t const*)tb_oc_data_getp(object);
     tb_size_t           size = tb_oc_data_size(object);
 
-    // writ type & size
+    // write type & size
     if (!tb_oc_writer_bin_type_size(writer->stream, object->type, size)) return tb_false;
 
     // empty?
@@ -98,7 +98,7 @@ static tb_bool_t tb_oc_bin_writer_func_data(tb_oc_bin_writer_t* writer, tb_objec
     tb_byte_t           xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
     for (; pb < pe && qb < qe; pb++, qb++, xb++) *qb = *pb ^ xb;
 
-    // writ it
+    // write it
     return tb_stream_bwrit(writer->stream, writer->data, size);
 }
 static tb_bool_t tb_oc_bin_writer_func_array(tb_oc_bin_writer_t* writer, tb_object_ref_t object)
@@ -106,7 +106,7 @@ static tb_bool_t tb_oc_bin_writer_func_array(tb_oc_bin_writer_t* writer, tb_obje
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream && writer->ohash, tb_false);
 
-    // writ type & size
+    // write type & size
     if (!tb_oc_writer_bin_type_size(writer->stream, object->type, tb_oc_array_size(object))) return tb_false;
 
     // walk
@@ -118,7 +118,7 @@ static tb_bool_t tb_oc_bin_writer_func_array(tb_oc_bin_writer_t* writer, tb_obje
             tb_size_t index = (tb_size_t)tb_hash_map_get(writer->ohash, item);
             if (index)
             {
-                // writ index
+                // write index
                 if (!tb_oc_writer_bin_type_size(writer->stream, 0, (tb_uint64_t)(index - 1))) return tb_false;
             }
             else
@@ -127,7 +127,7 @@ static tb_bool_t tb_oc_bin_writer_func_array(tb_oc_bin_writer_t* writer, tb_obje
                 tb_oc_bin_writer_func_t func = tb_oc_bin_writer_func(item->type);
                 tb_assert_and_check_continue(func);
 
-                // writ it
+                // write it
                 if (!func(writer, item)) return tb_false;
 
                 // save index
@@ -148,7 +148,7 @@ static tb_bool_t tb_oc_bin_writer_func_string(tb_oc_bin_writer_t* writer, tb_obj
     tb_char_t const*    data = tb_oc_string_cstr(object);
     tb_size_t           size = tb_oc_string_size(object);
 
-    // writ type & size
+    // write type & size
     if (!tb_oc_writer_bin_type_size(writer->stream, object->type, size)) return tb_false;
 
     // empty?
@@ -181,7 +181,7 @@ static tb_bool_t tb_oc_bin_writer_func_string(tb_oc_bin_writer_t* writer, tb_obj
     tb_byte_t           xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
     for (; pb < pe && qb < qe && *pb; pb++, qb++, xb++) *qb = *pb ^ xb;
 
-    // writ it
+    // write it
     return tb_stream_bwrit(writer->stream, writer->data, size);
 }
 static tb_bool_t tb_oc_bin_writer_func_number(tb_oc_bin_writer_t* writer, tb_object_ref_t object)
@@ -189,10 +189,10 @@ static tb_bool_t tb_oc_bin_writer_func_number(tb_oc_bin_writer_t* writer, tb_obj
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
 
-    // writ type
+    // write type
     if (!tb_oc_writer_bin_type_size(writer->stream, object->type, (tb_uint64_t)tb_oc_number_type(object))) return tb_false;
 
-    // writ number
+    // write number
     switch (tb_oc_number_type(object))
     {
     case TB_OC_NUMBER_TYPE_UINT64:
@@ -248,7 +248,7 @@ static tb_bool_t tb_oc_bin_writer_func_boolean(tb_oc_bin_writer_t* writer, tb_ob
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
 
-    // writ type & bool
+    // write type & bool
     return tb_oc_writer_bin_type_size(writer->stream, object->type, tb_oc_boolean_bool(object));
 }
 static tb_bool_t tb_oc_bin_writer_func_dictionary(tb_oc_bin_writer_t* writer, tb_object_ref_t object)
@@ -256,7 +256,7 @@ static tb_bool_t tb_oc_bin_writer_func_dictionary(tb_oc_bin_writer_t* writer, tb
     // check
     tb_assert_and_check_return_val(object && writer && writer->stream && writer->ohash, tb_false);
 
-    // writ type & size
+    // write type & size
     if (!tb_oc_writer_bin_type_size(writer->stream, object->type, tb_oc_dictionary_size(object))) return tb_false;
 
     // walk
@@ -268,13 +268,13 @@ static tb_bool_t tb_oc_bin_writer_func_dictionary(tb_oc_bin_writer_t* writer, tb
             tb_object_ref_t        val = item->val;
             if (key && val)
             {
-                // writ key
+                // write key
                 {
                     // exists?
                     tb_size_t index = (tb_size_t)tb_hash_map_get(writer->shash, key);
                     if (index)
                     {
-                        // writ index
+                        // write index
                         if (!tb_oc_writer_bin_type_size(writer->stream, 0, (tb_uint64_t)(index - 1))) return tb_false;
                     }
                     else
@@ -287,7 +287,7 @@ static tb_bool_t tb_oc_bin_writer_func_dictionary(tb_oc_bin_writer_t* writer, tb
                         tb_object_ref_t okey = tb_oc_string_init_from_cstr(key);
                         tb_assert_and_check_return_val(okey, tb_false);
 
-                        // writ it
+                        // write it
                         if (!func(writer, okey)) return tb_false;
 
                         // exit it
@@ -298,13 +298,13 @@ static tb_bool_t tb_oc_bin_writer_func_dictionary(tb_oc_bin_writer_t* writer, tb
                     }
                 }
 
-                // writ val
+                // write value
                 {
                     // exists?
                     tb_size_t index = (tb_size_t)tb_hash_map_get(writer->ohash, val);
                     if (index)
                     {
-                        // writ index
+                        // write index
                         if (!tb_oc_writer_bin_type_size(writer->stream, 0, (tb_uint64_t)(index - 1))) return tb_false;
                     }
                     else
@@ -313,7 +313,7 @@ static tb_bool_t tb_oc_bin_writer_func_dictionary(tb_oc_bin_writer_t* writer, tb
                         tb_oc_bin_writer_func_t func = tb_oc_bin_writer_func(val->type);
                         tb_assert_and_check_return_val(func, tb_false);
 
-                        // writ it
+                        // write it
                         if (!func(writer, val)) return tb_false;
 
                         // save index
@@ -339,7 +339,7 @@ static tb_long_t tb_oc_bin_writer_done(tb_stream_ref_t stream, tb_object_ref_t o
     // the begin offset
     tb_hize_t bof = tb_stream_offset(stream);
 
-    // writ bin header
+    // write bin header
     if (!tb_stream_bwrit(stream, (tb_byte_t const*)"tbo00", 5)) return -1;
 
     // done
@@ -352,7 +352,7 @@ static tb_long_t tb_oc_bin_writer_done(tb_stream_ref_t stream, tb_object_ref_t o
         writer.shash            = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_str(tb_true), tb_element_uint32());
         tb_assert_and_check_break(writer.shash && writer.ohash);
 
-        // writ
+        // write
         if (!func(&writer, object)) break;
 
         // sync

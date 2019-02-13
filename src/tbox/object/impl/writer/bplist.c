@@ -116,18 +116,18 @@ static tb_bool_t tb_oc_bplist_writer_func_rdata(tb_oc_bplist_writer_t* writer, t
     // check
     tb_assert_and_check_return_val(writer && writer->stream && !data == !size, tb_false);
 
-    // writ flag
+    // write flag
     tb_uint8_t flag = bype | (tb_uint8_t)(size < 15 ? size : 0xf);
     if (!tb_stream_bwrit_u8(writer->stream, flag)) return tb_false;
 
-    // writ size
+    // write size
     if (size >= 15)
     {
         // init object
         tb_object_ref_t object = tb_oc_bplist_writer_init_number(size);
         tb_assert_and_check_return_val(object, tb_false);
 
-        // writ it
+        // write it
         if (!tb_oc_bplist_writer_func_number(writer, object, item_size)) 
         {
             tb_object_exit(object);
@@ -141,7 +141,7 @@ static tb_bool_t tb_oc_bplist_writer_func_rdata(tb_oc_bplist_writer_t* writer, t
     // unicode? adjust size
     if (bype == TB_OBJECT_BPLIST_TYPE_UNICODE) size <<= 1;
 
-    // writ data
+    // write data
     if (data) if (!tb_stream_bwrit(writer->stream, data, size)) return tb_false;
 
     // ok
@@ -153,7 +153,7 @@ static tb_bool_t tb_oc_bplist_writer_func_date(tb_oc_bplist_writer_t* writer, tb
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-    // writ date time
+    // write date time
     if (!tb_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_DATE | 3)) return tb_false;
     if (!tb_stream_bwrit_double_bbe(writer->stream, (tb_double_t)tb_oc_bplist_writer_time_host2apple(tb_oc_date_time(object)))) return tb_false;
 #else
@@ -168,7 +168,7 @@ static tb_bool_t tb_oc_bplist_writer_func_data(tb_oc_bplist_writer_t* writer, tb
     // check
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
-    // writ
+    // write
     return tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_DATA, (tb_byte_t const*)tb_oc_data_getp(object), tb_oc_data_size(object), item_size);
 }
 static tb_bool_t tb_oc_bplist_writer_func_array(tb_oc_bplist_writer_t* writer, tb_object_ref_t object, tb_size_t item_size)
@@ -183,18 +183,18 @@ static tb_bool_t tb_oc_bplist_writer_func_array(tb_oc_bplist_writer_t* writer, t
     tb_size_t size = tb_oc_array_size(object);
     tb_assert_and_check_return_val(!size == !index_tables, tb_false);
 
-    // writ flag
+    // write flag
     tb_uint8_t flag = TB_OBJECT_BPLIST_TYPE_ARRAY | (size < 15 ? (tb_uint8_t)size : 0xf);
     if (!tb_stream_bwrit_u8(writer->stream, flag)) return tb_false;
 
-    // writ size
+    // write size
     if (size >= 15)
     {
         // init osize
         tb_object_ref_t osize = tb_oc_bplist_writer_init_number(size);
         tb_assert_and_check_return_val(osize, tb_false);
 
-        // writ it
+        // write it
         if (!tb_oc_bplist_writer_func_number(writer, osize, item_size)) 
         {
             tb_object_exit(osize);
@@ -205,7 +205,7 @@ static tb_bool_t tb_oc_bplist_writer_func_array(tb_oc_bplist_writer_t* writer, t
         tb_object_exit(osize);
     }
 
-    // writ index tables
+    // write index tables
     if (index_tables)
     {
         if (!tb_stream_bwrit(writer->stream, index_tables, size * item_size)) return tb_false;
@@ -219,10 +219,10 @@ static tb_bool_t tb_oc_bplist_writer_func_string(tb_oc_bplist_writer_t* writer, 
     // check
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 #if 0
-    // writ utf8
+    // write utf8
     return tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, tb_oc_string_cstr(object), tb_oc_string_size(object), item_size);
 #else
-    // writ utf16
+    // write utf16
     tb_char_t const*    utf8 = tb_oc_string_cstr(object);
     tb_size_t           size = tb_oc_string_size(object);
     if (utf8 && size)
@@ -251,9 +251,9 @@ static tb_bool_t tb_oc_bplist_writer_func_string(tb_oc_bplist_writer_t* writer, 
         // ok?
         if (ok) 
         {
-            // only ascii? writ utf8
+            // only ascii? write utf8
             if (osize == (size << 1)) ok = tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, (tb_byte_t*)utf8, size, item_size);
-            // writ utf16
+            // write utf16
             else ok = tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_UNICODE, (tb_byte_t*)utf16, osize >> 1, item_size);
 
         }
@@ -262,14 +262,14 @@ static tb_bool_t tb_oc_bplist_writer_func_string(tb_oc_bplist_writer_t* writer, 
         if (utf16) tb_free(utf16);
         utf16 = tb_null;
 #else
-        // writ utf8 only
+        // write utf8 only
         tb_bool_t ok = tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, (tb_byte_t*)utf8, size, item_size);
 #endif
 
         // ok?
         return ok;
     }
-    // writ empty
+    // write empty
     else return tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, tb_null, 0, item_size);
 #endif
 }
@@ -340,7 +340,7 @@ static tb_bool_t tb_oc_bplist_writer_func_boolean(tb_oc_bplist_writer_t* writer,
     // check
     tb_assert_and_check_return_val(writer && writer->stream && object, tb_false);
 
-    // writ it
+    // write it
     return tb_stream_bwrit_u8(writer->stream, TB_OBJECT_BPLIST_TYPE_NONE | (tb_oc_boolean_bool(object)? TB_OBJECT_BPLIST_TYPE_TRUE : TB_OBJECT_BPLIST_TYPE_FALSE));
 }
 static tb_bool_t tb_oc_bplist_writer_func_dictionary(tb_oc_bplist_writer_t* writer, tb_object_ref_t object, tb_size_t item_size)
@@ -355,18 +355,18 @@ static tb_bool_t tb_oc_bplist_writer_func_dictionary(tb_oc_bplist_writer_t* writ
     tb_size_t size = tb_oc_dictionary_size(object);
     tb_assert_and_check_return_val(!size == !index_tables, tb_false);
 
-    // writ flag
+    // write flag
     tb_uint8_t flag = TB_OBJECT_BPLIST_TYPE_DICT | (size < 15 ? (tb_uint8_t)size : 0xf);
     if (!tb_stream_bwrit_u8(writer->stream, flag)) return tb_false;
 
-    // writ size
+    // write size
     if (size >= 15)
     {
         // init osize
         tb_object_ref_t osize = tb_oc_bplist_writer_init_number(size);
         tb_assert_and_check_return_val(osize, tb_false);
 
-        // writ it
+        // write it
         if (!tb_oc_bplist_writer_func_number(writer, osize, item_size)) 
         {
             tb_object_exit(osize);
@@ -377,7 +377,7 @@ static tb_bool_t tb_oc_bplist_writer_func_dictionary(tb_oc_bplist_writer_t* writ
         tb_object_exit(osize);
     }
 
-    // writ index tables
+    // write index tables
     if (index_tables)
     {
         if (!tb_stream_bwrit(writer->stream, index_tables, (size << 1) * item_size)) return tb_false;
@@ -653,10 +653,10 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
         // the begin offset
         bof = tb_stream_offset(stream);
 
-        // writ magic & version
+        // write magic & version
         if (!tb_stream_bwrit(stream, (tb_byte_t const*)"bplist00", 8)) break;
 
-        // writ objects
+        // write objects
         if (object_count)
         {
             i = 0;
@@ -673,7 +673,7 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
                 tb_oc_bplist_writer_func_t func = tb_oc_bplist_writer_func(tb_object_type(item));
                 tb_assert_and_check_continue(func);
 
-                // writ object
+                // write object
                 if (!func(&writer, item, item_size)) 
                 {
                     failed = tb_true;
@@ -691,7 +691,7 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
         tb_trace_d("offset_table_index: %llu", offset_table_index);
         tb_trace_d("offset_size: %lu", offset_size);
 
-        // writ offset table
+        // write offset table
         tb_bool_t failed = tb_false;
         for (i = 0; !failed && i < object_count; i++)
         {
@@ -718,10 +718,10 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
         // failed?
         tb_check_break(!failed);
 
-        // writ pad, like apple?
+        // write pad, like apple?
         if (!tb_stream_bwrit(stream, pad, 6)) break;
         
-        // writ tail
+        // write tail
         if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)offset_size)) break;
         if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)item_size)) break;
         if (!tb_stream_bwrit_u64_be(stream, object_count)) break;

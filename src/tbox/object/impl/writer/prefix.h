@@ -34,35 +34,24 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_oc_writer_tab(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab)
-{
-    // writ tab
-    if (!deflate) 
-    {
-        while (tab--) if (tb_stream_printf(stream, "    ") < 0) return tb_false;
-    }
-
-    // ok
-    return tb_true;
-}
 static __tb_inline__ tb_bool_t tb_oc_writer_spaces(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab, tb_size_t width)
 {
-    // writ tab
+    // write tab
     if (!deflate) 
     {
         tb_size_t spaces = tab * width;
         while (spaces--) if (tb_stream_printf(stream, " ") < 0) return tb_false;
     }
-
-    // ok
     return tb_true;
+}
+static __tb_inline__ tb_bool_t tb_oc_writer_tab(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab)
+{
+    return tb_oc_writer_spaces(stream, deflate, tab, 4);
 }
 static __tb_inline__ tb_bool_t tb_oc_writer_newline(tb_stream_ref_t stream, tb_bool_t deflate)
 {
-    // writ newline
+    // write newline
     if (!deflate && tb_stream_printf(stream, __tb_newline__) < 0) return tb_false;
-
-    // ok
     return tb_true;
 }
 static __tb_inline__ tb_bool_t tb_oc_writer_bin_type_size(tb_stream_ref_t stream, tb_size_t type, tb_uint64_t size)
@@ -86,17 +75,17 @@ static __tb_inline__ tb_bool_t tb_oc_writer_bin_type_size(tb_stream_ref_t stream
     }
     tb_assert_and_check_return_val(sizef, tb_false);
 
-    // writ flag 
+    // write flag 
     tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xc? (tb_uint8_t)size : (tb_uint8_t)sizef);
     if (!tb_stream_bwrit_u8(stream, flag)) return tb_false;
 
     // trace
-//  tb_trace("writ: type: %lu, size: %llu", type, size);
+//  tb_trace("write: type: %lu, size: %llu", type, size);
 
-    // writ type
+    // write type
     if (type >= 0xf) if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)type)) return tb_false;
 
-    // writ size
+    // write size
     if (size >= 0xc)
     {
         switch (sizeb)
@@ -118,8 +107,6 @@ static __tb_inline__ tb_bool_t tb_oc_writer_bin_type_size(tb_stream_ref_t stream
             break;
         }
     }
-
-    // ok
     return tb_true;
 }
 
