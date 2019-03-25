@@ -329,7 +329,7 @@ static tb_stream_ref_t tb_database_mysql_stream_impl_init(MYSQL_STMT* statement,
     tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     if (impl)
     {
-        impl->statement      = statement;
+        impl->statement = statement;
         impl->result    = result;
         impl->column    = column;
     }

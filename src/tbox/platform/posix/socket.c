@@ -317,7 +317,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
     // load addr
     tb_size_t               n = 0;
-	struct sockaddr_storage d = {0};
+    struct sockaddr_storage d = {0};
     if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // connect
@@ -339,7 +339,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
     // load addr
     tb_int_t                n = 0;
-	struct sockaddr_storage d = {0};
+    struct sockaddr_storage d = {0};
     if (!(n = (tb_int_t)tb_sockaddr_load(&d, addr))) return tb_false;
 
     // reuse addr
@@ -610,7 +610,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
     tb_check_return_val(size, 0);
 
     // recv
-	struct sockaddr_storage d = {0};
+    struct sockaddr_storage d = {0};
     socklen_t               n = sizeof(d);
     tb_long_t               r = recvfrom(tb_sock2fd(sock), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
@@ -641,7 +641,7 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 
     // load addr
     tb_size_t               n = 0;
-	struct sockaddr_storage d = {0};
+    struct sockaddr_storage d = {0};
     if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // send
@@ -708,7 +708,7 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
 
     // init msg
     struct msghdr           msg = {0};
-	struct sockaddr_storage d = {0};
+    struct sockaddr_storage d = {0};
     msg.msg_name            = (tb_pointer_t)&d;
     msg.msg_namelen         = sizeof(d);
     msg.msg_iov             = (struct iovec*)list;
@@ -744,7 +744,7 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
 
     // load addr
     tb_size_t               n = 0;
-	struct sockaddr_storage d = {0};
+    struct sockaddr_storage d = {0};
     if (!(n = tb_sockaddr_load(&d, addr))) return -1;
 
     // init msg
