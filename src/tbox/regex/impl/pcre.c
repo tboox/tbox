@@ -27,7 +27,9 @@
  * includes
  */
 #include "prefix.h"
-#define PCRE_STATIC
+#ifndef PCRE_STATIC
+#   define PCRE_STATIC
+#endif
 #include <pcre.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
