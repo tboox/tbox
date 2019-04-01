@@ -2,7 +2,7 @@
 set_project("tbox")
 
 -- set xmake minimum version
-set_xmakever("2.2.3")
+set_xmakever("2.2.5")
 
 -- set project version
 set_version("1.6.3", {build = "%Y%m%d%H%M"})
