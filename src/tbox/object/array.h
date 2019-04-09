@@ -101,7 +101,7 @@ tb_void_t           tb_oc_array_remove(tb_object_ref_t array, tb_size_t index);
 /*! append item to array
  *
  * @param array     the array object
- * @param index     the array index
+ * @param item      the array item
  */
 tb_void_t           tb_oc_array_append(tb_object_ref_t array, tb_object_ref_t item);
 

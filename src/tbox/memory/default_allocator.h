@@ -74,7 +74,9 @@ tb_allocator_ref_t          tb_default_allocator(tb_byte_t* data, tb_size_t size
  * |-----------------------------------------------------------------------------|
  * |                              default allocator                              |
  *  -----------------------------------------------------------------------------
- * 
+ *
+ * </pre>
+ *
  * @param large_allocator   the large allocator, cannot be null
  *
  * @return                  the allocator 

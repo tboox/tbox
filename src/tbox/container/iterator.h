@@ -219,8 +219,8 @@ tb_void_t           tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor,
 /*! compare the iterator item
  * 
  * @param iterator  the iterator
- * @param itor      the item 
- * @param item      the compared item 
+ * @param litem     the item
+ * @param ritem     the compared item
  *
  * @return          =: 0, >: 1, <: -1
  */

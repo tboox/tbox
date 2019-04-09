@@ -98,7 +98,7 @@ typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_socket_
  *
  * @param priv      the user private data 
  *
- * @param poller    the poller
+ * @return          the poller
  */
 tb_poller_ref_t     tb_poller_init(tb_cpointer_t priv);
 
@@ -159,7 +159,7 @@ tb_bool_t           tb_poller_insert(tb_poller_ref_t poller, tb_socket_ref_t soc
 /*! remove socket from poller
  *
  * @param poller    the poller
- * @param aioo      the aioo
+ * @param sock      the sock
  *
  * @return          tb_true or tb_false
  */

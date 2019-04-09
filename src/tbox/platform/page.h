@@ -51,7 +51,6 @@ tb_bool_t               tb_page_init(tb_noarg_t);
 
 /*! exit page 
  *
- * @return              the page size
  */
 tb_void_t               tb_page_exit(tb_noarg_t);
 

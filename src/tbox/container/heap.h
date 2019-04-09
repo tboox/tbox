@@ -57,7 +57,6 @@ __tb_extern_c_enter__
  *                   ---------       ----
  *                  |         |     |
  *                  10        14    16(last - 1)
- * </pre>
  *
  * performance: 
  *

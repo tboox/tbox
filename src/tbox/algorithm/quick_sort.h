@@ -52,8 +52,6 @@ tb_void_t           tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb
 /*! the quick sorter for all
  *
  * @param iterator  the iterator
- * @param head      the iterator head
- * @param tail      the iterator tail
  * @param comp      the comparer
  */
 tb_void_t           tb_quick_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp);

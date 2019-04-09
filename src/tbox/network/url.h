@@ -170,7 +170,7 @@ tb_size_t           tb_url_protocol(tb_url_ref_t url);
 /*! set the protocol to the url
  *
  * @param url       the url
- * @param poto      the url protocol
+ * @param protocol  the url protocol
  */
 tb_void_t           tb_url_protocol_set(tb_url_ref_t url, tb_size_t protocol);
 

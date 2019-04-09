@@ -145,7 +145,7 @@ tb_object_ref_t     tb_oc_number_init_from_double(tb_double_t value);
 
 /*! the number type
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number type
  */
@@ -153,7 +153,7 @@ tb_size_t           tb_oc_number_type(tb_object_ref_t number);
 
 /*! the uint8 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -161,7 +161,7 @@ tb_uint8_t          tb_oc_number_uint8(tb_object_ref_t number);
 
 /*! the sint8 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -169,7 +169,7 @@ tb_sint8_t          tb_oc_number_sint8(tb_object_ref_t number);
 
 /*! the uint16 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -177,7 +177,7 @@ tb_uint16_t         tb_oc_number_uint16(tb_object_ref_t number);
 
 /*! the sint16 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -185,7 +185,7 @@ tb_sint16_t         tb_oc_number_sint16(tb_object_ref_t number);
 
 /*! the uint32 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -193,7 +193,7 @@ tb_uint32_t         tb_oc_number_uint32(tb_object_ref_t number);
 
 /*! the sint32 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -201,7 +201,7 @@ tb_sint32_t         tb_oc_number_sint32(tb_object_ref_t number);
 
 /*! the uint64 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -209,7 +209,7 @@ tb_uint64_t         tb_oc_number_uint64(tb_object_ref_t number);
 
 /*! the sint64 value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -218,7 +218,7 @@ tb_sint64_t         tb_oc_number_sint64(tb_object_ref_t number);
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 /*! the float value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -226,7 +226,7 @@ tb_float_t          tb_oc_number_float(tb_object_ref_t number);
 
 /*! the double value of the number
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  *
  * @return          the number value
  */
@@ -235,7 +235,7 @@ tb_double_t         tb_oc_number_double(tb_object_ref_t number);
 
 /*! set the uint8 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -244,7 +244,7 @@ tb_bool_t           tb_oc_number_uint8_set(tb_object_ref_t number, tb_uint8_t va
 
 /*! set the sint8 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -253,7 +253,7 @@ tb_bool_t           tb_oc_number_sint8_set(tb_object_ref_t number, tb_sint8_t va
 
 /*! set the uint16 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -262,7 +262,7 @@ tb_bool_t           tb_oc_number_uint16_set(tb_object_ref_t number, tb_uint16_t 
 
 /*! set the sint16 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -271,7 +271,7 @@ tb_bool_t           tb_oc_number_sint16_set(tb_object_ref_t number, tb_sint16_t 
 
 /*! set the uint32 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -280,7 +280,7 @@ tb_bool_t           tb_oc_number_uint32_set(tb_object_ref_t number, tb_uint32_t 
 
 /*! set the sint32 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -289,7 +289,7 @@ tb_bool_t           tb_oc_number_sint32_set(tb_object_ref_t number, tb_sint32_t 
 
 /*! set the uint64 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -298,7 +298,7 @@ tb_bool_t           tb_oc_number_uint64_set(tb_object_ref_t number, tb_uint64_t 
 
 /*! set the sint64 value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -308,7 +308,7 @@ tb_bool_t           tb_oc_number_sint64_set(tb_object_ref_t number, tb_sint64_t 
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 /*! set the float value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false
@@ -317,7 +317,7 @@ tb_bool_t           tb_oc_number_float_set(tb_object_ref_t number, tb_float_t va
 
 /*! set the double value 
  *
- * @param object    the object pointer
+ * @param number    the object pointer
  * @param value     the number value
  *
  * @return          tb_true or tb_false

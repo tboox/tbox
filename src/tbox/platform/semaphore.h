@@ -50,7 +50,7 @@ tb_semaphore_ref_t  tb_semaphore_init(tb_size_t value);
 
 /*! exit semaphore
  * 
- * @return          the semaphore 
+ * @param semaphore the semaphore
  */
 tb_void_t           tb_semaphore_exit(tb_semaphore_ref_t semaphore);
 

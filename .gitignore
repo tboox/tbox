@@ -32,3 +32,5 @@ gmon.out
 tags
 Doxyfile
 .vscode
+.idea
+CMakeLists.txt

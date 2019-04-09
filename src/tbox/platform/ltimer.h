@@ -143,7 +143,6 @@ tb_bool_t               tb_ltimer_spak(tb_ltimer_ref_t timer);
  *
  * @param timer         the timer 
  *
- * @return              tb_true or tb_false
  */
 tb_void_t               tb_ltimer_loop(tb_ltimer_ref_t timer);
 

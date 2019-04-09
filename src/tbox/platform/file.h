@@ -254,7 +254,7 @@ tb_hong_t               tb_file_offset(tb_file_ref_t file);
 
 /*! the file info for file or directory
  * 
- * @param file          the file handle
+ * @param path          the file path
  * @param info          the file info
  *
  * @return              tb_true or tb_false
