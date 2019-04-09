@@ -399,7 +399,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_safe
 /*! remove the next entry
  *
  * @param list                                  the list
- * @param entry                                 the prev entry
+ * @param prev                                  the prev entry
  */
 static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t prev)
 {

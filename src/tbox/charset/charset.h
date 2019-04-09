@@ -159,7 +159,7 @@ tb_long_t           tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_sta
  * @param ttype     the to charset
  * @param cstr      the cstr
  * @param data      the data
- * @param maxn      the size
+ * @param size      the size
  *
  * @return          the converted bytes for output or -1
  */

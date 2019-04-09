@@ -214,14 +214,14 @@ tb_void_t           tb_list_moveto_next(tb_list_ref_t list, tb_size_t itor, tb_s
 /*! moveto the head item
  *
  * @param list      the list
- * @param itor      the item itor
+ * @param move      the move itor
  */
 tb_void_t           tb_list_moveto_head(tb_list_ref_t list, tb_size_t move);
 
 /*! moveto the tail item
  *
  * @param list      the list
- * @param itor      the item itor
+ * @param move      the move itor
  */
 tb_void_t           tb_list_moveto_tail(tb_list_ref_t list, tb_size_t move);
 

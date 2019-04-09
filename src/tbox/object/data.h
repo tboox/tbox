@@ -42,8 +42,7 @@ __tb_extern_c_enter__
 
 /*! init data from url
  *
- * @param data      the data
- * @param size      the size
+ * @param url       the url
  *
  * @return          the data object
  */

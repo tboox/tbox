@@ -222,7 +222,6 @@ tb_void_t           tb_vector_ninsert_next(tb_vector_ref_t vector, tb_size_t ito
 /*! insert the vector head items
  *
  * @param vector    the vector
- * @param itor      the item itor
  * @param data      the item data
  * @param size      the item count
  */
@@ -231,7 +230,6 @@ tb_void_t           tb_vector_ninsert_head(tb_vector_ref_t vector, tb_cpointer_t
 /*! insert the vector tail items
  *
  * @param vector    the vector
- * @param itor      the item itor
  * @param data      the item data
  * @param size      the item count
  */
@@ -248,7 +246,6 @@ tb_void_t           tb_vector_replace(tb_vector_ref_t vector, tb_size_t itor, tb
 /*! replace the vector head item
  *
  * @param vector    the vector
- * @param itor      the item itor
  * @param data      the item data
  */
 tb_void_t           tb_vector_replace_head(tb_vector_ref_t vector, tb_cpointer_t data);
@@ -256,7 +253,6 @@ tb_void_t           tb_vector_replace_head(tb_vector_ref_t vector, tb_cpointer_t
 /*! replace the vector last item
  *
  * @param vector    the vector
- * @param itor      the item itor
  * @param data      the item data
  */
 tb_void_t           tb_vector_replace_last(tb_vector_ref_t vector, tb_cpointer_t data);
@@ -273,7 +269,6 @@ tb_void_t           tb_vector_nreplace(tb_vector_ref_t vector, tb_size_t itor, t
 /*! replace the vector head items
  *
  * @param vector    the vector
- * @param itor      the item itor
  * @param data      the item data
  * @param size      the item count
  */
@@ -282,7 +277,6 @@ tb_void_t           tb_vector_nreplace_head(tb_vector_ref_t vector, tb_cpointer_
 /*! replace the vector last items
  *
  * @param vector    the vector
- * @param itor      the item itor
  * @param data      the item data
  * @param size      the item count
  */

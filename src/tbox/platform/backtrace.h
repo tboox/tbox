@@ -64,7 +64,7 @@ tb_handle_t             tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_
  * @param symbols       the symbols handle
  * @param frames        the backtrace frames
  * @param nframe        the backtrace frame count
- * @param frame         the backtrace frame index
+ * @param iframe        the backtrace frame index
  *
  * @return              the symbol name
  */

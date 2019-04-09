@@ -89,8 +89,9 @@ tb_void_t               tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_siz
 
 /*! make sha 
  *
+ * @param mode          the mode
  * @param ib            the input data
- * @param in            the input size
+ * @param ip            the input size
  * @param ob            the output data
  * @param on            the output size
  *

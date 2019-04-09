@@ -48,8 +48,8 @@ tb_time_t               tb_time(tb_noarg_t);
 
 /*! the gmt time
  *
- * @param               the time value
- * @param               the gmt time pointer
+ * @param time          the time value
+ * @param tm            the gmt time pointer
  *
  * @return              tb_true or tb_false
  */
@@ -57,8 +57,8 @@ tb_bool_t               tb_gmtime(tb_time_t time, tb_tm_t* tm);
 
 /*! the local time
  *
- * @param               the time value
- * @param               the local time pointer
+ * @param time          the time value
+ * @param tm            the local time pointer
  *
  * @return              tb_true or tb_false
  */
@@ -66,7 +66,7 @@ tb_bool_t               tb_localtime(tb_time_t time, tb_tm_t* tm);
 
 /*! make the time value from the local time
  *
- * @param               the time
+ * @param tm            the time
  *
  * @return              the time value
  */
@@ -74,7 +74,7 @@ tb_time_t               tb_mktime(tb_tm_t const* tm);
 
 /*! make the time value from the gmt time
  *
- * @param               the time
+ * @param tm            the time
  *
  * @return              the time value
  */

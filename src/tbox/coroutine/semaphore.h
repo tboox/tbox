@@ -57,7 +57,6 @@ tb_co_semaphore_ref_t   tb_co_semaphore_init(tb_size_t value);
 
 /*! exit semaphore
  * 
- * @return              the semaphore 
  */
 tb_void_t               tb_co_semaphore_exit(tb_co_semaphore_ref_t semaphore);
 
@@ -66,7 +65,6 @@ tb_void_t               tb_co_semaphore_exit(tb_co_semaphore_ref_t semaphore);
  * @param semaphore     the semaphore 
  * @param post          the post semaphore value
  *
- * @return              tb_true or tb_false
  */
 tb_void_t               tb_co_semaphore_post(tb_co_semaphore_ref_t semaphore, tb_size_t post);
 

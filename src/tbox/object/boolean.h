@@ -62,7 +62,7 @@ tb_object_ref_t     tb_oc_boolean_false(tb_noarg_t);
 
 /*! the boolean value
  *
- * @param           the boolean object
+ * @param boolean   the boolean object
  *
  * @return          tb_true or tb_false
  */
