@@ -28,6 +28,10 @@
 #include "compiler.h"
 #include "cpu.h"
 
+#if __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
@@ -239,7 +243,11 @@
 #   if TB_COMPILER_VERSION_BE(4, 9)
 #       define __tb_thread_local__                          _Thread_local
 #   else
+#       if (defined(__i386__) && TARGET_OS_SIMULATOR)
+#       define  __tb_thread_local__
+#       else
 #       define __tb_thread_local__                          __thread
+#       endif
 #   endif
 #elif defined(TB_COMPILER_IS_MSVC) || defined(TB_COMPILER_IS_BORLAND)
 #   define __tb_thread_local__                              __declspec(thread)
