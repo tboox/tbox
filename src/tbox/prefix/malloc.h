@@ -95,7 +95,7 @@ __tb_extern_c_enter__
  */
 
 struct __tb_allocator_t;
-struct __tb_allocator_t*    tb_allocator();
+struct __tb_allocator_t*    tb_allocator(tb_noarg_t);
 tb_pointer_t                tb_allocator_malloc_(struct __tb_allocator_t* allocator, tb_size_t size __tb_debug_decl__);
 tb_pointer_t                tb_allocator_malloc0_(struct __tb_allocator_t* allocator, tb_size_t size __tb_debug_decl__);
 tb_pointer_t                tb_allocator_nalloc_(struct __tb_allocator_t* allocator, tb_size_t item, tb_size_t size __tb_debug_decl__);

@@ -196,7 +196,7 @@ typedef struct __tb_allocator_t
  *
  * @return              the allocator
  */
-tb_allocator_ref_t      tb_allocator();
+tb_allocator_ref_t      tb_allocator(tb_noarg_t);
 
 /*! the native allocator
  *
