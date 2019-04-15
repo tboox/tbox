@@ -28,19 +28,15 @@
 #include "compiler.h"
 #include "cpu.h"
 
-#if __APPLE__
-#include <TargetConditionals.h>
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
-// the register keyword will be deprecated in C++ 
-#ifndef __cplusplus 
+// the register keyword will be deprecated in C++
+#ifndef __cplusplus
 #   define __tb_register__                      register
 #else
-#   define __tb_register__                      
+#   define __tb_register__
 #endif
 #define __tb_volatile__                         volatile
 
@@ -56,7 +52,7 @@
 #   define __tb_stdcall__                       __stdcall
 #   define __tb_fastcall__                      __fastcall
 #   define __tb_thiscall__                      __thiscall
-#   define __tb_packed__ 
+#   define __tb_packed__
 #   define __tb_aligned__(a)                    __declspec(align(a))
 
 #elif defined(TB_COMPILER_IS_GCC)
@@ -75,10 +71,10 @@
     || defined(__amd64) \
     || defined(_M_IA64) \
     || defined(_M_X64)
-#       define __tb_cdecl__                     
-#       define __tb_stdcall__                   
-#       define __tb_fastcall__                  
-#       define __tb_thiscall__                  
+#       define __tb_cdecl__
+#       define __tb_stdcall__
+#       define __tb_fastcall__
+#       define __tb_thiscall__
 #   else
 #       define __tb_cdecl__                     __attribute__((__cdecl__))
 #       define __tb_stdcall__                   __attribute__((__stdcall__))
@@ -103,19 +99,19 @@
 
 #else
 
-#   define __tb_asm__               
+#   define __tb_asm__
 #   define __tb_inline__                        inline
 #   define __tb_inline_force__                  inline
-#   define __tb_func__                  
+#   define __tb_func__
 #   define __tb_file__                          ""
 #   define __tb_line__                          (0)
 
-#   define __tb_cdecl__     
-#   define __tb_stdcall__       
-#   define __tb_fastcall__      
+#   define __tb_cdecl__
+#   define __tb_stdcall__
+#   define __tb_fastcall__
 #   define __tb_thiscall__
-#   define __tb_packed__ 
-#   define __tb_aligned__(a) 
+#   define __tb_packed__
+#   define __tb_aligned__(a)
 
 #endif
 
@@ -147,10 +143,10 @@
 #   define __tb_debug_decl__                    , tb_char_t const* func_, tb_size_t line_, tb_char_t const* file_
 #   define __tb_debug_vals__                    , __tb_func__, __tb_line__, __tb_file__
 #   define __tb_debug_args__                    , func_, line_, file_
-#else 
-#   define __tb_debug_decl__ 
-#   define __tb_debug_vals__ 
-#   define __tb_debug_args__ 
+#else
+#   define __tb_debug_decl__
+#   define __tb_debug_vals__
+#   define __tb_debug_args__
 #endif
 
 // small
@@ -182,13 +178,13 @@
 
 // extern c
 #ifdef __cplusplus
-#   define __tb_extern_c__                      extern "C" 
+#   define __tb_extern_c__                      extern "C"
 #   define __tb_extern_c_enter__                extern "C" {
 #   define __tb_extern_c_leave__                }
 #else
 #   define __tb_extern_c__
 #   define __tb_extern_c_enter__
-#   define __tb_extern_c_leave__                
+#   define __tb_extern_c_leave__
 #endif
 
 // export for the shared library
@@ -197,7 +193,7 @@
 #elif defined(TB_COMPILER_IS_GCC) && ((__GNUC__ >= 4) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3))
 #   define __tb_export__                        __attribute__((visibility("default")))
 #else
-#   define __tb_export__         
+#   define __tb_export__
 #endif
 
 #if defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(3, 0)
@@ -239,15 +235,13 @@
 // thread local
 #if __tb_has_feature__(c_thread_local)
 #   define __tb_thread_local__                              _Thread_local
-#elif defined(TB_COMPILER_IS_GCC) 
+#elif defined(TB_COMPILER_IS_GCC)
 #   if TB_COMPILER_VERSION_BE(4, 9)
 #       define __tb_thread_local__                          _Thread_local
+#   elif defined(__APPLE__) && defined(__i386__)
+#       define __tb_thread_local__
 #   else
-#       if (defined(__i386__) && TARGET_OS_SIMULATOR)
-#       define  __tb_thread_local__
-#       else
 #       define __tb_thread_local__                          __thread
-#       endif
 #   endif
 #elif defined(TB_COMPILER_IS_MSVC) || defined(TB_COMPILER_IS_BORLAND)
 #   define __tb_thread_local__                              __declspec(thread)
