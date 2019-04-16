@@ -17,6 +17,10 @@ ${define TB_CONFIG_MICRO_ENABLE}
 ${define TB_CONFIG_TYPE_HAVE_WCHAR}
 ${define TB_CONFIG_TYPE_HAVE_FLOAT}
 
+// keywords
+${define TB_CONFIG_KEYWORD_HAVE__thread}
+${define TB_CONFIG_KEYWORD_HAVE_Thread_local}
+
 // modules
 ${define TB_CONFIG_MODULE_HAVE_XML}
 ${define TB_CONFIG_MODULE_HAVE_ZIP}

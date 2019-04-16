@@ -1,4 +1,5 @@
 includes("check_cfuncs.lua")
+includes("check_csnippets.lua")
 
 -- option: demo
 option("demo")
@@ -265,6 +266,10 @@ function check_interfaces()
 
     -- add the interfaces for valgrind
     check_module_cfuncs("valgrind", "valgrind/valgrind.h",           "VALGRIND_STACK_REGISTER(0, 0)")
+
+    -- check __thread keyword
+    configvar_check_csnippets("TB_CONFIG_KEYWORD_HAVE__thread", "__thread int a = 0;", {name = "keyword_thread", languages = "c99"})
+    configvar_check_csnippets("TB_CONFIG_KEYWORD_HAVE_Thread_local", "_Thread_local int a = 0;", {name = "keyword_thread_local", languages = "c99"})
 end
 
 -- include project directories

@@ -235,14 +235,10 @@
 // thread local
 #if __tb_has_feature__(c_thread_local)
 #   define __tb_thread_local__                              _Thread_local
-#elif defined(TB_COMPILER_IS_GCC)
-#   if TB_COMPILER_VERSION_BE(4, 9)
-#       define __tb_thread_local__                          _Thread_local
-#   elif defined(__APPLE__) && defined(__i386__)
-#       define __tb_thread_local__
-#   else
-#       define __tb_thread_local__                          __thread
-#   endif
+#elif defined(TB_CONFIG_KEYWORD_HAVE_Thread_local)
+#   define __tb_thread_local__                              _Thread_local
+#elif defined(TB_CONFIG_KEYWORD_HAVE__thread)
+#   define __tb_thread_local__                              __thread
 #elif defined(TB_COMPILER_IS_MSVC) || defined(TB_COMPILER_IS_BORLAND)
 #   define __tb_thread_local__                              __declspec(thread)
 #endif
