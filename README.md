@@ -51,7 +51,7 @@ It supports the following platforms:
 - Android
 - iOS
 
-And it provides many compiling options using [xmake](http://www.xmake.io):
+And it provides many compiling options using [xmake](https://github.com/xmake-io/xmake):
 
 * Release: Disable debug information, assertion, memory checking and enable optimization.
 * Debug: Enable debug information, assertion, memory checking and disable optimization.

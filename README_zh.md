@@ -52,7 +52,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - Android
 - iOS
 
-通过[xmake](http://www.xmake.io/cn)支持各种编译模式：
+通过[xmake](https://github.com/xmake-io/xmake))支持各种编译模式：
 
 * Release: 正式版编译，禁用调试信息、断言，各种检测机制，启用编译器优化
 * Debug: 调试模式，默认启用详细调试信息、断言、内存越界检测、内存泄漏、锁竞争分析等检测机制
