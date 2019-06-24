@@ -1,5 +1,8 @@
 <div align="center">
-  <h1>tbox</h1>
+
+  <a href="https://tboox.io">
+    <img width="200" heigth="200" src="https://tboox.io/assets/img/logo_text.png">
+  </a>  
 
   <div>
     <a href="https://travis-ci.org/tboox/tbox">
