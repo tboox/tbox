@@ -52,14 +52,32 @@ tb_void_t tb_print(tb_char_t const* string)
 
     // write string to stdout
     tb_size_t writ = 0;
-    while (writ < size)
-    {
-        // write to the stdout
-        DWORD real = 0;
-        if (!WriteFile(handle, data + writ, (DWORD)(size - writ), &real, tb_null)) break;
 
-        // update writted size
-        writ += (tb_size_t)real;
+    // write to the stdout
+    DWORD real = 0;
+    if (GetConsoleMode(handle, &real))
+    {
+        // write to console
+        tb_size_t   wsize = size * 2;
+        tb_wchar_t *wdata = (tb_wchar_t *)tb_malloc(wsize * sizeof(tb_wchar_t));
+        wsize = tb_mbstowcs(wdata, data, wsize);
+        while (writ < wsize)
+        {
+            if (!WriteConsole(handle, wdata + writ, (DWORD)(wsize - writ), &real, tb_null)) break;
+            // update writted size
+            writ += (tb_size_t)real;
+        }
+        tb_free(wdata);
+    }
+    else
+    {
+        // write to redirected file
+        while (writ < size)
+        {
+            if (!WriteFile(handle, data + writ, (DWORD)(size - writ), &real, tb_null)) break;
+            // update writted size
+            writ += (tb_size_t)real;
+        }
     }
 }
 tb_void_t tb_printl(tb_char_t const* string)
