@@ -40,6 +40,7 @@ __tb_extern_c_enter__
 
 // the endian for the charset type
 #define TB_CHARSET_TYPE_LE                  (0x0100)
+#define TB_CHARSET_TYPE_BE                  (0x0000)
 #define TB_CHARSET_TYPE_ME                  (0x0100)
 #ifdef TB_WORDS_BIGENDIAN
 #   define TB_CHARSET_TYPE_NE               (TB_CHARSET_TYPE_BE)

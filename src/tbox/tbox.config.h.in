@@ -16,6 +16,7 @@ ${define TB_CONFIG_SMALL}
 ${define TB_CONFIG_MICRO_ENABLE}
 ${define TB_CONFIG_TYPE_HAVE_WCHAR}
 ${define TB_CONFIG_TYPE_HAVE_FLOAT}
+${define TB_CONFIG_FORCE_UTF8}
 
 // keywords
 ${define TB_CONFIG_KEYWORD_HAVE__thread}

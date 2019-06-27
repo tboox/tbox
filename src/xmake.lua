@@ -81,6 +81,18 @@ option("deprecated")
     set_configvar("TB_CONFIG_API_HAVE_DEPRECATED", 1)
 option_end()
 
+-- option: force-utf8
+option("force-utf8")
+    set_default(false)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Forcely regard all tb_char* as utf-8.")
+    set_configvar("TB_CONFIG_FORCE_UTF8", 1)
+    if is_plat("windows") then
+        add_cxflags("/utf8")
+    end
+option_end()
+
 -- add modules
 for _, name in ipairs({"xml", "zip", "hash", "regex", "object", "charset", "database", "coroutine"}) do
     option(name)

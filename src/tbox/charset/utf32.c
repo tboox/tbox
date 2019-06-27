@@ -32,14 +32,15 @@
 tb_long_t tb_charset_utf32_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_utf32_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch)
 {
-    tb_trace_noimpl();
-    return -1;
+    *ch = be ? tb_static_stream_read_u32_be(sstream) : tb_static_stream_read_u32_le(sstream);
+    return 1;
 }
 
 tb_long_t tb_charset_utf32_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch);
 tb_long_t tb_charset_utf32_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch)
 {
-    tb_trace_noimpl();
-    return -1;
+    if (be) tb_static_stream_writ_u32_be(sstream, ch);
+    else tb_static_stream_writ_u32_le(sstream, ch);
+    return 1;
 }
 
