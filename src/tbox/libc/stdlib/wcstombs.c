@@ -77,11 +77,7 @@ static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2, tb_siz
     return r > 0? r : -1;
 }
 #endif
-static tb_size_t tb_wcstombs_noimpl(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
-{
-    tb_trace_noimpl();
-    return -1;
-}
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -94,7 +90,8 @@ tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 #   elif defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
     return tb_wcstombs_libc(s1, s2, n);
 #   else
-    return tb_wcstombs_noimpl(s1, s2, n);
+    tb_trace_noimpl();
+    return -1;
 #   endif
 #else
 #   if defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
@@ -102,7 +99,8 @@ tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 #   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
     return tb_wcstombs_charset(s1, s2, n);
 #   else
-    return tb_wcstombs_noimpl(s1, s2, n);
+    tb_trace_noimpl();
+    return -1;
 #   endif
 #endif
 }

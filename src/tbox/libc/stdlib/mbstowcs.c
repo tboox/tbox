@@ -72,12 +72,6 @@ static tb_size_t tb_mbstowcs_charset(tb_wchar_t* s1, tb_char_t const* s2, tb_siz
 }
 #endif
 
-static tb_size_t tb_mbstowcs_noimpl(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
-{
-    tb_trace_noimpl();
-    return -1;
-}
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -89,7 +83,8 @@ tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 #   elif defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
     return tb_mbstowcs_libc(s1, s2, n);
 #   else
-    return tb_mbstowcs_noimpl(s1, s2, n);
+    tb_trace_noimpl();
+    return -1;
 #   endif
 #else
 #   if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
@@ -97,7 +92,8 @@ tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 #   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
     return tb_mbstowcs_charset(s1, s2, n);
 #   else
-    return tb_mbstowcs_noimpl(s1, s2, n);
+    tb_trace_noimpl();
+    return -1;
 #   endif
 #endif
 }
