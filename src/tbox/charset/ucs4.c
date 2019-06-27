@@ -32,7 +32,7 @@
 tb_long_t tb_charset_ucs4_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_ucs4_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch)
 {
-    *ch = be? tb_static_stream_read_u32_be(sstream) : tb_static_stream_read_u32_le(sstream);
+    *ch = be ? tb_static_stream_read_u32_be(sstream) : tb_static_stream_read_u32_le(sstream);
     return 1;
 }
 

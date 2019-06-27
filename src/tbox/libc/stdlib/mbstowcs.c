@@ -25,58 +25,75 @@
  */
 #include "stdlib.h"
 #ifdef TB_CONFIG_LIBC_HAVE_MBSTOWCS
+#   include "setlocale.h"
 #   include <stdlib.h>
-#   ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
-#       include <locale.h>
-#   endif
-#else
+#endif
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 #   include "../../charset/charset.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation
  */
-
 #if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
-tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
+static tb_size_t tb_mbstowcs_libc(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // set local locale
-#ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
-    setlocale(LC_ALL, "");
-#endif
+    tb_setlocale();
 
     // convert it
     n = mbstowcs(s1, s2, n);
 
     // set default locale
-#ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
-    setlocale(LC_ALL, "C");
-#endif
+    tb_resetlocale();
 
     // ok
     return n;
 }
-#elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
+#endif
+
+#if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+static tb_size_t tb_mbstowcs_charset(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(s1 && s2, 0);
 
     // init
-    tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UCS4 : TB_CHARSET_TYPE_UCS2;
-    tb_long_t r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, e | TB_CHARSET_TYPE_LE, s2, (tb_byte_t*)s1, n * sizeof(tb_wchar_t));
+    tb_size_t e = (sizeof(tb_wchar_t) == 4) ? TB_CHARSET_TYPE_UTF32 : TB_CHARSET_TYPE_UTF16;
+    tb_long_t r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, e | TB_CHARSET_TYPE_LE, s2,
+                             (tb_byte_t*)s1, n * sizeof(tb_wchar_t));
     if (r > 0) r /= sizeof(tb_wchar_t);
-    
+
     // strip
     if (r >= 0) s1[r] = L'\0';
 
     // ok?
-    return r >= 0? r : -1;
-}
-#else
-tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
-{
-    tb_trace_noimpl();
-    return -1;
+    return r >= 0 ? r : -1;
 }
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
+{
+#ifdef TB_CONFIG_FORCE_UTF8
+#   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+    return tb_mbstowcs_charset(s1, s2, n);
+#   elif defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
+    return tb_mbstowcs_libc(s1, s2, n);
+#   else
+    tb_trace_noimpl();
+    return -1;
+#   endif
+#else
+#   if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
+    return tb_mbstowcs_libc(s1, s2, n);
+#   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+    return tb_mbstowcs_charset(s1, s2, n);
+#   else
+    tb_trace_noimpl();
+    return -1;
+#   endif
+#endif
+}
