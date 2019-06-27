@@ -861,6 +861,17 @@ get_qualifier:
             }
             break;
         }
+    case 'z':
+        switch (sizeof(tb_size_t))
+        {
+        case 1: e->qual = TB_PRINTF_QUAL_I8; break;
+        case 2: e->qual = TB_PRINTF_QUAL_I16; break;
+        case 4: e->qual = TB_PRINTF_QUAL_I32; break;
+        case 8: e->qual = TB_PRINTF_QUAL_I64; break;
+        default: break;
+        }
+        ++p;
+        break;
     default:
         e->qual = TB_PRINTF_QUAL_NONE;
         break;

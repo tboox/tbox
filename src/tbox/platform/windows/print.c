@@ -64,7 +64,7 @@ tb_void_t tb_print(tb_char_t const* string)
         wsize = tb_mbstowcs(wdata, string, wsize);
         while (writ < wsize)
         {
-            if (!WriteConsole(handle, wdata + writ, (DWORD)(wsize - writ), &real, tb_null)) break;
+            if (!WriteConsoleW(handle, wdata + writ, (DWORD)(wsize - writ), &real, tb_null)) break;
             // update writted size
             writ += (tb_size_t)real;
         }

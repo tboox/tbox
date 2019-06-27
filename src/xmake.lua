@@ -88,9 +88,12 @@ option("force-utf8")
     set_category("option")
     set_description("Forcely regard all tb_char* as utf-8.")
     set_configvar("TB_CONFIG_FORCE_UTF8", 1)
-    if is_plat("windows") then
-        add_cxflags("/utf-8")
-    end
+
+    before_check(function (option)
+        if is_plat("windows") then
+            option:add("cxflags", "/utf-8")
+        end
+    end)
 option_end()
 
 -- add modules
