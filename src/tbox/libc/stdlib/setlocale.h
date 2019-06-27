@@ -14,8 +14,8 @@
  *
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
- * @author      ruki
- * @file        wcstombs.c
+ * @author      OpportunityLiu
+ * @file        setlocale.h
  * @ingroup     libc
  *
  */
@@ -36,27 +36,27 @@
 #ifdef TB_CONFIG_LIBC_HAVE_SETLOCALE
 #   ifdef TB_CONFIG_FORCE_UTF8
 #       if defined(TB_CONFIG_OS_WINDOWS)
-#           define tb_setlocale()                                            \
-              do                                                             \
-              {                                                              \
-                  if (!setlocale(LC_ALL, ".65001"))                          \
-                  {                                                          \
-                      tb_trace_w("failed to setlocale to utf-8");            \
-                      setlocale(LC_ALL, "");                                 \
-                  }                                                          \
-              } while (0)
+#           define tb_setlocale()                                              \
+                do                                                             \
+                {                                                              \
+                    if (!setlocale(LC_ALL, ".65001"))                          \
+                    {                                                          \
+                        tb_trace_w("failed to setlocale to utf-8");            \
+                        setlocale(LC_ALL, "");                                 \
+                    }                                                          \
+                } while (0)
 #       else
-#           define tb_setlocale()                                            \
-              do                                                             \
-              {                                                              \
-                  if (!(setlocale(LC_ALL, "C.UTF-8") ||                      \
-                        setlocale(LC_ALL, "en_US.UTF-8") ||                  \
-                        setlocale(LC_ALL, "zh_CN.UTF-8")))                   \
-                  {                                                          \
-                      tb_trace_w("failed to setlocale to utf-8");            \
-                      setlocale(LC_ALL, "");                                 \
-                  }                                                          \
-              } while (0)
+#           define tb_setlocale()                                              \
+                do                                                             \
+                {                                                              \
+                    if (!(setlocale(LC_ALL, "C.UTF-8") ||                      \
+                          setlocale(LC_ALL, "en_US.UTF-8") ||                  \
+                          setlocale(LC_ALL, "zh_CN.UTF-8")))                   \
+                    {                                                          \
+                        tb_trace_w("failed to setlocale to utf-8");            \
+                        setlocale(LC_ALL, "");                                 \
+                    }                                                          \
+                } while (0)
 #       endif
 #   else
 #       define tb_setlocale() setlocale(LC_ALL, "")
