@@ -33,9 +33,28 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// select the implementation of mbstowcs
+#ifdef TB_CONFIG_FORCE_UTF8
+#   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#       define TB_MBSTOWCS_IMPL_CHARSET 
+#   elif defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
+#       define TB_MBSTOWCS_IMPL_LIBC
+#   endif
+#else
+#   if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
+#       define TB_MBSTOWCS_IMPL_LIBC
+#   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#       define TB_MBSTOWCS_IMPL_CHARSET 
+#   endif
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
+#ifdef TB_MBSTOWCS_IMPL_LIBC
 static tb_size_t tb_mbstowcs_libc(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // set local locale
@@ -52,7 +71,7 @@ static tb_size_t tb_mbstowcs_libc(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t
 }
 #endif
 
-#if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#ifdef TB_MBSTOWCS_IMPL_CHARSET
 static tb_size_t tb_mbstowcs_charset(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check
@@ -77,23 +96,12 @@ static tb_size_t tb_mbstowcs_charset(tb_wchar_t* s1, tb_char_t const* s2, tb_siz
  */
 tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-#ifdef TB_CONFIG_FORCE_UTF8
-#   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#if defined(TB_MBSTOWCS_IMPL_CHARSET)
     return tb_mbstowcs_charset(s1, s2, n);
-#   elif defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
+#elif defined(TB_MBSTOWCS_IMPL_LIBC)
     return tb_mbstowcs_libc(s1, s2, n);
-#   else
-    tb_trace_noimpl();
-    return -1;
-#   endif
 #else
-#   if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
-    return tb_mbstowcs_libc(s1, s2, n);
-#   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-    return tb_mbstowcs_charset(s1, s2, n);
-#   else
     tb_trace_noimpl();
     return -1;
-#   endif
 #endif
 }
