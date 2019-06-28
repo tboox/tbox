@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "sched.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -170,6 +171,24 @@ tb_void_t               tb_thread_return(tb_int_t value);
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv);
+
+/*! set cpu affinity for the given thread
+ *
+ * @param thread        the thread, set the current thread if be null 
+ * @param cpuset        the cpu set 
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset);
+
+/*! get cpu affinity from the given thread
+ *
+ * @param thread        the thread, set the current thread if be null 
+ * @param cpuset        the cpu set 
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

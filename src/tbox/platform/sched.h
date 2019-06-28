@@ -34,6 +34,8 @@
 
 // cpu affinity
 #define TB_CPUSET_SIZE                              TB_CPU_BITSIZE
+#define TB_CPUSET_FFS(pset)                         (tb_sched_affinity_cpu_ffs(pset))
+#define TB_CPUSET_EMPTY(pset)                       (tb_sched_affinity_cpu_empty(pset))
 #define TB_CPUSET_COUNT(pset)                       (tb_sched_affinity_cpu_count(pset))
 #define TB_CPUSET_ZERO(pset)                        (tb_sched_affinity_cpu_zero(pset))
 #define TB_CPUSET_SET(cpu, pset)                    (tb_sched_affinity_cpu_set((cpu), (pset)))
@@ -67,13 +69,47 @@ __tb_extern_c_enter__
 
 /*! yield the processor
  *
- * @return      tb_true or tb_false
+ * @return          tb_true or tb_false
  */
-tb_bool_t       tb_sched_yield(tb_noarg_t);
+tb_bool_t           tb_sched_yield(tb_noarg_t);
+
+/*! set cpu affinity for the given process id
+ *
+ * @param pid       the process id, set to the current process if be zero
+ * @param cpuset    the cpu set 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset);
+
+/*! get cpu affinity from the given process id
+ *
+ * @param pid       the process id, get the current process if be zero
+ * @param cpuset    the cpu set 
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+
+/*! get the first cpu index from the given cpu set
+ *
+ * @param pset  the cpu set
+ *
+ * @return      the cpu index
+ */
+static __tb_inline__ tb_int_t tb_sched_affinity_cpu_ffs(tb_cpuset_ref_t pset)
+{
+    tb_assert(pset);
+#if TB_CPU_BIT64
+    return (tb_int_t)tb_bits_fb1_u64_le(pset->_cpuset);
+#else
+    return (tb_int_t)tb_bits_fb1_u32_le(pset->_cpuset);
+#endif
+}
 
 /*! get cpu count from the given cpu set
  *
@@ -89,6 +125,18 @@ static __tb_inline__ tb_int_t tb_sched_affinity_cpu_count(tb_cpuset_ref_t pset)
 #else
     return (tb_int_t)tb_bits_cb1_u32(pset->_cpuset);
 #endif
+}
+
+/*! the given cpu set is empty?
+ *
+ * @param pset  the cpu set
+ *
+ * @return      tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_sched_affinity_cpu_empty(tb_cpuset_ref_t pset)
+{
+    tb_assert(pset);
+    return pset->_cpuset == 0;
 }
 
 /*! clear the given cpu set

@@ -43,6 +43,9 @@ typedef tb_pointer_t    tb_thread_retval_t;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
+__tb_extern_c_enter__
+tb_void_t tb_thread_local_clear_atexit();
+__tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -67,6 +70,14 @@ static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t i
 }
 #endif
 
+tb_void_t tb_thread_local_clear_atexit()
+{
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // free all thread local data on the current thread
+    tb_thread_local_walk(tb_thread_local_free, tb_null);
+#endif
+}
+
 #ifdef TB_CONFIG_OS_WINDOWS
 static tb_thread_retval_t __tb_stdcall__ tb_thread_func(tb_pointer_t priv)
 #else
@@ -85,19 +96,20 @@ static tb_thread_retval_t tb_thread_func(tb_pointer_t priv)
         tb_thread_func_t func = (tb_thread_func_t)args[0].ptr;
         tb_assert_and_check_break(func);
 
-        // call the thread function
-        retval = (tb_thread_retval_t)(tb_size_t)func(args[1].ptr);
+        // get the thread private data
+        tb_cpointer_t priv = args[1].ptr;
 
-#ifndef TB_CONFIG_MICRO_ENABLE
+        // free arguments before calling thread function
+        if (args) tb_free(args);
+        args = tb_null;
+
+        // call the thread function
+        retval = (tb_thread_retval_t)(tb_size_t)func(priv);
+
         // free all thread local data on the current thread
-        tb_thread_local_walk(tb_thread_local_free, tb_null);
-#endif
+        tb_thread_local_clear_atexit();
 
     } while (0);
-
-    // exit arguments
-    if (args) tb_free(args);
-    args = tb_null;
 
     // return the return value
     return retval;
@@ -146,6 +158,26 @@ tb_size_t tb_thread_self()
     return 0;
 }
 #endif
+
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/thread_affinity.c"
+#elif defined(TB_CONFIG_OS_MACOSX)
+#   include "mach/thread_affinity.c"
+#elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETAFFINITY_NP)
+#   include "posix/thread_affinity.c"
+#else
+tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+#endif
+
 tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv)
 {
     // check

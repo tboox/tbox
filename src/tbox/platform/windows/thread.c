@@ -27,6 +27,13 @@
 #include <process.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+tb_void_t tb_thread_local_clear_atexit();
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
@@ -93,6 +100,10 @@ tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout, tb_int_t* re
 }
 tb_void_t tb_thread_return(tb_int_t value)
 {
+    // free all thread local data on the current thread
+    tb_thread_local_clear_atexit();
+
+    // exit thread and return value
     ExitThread(value);
 }
 tb_bool_t tb_thread_suspend(tb_thread_ref_t thread)
