@@ -144,5 +144,7 @@ else
     add_syslinks("pthread", "dl", "m", "c") 
 end
 
+add_frameworks("IOKit")
+
 -- include project sources
 includes("src") 
