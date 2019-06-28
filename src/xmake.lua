@@ -251,7 +251,8 @@ function check_interfaces()
         "pthread_setspecific", 
         "pthread_getspecific",
         "pthread_key_create",
-        "pthread_key_delete")
+        "pthread_key_delete",
+        "pthread_setaffinity_np")
     check_module_cfuncs("posix", {"sys/socket.h", "fcntl.h"},        "socket")
     check_module_cfuncs("posix", "dirent.h",                         "opendir")
     check_module_cfuncs("posix", "dlfcn.h",                          "dlopen")
@@ -260,7 +261,7 @@ function check_interfaces()
     check_module_cfuncs("posix", "ifaddrs.h",                        "getifaddrs")
     check_module_cfuncs("posix", "semaphore.h",                      "sem_init")
     check_module_cfuncs("posix", "unistd.h",                         "getpagesize", "sysconf")
-    check_module_cfuncs("posix", "sched.h",                          "sched_yield")
+    check_module_cfuncs("posix", "sched.h",                          "sched_yield", "sched_setaffinity")
     check_module_cfuncs("posix", "regex.h",                          "regcomp", "regexec")
     check_module_cfuncs("posix", "sys/uio.h",                        "readv", "writev", "preadv", "pwritev")
     check_module_cfuncs("posix", "unistd.h",                         "pread64", "pwrite64")

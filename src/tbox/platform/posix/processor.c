@@ -31,12 +31,9 @@
  */
 tb_size_t tb_processor_count()
 {
-    // the processor count
     tb_size_t count = sysconf(_SC_NPROCESSORS_ONLN);
     if (!count) count = sysconf(_SC_NPROCESSORS_CONF);
     if (!count) count = 1;
-
-    // ok?
     return count;
 }
 

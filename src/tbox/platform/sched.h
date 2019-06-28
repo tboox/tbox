@@ -26,7 +26,35 @@
  * includes
  */
 #include "prefix.h"
-#include "time.h"
+#include "../utils/bits.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// cpu affinity
+#define TB_CPUSET_SIZE                              TB_CPU_BITSIZE
+#define TB_CPUSET_COUNT(pset)                       (tb_sched_affinity_cpu_count(pset))
+#define TB_CPUSET_ZERO(pset)                        (tb_sched_affinity_cpu_zero(pset))
+#define TB_CPUSET_SET(cpu, pset)                    (tb_sched_affinity_cpu_set((cpu), (pset)))
+#define TB_CPUSET_CLR(cpu, pset)                    (tb_sched_affinity_cpu_clr((cpu), (pset)))
+#define TB_CPUSET_ISSET(cpu, pset)                  (tb_sched_affinity_cpu_isset((cpu), (pset)))
+#define TB_CPUSET_AND(pdstset, psrcset1, psrcset2)  (tb_sched_affinity_cpu_and((pdstset), (psrcset1), (psrcset2)))
+#define TB_CPUSET_OR(pdstset, psrcset1, psrcset2)   (tb_sched_affinity_cpu_or((pdstset), (psrcset1), (psrcset2)))
+#define TB_CPUSET_XOR(pdstset, psrcset1, psrcset2)  (tb_sched_affinity_cpu_xor((pdstset), (psrcset1), (psrcset2)))
+#define TB_CPUSET_EQUAL(set1ptr, pset2)             (tb_sched_affinity_cpu_equal((set1ptr), (pset2)))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the cpuset type
+typedef union __tb_cpuset_t
+{
+    tb_byte_t cpuset[TB_CPU_BITBYTE];
+    tb_size_t _cpuset;
+
+}tb_cpuset_t, *tb_cpuset_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -42,6 +70,120 @@ __tb_extern_c_enter__
  * @return      tb_true or tb_false
  */
 tb_bool_t       tb_sched_yield(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+
+/*! get cpu count from the given cpu set
+ *
+ * @param pset  the cpu set
+ *
+ * @return      the cpu count
+ */
+static __tb_inline__ tb_int_t tb_sched_affinity_cpu_count(tb_cpuset_ref_t pset)
+{
+    tb_assert(pset);
+#if TB_CPU_BIT64
+    return (tb_int_t)tb_bits_cb1_u64(pset->_cpuset);
+#else
+    return (tb_int_t)tb_bits_cb1_u32(pset->_cpuset);
+#endif
+}
+
+/*! clear the given cpu set
+ *
+ * @param pset  the cpu set
+ */
+static __tb_inline__ tb_void_t tb_sched_affinity_cpu_zero(tb_cpuset_ref_t pset)
+{
+    tb_assert(pset);
+    pset->_cpuset = 0;
+}
+
+/*! set cpu to the given cpu set
+ *
+ * @param cpu   the cpu index
+ * @param pset  the cpu set
+ */
+static __tb_inline__ tb_void_t tb_sched_affinity_cpu_set(tb_int_t cpu, tb_cpuset_ref_t pset)
+{
+    tb_assert(pset && cpu >= 0 && cpu < TB_CPUSET_SIZE);
+    pset->_cpuset |= ((tb_size_t)1 << cpu);
+}
+
+/*! clear cpu index in the given cpu set
+ *
+ * @param cpu   the cpu index
+ * @param pset  the cpu set
+ */
+static __tb_inline__ tb_void_t tb_sched_affinity_cpu_clr(tb_int_t cpu, tb_cpuset_ref_t pset)
+{
+    tb_assert(pset && cpu >= 0 && cpu < TB_CPUSET_SIZE);
+    pset->_cpuset &= ~((tb_size_t)1 << cpu);
+}
+
+/*! Is the given cpu index is setted?
+ *
+ * @param cpu   the cpu index
+ * @param pset  the cpu set
+ *
+ * @return      exists this cpu (not zero)
+ */
+static __tb_inline__ tb_int_t tb_sched_affinity_cpu_isset(tb_int_t cpu, tb_cpuset_ref_t pset)
+{
+    tb_assert(pset && cpu >= 0 && cpu < TB_CPUSET_SIZE);
+    return ((pset->_cpuset & ((tb_size_t)1 << cpu)) != (tb_size_t)0);
+}
+
+/*! compute bits(and) for the given cpusets
+ *
+ * @param pdstset   the dest cpu set
+ * @param psrcset1  the src cpu set1
+ * @param psrcset2  the src cpu set2
+ */
+static __tb_inline__ tb_void_t tb_sched_affinity_cpu_and(tb_cpuset_ref_t pdstset, tb_cpuset_ref_t psrcset1, tb_cpuset_ref_t psrcset2)
+{
+    tb_assert(pdstset && psrcset1 && psrcset2);
+    pdstset->_cpuset = psrcset1->_cpuset & psrcset2->_cpuset;
+}
+
+/*! compute bits(or) for the given cpusets
+ *
+ * @param pdstset   the dest cpu set
+ * @param psrcset1  the src cpu set1
+ * @param psrcset2  the src cpu set2
+ */
+static __tb_inline__ tb_void_t tb_sched_affinity_cpu_or(tb_cpuset_ref_t pdstset, tb_cpuset_ref_t psrcset1, tb_cpuset_ref_t psrcset2)
+{
+    tb_assert(pdstset && psrcset1 && psrcset2);
+    pdstset->_cpuset = psrcset1->_cpuset | psrcset2->_cpuset;
+}
+
+/*! compute bits(xor) for the given cpusets
+ *
+ * @param pdstset   the dest cpu set
+ * @param psrcset1  the src cpu set1
+ * @param psrcset2  the src cpu set2
+ */
+static __tb_inline__ tb_void_t tb_sched_affinity_cpu_xor(tb_cpuset_ref_t pdstset, tb_cpuset_ref_t psrcset1, tb_cpuset_ref_t psrcset2)
+{
+    tb_assert(pdstset && psrcset1 && psrcset2);
+    pdstset->_cpuset = psrcset1->_cpuset ^ psrcset2->_cpuset;
+}
+
+/*! Is equal with the given cpu sets ?
+ *
+ * @param pset1     the cpu set1
+ * @param pset2     the cpu set2
+ *
+ * @return          is equal? (not zero)
+ */
+static __tb_inline__ tb_int_t tb_sched_affinity_cpu_equal(tb_cpuset_ref_t pset1, tb_cpuset_ref_t pset2)
+{
+    tb_assert(pset1 && pset2);
+    return pset1->_cpuset == pset2->_cpuset;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
