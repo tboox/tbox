@@ -127,19 +127,27 @@ target("tbox")
     elseif has_package("polarssl") then add_files("network/impl/ssl/polarssl.c") 
     elseif has_package("openssl") then add_files("network/impl/ssl/openssl.c") end
 
-    -- add the source for the windows 
+    -- add the source files for the windows 
     if is_os("windows") then
         add_files("platform/windows/iocp_object.c")
         add_files("platform/windows/socket_pool.c")
         add_files("platform/windows/interface/*.c")
     end
 
-    -- add the source for the ios 
+    -- add the source files for the macosx 
+    if is_os("macosx") then
+        del_files("platform/processor.c")
+        add_files("platform/mach/processor.m")
+    end
+
+    -- add the source files for the ios 
     if is_os("ios") then
+        del_files("platform/processor.c")
+        add_files("platform/mach/processor.m")
         add_files("platform/mach/ios/directory.m")
     end
 
-    -- add the source for the android 
+    -- add the source files for the android 
     if is_os("android") then
         add_files("platform/android/*.c")
     end
