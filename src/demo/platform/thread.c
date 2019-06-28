@@ -31,8 +31,9 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
     }
 
     // reset thread affinity
+    tb_int_t cpu = tb_min(1, tb_processor_count() - 1);
     TB_CPUSET_ZERO(&cpuset); 
-    TB_CPUSET_SET(1, &cpuset);
+    TB_CPUSET_SET(cpu, &cpuset);
     if (!tb_thread_setaffinity(tb_null, &cpuset))
         tb_trace_e("thread[%lx: %zu]: set cpu core(%zu) failed!", self, priv, 1);
 

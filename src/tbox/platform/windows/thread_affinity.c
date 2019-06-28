@@ -24,17 +24,39 @@
  * includes
  */
 #include "../thread.h"
+#include <windows.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // get thread
+    HANDLE hthread = thread? (HANDLE)thread : GetCurrentThread();
+
+    // set cpu affinity
+    return (tb_bool_t)SetThreadAffinityMask(hthread, cpuset->_cpuset) != 0;
 }
 tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // get thread
+    HANDLE hthread = thread? (HANDLE)thread : GetCurrentThread();
+
+    // get cpu affinity
+    DWORD_PTR vThreadMask = SetThreadAffinityMask(hthread, 1);
+    if (!vThreadMask) return tb_false;
+
+    // restore cpu affinity
+    if (vThreadMask != 1)
+        SetThreadAffinityMask(hthread, vThreadMask);
+
+    // save cpuset
+    cpuset->_cpuset = (tb_size_t)vThreadMask;
+    return tb_true;
 }
