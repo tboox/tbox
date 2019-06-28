@@ -142,6 +142,7 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 
     // set affinity for all threads
     tb_size_t ok = tb_true;
+    TB_CPUSET_ZERO(cpuset);
     for (i = 0; i < thread_count; i++) 
     {
         if (threads[i] != MACH_PORT_NULL) 

@@ -67,6 +67,7 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
         return tb_false;
 
     // save to cpuset
+    TB_CPUSET_ZERO(cpuset);
     TB_CPUSET_SET(policy.affinity_tag, cpuset);
     return tb_true;
 }

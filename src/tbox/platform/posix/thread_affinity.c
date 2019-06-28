@@ -23,18 +23,53 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "../sched.h"
 #include "../thread.h"
+#include <pthread.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // get thread
+    pthread_t pthread = thread? (pthread_t)thread : pthread_self();
+
+    // set cpu affinity
+    tb_int_t i;
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (TB_CPUSET_ISSET(i, cpuset) && i < CPU_SETSIZE)
+            CPU_SET(i, &cpu_set);
+    }
+    return pthread_setaffinity_np(pthread, sizeof(cpu_set_t), &cpu_set) == 0;
 }
 tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // get thread
+    pthread_t pthread = thread? (pthread_t)thread : pthread_self();
+
+    // get cpu affinity
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    if (pthread_getaffinity_np(pthread, sizeof(cpu_set_t), &cpu_set) != 0)
+        return tb_false;
+
+    // save cpuset
+    tb_int_t i;
+    TB_CPUSET_ZERO(cpuset);
+    for (i = 0; i < CPU_SETSIZE; i++)
+    {
+        if (CPU_ISSET(i, &cpu_set) && i < TB_CPUSET_SIZE)
+            TB_CPUSET_SET(i, cpuset);
+    }
+    return tb_true;
 }

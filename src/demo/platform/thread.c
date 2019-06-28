@@ -63,11 +63,15 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
  */ 
 tb_int_t tb_demo_platform_thread_main(tb_int_t argc, tb_char_t** argv)
 {
+    // get cpu count
+    tb_size_t cpu_count = tb_processor_count();
+    tb_trace_i("cpu count: %lu", cpu_count);
+
     // init threads
     tb_size_t i = 0;
     tb_cpuset_t cpuset;
-    tb_thread_ref_t threads[8] = {0};
-    for (i = 0; i < tb_arrayn(threads); i++)
+    tb_thread_ref_t threads[64] = {0};
+    for (i = 0; i < cpu_count; i++)
     {
         // init thread
         threads[i] = tb_thread_init(tb_null, tb_demo_thread_func, tb_u2p(i), 0);
@@ -81,7 +85,7 @@ tb_int_t tb_demo_platform_thread_main(tb_int_t argc, tb_char_t** argv)
     }
 
     // wait threads
-    for (i = 0; i < tb_arrayn(threads); i++)
+    for (i = 0; i < cpu_count; i++)
     {
         tb_thread_ref_t thread = threads[i];
         if (thread)

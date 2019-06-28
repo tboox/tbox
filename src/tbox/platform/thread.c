@@ -161,7 +161,7 @@ tb_size_t tb_thread_self()
 
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/thread_affinity.c"
-#elif defined(TB_CONFIG_OS_MACOSX)
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 #   include "mach/thread_affinity.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_SETAFFINITY_NP)
 #   include "posix/thread_affinity.c"
