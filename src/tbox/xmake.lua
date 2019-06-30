@@ -134,16 +134,8 @@ target("tbox")
         add_files("platform/windows/interface/*.c")
     end
 
-    -- add the source files for the macosx 
-    if is_os("macosx") then
-        del_files("platform/processor.c")
-        add_files("platform/mach/processor.m")
-    end
-
     -- add the source files for the ios 
     if is_os("ios") then
-        del_files("platform/processor.c")
-        add_files("platform/mach/processor.m")
         add_files("platform/mach/ios/directory.m")
     end
 
