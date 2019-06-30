@@ -15,7 +15,7 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        sched.c
+ * @file        sched_affinity.c
  * @ingroup     platform
  *
  */
@@ -24,14 +24,17 @@
  * includes
  */
 #include "../sched.h"
-#include <sched.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_sched_yield()
+tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 {
-    // yield it in thread
-    return !sched_yield()? tb_true : tb_false;
+    tb_trace_noimpl();
+    return tb_false;
 }
-
+tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}

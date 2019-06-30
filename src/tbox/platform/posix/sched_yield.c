@@ -15,7 +15,7 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        sched.c
+ * @file        sched_yield.c
  * @ingroup     platform
  *
  */
@@ -23,11 +23,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
 #include "../sched.h"
-#if defined(YieldProcessor)
-#   include <intrin.h>
-#endif
+#include <sched.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -35,12 +32,6 @@
 tb_bool_t tb_sched_yield()
 {
     // yield it in thread
-#if defined(YieldProcessor)
-    YieldProcessor();
-    return tb_true;
-#else
-    tb_usleep(1);
-    return tb_true;
-#endif
+    return !sched_yield()? tb_true : tb_false;
 }
 

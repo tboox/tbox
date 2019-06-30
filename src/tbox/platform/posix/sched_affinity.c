@@ -15,53 +15,54 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        sched.c
+ * @file        sched_affinity.c
  * @ingroup     platform
  *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME                "platform_sched"
-#define TB_TRACE_MODULE_DEBUG               (1)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "sched.h"
+#include "../sched.h"
+#include <sched.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/sched_yield.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
-#   include "posix/sched_yield.c"
-#else
-tb_bool_t tb_sched_yield()
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-#endif
-
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/sched_affinity.c"
-#elif defined(TB_CONFIG_OS_MACOSX) 
-#   include "mach/sched_affinity.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_SETAFFINITY)
-#   include "posix/sched_affinity.c"
-#else
 tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // set cpu affinity
+    tb_int_t i;
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (TB_CPUSET_ISSET(i, cpuset) && i < CPU_SETSIZE)
+            CPU_SET(i, &cpu_set);
+    }
+    return sched_setaffinity((pid_t)pid, sizeof(cpu_set_t), &cpu_set) == 0;
 }
 tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
-}
-#endif
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
 
+    // get cpu affinity
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    if (sched_getaffinity((pid_t)pid, sizeof(cpu_set_t), &cpu_set) != 0)
+        return tb_false;
+
+    // save cpuset
+    tb_int_t i;
+    TB_CPUSET_ZERO(cpuset);
+    for (i = 0; i < CPU_SETSIZE; i++)
+    {
+        if (CPU_ISSET(i, &cpu_set) && i < TB_CPUSET_SIZE)
+            TB_CPUSET_SET(i, cpuset);
+    }
+    return tb_true;
+}

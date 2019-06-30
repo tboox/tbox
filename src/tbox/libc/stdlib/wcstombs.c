@@ -34,9 +34,28 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// select the implementation of wcstombs
+#ifdef TB_CONFIG_FORCE_UTF8
+#   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#       define TB_WCSTOMBS_IMPL_CHARSET 
+#   elif defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
+#       define TB_WCSTOMBS_IMPL_LIBC
+#   endif
+#else
+#   if defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
+#       define TB_WCSTOMBS_IMPL_LIBC
+#   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#       define TB_WCSTOMBS_IMPL_CHARSET 
+#   endif
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
+#ifdef TB_WCSTOMBS_IMPL_LIBC
 inline static tb_size_t tb_wcstombs_libc(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
     // set local locale
@@ -53,7 +72,7 @@ inline static tb_size_t tb_wcstombs_libc(tb_char_t* s1, tb_wchar_t const* s2, tb
 }
 #endif
 
-#if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#ifdef TB_WCSTOMBS_IMPL_CHARSET
 inline static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
     // check
@@ -84,23 +103,12 @@ inline static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2,
  */
 tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-#ifdef TB_CONFIG_FORCE_UTF8
-#   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
+#if defined(TB_WCSTOMBS_IMPL_CHARSET)
     return tb_wcstombs_charset(s1, s2, n);
-#   elif defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
+#elif defined(TB_WCSTOMBS_IMPL_LIBC)
     return tb_wcstombs_libc(s1, s2, n);
-#   else
-    tb_trace_noimpl();
-    return -1;
-#   endif
 #else
-#   if defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
-    return tb_wcstombs_libc(s1, s2, n);
-#   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-    return tb_wcstombs_charset(s1, s2, n);
-#   else
     tb_trace_noimpl();
     return -1;
-#   endif
 #endif
 }

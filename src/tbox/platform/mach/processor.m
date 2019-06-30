@@ -15,28 +15,23 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        processor.c
- * @ingroup     platform
+ * @file        processor.m
+ *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "processor.h"
+#include "prefix.h"
+#include "../platform.h"
+#include <Foundation/Foundation.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/processor.c"
-#elif 0//defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
-#   include "mach/processor.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_SYSCONF)
-#   include "posix/processor.c"
-#else
 tb_size_t tb_processor_count()
 {
-    return 1;
+    return (tb_size_t)[[NSProcessInfo processInfo] processorCount];
 }
-#endif
+
 
