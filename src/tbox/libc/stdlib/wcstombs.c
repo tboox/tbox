@@ -37,7 +37,7 @@
  * implementation
  */
 #if defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
-static tb_size_t tb_wcstombs_libc(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
+inline static tb_size_t tb_wcstombs_libc(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
     // set local locale
     tb_setlocale();
@@ -54,7 +54,7 @@ static tb_size_t tb_wcstombs_libc(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t
 #endif
 
 #if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
+inline static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(s1 && s2, 0);
