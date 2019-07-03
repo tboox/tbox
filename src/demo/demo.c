@@ -158,6 +158,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_utils)
 ,   TB_DEMO_MAIN_ITEM(platform_sched)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic)
+,   TB_DEMO_MAIN_ITEM(platform_stdfile)
 ,   TB_DEMO_MAIN_ITEM(platform_process)
 ,   TB_DEMO_MAIN_ITEM(platform_barrier)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic64)
