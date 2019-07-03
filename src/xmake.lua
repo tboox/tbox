@@ -210,7 +210,7 @@ function check_interfaces()
     check_module_cfuncs("libc", {"signal.h", "setjmp.h"},           "signal", "setjmp", "sigsetjmp{sigjmp_buf buf; sigsetjmp(buf, 0);}", "kill")
     check_module_cfuncs("libc", "execinfo.h",                       "backtrace")
     check_module_cfuncs("libc", "locale.h",                         "setlocale")
-    check_module_cfuncs("libc", "stdio.h",                          "fputs")
+    check_module_cfuncs("libc", "stdio.h",                          "fputs", "fgets", "fgetc", "fputc", "fread", "fwrite")
     check_module_cfuncs("libc", "stdlib.h",                         "srandom", "random")
 
     -- add the interfaces for libm

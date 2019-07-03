@@ -29,14 +29,41 @@
  * includes
  */
 #include "stdfile.h"
+#include "../utils/utils.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * instance implementation
+ */
+static tb_handle_t tb_stdfile_instance_init(tb_cpointer_t* ppriv)
+{
+    tb_size_t* ptype = (tb_size_t*)ppriv;
+    return ptype? (tb_handle_t)tb_stdfile_init(*ptype) : tb_null;
+}
+static tb_void_t tb_stdfile_instance_exit(tb_handle_t stdfile, tb_cpointer_t priv)
+{
+    tb_stdfile_exit((tb_stdfile_ref_t)stdfile);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_stdfile_ref_t tb_stdfile_stdin()
+{
+    return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDIN, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDIN));
+}
+tb_stdfile_ref_t tb_stdfile_stdout()
+{
+    return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDOUT, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDOUT));
+}
+tb_stdfile_ref_t tb_stdfile_stderr()
+{
+    return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDERR, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDERR));
+}
+
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/stdfile.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_OPEN)
-#   include "posix/stdfile.c"
+#elif defined(TB_CONFIG_LIBC_HAVE_FREAD) && defined(TB_CONFIG_LIBC_HAVE_FWRITE)
+#   include "libc/stdfile.c"
 #else
 tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
 {
@@ -57,14 +84,34 @@ tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t stdfile)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_long_t tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     tb_trace_noimpl();
-    return -1;
+    return tb_false;
 }
-tb_long_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
-    return -1;
+    return tb_false;
+}
+tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t file, tb_int_t* pch)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t file, tb_int_t ch)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t file, tb_char_t* str, tb_size_t num)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t file, tb_char_t const* str)
+{
+    tb_trace_noimpl();
+    return tb_false;
 }
 #endif

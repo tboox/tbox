@@ -48,13 +48,33 @@ tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t stdfile)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_long_t tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     tb_trace_noimpl();
-    return -1;
+    return tb_false;
 }
-tb_long_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
-    return -1;
+    return tb_false;
+}
+tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t file, tb_int_t* pch)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t file, tb_int_t ch)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t file, tb_char_t* str, tb_size_t num)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t file, tb_char_t const* str)
+{
+    tb_trace_noimpl();
+    return tb_false;
 }

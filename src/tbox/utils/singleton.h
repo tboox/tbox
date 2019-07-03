@@ -85,8 +85,17 @@ typedef enum __tb_singleton_type_e
     /// the cookies type
 ,   TB_SINGLETON_TYPE_COOKIES               = 12
 
+    /// the stdfile(stdin) type
+,   TB_SINGLETON_TYPE_STDFILE_STDIN         = 13
+
+    /// the stdfile(stdout) type
+,   TB_SINGLETON_TYPE_STDFILE_STDOUT        = 14
+
+    /// the stdfile(stderr) type
+,   TB_SINGLETON_TYPE_STDFILE_STDERR        = 15
+
     /// the user defined type
-,   TB_SINGLETON_TYPE_USER                  = 13
+,   TB_SINGLETON_TYPE_USER                  = 16
 
 #endif
 
