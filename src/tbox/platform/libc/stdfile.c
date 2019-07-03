@@ -132,7 +132,7 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
     return fwrite(data, size, 1, stdfile->fp) == 1;
 }
 #ifdef TB_CONFIG_LIBC_HAVE_FGETC
-tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_int_t* pch)
+tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
@@ -143,40 +143,29 @@ tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_int_t* pch)
     tb_check_return_val(ch != EOF, tb_false);
         
     // save result
-    *pch = ch;
+    *pch = (tb_char_t)ch;
     return tb_true;
 }
 #else
-tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_int_t* pch)
+tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
 {
-    // check
-    tb_assert_and_check_return_val(pch, tb_false);
-
-    // read character from stdin
-    tb_byte_t ch;
-    if (tb_stdfile_read(self, &ch, 1))
-    {
-        *pch = (tb_int_t)ch;
-        return tb_true;
-    }
-    return tb_false;
+    return tb_stdfile_read(self, (tb_byte_t*)pch, 1);
 }
 #endif
 #ifdef TB_CONFIG_LIBC_HAVE_FPUTC
-tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_int_t ch)
+tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_char_t ch)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp, tb_false);
 
     // write character to stdout/stderr
-    return fputc(ch, stdfile->fp) == ch;
+    return fputc((tb_int_t)ch, stdfile->fp) == ch;
 }
 #else
-tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_int_t ch)
+tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_char_t ch)
 {
-    tb_byte_t b = (tb_byte_t)ch;
-    return tb_stdfile_writ(self, &b, 1)
+    return tb_stdfile_writ(self, (tb_byte_t const*)&ch, 1);
 }
 #endif
 #ifdef TB_CONFIG_LIBC_HAVE_FGETS
@@ -193,15 +182,25 @@ tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t self, tb_char_t* str, tb_size_t num)
 tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t self, tb_char_t* str, tb_size_t num)
 {
     // check
-    tb_assert_and_check_return_val(num > 1 && str, tb_false);
+    tb_assert_and_check_return_val(num && str, tb_false);
 
-    // read string from stdin
-    if (tb_stdfile_read(self, str, num - 1))
+    tb_size_t i;
+    tb_char_t ch;
+    for (i = 0; i < num - 1; i++)
     {
-        str[num - 1] = '\0';
-        return tb_true;
+        if (tb_stdfile_getc(self, &ch))
+        {
+            if (ch == '\n')
+            {
+                str[i++] = '\n';
+                break;
+            }
+            else str[i] = ch;
+        }
+        else return tb_false;
     }
-    return tb_false;
+    if (i < num) str[i] = '\0';
+    return i < num;
 }
 #endif
 #ifdef TB_CONFIG_LIBC_HAVE_FPUTS
@@ -217,6 +216,11 @@ tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t self, tb_char_t const* str)
 #else
 tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t self, tb_char_t const* str)
 {
-    return tb_stdfile_writ(self, (tb_byte_t const*)str, (tb_size_t)tb_strlen(str));
+    // check
+    tb_assert_and_check_return_val(str, tb_false);
+
+    // write string to stdout/stderr
+    tb_size_t len = tb_strlen(str);
+    return len? tb_stdfile_writ(self, (tb_byte_t const*)str, tb_strlen(str)) : tb_true;
 }
 #endif

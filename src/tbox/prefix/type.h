@@ -70,7 +70,7 @@ typedef tb_int_t                    tb_int32_t;
 typedef tb_int32_t                  tb_sint32_t;
 typedef tb_uint_t                   tb_uint32_t;
 typedef char                        tb_char_t;
-typedef tb_int32_t                  tb_uchar_t;
+typedef unsigned char               tb_uchar_t;
 typedef tb_uint8_t                  tb_byte_t;
 typedef void                        tb_void_t;
 typedef tb_void_t*                  tb_pointer_t;

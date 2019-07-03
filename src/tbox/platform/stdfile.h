@@ -57,19 +57,19 @@ typedef enum __tb_stdfile_type_e
  *
  * @return              the stdin file singleton
  */
-tb_stdfile_ref_t        tb_stdfile_stdin(tb_noarg_t);
+tb_stdfile_ref_t        tb_stdfile_input(tb_noarg_t);
 
 /*! get stdout file singleton
  *
  * @return              the stdout file singleton
  */
-tb_stdfile_ref_t        tb_stdfile_stdout(tb_noarg_t);
+tb_stdfile_ref_t        tb_stdfile_output(tb_noarg_t);
 
 /*! get stderr file singleton
  *
  * @return              the stdin file singleton
  */
-tb_stdfile_ref_t        tb_stdfile_stderr(tb_noarg_t);
+tb_stdfile_ref_t        tb_stdfile_error(tb_noarg_t);
 
 /*! init the standard input/ouput device file
  * 
@@ -122,20 +122,20 @@ tb_bool_t               tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* 
 /*! read an character from stdfile
  * 
  * @param file          the stdfile 
- * @param ch            the character pointer, an unsigned char as int
+ * @param ch            the character pointer
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stdfile_getc(tb_stdfile_ref_t file, tb_int_t* pch);
+tb_bool_t               tb_stdfile_getc(tb_stdfile_ref_t file, tb_char_t* pch);
 
 /*! write an character to stdfile
  * 
  * @param file          the stdfile 
- * @param ch            the character, an unsigned char as int
+ * @param ch            the character
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_stdfile_putc(tb_stdfile_ref_t file, tb_int_t ch);
+tb_bool_t               tb_stdfile_putc(tb_stdfile_ref_t file, tb_char_t ch);
 
 /*! reads characters from stdfile and stores them as a C string into str until (num-1) characters have been read 
  * or either a newline or the end-of-file is reached, whichever happens first.

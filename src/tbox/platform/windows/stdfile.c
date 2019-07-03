@@ -58,12 +58,12 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t file, tb_int_t* pch)
+tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t file, tb_char_t* pch)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t file, tb_int_t ch)
+tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t file, tb_char_t ch)
 {
     tb_trace_noimpl();
     return tb_false;

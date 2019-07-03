@@ -9,36 +9,32 @@
 static tb_void_t tb_test_writ()
 {
     tb_trace_i("=================== test stdfile writ ===================");
-    tb_stdfile_writ(tb_stdfile_stdout(), (tb_byte_t const*)"hello world!\n", sizeof("hello world!\n"));
+    tb_stdfile_writ(tb_stdfile_output(), (tb_byte_t const*)"hello world!\n", sizeof("hello world!\n"));
 }
 static tb_void_t tb_test_read()
 {
     tb_trace_i("=================== test stdfile read ===================");
     tb_byte_t data[4096] = {0};
-    if (tb_stdfile_read(tb_stdfile_stdin(), data, 3))
+    if (tb_stdfile_read(tb_stdfile_input(), data, 3))
         tb_trace_i("%s", data);
     tb_trace_i("------");
 
     // ignore left characters
-    tb_int_t ch;
-    while (tb_stdfile_getc(tb_stdfile_stdin(), &ch) && ch != '\n') ;
+    tb_char_t ch;
+    while (tb_stdfile_getc(tb_stdfile_input(), &ch) && ch != '\n') ;
 }
 static tb_void_t tb_test_puts()
 {
     tb_trace_i("=================== test stdfile puts ===================");
-    tb_stdfile_puts(tb_stdfile_stdout(), "hello world!\n");
+    tb_stdfile_puts(tb_stdfile_output(), "hello world!\n");
 }
 static tb_void_t tb_test_gets()
 {
     tb_trace_i("=================== test stdfile gets ===================");
     tb_char_t data[4096] = {0};
-    if (tb_stdfile_gets(tb_stdfile_stdin(), data, 4))
+    if (tb_stdfile_gets(tb_stdfile_input(), data, sizeof(data)))
         tb_trace_i("%s", data);
     tb_trace_i("------");
-
-    // ignore left characters
-    tb_int_t ch;
-    while (tb_stdfile_getc(tb_stdfile_stdin(), &ch) && ch != '\n') ;
 }
 static tb_void_t tb_test_putc()
 {
@@ -47,15 +43,15 @@ static tb_void_t tb_test_putc()
     tb_size_t        n = sizeof("hello world!\n");
     tb_size_t        i = 0;
     for (i = 0; i < n; i++)
-        tb_stdfile_putc(tb_stdfile_stdout(), (tb_int_t)s[i]);
+        tb_stdfile_putc(tb_stdfile_output(), s[i]);
 }
 static tb_void_t tb_test_getc()
 {
     tb_trace_i("=================== test stdfile getc ===================");
-    tb_int_t  ch;
+    tb_char_t ch;
     tb_int_t  i = 0;
     tb_char_t s[4096] = {0};
-    while (tb_stdfile_getc(tb_stdfile_stdin(), &ch) && ch != '\n')
+    while (tb_stdfile_getc(tb_stdfile_input(), &ch) && ch != '\n')
         s[i++] = (tb_char_t)ch;
     s[i] = '\0';
     tb_trace_i("%s", s);

@@ -47,15 +47,15 @@ static tb_void_t tb_stdfile_instance_exit(tb_handle_t stdfile, tb_cpointer_t pri
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_stdfile_ref_t tb_stdfile_stdin()
+tb_stdfile_ref_t tb_stdfile_input()
 {
     return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDIN, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDIN));
 }
-tb_stdfile_ref_t tb_stdfile_stdout()
+tb_stdfile_ref_t tb_stdfile_output()
 {
     return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDOUT, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDOUT));
 }
-tb_stdfile_ref_t tb_stdfile_stderr()
+tb_stdfile_ref_t tb_stdfile_error()
 {
     return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDERR, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDERR));
 }
@@ -94,12 +94,12 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t file, tb_int_t* pch)
+tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t file, tb_char_t* pch)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t file, tb_int_t ch)
+tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t file, tb_char_t ch)
 {
     tb_trace_noimpl();
     return tb_false;
