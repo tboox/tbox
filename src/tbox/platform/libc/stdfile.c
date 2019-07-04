@@ -36,11 +36,11 @@
 // the stdfile type
 typedef struct __tb_stdfile_t
 {
-    // the file pointer
-    FILE*       fp;
-
     // the file type
     tb_size_t   type;
+
+    // the file pointer
+    FILE*       fp;
 
 }tb_stdfile_t;
 
@@ -52,7 +52,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
     // check
     tb_assert_and_check_return_val(type, tb_null);
 
-    // get std fd
+    // get std pointer
     FILE* fp = tb_null;
     switch (type)
     {
@@ -110,6 +110,7 @@ tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t self)
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp, tb_false);
+    tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
 
     return !fflush(stdfile->fp)? tb_true : tb_false;
 }
@@ -118,6 +119,7 @@ tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && data, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
     // read data from stdin
     return fread(data, size, 1, stdfile->fp) == 1;
@@ -127,6 +129,7 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp && data, tb_false);
+    tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
 
     // write data to stdout/stderr
     return fwrite(data, size, 1, stdfile->fp) == 1;
@@ -137,6 +140,7 @@ tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp && pch, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
     // read character from stdin
     tb_int_t ch = fgetc(stdfile->fp);
@@ -158,6 +162,7 @@ tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_char_t ch)
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp, tb_false);
+    tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
 
     // write character to stdout/stderr
     return fputc((tb_int_t)ch, stdfile->fp) == ch;
@@ -174,6 +179,7 @@ tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t self, tb_char_t* str, tb_size_t num)
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp && str && num, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
     // read string from stdin
     return fgets(str, num, stdfile->fp) == str;
@@ -209,6 +215,7 @@ tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t self, tb_char_t const* str)
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->fp && str, tb_false);
+    tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
 
     // write string to stdout/stderr
     return fputs(str, stdfile->fp) >= 0;

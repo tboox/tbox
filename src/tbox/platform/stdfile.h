@@ -93,7 +93,9 @@ tb_void_t               tb_stdfile_exit(tb_stdfile_ref_t stdfile);
  */
 tb_size_t               tb_stdfile_type(tb_stdfile_ref_t stdfile);
 
-/*! flush cache data to file
+/*! forces a write of all buffered data for the given output
+ *
+ * @note does not support to flush stdin
  * 
  * @param file          the file 
  */

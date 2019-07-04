@@ -63,11 +63,11 @@ static tb_void_t tb_test_getc()
  */ 
 tb_int_t tb_demo_platform_stdfile_main(tb_int_t argc, tb_char_t** argv)
 {
+    tb_test_writ();
     tb_test_putc();
     tb_test_puts();
-    tb_test_writ();
+    tb_test_read();
     tb_test_getc();
     tb_test_gets();
-    tb_test_read();
     return 0;
 }
