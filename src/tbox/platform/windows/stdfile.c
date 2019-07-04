@@ -25,6 +25,7 @@
 #include "prefix.h"
 #include "../stdfile.h"
 #include "../../stream/stream.h"
+#include "../../charset/charset.h"
 #include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -47,8 +48,14 @@ typedef struct __tb_stdfile_t
     // the input stream 
     tb_stream_ref_t     istream;
 
+    // the input filter stream
+    tb_stream_ref_t     ifstream;
+
     // the output stream
     tb_stream_ref_t     ostream;
+
+    // the output filter stream
+    tb_stream_ref_t     ofstream;
 
 }tb_stdfile_t;
 
@@ -220,16 +227,29 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
         // init type
         file->type = type;
 
+        // check wchar
+        tb_assert_static(sizeof(tb_wchar_t) == 2);
+
         // init input/output stream
         if (type == TB_STDFILE_TYPE_STDIN)
         {
             file->istream = tb_stdfile_stream_init(type, fp);
             tb_assert_and_check_break(file->istream);
+
+            file->ifstream = tb_stream_init_filter_from_charset(file->istream, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8);
+            tb_assert_and_check_break(file->ifstream);
+
+            if (!tb_stream_open(file->ifstream)) break;
         }
         else
         {
             file->ostream = tb_stdfile_stream_init(type, fp);
             tb_assert_and_check_break(file->ostream);
+
+            file->ofstream = tb_stream_init_filter_from_charset(file->ostream, TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
+            tb_assert_and_check_break(file->ofstream);
+
+            if (!tb_stream_open(file->ofstream)) break;
         }
 
         // ok
@@ -250,6 +270,14 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return(stdfile);
+
+    // exit ifstream
+    if (stdfile->ifstream) tb_stream_exit(stdfile->ifstream);
+    stdfile->ifstream = tb_null;
+
+    // exit ofstream
+    if (stdfile->ofstream) tb_stream_exit(stdfile->ofstream);
+    stdfile->ofstream = tb_null;
 
     // exit istream
     if (stdfile->istream) tb_stream_exit(stdfile->istream);
@@ -272,17 +300,56 @@ tb_size_t tb_stdfile_type(tb_stdfile_ref_t self)
 }
 tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t self)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->ofstream, tb_false);
+    tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
+
+    return tb_stream_sync(stdfile->ofstream, tb_false);
 }
 tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->ifstream && data, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
+    tb_check_return_val(size, tb_true);
+
+    return tb_stream_bread(stdfile->ifstream, data, size);
 }
 tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
-    tb_trace_noimpl();
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->ofstream && data, tb_false);
+    tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
+    tb_check_return_val(size, tb_true);
+
+    // write data to stdout/stderr
+    if (!tb_stream_bwrit(stdfile->ofstream, data, size)) return tb_false;
+
+    // flush data if exists '\n'
+    tb_byte_t const* p = data + size - 1;
+    while (p >= data)
+    {
+        if (*p == '\n') return tb_stream_sync(stdfile->ofstream, tb_false);
+        p--;
+    }
+    return tb_true;
+}
+tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
+{
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->ifstream && pch, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
+
+    tb_byte_t* data = tb_null;
+    if (tb_stream_need(stdfile->ifstream, &data, 1) && data)
+    {
+        *pch = (tb_char_t)*data;
+        return tb_true;
+    }
     return tb_false;
 }
 tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)

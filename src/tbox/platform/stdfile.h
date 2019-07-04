@@ -121,6 +121,15 @@ tb_bool_t               tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, 
  */
 tb_bool_t               tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size);
 
+/*! peek an character from stdfile
+ * 
+ * @param file          the stdfile 
+ * @param ch            the character pointer
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_stdfile_peek(tb_stdfile_ref_t file, tb_char_t* pch);
+
 /*! read an character from stdfile
  * 
  * @param file          the stdfile 

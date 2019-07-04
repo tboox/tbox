@@ -118,7 +118,7 @@ tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
-    tb_assert_and_check_return_val(stdfile && data, tb_false);
+    tb_assert_and_check_return_val(stdfile && stdfile->fp && data, tb_false);
     tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
     // read data from stdin
@@ -134,6 +134,32 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
     // write data to stdout/stderr
     return fwrite(data, size, 1, stdfile->fp) == 1;
 }
+#if defined(TB_CONFIG_LIBC_HAVE_FGETC) && defined(TB_CONFIG_LIBC_HAVE_UNGETC)
+tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
+{
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->fp && pch, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
+
+    // read character from stdin
+    tb_int_t ch = fgetc(stdfile->fp);
+    tb_check_return_val(ch != EOF, tb_false);
+        
+    // unread character from stdin
+    ungetc(ch, stdfile->fp);
+ 
+    // save result
+    *pch = (tb_char_t)ch;
+    return tb_true;
+}
+#else
+tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+#endif
 #ifdef TB_CONFIG_LIBC_HAVE_FGETC
 tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
 {
