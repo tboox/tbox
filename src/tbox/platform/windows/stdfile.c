@@ -174,7 +174,7 @@ static tb_bool_t tb_stdfile_stream_ctrl(tb_stream_ref_t self, tb_size_t ctrl, tb
 {
     return tb_false;
 }
-static tb_stream_ref_t tb_stdfile_stream_init(tb_size_t type, HANDLE fp)
+static tb_stream_ref_t tb_stdfile_stream_init(tb_size_t type, HANDLE fp, tb_bool_t is_console)
 {
     tb_stdfile_stream_t* stream = (tb_stdfile_stream_t*)tb_stream_init(     TB_STREAM_TYPE_NONE
                                                                         ,   sizeof(tb_stdfile_stream_t)
@@ -193,7 +193,7 @@ static tb_stream_ref_t tb_stdfile_stream_init(tb_size_t type, HANDLE fp)
 
     stream->fp          = fp;
     stream->type        = type;
-    stream->is_console  = tb_true;
+    stream->is_console  = is_console;
     return (tb_stream_ref_t)stream;
 }
 
@@ -230,24 +230,38 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
         // check wchar
         tb_assert_static(sizeof(tb_wchar_t) == 2);
 
+        // get console mode
+        DWORD       real = 0;
+        tb_bool_t   is_console = tb_true;
+        if (!GetConsoleMode(fp, &real))
+            is_console = tb_false;
+
         // init input/output stream
         if (type == TB_STDFILE_TYPE_STDIN)
         {
-            file->istream = tb_stdfile_stream_init(type, fp);
+            file->istream = tb_stdfile_stream_init(type, fp, is_console);
             tb_assert_and_check_break(file->istream);
 
-            file->ifstream = tb_stream_init_filter_from_charset(file->istream, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8);
-            tb_assert_and_check_break(file->ifstream);
+            if (is_console)
+            {
+                file->ifstream = tb_stream_init_filter_from_charset(file->istream, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8);
+                tb_assert_and_check_break(file->ifstream);
+            }
+            else file->ifstream = file->istream;
 
             if (!tb_stream_open(file->ifstream)) break;
         }
         else
         {
-            file->ostream = tb_stdfile_stream_init(type, fp);
+            file->ostream = tb_stdfile_stream_init(type, fp, is_console);
             tb_assert_and_check_break(file->ostream);
 
-            file->ofstream = tb_stream_init_filter_from_charset(file->ostream, TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
-            tb_assert_and_check_break(file->ofstream);
+            if (is_console)
+            {
+                file->ofstream = tb_stream_init_filter_from_charset(file->ostream, TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
+                tb_assert_and_check_break(file->ofstream);
+            }
+            else file->ofstream = file->ostream;
 
             if (!tb_stream_open(file->ofstream)) break;
         }
@@ -272,11 +286,11 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     tb_assert_and_check_return(stdfile);
 
     // exit ifstream
-    if (stdfile->ifstream) tb_stream_exit(stdfile->ifstream);
+    if (stdfile->ifstream != stdfile->istream) tb_stream_exit(stdfile->ifstream);
     stdfile->ifstream = tb_null;
 
     // exit ofstream
-    if (stdfile->ofstream) tb_stream_exit(stdfile->ofstream);
+    if (stdfile->ofstream != stdfile->ostream) tb_stream_exit(stdfile->ofstream);
     stdfile->ofstream = tb_null;
 
     // exit istream
