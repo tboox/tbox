@@ -60,7 +60,7 @@ tb_stdfile_ref_t tb_stdfile_error()
     return (tb_stdfile_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_STDFILE_STDERR, tb_stdfile_instance_init, tb_stdfile_instance_exit, tb_null, tb_u2p(TB_STDFILE_TYPE_STDERR));
 }
 
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && defined(TB_CONFIG_MODULE_HAVE_CHARSET)
 #   include "windows/stdfile.c"
 #elif defined(TB_CONFIG_LIBC_HAVE_FREAD) && defined(TB_CONFIG_LIBC_HAVE_FWRITE)
 #   include "libc/stdfile.c"
