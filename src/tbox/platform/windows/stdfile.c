@@ -23,6 +23,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../mutex.h"
 #include "../stdfile.h"
 #include "../../stream/stream.h"
 #include "../../charset/charset.h"
@@ -56,6 +57,9 @@ typedef struct __tb_stdfile_t
 
     // the output filter stream
     tb_stream_ref_t     ofstream;
+
+    // the mutex lock
+    tb_mutex_ref_t      mutex;
 
 }tb_stdfile_t;
 
@@ -220,6 +224,10 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
 
         // init type
         file->type = type;
+        
+        // init mutex
+        file->mutex = tb_mutex_init();
+        tb_assert_and_check_break(file->mutex);
 
         // check wchar
         tb_assert_static(sizeof(tb_wchar_t) == 2);
@@ -279,6 +287,9 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return(stdfile);
 
+    // enter mutex
+    if (stdfile->mutex) tb_mutex_enter(stdfile->mutex);
+
     // exit ifstream
     if (stdfile->ifstream != stdfile->istream) tb_stream_exit(stdfile->ifstream);
     stdfile->ifstream = tb_null;
@@ -295,6 +306,13 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     if (stdfile->ostream) tb_stream_exit(stdfile->ostream);
     stdfile->ostream = tb_null;
 
+    // leave mutex
+    if (stdfile->mutex) tb_mutex_leave(stdfile->mutex);
+
+    // exit mutex
+    if (stdfile->mutex) tb_mutex_exit(stdfile->mutex);
+    stdfile->mutex = tb_null;
+
     // free it
     tb_free(stdfile);
 }
@@ -310,40 +328,66 @@ tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t self)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
-    tb_assert_and_check_return_val(stdfile && stdfile->ofstream, tb_false);
+    tb_assert_and_check_return_val(stdfile && stdfile->ofstream && stdfile->mutex, tb_false);
     tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
 
-    return tb_stream_sync(stdfile->ofstream, tb_false);
+    tb_bool_t ok = tb_false;
+    if (tb_mutex_enter(stdfile->mutex)) 
+    {
+        ok = tb_stream_sync(stdfile->ofstream, tb_false);
+        tb_mutex_leave(stdfile->mutex);
+    }
+    return ok;
 }
 tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
-    tb_assert_and_check_return_val(stdfile && stdfile->ifstream && data, tb_false);
+    tb_assert_and_check_return_val(stdfile && stdfile->ifstream && stdfile->mutex && data, tb_false);
     tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
     tb_check_return_val(size, tb_true);
 
-    return tb_stream_bread(stdfile->ifstream, data, size);
+    tb_bool_t ok = tb_false;
+    if (tb_mutex_enter(stdfile->mutex)) 
+    {
+        ok = tb_stream_bread(stdfile->ifstream, data, size);
+        tb_mutex_leave(stdfile->mutex);
+    }
+    return ok;
 }
 tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
-    tb_assert_and_check_return_val(stdfile && stdfile->ofstream && data, tb_false);
+    tb_assert_and_check_return_val(stdfile && stdfile->ofstream && stdfile->mutex && data, tb_false);
     tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
     tb_check_return_val(size, tb_true);
 
-    // write data to stdout/stderr
-    if (!tb_stream_bwrit(stdfile->ofstream, data, size)) return tb_false;
-
-    // flush data if exists '\n'
-    tb_byte_t const* p = data + size - 1;
-    while (p >= data)
+    tb_bool_t ok = tb_false;
+    if (tb_mutex_enter(stdfile->mutex)) 
     {
-        if (*p == '\n') return tb_stream_sync(stdfile->ofstream, tb_false);
-        p--;
+        // write data to stdout/stderr
+        if (tb_stream_bwrit(stdfile->ofstream, data, size)) 
+        {
+            // flush data if exists '\n'
+            tb_byte_t const* p = data + size - 1;
+            tb_bool_t flush = tb_false;
+            while (p >= data)
+            {
+                if (*p == '\n') 
+                {
+                    flush = tb_true;
+                    break;
+                }
+                p--;
+            }
+
+            // ok
+            ok = flush? tb_stream_sync(stdfile->ofstream, tb_false) : tb_true;
+        }
+        tb_mutex_leave(stdfile->mutex);
     }
-    return tb_true;
+    return ok;
 }
 tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
 {
@@ -352,13 +396,18 @@ tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
     tb_assert_and_check_return_val(stdfile && stdfile->ifstream && pch, tb_false);
     tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
-    tb_byte_t* data = tb_null;
-    if (tb_stream_need(stdfile->ifstream, &data, 1) && data)
+    tb_bool_t ok = tb_false;
+    if (tb_mutex_enter(stdfile->mutex)) 
     {
-        *pch = (tb_char_t)*data;
-        return tb_true;
+        tb_byte_t* data = tb_null;
+        if (tb_stream_need(stdfile->ifstream, &data, 1) && data)
+        {
+            *pch = (tb_char_t)*data;
+            ok = tb_true;
+        }
+        tb_mutex_leave(stdfile->mutex);
     }
-    return tb_false;
+    return ok;
 }
 tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
 {
