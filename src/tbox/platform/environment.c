@@ -74,7 +74,7 @@ tb_bool_t tb_environment_replace(tb_environment_ref_t environment, tb_char_t con
     tb_vector_clear(environment);
 
     // insert value
-    if (value) tb_vector_insert_tail(environment, value);
+    if (value && *value != '\0') tb_vector_insert_tail(environment, value);
 
     // ok
     return tb_true;
@@ -83,6 +83,7 @@ tb_bool_t tb_environment_insert(tb_environment_ref_t environment, tb_char_t cons
 {
     // check
     tb_assert_and_check_return_val(environment && value, tb_false);
+    tb_check_return_val(*value != '\0', tb_true);
 
     // insert value into the head
     if (to_head) tb_vector_insert_head(environment, value);
