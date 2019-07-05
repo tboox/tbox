@@ -206,7 +206,7 @@ tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t self, tb_char_t* str, tb_size_t num)
     tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
     // read string from stdin
-    return fgets(str, num, stdfile->fp) == str;
+    return fgets(str, (tb_int_t)num, stdfile->fp) == str;
 }
 #else
 tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t self, tb_char_t* str, tb_size_t num)
