@@ -82,12 +82,6 @@ static tb_bool_t tb_stdfile_stream_open(tb_stream_ref_t self)
     tb_stdfile_stream_t* stream = (tb_stdfile_stream_t*)self;
     tb_assert_and_check_return_val(stream && stream->fp, tb_false);
 
-    // get console mode
-    DWORD real = 0;
-    if (GetConsoleMode(stream->fp, &real))
-        stream->is_console = tb_true;
-    else stream->is_console = tb_false;
-
     // ok
     return tb_true;
 }
@@ -108,7 +102,7 @@ static tb_long_t tb_stdfile_stream_read(tb_stream_ref_t self, tb_byte_t* data, t
     if (stream->is_console)
     {
         // get wide characters size
-        DWORD wsize = size / sizeof(tb_wchar_t);
+        DWORD wsize = (DWORD)(size / sizeof(tb_wchar_t));
         tb_check_return_val(wsize, 0);
 
         // read wide characters from console
@@ -137,7 +131,7 @@ static tb_long_t tb_stdfile_stream_writ(tb_stream_ref_t self, tb_byte_t const* d
     if (stream->is_console)
     {
         // get wide characters size
-        DWORD wsize = size / sizeof(tb_wchar_t);
+        DWORD wsize = (DWORD)(size / sizeof(tb_wchar_t));
         tb_check_return_val(wsize, 0);
 
         // write wide characters to console
