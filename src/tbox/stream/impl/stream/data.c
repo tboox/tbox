@@ -160,11 +160,11 @@ static tb_long_t tb_stream_data_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
 {
     // check
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
-    tb_assert_and_check_return_val(stream_data && stream_data->head <= stream_data->data + stream_data->size, -1);
+    tb_assert_and_check_return_val(stream_data, -1);
 
     // wait 
     tb_long_t events = 0;
-    if (!tb_stream_beof((tb_stream_ref_t)stream))
+    if (stream_data->head < stream_data->data + stream_data->size)
     {
         if (wait & TB_STREAM_WAIT_READ) events |= TB_STREAM_WAIT_READ;
         if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;

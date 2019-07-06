@@ -44,6 +44,9 @@ typedef struct __tb_stream_file_t
     // the last read size
     tb_long_t           read;
 
+    // the offset
+    tb_hize_t           offset;
+
     // the file mode
     tb_size_t           mode;
 
@@ -87,6 +90,9 @@ static tb_bool_t tb_stream_file_open(tb_stream_ref_t stream)
         return tb_false;
     }
 
+    // init offset
+    stream_file->offset = 0;
+
     // ok
     return tb_true;
 }
@@ -99,6 +105,9 @@ static tb_bool_t tb_stream_file_clos(tb_stream_ref_t stream)
     // exit file
     if (stream_file->file && !tb_file_exit(stream_file->file)) return tb_false;
     stream_file->file = tb_null;
+
+    // clear offset
+    stream_file->offset = 0;
 
     // ok
     return tb_true;
@@ -115,6 +124,8 @@ static tb_long_t tb_stream_file_read(tb_stream_ref_t stream, tb_byte_t* data, tb
 
     // read 
     stream_file->read = tb_file_read(stream_file->file, data, size);
+    if (stream_file->read > 0)
+        stream_file->offset += stream_file->read;
 
     // ok?
     return stream_file->read;
@@ -132,7 +143,10 @@ static tb_long_t tb_stream_file_writ(tb_stream_ref_t stream, tb_byte_t const* da
     tb_assert_and_check_return_val(!stream_file->bstream, -1);
 
     // writ
-    return tb_file_writ(stream_file->file, data, size);
+    tb_long_t writ = tb_file_writ(stream_file->file, data, size);
+    if (writ > 0)
+        stream_file->offset += writ;
+    return writ;
 }
 static tb_bool_t tb_stream_file_sync(tb_stream_ref_t stream, tb_bool_t bclosing)
 {
@@ -156,7 +170,12 @@ static tb_bool_t tb_stream_file_seek(tb_stream_ref_t stream, tb_hize_t offset)
     tb_check_return_val(!stream_file->bstream, tb_false);
 
     // seek
-    return (tb_file_seek(stream_file->file, offset, TB_FILE_SEEK_BEG) == offset)? tb_true : tb_false;
+    if (tb_file_seek(stream_file->file, offset, TB_FILE_SEEK_BEG) == offset)
+    {
+        stream_file->offset = offset;
+        return tb_true;
+    }
+    return tb_false;
 }
 static tb_long_t tb_stream_file_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
 {
@@ -166,11 +185,12 @@ static tb_long_t tb_stream_file_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
 
     // wait 
     tb_long_t events = 0;
-    if (!tb_stream_beof(stream))
+    if (wait & TB_STREAM_WAIT_READ) 
     {
-        if (wait & TB_STREAM_WAIT_READ) events |= TB_STREAM_WAIT_READ;
-        if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;
+        if (stream_file->bstream || stream_file->offset < tb_file_size(stream_file->file))
+            events |= TB_STREAM_WAIT_READ;
     }
+    if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;
 
     // end?
     if (stream_file->bstream && events > 0 && !stream_file->read) events = -1;
@@ -196,16 +216,11 @@ static tb_bool_t tb_stream_file_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // get size
             if (!stream_file->bstream) *psize = stream_file->file? tb_file_size(stream_file->file) : 0;
             else *psize = -1;
-
-            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_SET_MODE:
         {
-            // get mode
             stream_file->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_GET_MODE:
@@ -216,16 +231,11 @@ static tb_bool_t tb_stream_file_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
 
             // get mode
             *pmode = stream_file->mode;
-
-            // ok
             return tb_true;
         }
     case TB_STREAM_CTRL_FILE_IS_STREAM:
         {
-            // is stream
             stream_file->bstream = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-
-            // ok
             return tb_true;
         }
     default:

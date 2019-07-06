@@ -103,6 +103,9 @@ tb_long_t           tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_siz
 tb_char_t*          tb_strchr(tb_char_t const* s, tb_char_t c);
 tb_char_t*          tb_strichr(tb_char_t const* s, tb_char_t c);
 
+tb_char_t*          tb_strnchr(tb_char_t const* s, tb_size_t n, tb_char_t c);
+tb_char_t*          tb_strnichr(tb_char_t const* s, tb_size_t n, tb_char_t c);
+
 // strrchr
 tb_char_t*          tb_strrchr(tb_char_t const* s, tb_char_t c);
 tb_char_t*          tb_strirchr(tb_char_t const* s, tb_char_t c);
