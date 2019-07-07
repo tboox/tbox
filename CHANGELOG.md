@@ -5,6 +5,7 @@
 ### New features
 
 * [#70](https://github.com/tboox/tbox/issues/70): Add `tb_stream_init_from_sock_ref()` to open a given socket as stream
+* Add stdfile api to read/write stdin, stdout and stderr.
 
 ### Changes
 
@@ -176,6 +177,7 @@
 ### 新特性
 
 * [#70](https://github.com/tboox/tbox/issues/70): 添加`tb_stream_init_from_sock_ref()`接口去直接打开一个socket作为stream去读取数据。
+* 添加stdfile接口去读写stdin, stdout和stderr。
 
 ### 改进
 
