@@ -689,8 +689,6 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
     {
         // save data
         *data = tb_queue_buffer_head(&stream->cache);
-
-        // ok
         return tb_true;
     }
 
@@ -745,6 +743,67 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
 
     // ok
     return tb_true;
+}
+tb_long_t tb_stream_peek(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
+{
+    // check 
+    tb_stream_t* stream = tb_stream_cast(self);
+    tb_assert_and_check_return_val(data && size, -1);
+
+    // check self
+    tb_assert_and_check_return_val(stream && tb_stream_is_opened(self) && stream->read && stream->wait, -1);
+
+    // stoped?
+    tb_assert_and_check_return_val(TB_STATE_OPENED == tb_atomic_get(&stream->istate), -1);
+
+    // have writed cache? sync first
+    if (stream->bwrited && !tb_queue_buffer_null(&stream->cache) && !tb_stream_sync(self, tb_false)) return -1;
+
+    // switch to the read cache mode
+    if (stream->bwrited && tb_queue_buffer_null(&stream->cache)) stream->bwrited = 0;
+
+    // check the cache mode, must be read cache
+    tb_assert_and_check_return_val(!stream->bwrited, -1);
+
+    // not enough? grow the cache first
+    if (tb_queue_buffer_maxn(&stream->cache) < size) tb_queue_buffer_resize(&stream->cache, size);
+
+    // check
+    tb_assert_and_check_return_val(tb_queue_buffer_maxn(&stream->cache) && size <= tb_queue_buffer_maxn(&stream->cache), -1);
+
+    // attempt to peek data from cache directly?
+    tb_size_t cached_size = tb_queue_buffer_size(&stream->cache);
+    if (cached_size) 
+    {
+        *data = tb_queue_buffer_head(&stream->cache);
+        return tb_min(size, cached_size);
+    }
+
+    // cache is null now.
+    tb_assert(tb_queue_buffer_null(&stream->cache));
+
+    // enter cache for push
+    tb_size_t   push = 0;
+    tb_byte_t*  tail = tb_queue_buffer_push_init(&stream->cache, &push);
+    tb_assert_and_check_return_val(tail && push, -1);
+
+    // push data to cache from self
+    tb_assert(stream->read);
+    tb_long_t real = stream->read(self, tail, push);
+    tb_check_return_val(real >= 0, -1);
+
+    // peek data from cache
+    if (real > 0)
+    {
+        // leave cache for push
+        tb_queue_buffer_push_exit(&stream->cache, real);
+
+        // peek data from cache again
+        *data = tb_queue_buffer_head(&stream->cache);
+        return tb_min(size, real);
+    }
+    // need wait
+    else return 0; 
 }
 tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
 {

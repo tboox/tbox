@@ -659,7 +659,9 @@ tb_bool_t               tb_stream_bwrit(tb_stream_ref_t stream, tb_byte_t const*
  */
 tb_bool_t               tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosing);
 
-/*! need stream
+/*! need stream (block mode)
+ *
+ * @note it will not update offset, if you want to use block mode, please use tb_stream_peek()
  *
  * @code
  
@@ -679,6 +681,52 @@ tb_bool_t               tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosin
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t size);
+
+/*! try to peek stream (non-block mode)
+ *
+ * @note it will not update offset, if you want to use block mode, please use tb_stream_need()
+ *
+ * @code
+
+    tb_long_t  read = 0;
+    tb_byte_t* data = tb_null;
+    while (!tb_stream_beof(stream))
+    {
+        // peek data
+        tb_long_t real = tb_stream_peek(stream, &data, TB_STREAM_BLOCK_MAXN);    
+
+        // ok?
+        if (real > 0) 
+        {
+            // TODO data
+            // ...
+
+            read += real;
+            if (!tb_stream_skip(stream, real)) break;
+        }
+        // no data? continue it
+        else if (!real)
+        {
+            // wait
+            real = tb_stream_wait(stream, TB_STREAM_WAIT_READ, tb_stream_timeout(stream));
+            tb_check_break(real > 0);
+
+            // has read?
+            tb_assert_and_check_break(real & TB_STREAM_WAIT_READ);
+        }
+        // failed or end?
+        else break;
+    }
+
+ * @endcode
+ *
+ * @param stream        the stream
+ * @param data          the data
+ * @param size          the size
+ *
+ * @return              the real peek size or -1 (eof)
+ */
+tb_long_t               tb_stream_peek(tb_stream_ref_t stream, tb_byte_t** data, tb_size_t size);
 
 /*! seek stream
  *

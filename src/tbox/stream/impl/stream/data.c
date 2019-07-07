@@ -169,6 +169,7 @@ static tb_long_t tb_stream_data_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
         if (wait & TB_STREAM_WAIT_READ) events |= TB_STREAM_WAIT_READ;
         if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;
     }
+    else events = -1;
 
     // ok?
     return events;

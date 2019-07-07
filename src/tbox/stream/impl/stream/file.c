@@ -124,6 +124,7 @@ static tb_long_t tb_stream_file_read(tb_stream_ref_t stream, tb_byte_t* data, tb
 
     // read 
     stream_file->read = tb_file_read(stream_file->file, data, size);
+//    tb_trace_i("stream_file->read: %ld", stream_file->read);
     if (stream_file->read > 0)
         stream_file->offset += stream_file->read;
 
@@ -187,10 +188,16 @@ static tb_long_t tb_stream_file_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
     tb_long_t events = 0;
     if (wait & TB_STREAM_WAIT_READ) 
     {
-        if (stream_file->bstream || stream_file->offset < tb_file_size(stream_file->file))
+        if (stream_file->bstream)
             events |= TB_STREAM_WAIT_READ;
+        else
+        {
+            if (stream_file->offset < tb_file_size(stream_file->file))
+                events |= TB_STREAM_WAIT_READ;
+            else events = -1;
+        }
     }
-    if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;
+    else if (wait & TB_STREAM_WAIT_WRIT) events |= TB_STREAM_WAIT_WRIT;
 
     // end?
     if (stream_file->bstream && events > 0 && !stream_file->read) events = -1;
