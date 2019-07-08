@@ -86,8 +86,8 @@ static tb_bool_t tb_stream_filter_open(tb_stream_ref_t stream)
     // open filter
     if (stream_filter->filter && !tb_filter_open(stream_filter->filter)) return tb_false;
 
-    // ok
-    return tb_stream_open(stream_filter->stream);
+    // open stream
+    return !tb_stream_is_opened(stream_filter->stream)? tb_stream_open(stream_filter->stream) : tb_true;
 }
 static tb_bool_t tb_stream_filter_clos(tb_stream_ref_t stream)
 {
