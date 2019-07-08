@@ -157,7 +157,8 @@ static tb_long_t tb_stream_filter_read(tb_stream_ref_t stream, tb_byte_t* data, 
 {
     // check
     tb_stream_filter_t* stream_filter = tb_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(stream_filter && stream_filter->stream, -1);
+    tb_assert_and_check_return_val(stream_filter && stream_filter->stream && data, -1);
+    tb_check_return_val(size, 0);
 
     // read 
     tb_long_t real = tb_stream_read(stream_filter->stream, data, size);
@@ -200,10 +201,11 @@ static tb_long_t tb_stream_filter_writ(tb_stream_ref_t stream, tb_byte_t const* 
 {
     // check
     tb_stream_filter_t* stream_filter = tb_stream_filter_cast(stream);
-    tb_assert_and_check_return_val(stream_filter && stream_filter->stream, -1);
+    tb_assert_and_check_return_val(stream_filter && stream_filter->stream && data, -1);
+    tb_check_return_val(size, 0);
 
     // done filter
-    if (stream_filter->filter && data && size)
+    if (stream_filter->filter)
     {
         // save mode: writ
         if (!stream_filter->mode) stream_filter->mode = -1;
@@ -215,15 +217,15 @@ static tb_long_t tb_stream_filter_writ(tb_stream_ref_t stream, tb_byte_t const* 
         tb_long_t real = tb_filter_spak(stream_filter->filter, data, size, &data, size, 0);
         tb_assert_and_check_return_val(real >= 0, -1);
 
-        // no data?
-        tb_check_return_val(real, 0);
+        // no output data?
+        tb_check_return_val(real, size);
 
-        // save size
-        size = real;
+        // write output data, @note need return the input size, filter/spak will cache all input data
+        if (tb_stream_writ(stream_filter->stream, data, real) >= 0)
+            return size;
+        else return -1;
     }
-
-    // writ 
-    return tb_stream_writ(stream_filter->stream, data, size);
+    else return tb_stream_writ(stream_filter->stream, data, size);
 }
 static tb_bool_t tb_stream_filter_sync(tb_stream_ref_t stream, tb_bool_t bclosing)
 {

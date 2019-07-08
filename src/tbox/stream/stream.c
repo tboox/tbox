@@ -970,7 +970,7 @@ tb_bool_t tb_stream_bread(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
     while (read < size && (TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
         // read data
-        tb_long_t real = tb_stream_read(self, data + read, size - read);    
+        tb_long_t real = tb_stream_read(self, data + read, tb_min(size - read, TB_STREAM_BLOCK_MAXN));    
         if (real > 0) read += real;
         else if (!real)
         {
@@ -1003,7 +1003,7 @@ tb_bool_t tb_stream_bwrit(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t
     while (writ < size && (TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
         // writ data
-        tb_long_t real = tb_stream_writ(self, data + writ, size - writ);    
+        tb_long_t real = tb_stream_writ(self, data + writ, tb_min(size - writ, TB_STREAM_BLOCK_MAXN));    
         if (real > 0) writ += real;
         else if (!real)
         {
