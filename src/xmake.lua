@@ -184,6 +184,8 @@ function check_interfaces()
         "strlen",
         "strnlen",
         "strstr",
+        "strchr",
+        "strrchr",
         "strcasestr",
         "strcmp",
         "strcasecmp",

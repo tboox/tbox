@@ -24,15 +24,23 @@
  * includes
  */
 #include "string.h"
+#ifdef TB_CONFIG_LIBC_HAVE_STRRCHR
+#   include <string.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation 
  */
+#ifdef TB_CONFIG_LIBC_HAVE_STRRCHR
 tb_char_t* tb_strrchr(tb_char_t const* s, tb_char_t c)
 {
-    // check
+    tb_assert(s);
+    return strrchr(s, c);
+}
+#else
+tb_char_t* tb_strrchr(tb_char_t const* s, tb_char_t c)
+{
     tb_assert_and_check_return_val(s, tb_null);
-
-    // done
     return tb_strnrchr(s, tb_strlen(s), c);
 }
+#endif
