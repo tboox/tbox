@@ -46,7 +46,7 @@ static tb_long_t tb_charset_conv_impl_ansi_to_utf8(tb_static_stream_ref_t fst, t
     // convert to wchar buffer first
     tb_wchar_t u16data[4096];
     tb_int_t   u16maxn = tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
-    tb_int_t   u16size = MultiByteToWideChar(CP_ACP, 0, (tb_char_t const*)idata, isize, u16data, u16maxn);
+    tb_int_t   u16size = MultiByteToWideChar(CP_ACP, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, u16maxn);
     tb_assert_static(sizeof(tb_wchar_t) == 2);
     tb_check_return_val(u16size > 0, 0);
 
@@ -81,7 +81,7 @@ static tb_long_t tb_charset_conv_impl_ansi_to_utf16le(tb_static_stream_ref_t fst
     tb_assert_and_check_return_val(odata && osize, -1);
 
     // convert to the given charset
-    tb_int_t oreal = MultiByteToWideChar(CP_ACP, 0, (tb_char_t const*)idata, isize, (tb_wchar_t*)odata, osize / sizeof(tb_wchar_t));
+    tb_int_t oreal = MultiByteToWideChar(CP_ACP, 0, (tb_char_t const*)idata, (tb_int_t)isize, (tb_wchar_t*)odata, (tb_int_t)osize / sizeof(tb_wchar_t));
     if (oreal > 0) 
     {
         // get the real converted input size
@@ -113,7 +113,7 @@ static tb_long_t tb_charset_conv_impl_utf8_to_ansi(tb_static_stream_ref_t fst, t
     // convert to wchar buffer first
     tb_wchar_t u16data[4096];
     tb_int_t   u16maxn = tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
-    tb_int_t   u16size = MultiByteToWideChar(CP_UTF8, 0, (tb_char_t const*)idata, isize, u16data, u16maxn);
+    tb_int_t   u16size = MultiByteToWideChar(CP_UTF8, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, u16maxn);
     tb_assert_static(sizeof(tb_wchar_t) == 2);
     tb_check_return_val(u16size > 0, 0);
 
@@ -148,7 +148,7 @@ static tb_long_t tb_charset_conv_impl_utf16le_to_ansi(tb_static_stream_ref_t fst
     tb_assert_and_check_return_val(odata && osize, -1);
 
     // convert to the given charset
-    tb_int_t oreal = WideCharToMultiByte(CP_ACP, 0, (tb_wchar_t const*)idata, isize / sizeof(tb_wchar_t), (tb_char_t*)odata, osize, tb_null, tb_null);
+    tb_int_t oreal = WideCharToMultiByte(CP_ACP, 0, (tb_wchar_t const*)idata, (tb_int_t)isize / sizeof(tb_wchar_t), (tb_char_t*)odata, (tb_int_t)osize, tb_null, tb_null);
     if (oreal > 0) 
     {
         // get the real converted input size
