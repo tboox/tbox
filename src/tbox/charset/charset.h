@@ -74,6 +74,7 @@ typedef enum __tb_charset_type_e
 ,   TB_CHARSET_TYPE_UTF16       = 0x07
 ,   TB_CHARSET_TYPE_UTF32       = 0x08
 ,   TB_CHARSET_TYPE_UTF8        = 0x09
+,   TB_CHARSET_TYPE_ANSI        = 0x10
 
 }tb_charset_type_e;
 

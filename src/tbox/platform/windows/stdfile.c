@@ -242,7 +242,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
 #if TB_CONFIG_FORCE_UTF8
         tb_size_t encoding = TB_CHARSET_TYPE_UTF8;
 #else
-        tb_size_t encoding = TB_CHARSET_TYPE_ASCII;
+        tb_size_t encoding = TB_CHARSET_TYPE_ANSI;
 #endif
 
         // init input/output stream
