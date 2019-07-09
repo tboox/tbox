@@ -238,6 +238,13 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
         if (!GetConsoleMode(fp, &real))
             is_console = tb_false;
 
+        // init encoding for console mode
+#if TB_CONFIG_FORCE_UTF8
+        tb_size_t encoding = TB_CHARSET_TYPE_UTF8;
+#else
+        tb_size_t encoding = TB_CHARSET_TYPE_ASCII;
+#endif
+
         // init input/output stream
         if (type == TB_STDFILE_TYPE_STDIN)
         {
@@ -246,7 +253,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
 
             if (is_console)
             {
-                file->ifstream = tb_stream_init_filter_from_charset(file->istream, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8);
+                file->ifstream = tb_stream_init_filter_from_charset(file->istream, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE, encoding);
                 tb_assert_and_check_break(file->ifstream);
             }
             else file->ifstream = file->istream;
@@ -260,7 +267,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
 
             if (is_console)
             {
-                file->ofstream = tb_stream_init_filter_from_charset(file->ostream, TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
+                file->ofstream = tb_stream_init_filter_from_charset(file->ostream, encoding, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
                 tb_assert_and_check_break(file->ofstream);
             }
             else file->ofstream = file->ostream;

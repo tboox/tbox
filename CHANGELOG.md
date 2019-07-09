@@ -10,6 +10,7 @@
 ### Changes
 
 * Optimize queue_buffer module
+* Improve stream interfaces
 
 ## v1.6.3
 
@@ -182,6 +183,7 @@
 ### 改进
 
 * 优化queue_buffer模块
+* 改进stream接口实现
 
 ## v1.6.3
 
