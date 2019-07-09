@@ -35,7 +35,7 @@
 tb_char_t* tb_strrchr(tb_char_t const* s, tb_char_t c)
 {
     tb_assert(s);
-    return strrchr(s, c);
+    return (tb_char_t*)strrchr(s, c);
 }
 #else
 tb_char_t* tb_strrchr(tb_char_t const* s, tb_char_t c)
