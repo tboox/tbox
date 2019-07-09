@@ -45,7 +45,7 @@ static tb_long_t tb_charset_conv_impl_ansi_to_utf8(tb_static_stream_ref_t fst, t
 
     // convert to wchar buffer first
     tb_wchar_t u16data[4096];
-    tb_int_t   u16maxn = tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
+    tb_int_t   u16maxn = (tb_int_t)tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
     tb_int_t   u16size = MultiByteToWideChar(CP_ACP, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, u16maxn);
     tb_assert_static(sizeof(tb_wchar_t) == 2);
     tb_check_return_val(u16size > 0, 0);
@@ -112,7 +112,7 @@ static tb_long_t tb_charset_conv_impl_utf8_to_ansi(tb_static_stream_ref_t fst, t
 
     // convert to wchar buffer first
     tb_wchar_t u16data[4096];
-    tb_int_t   u16maxn = tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
+    tb_int_t   u16maxn = (tb_int_t)tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
     tb_int_t   u16size = MultiByteToWideChar(CP_UTF8, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, u16maxn);
     tb_assert_static(sizeof(tb_wchar_t) == 2);
     tb_check_return_val(u16size > 0, 0);
