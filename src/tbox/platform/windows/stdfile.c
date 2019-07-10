@@ -304,6 +304,9 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return(stdfile);
 
+    // flush the left data first
+    tb_stdfile_flush(self);
+
     // enter mutex
     if (stdfile->mutex) tb_mutex_enter(stdfile->mutex);
 
@@ -351,12 +354,29 @@ tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t self)
     tb_assert_and_check_return_val(stdfile && stdfile->ofstream && stdfile->mutex, tb_false);
     tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
 
+    // enter mutex
+    if (!tb_mutex_enter(stdfile->mutex)) return tb_false;
+
+    // write data
     tb_bool_t ok = tb_false;
-    if (tb_mutex_enter(stdfile->mutex)) 
+    do
     {
+        // write cached data first
+        tb_byte_t const* odata = tb_buffer_data(&stdfile->ocache);
+        tb_size_t        osize = tb_buffer_size(&stdfile->ocache);
+        if (odata && osize)
+        {
+            if (!tb_stream_bwrit(stdfile->ofstream, odata, osize)) break;
+            tb_buffer_clear(&stdfile->ocache);
+        }
+
+        // flush stream
         ok = tb_stream_sync(stdfile->ofstream, tb_false);
-        tb_mutex_leave(stdfile->mutex);
-    }
+
+    } while (0);
+    
+    // leave mutex
+    tb_mutex_leave(stdfile->mutex);
     return ok;
 }
 tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size)
