@@ -58,6 +58,9 @@ typedef struct __tb_stdfile_t
     // the output filter stream
     tb_stream_ref_t     ofstream;
 
+    // the output cache
+    tb_buffer_t         ocache;
+
     // the mutex lock
     tb_mutex_ref_t      mutex;
 
@@ -248,6 +251,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
         // init input/output stream
         if (type == TB_STDFILE_TYPE_STDIN)
         {
+            // init stream
             file->istream = tb_stdfile_stream_init(type, fp, is_console);
             tb_assert_and_check_break(file->istream);
 
@@ -258,10 +262,12 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
             }
             else file->ifstream = file->istream;
 
+            // open stream
             if (!tb_stream_open(file->ifstream)) break;
         }
         else
         {
+            // init stream
             file->ostream = tb_stdfile_stream_init(type, fp, is_console);
             tb_assert_and_check_break(file->ostream);
 
@@ -272,8 +278,12 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
             }
             else file->ofstream = file->ostream;
 
+            // open stream
             if (!tb_stream_open(file->ofstream)) break;
         }
+
+        // init output cache
+        if (!tb_buffer_init(&file->ocache)) break;
 
         // ok
         ok = tb_true;
@@ -312,6 +322,9 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     // exit ostream
     if (stdfile->ostream) tb_stream_exit(stdfile->ostream);
     stdfile->ostream = tb_null;
+
+    // exit ocache
+    tb_buffer_exit(&stdfile->ocache);
 
     // leave mutex
     if (stdfile->mutex) tb_mutex_leave(stdfile->mutex);
@@ -370,30 +383,68 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
     tb_assert_and_check_return_val(stdfile->type != TB_STDFILE_TYPE_STDIN, tb_false);
     tb_check_return_val(size, tb_true);
 
-    tb_bool_t ok = tb_false;
-    if (tb_mutex_enter(stdfile->mutex)) 
-    {
-        // write data to stdout/stderr
-        if (tb_stream_bwrit(stdfile->ofstream, data, size)) 
-        {
-            // flush data if exists '\n'
-            tb_byte_t const* p = data + size - 1;
-            tb_bool_t flush = tb_false;
-            while (p >= data)
-            {
-                if (*p == '\n') 
-                {
-                    flush = tb_true;
-                    break;
-                }
-                p--;
-            }
+    // enter mutex
+    if (!tb_mutex_enter(stdfile->mutex)) return tb_false;
 
-            // ok
-            ok = flush? tb_stream_sync(stdfile->ofstream, tb_false) : tb_true;
+    // write data
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // write cached data first
+        tb_byte_t const* odata = tb_buffer_data(&stdfile->ocache);
+        tb_size_t        osize = tb_buffer_size(&stdfile->ocache);
+        if (odata && osize)
+        {
+            if (!tb_stream_bwrit(stdfile->ofstream, odata, osize)) break;
+            tb_buffer_clear(&stdfile->ocache);
         }
-        tb_mutex_leave(stdfile->mutex);
-    }
+
+        // write data by lines
+        tb_bool_t flush = tb_false;
+        tb_char_t const* p = (tb_char_t const*)data;
+        tb_char_t const* e = p + size;
+        tb_char_t const* lf = tb_null;
+        while (p < e)
+        {
+            lf = tb_strnchr(p, e - p, '\n');
+            if (lf)
+            {
+                if (lf > p && lf[-1] == '\r')
+                {
+                    if (!tb_stream_bwrit(stdfile->ofstream, (tb_byte_t const*)p, lf + 1 - p)) break;
+                }
+                else
+                {
+                    if (lf > p && !tb_stream_bwrit(stdfile->ofstream, (tb_byte_t const*)p, lf - p)) break;
+                    if (!tb_stream_bwrit(stdfile->ofstream, (tb_byte_t const*)"\r\n", 2)) break;
+                }
+
+                // next line
+                p = lf + 1;
+
+                // need flush
+                flush = tb_true;
+            }
+            else
+            {
+                // cache the left data
+                tb_buffer_memncat(&stdfile->ocache, (tb_byte_t const*)p, e - p);
+                p = e;
+                break;
+            }
+        }
+        tb_check_break(p == e);
+
+        // flush data
+        if (flush && !tb_stream_sync(stdfile->ofstream, tb_false)) break;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+    
+    // leave mutex
+    tb_mutex_leave(stdfile->mutex);
     return ok;
 }
 tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
