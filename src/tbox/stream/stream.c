@@ -1132,9 +1132,9 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t self, tb_hize_t offset)
         tb_bool_t ok = tb_false;
         if (tb_queue_buffer_maxn(&stream->cache))
         {
-            tb_size_t   size = 0;
-            tb_byte_t*  data = tb_queue_buffer_pull_init(&stream->cache, &size);
-            if (data && size && offset > curt && offset < curt + size)
+            tb_size_t   pull = 0;
+            tb_byte_t*  data = tb_queue_buffer_pull_init(&stream->cache, &pull);
+            if (data && pull && offset > curt && offset <= curt + pull)
             {
                 // seek it at the cache
                 tb_queue_buffer_pull_exit(&stream->cache, (tb_size_t)(offset - curt));
@@ -1146,6 +1146,7 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t self, tb_hize_t offset)
                 ok = tb_true;
             }
         }
+
 
         // seek it
         if (!ok)
@@ -1190,43 +1191,62 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream, -1);
 
-    // done
-    tb_char_t   ch = 0;
-    tb_char_t*  p = data;
+    // init static buffer 
+    tb_static_buffer_t buffer;
+    if (!tb_static_buffer_init(&buffer, (tb_byte_t*)data, size)) return -1;
+
+    // read line
+    tb_bool_t   eof = tb_false;
+    tb_byte_t*  line = tb_null;
     while ((TB_STATE_OPENED == tb_atomic_get(&stream->istate)))
     {
-        // read char
-        if (!tb_stream_bread_s8(self, (tb_sint8_t*)&ch)) break;
-
-        // is line?
-        if (ch == '\n') 
+        tb_long_t real = tb_stream_peek(self, &line, tb_min(size, TB_STREAM_BLOCK_MAXN));
+        if (real > 0)
         {
-            // finish line
-            if (p > data && p[-1] == '\r')
-                p--;
-            *p = '\0';
-    
-            // ok
-            return p - data;
+            tb_assert(real <= size);
+            tb_char_t const* e = tb_strnchr((tb_char_t const*)line, real, '\n');
+            if (e)
+            {
+                tb_size_t n = (tb_byte_t const*)e + 1 - line;
+                if (!tb_stream_skip(self, n)) return -1;
+                tb_static_buffer_memncat(&buffer, line, n);
+                break;
+            }
+            else 
+            {
+                if (!tb_stream_skip(self, real)) return -1;
+                tb_static_buffer_memncat(&buffer, line, real);
+            }
         }
-        // append char to line
+        else if (!real)
+        {
+            real = tb_stream_wait(self, TB_STREAM_WAIT_READ, tb_stream_timeout(self));
+            if (real <= 0)
+            {
+                eof = tb_true;
+                break;
+            }
+        }
         else 
         {
-            if ((p - data) < size - 1) *p++ = ch;
-
-            // line end?
-            if (!ch) break;
+            eof = tb_true;
+            break;
         }
     }
 
     // killed?
     if ((TB_STATE_KILLING == tb_atomic_get(&stream->istate))) return -1;
 
-    // end
-    if (p < data + size) *p = '\0';
-
     // ok?
-    return !tb_stream_beof(self)? p - data : -1;
+    tb_size_t linesize = tb_static_buffer_size(&buffer);
+    if (linesize) 
+    {
+        if (linesize && data[linesize - 1] == '\n') linesize--;
+        if (linesize && data[linesize - 1] == '\r') linesize--;
+        data[linesize] = '\0';
+        return linesize;
+    }
+    else return (eof || tb_stream_beof(self))? -1 : 0;
 }
 tb_long_t tb_stream_bwrit_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t size)
 {
