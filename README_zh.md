@@ -65,7 +65,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 如果你想了解更多，请参考：
 
 * [项目主页](https://tboox.org/cn)
-* [在线文档](https://github.com/tboox/tbox/wiki/%E7%9B%AE%E5%BD%95)
+* [在线文档](https://tboox.io/#/zh-cn/getting_started)
 * [Github](https://github.com/tboox/tbox)
 * [Gitee](https://gitee.com/tboox/tbox)
 
