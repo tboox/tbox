@@ -276,7 +276,11 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
                 file->ofstream = tb_stream_init_filter_from_charset(file->ostream, encoding, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
                 tb_assert_and_check_break(file->ofstream);
             }
-            else file->ofstream = file->ostream;
+            else 
+            {
+                file->ofstream = tb_stream_init_filter_from_charset(file->ostream, encoding, TB_CHARSET_TYPE_COCP);
+                tb_assert_and_check_break(file->ofstream);
+            }
 
             // open stream
             if (!tb_stream_open(file->ofstream)) break;

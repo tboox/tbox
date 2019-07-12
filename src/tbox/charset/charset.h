@@ -75,6 +75,9 @@ typedef enum __tb_charset_type_e
 ,   TB_CHARSET_TYPE_UTF32       = 0x08
 ,   TB_CHARSET_TYPE_UTF8        = 0x09
 ,   TB_CHARSET_TYPE_ANSI        = 0x10
+#ifdef TB_CONFIG_OS_WINDOWS
+,   TB_CHARSET_TYPE_COCP        = 0x11 //!< console output cp
+#endif
 
 }tb_charset_type_e;
 
