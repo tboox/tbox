@@ -278,6 +278,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
             }
             else 
             {
+                // redirect (console output cp)
                 file->ofstream = tb_stream_init_filter_from_charset(file->ostream, encoding, TB_CHARSET_TYPE_COCP);
                 tb_assert_and_check_break(file->ofstream);
             }
