@@ -24,17 +24,87 @@
  * includes
  */
 #include "../sched.h"
+#include <windows.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // get the current pid
+    if (!pid) pid = (tb_size_t)GetCurrentProcessId();
+
+    // set affinity
+    tb_bool_t ok = tb_false;
+    HANDLE    process = tb_null;
+    do
+    {
+        // open process
+        process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_SET_INFORMATION, FALSE, (DWORD)pid);
+        tb_assert_and_check_break(process);
+
+        // get process affinity
+        DWORD_PTR vProcessMask;
+        DWORD_PTR vSystemMask;
+        if (!GetProcessAffinityMask(process, &vProcessMask, &vSystemMask)) break;
+
+        // result is the intersection of available CPUs and the mask.
+        DWORD_PTR newMask = vSystemMask & cpuset->_cpuset;
+        if (newMask)
+        {
+            if (SetProcessAffinityMask(process, newMask) == 0)
+                break;
+        }
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // close process
+    if (process) CloseHandle(process);
+    process = tb_null;
+
+    // ok?
+    return ok;
 }
 tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(cpuset, tb_false);
+
+    // get the current pid
+    if (!pid) pid = (tb_size_t)GetCurrentProcessId();
+
+    // set affinity
+    tb_bool_t ok = tb_false;
+    HANDLE    process = tb_null;
+    do
+    {
+        // open process
+        process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_SET_INFORMATION, FALSE, (DWORD)pid);
+        tb_assert_and_check_break(process);
+
+        // get process affinity
+        DWORD_PTR vProcessMask;
+        DWORD_PTR vSystemMask;
+        if (!GetProcessAffinityMask(process, &vProcessMask, &vSystemMask)) break;
+
+        // save result
+        cpuset->_cpuset = vProcessMask;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // close process
+    if (process) CloseHandle(process);
+    process = tb_null;
+
+    // ok?
+    return ok;
 }
