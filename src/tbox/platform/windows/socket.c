@@ -328,12 +328,8 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
         break;
     case TB_SOCKET_CTRL_SET_RECV_BUFF_SIZE:
         {
-            // the buff_size
-            tb_size_t buff_size = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // set the recv buffer size
-            tb_int_t real = (tb_int_t)buff_size;
-            if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (tb_char_t*)&real, sizeof(real)))
+            tb_int_t buff_size = (tb_int_t)tb_va_arg(args, tb_size_t);
+            if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (tb_char_t*)&buff_size, sizeof(buff_size)))
                 ok = tb_true;
         }
         break;
@@ -359,12 +355,8 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
         break;
     case TB_SOCKET_CTRL_SET_SEND_BUFF_SIZE:
         {
-            // the buff_size
-            tb_size_t buff_size = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-            // set the send buffer size
-            tb_int_t real = (tb_int_t)buff_size;
-            if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (tb_char_t*)&real, sizeof(real)))
+            tb_int_t buff_size = (tb_int_t)tb_va_arg(args, tb_size_t);
+            if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (tb_char_t*)&buff_size, sizeof(buff_size)))
                 ok = tb_true;
         }
         break;
@@ -391,6 +383,24 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
     case TB_SOCKET_CTRL_SET_NOSIGPIPE:
         ok = true;
         break;
+#ifdef SO_KEEPALIVE
+    case TB_SOCKET_CTRL_SET_KEEPALIVE:
+        {
+            tb_int_t enable = (tb_int_t)tb_va_arg(args, tb_bool_t);
+            if (!tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (tb_char_t*)&enable, sizeof(enable)))
+                ok = tb_true;
+        }
+        break;
+#endif
+#ifdef TCP_KEEPINTVL
+    case TB_SOCKET_CTRL_SET_TCP_KEEPINTVL:
+        {
+            tb_int_t intvl = (tb_int_t)tb_va_arg(args, tb_size_t);
+            if (!tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, (tb_char_t*)&intvl, sizeof(intvl)))
+                ok = tb_true;
+        }
+        break;
+#endif
     default:
         {
             // trace

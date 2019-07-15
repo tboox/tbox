@@ -88,7 +88,9 @@ typedef enum __tb_socket_ctrl_e
 ,   TB_SOCKET_CTRL_GET_SEND_BUFF_SIZE   = 5
 ,   TB_SOCKET_CTRL_SET_TCP_NODELAY      = 6
 ,   TB_SOCKET_CTRL_GET_TCP_NODELAY      = 7
-,   TB_SOCKET_CTRL_SET_NOSIGPIPE        = 8 //!< @note this operation always return true on windows
+,   TB_SOCKET_CTRL_SET_TCP_KEEPINTVL    = 8
+,   TB_SOCKET_CTRL_SET_KEEPALIVE        = 9
+,   TB_SOCKET_CTRL_SET_NOSIGPIPE        = 10 //!< @note this operation always return true on windows
 
 }tb_socket_ctrl_e;
 
