@@ -47,6 +47,15 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// no sigpipe
+#if !defined(SO_NOSIGPIPE) && defined(MSG_NOSIGNAL)
+#   define SO_NOSIGPIPE MSG_NOSIGNAL
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_int_t tb_socket_type(tb_size_t type)
@@ -291,6 +300,15 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             else *pbuff_size = 0;
         }
         break;
+#ifdef SO_NOSIGPIPE
+    case TB_SOCKET_CTRL_SET_NOSIGPIPE:
+        {
+            tb_int_t enable = (tb_int_t)tb_va_arg(args, tb_bool_t);
+            if (!setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (tb_char_t*)&enable, sizeof(enable)))
+                ok = tb_true;
+        }
+        break;
+#endif
     default:
         {
             // trace

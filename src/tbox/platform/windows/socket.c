@@ -388,6 +388,9 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             else *pbuff_size = 0;
         }
         break;
+    case TB_SOCKET_CTRL_SET_NOSIGPIPE:
+        ok = true;
+        break;
     default:
         {
             // trace
