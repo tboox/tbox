@@ -24,143 +24,285 @@
  */
 #include "prefix.h"
 #include "../impl/charset.h"
+#include "../../utils/utils.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_long_t tb_charset_conv_impl_cp_to_utf8(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+static tb_size_t tb_charset_conv_impl_char_cp_bytes(tb_byte_t const* idata, tb_size_t isize, tb_uint_t cp)
 {
-    // no data? 
-    tb_check_return_val(tb_static_stream_left(fst), 0);
+    // check
+    tb_assert(idata && isize);
 
-    // get input data
-    tb_byte_t const* idata = tb_static_stream_pos(fst);
-    tb_size_t        isize = tb_static_stream_left(fst);
-    tb_assert_and_check_return_val(idata && isize, -1);
+    // @note CharNextExA do not support utf8/utf16
+    if (cp == CP_UTF8)
+    {
+        tb_byte_t ch = idata[0];
+        if (!(ch & 0x80))
+            return 1;
+        else if ((ch & 0xe0) == 0xc0)
+            return isize >= 2? 2 : 0;
+        else if ((ch & 0xf0) == 0xe0)
+            return isize >= 3? 3 : 0;
+        else if ((ch & 0xf8) == 0xf0)
+            return isize >= 4? 4 : 0;
+        else if ((ch & 0xfc) == 0xf8)
+            return isize >= 5? 5 : 0;
+        else if ((ch & 0xfe) == 0xfc)
+            return isize >= 6? 6 : 0;
+        else
+            return 0;
+    }
+    else if (cp == 1200 || cp == 1201) // utf16le or utf16be
+    {
+        // not enough? 
+        tb_check_return_val(isize > 1, 0);
 
-    // get output data
-    tb_byte_t const* odata = tb_static_stream_pos(tst);
-    tb_size_t        osize = tb_static_stream_left(tst);
-    tb_assert_and_check_return_val(odata && osize, -1);
+        // get the first character
+        tb_uint32_t c = cp == 1200? tb_bits_get_u16_le(idata) : tb_bits_get_u16_be(idata);
+        if (c >= 0xd800 && c <= 0xdbff) 
+        {
+            // not enough? 
+            tb_check_return_val(isize > 3, 0);
+
+            // the next character
+            tb_byte_t const* p = idata + 2;
+            tb_uint32_t c2 = cp == 1200? tb_bits_get_u16_le(p) : tb_bits_get_u16_be(p);
+            return (c2 >= 0xdc00 && c2 <= 0xdfff)? 4 : 2;
+        } 
+        else return 2;
+    }
+    else if (cp == 12000 || cp == 12001) // utf32le or utf32be
+        return isize >= 4? 4 : 0;
+ 
+    // copy input buffer for patching '\0'
+    tb_byte_t ibuffer[5];
+    tb_size_t ineed = tb_min(isize, 4);
+    if (ineed == 4)
+    {
+        ibuffer[0] = idata[0];
+        ibuffer[1] = idata[1];
+        ibuffer[2] = idata[2];
+        ibuffer[3] = idata[3];
+    }
+    else tb_memcpy(ibuffer, idata, ineed);
+    ibuffer[ineed] = 0;
+
+    // get next character position
+    tb_byte_t const* next = (tb_byte_t const*)CharNextExA(cp, (tb_char_t const*)ibuffer, 0);
+    tb_check_return_val(next && next > ibuffer, 0);
+    tb_assert_and_check_return_val(next <= ibuffer + ineed, 0);
+
+    // get the current character bytes
+    return next - ibuffer;
+}
+static tb_size_t tb_charset_conv_impl_char_cp_to_utf8(tb_byte_t const* idata, tb_size_t isize, tb_byte_t* odata, tb_size_t osize, tb_uint_t cp)
+{
+    // check
+    tb_assert(idata && isize && odata && osize);
 
     // convert to wchar buffer first
-    tb_wchar_t u16data[4096];
-    tb_int_t   u16maxn = (tb_int_t)tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
-    tb_int_t   u16size = MultiByteToWideChar(cp, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, u16maxn);
+    tb_wchar_t u16data[8];
+    tb_int_t   u16size = MultiByteToWideChar(cp, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, tb_arrayn(u16data));
     tb_assert_static(sizeof(tb_wchar_t) == 2);
     tb_check_return_val(u16size > 0, 0);
 
     // convert to the given charset
     tb_int_t oreal = WideCharToMultiByte(CP_UTF8, 0, u16data, u16size, (tb_char_t*)odata, (tb_int_t)osize, tb_null, tb_null);
-    if (oreal > 0) 
-    {
-        // get the real converted input size
-        tb_int_t ireal = WideCharToMultiByte(cp, 0, u16data, u16size, tb_null, 0, tb_null, tb_null);
-        tb_assert_and_check_return_val(ireal > 0, -1);
-
-        // update stream
-        if (!tb_static_stream_skip(fst, ireal)) return -1;
-        if (!tb_static_stream_skip(tst, oreal)) return -1;
-        return oreal;
-    }
-    return 0;
+    return oreal > 0? oreal : 0;
 }
-static tb_long_t tb_charset_conv_impl_cp_to_utf16le(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+static tb_size_t tb_charset_conv_impl_char_cp_to_utf16le(tb_byte_t const* idata, tb_size_t isize, tb_byte_t* odata, tb_size_t osize, tb_uint_t cp)
 {
-    // no data? 
-    tb_check_return_val(tb_static_stream_left(fst), 0);
-
-    // get input data
-    tb_byte_t const* idata = tb_static_stream_pos(fst);
-    tb_size_t        isize = tb_static_stream_left(fst);
-    tb_assert_and_check_return_val(idata && isize, -1);
-
-    // get output data
-    tb_byte_t const* odata = tb_static_stream_pos(tst);
-    tb_size_t        osize = tb_static_stream_left(tst);
-    tb_assert_and_check_return_val(odata && osize, -1);
+    // check
+    tb_assert(idata && isize && odata && osize);
 
     // convert to the given charset
     tb_int_t oreal = MultiByteToWideChar(cp, 0, (tb_char_t const*)idata, (tb_int_t)isize, (tb_wchar_t*)odata, (tb_int_t)osize / sizeof(tb_wchar_t));
-    if (oreal > 0) 
-    {
-        // get the real converted input size
-        tb_int_t ireal = WideCharToMultiByte(cp, 0, (tb_wchar_t const*)odata, oreal, tb_null, 0, tb_null, tb_null);
-        tb_assert_and_check_return_val(ireal > 0, -1);
-
-        // update stream
-        if (!tb_static_stream_skip(fst, ireal)) return -1;
-        if (!tb_static_stream_skip(tst, oreal * sizeof(tb_wchar_t))) return -1;
-        return oreal * sizeof(tb_wchar_t);
-    }
-    return 0;
+    return oreal > 0? oreal * sizeof(tb_wchar_t) : 0;
 }
-static tb_long_t tb_charset_conv_impl_utf8_to_cp(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+static tb_size_t tb_charset_conv_impl_char_utf8_to_cp(tb_byte_t const* idata, tb_size_t isize, tb_byte_t* odata, tb_size_t osize, tb_uint_t cp)
 {
-    // no data? 
-    tb_check_return_val(tb_static_stream_left(fst), 0);
-
-    // get input data
-    tb_byte_t const* idata = tb_static_stream_pos(fst);
-    tb_size_t        isize = tb_static_stream_left(fst);
-    tb_assert_and_check_return_val(idata && isize, -1);
-
-    // get output data
-    tb_byte_t const* odata = tb_static_stream_pos(tst);
-    tb_size_t        osize = tb_static_stream_left(tst);
-    tb_assert_and_check_return_val(odata && osize, -1);
+    // check
+    tb_assert(idata && isize && odata && osize);
 
     // convert to wchar buffer first
-    tb_wchar_t u16data[4096];
-    tb_int_t   u16maxn = (tb_int_t)tb_min((osize >> 1) + 4, tb_arrayn(u16data) - 1);
-    tb_int_t   u16size = MultiByteToWideChar(CP_UTF8, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, u16maxn);
+    tb_wchar_t u16data[8];
+    tb_int_t   u16size = MultiByteToWideChar(CP_UTF8, 0, (tb_char_t const*)idata, (tb_int_t)isize, u16data, tb_arrayn(u16data));
     tb_assert_static(sizeof(tb_wchar_t) == 2);
     tb_check_return_val(u16size > 0, 0);
 
     // convert to the given charset
     tb_int_t oreal = WideCharToMultiByte(cp, 0, u16data, u16size, (tb_char_t*)odata, (tb_int_t)osize, tb_null, tb_null);
-    if (oreal > 0) 
-    {
-        // get the real converted input size
-        tb_int_t ireal = WideCharToMultiByte(CP_UTF8, 0, u16data, u16size, tb_null, 0, tb_null, tb_null);
-        tb_assert_and_check_return_val(ireal > 0, -1);
-
-        // update stream
-        if (!tb_static_stream_skip(fst, ireal)) return -1;
-        if (!tb_static_stream_skip(tst, oreal)) return -1;
-        return oreal;
-    }
-    return 0;
+    return oreal > 0? oreal : 0;
 }
-static tb_long_t tb_charset_conv_impl_utf16le_to_cp(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+static tb_size_t tb_charset_conv_impl_char_utf16le_to_cp(tb_byte_t const* idata, tb_size_t isize, tb_byte_t* odata, tb_size_t osize, tb_uint_t cp)
 {
-    // no data? 
-    tb_check_return_val(tb_static_stream_left(fst), 0);
-
-    // get input data
-    tb_byte_t const* idata = tb_static_stream_pos(fst);
-    tb_size_t        isize = tb_static_stream_left(fst);
-    tb_assert_and_check_return_val(idata && isize, -1);
-
-    // get output data
-    tb_byte_t const* odata = tb_static_stream_pos(tst);
-    tb_size_t        osize = tb_static_stream_left(tst);
-    tb_assert_and_check_return_val(odata && osize, -1);
+    // check
+    tb_assert(idata && isize && odata && osize);
 
     // convert to the given charset
     tb_int_t oreal = WideCharToMultiByte(cp, 0, (tb_wchar_t const*)idata, (tb_int_t)isize / sizeof(tb_wchar_t), (tb_char_t*)odata, (tb_int_t)osize, tb_null, tb_null);
-    if (oreal > 0) 
-    {
-        // get the real converted input size
-        tb_int_t ireal = MultiByteToWideChar(cp, 0, (tb_char_t const*)odata, oreal, tb_null, 0);
-        tb_assert_and_check_return_val(ireal > 0, -1);
+    return oreal > 0? oreal : 0;
+}
+static tb_long_t tb_charset_conv_impl_cp_to_utf8(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+{
+    // get input data
+    tb_byte_t const* idata = tb_static_stream_pos(fst);
+    tb_size_t        isize = tb_static_stream_left(fst);
+    tb_check_return_val(isize, 0);
+    tb_assert_and_check_return_val(idata, -1);
 
-        // update stream
-        if (!tb_static_stream_skip(fst, ireal * sizeof(tb_wchar_t))) return -1;
-        if (!tb_static_stream_skip(tst, oreal)) return -1;
-        return oreal;
+    // get output data
+    tb_byte_t*       odata = (tb_byte_t*)tb_static_stream_pos(tst);
+    tb_size_t        osize = tb_static_stream_left(tst);
+    tb_assert_and_check_return_val(odata && osize, -1);
+
+    // convert stream by characters
+    tb_size_t ireal = 0;
+    tb_size_t oreal = 0;
+    while (isize && osize)
+    {
+        // get the current character bytes
+        ireal = tb_charset_conv_impl_char_cp_bytes(idata, isize, cp);
+        tb_check_break(ireal);
+
+        // convert the current character
+        oreal = tb_charset_conv_impl_char_cp_to_utf8(idata, ireal, odata, osize, cp);
+        tb_check_break(oreal);
+
+        // next
+        idata += ireal;
+        isize -= ireal;
+        odata += oreal;
+        osize -= oreal;
     }
-    return 0;
+
+    // update stream
+    ireal = tb_static_stream_left(fst) - isize;
+    oreal = tb_static_stream_left(tst) - osize;
+    if (!tb_static_stream_skip(fst, ireal)) return -1;
+    if (!tb_static_stream_skip(tst, oreal)) return -1;
+    return oreal;
+}
+static tb_long_t tb_charset_conv_impl_cp_to_utf16le(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+{
+    // get input data
+    tb_byte_t const* idata = tb_static_stream_pos(fst);
+    tb_size_t        isize = tb_static_stream_left(fst);
+    tb_check_return_val(isize, 0);
+    tb_assert_and_check_return_val(idata, -1);
+
+    // get output data
+    tb_byte_t*       odata = (tb_byte_t*)tb_static_stream_pos(tst);
+    tb_size_t        osize = tb_static_stream_left(tst);
+    tb_assert_and_check_return_val(odata && osize, -1);
+
+    // convert stream by characters
+    tb_size_t ireal = 0;
+    tb_size_t oreal = 0;
+    while (isize && osize)
+    {
+        // get the current character bytes
+        ireal = tb_charset_conv_impl_char_cp_bytes(idata, isize, cp);
+        tb_check_break(ireal);
+
+        // convert the current character
+        oreal = tb_charset_conv_impl_char_cp_to_utf16le(idata, ireal, odata, osize, cp);
+        tb_check_break(oreal);
+
+        // next
+        idata += ireal;
+        isize -= ireal;
+        odata += oreal;
+        osize -= oreal;
+    }
+
+    // update stream
+    ireal = tb_static_stream_left(fst) - isize;
+    oreal = tb_static_stream_left(tst) - osize;
+    if (!tb_static_stream_skip(fst, ireal)) return -1;
+    if (!tb_static_stream_skip(tst, oreal)) return -1;
+    return oreal;
+}
+static tb_long_t tb_charset_conv_impl_utf8_to_cp(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+{
+    // get input data
+    tb_byte_t const* idata = tb_static_stream_pos(fst);
+    tb_size_t        isize = tb_static_stream_left(fst);
+    tb_check_return_val(isize, 0);
+    tb_assert_and_check_return_val(idata, -1);
+
+    // get output data
+    tb_byte_t*       odata = (tb_byte_t*)tb_static_stream_pos(tst);
+    tb_size_t        osize = tb_static_stream_left(tst);
+    tb_assert_and_check_return_val(odata && osize, -1);
+
+    // convert stream by characters
+    tb_size_t ireal = 0;
+    tb_size_t oreal = 0;
+    while (isize && osize)
+    {
+        // get the current character bytes
+        ireal = tb_charset_conv_impl_char_cp_bytes(idata, isize, CP_UTF8);
+        tb_check_break(ireal);
+
+        // convert the current character
+        oreal = tb_charset_conv_impl_char_utf8_to_cp(idata, ireal, odata, osize, cp);
+        tb_check_break(oreal);
+
+        // next
+        idata += ireal;
+        isize -= ireal;
+        odata += oreal;
+        osize -= oreal;
+    }
+
+    // update stream
+    ireal = tb_static_stream_left(fst) - isize;
+    oreal = tb_static_stream_left(tst) - osize;
+    if (!tb_static_stream_skip(fst, ireal)) return -1;
+    if (!tb_static_stream_skip(tst, oreal)) return -1;
+    return oreal;
+}
+static tb_long_t tb_charset_conv_impl_utf16le_to_cp(tb_static_stream_ref_t fst, tb_static_stream_ref_t tst, tb_uint_t cp)
+{
+    // get input data
+    tb_byte_t const* idata = tb_static_stream_pos(fst);
+    tb_size_t        isize = tb_static_stream_left(fst);
+    tb_check_return_val(isize, 0);
+    tb_assert_and_check_return_val(idata, -1);
+
+    // get output data
+    tb_byte_t*       odata = (tb_byte_t*)tb_static_stream_pos(tst);
+    tb_size_t        osize = tb_static_stream_left(tst);
+    tb_assert_and_check_return_val(odata && osize, -1);
+
+    // convert stream by characters
+    tb_size_t ireal = 0;
+    tb_size_t oreal = 0;
+    while (isize && osize)
+    {
+        // get the current character bytes
+        ireal = tb_charset_conv_impl_char_cp_bytes(idata, isize, 1200); // utf16le
+        tb_check_break(ireal);
+
+        // convert the current character
+        oreal = tb_charset_conv_impl_char_utf16le_to_cp(idata, ireal, odata, osize, cp);
+        tb_check_break(oreal);
+
+        // next
+        idata += ireal;
+        isize -= ireal;
+        odata += oreal;
+        osize -= oreal;
+    }
+
+    // update stream
+    ireal = tb_static_stream_left(fst) - isize;
+    oreal = tb_static_stream_left(tst) - osize;
+    if (!tb_static_stream_skip(fst, ireal)) return -1;
+    if (!tb_static_stream_skip(tst, oreal)) return -1;
+    return oreal;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
