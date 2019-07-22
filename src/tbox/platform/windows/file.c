@@ -83,10 +83,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     else if (mode & TB_FILE_MODE_RW) access = GENERIC_READ | GENERIC_WRITE;
 
     // init share
-    DWORD share = FILE_SHARE_READ;
-    if (mode & TB_FILE_MODE_RO) share = FILE_SHARE_READ;
-    else if (mode & TB_FILE_MODE_WO) share = FILE_SHARE_WRITE;
-    else if (mode & TB_FILE_MODE_RW) share = FILE_SHARE_READ | FILE_SHARE_WRITE;
+    DWORD share = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
     // init flag
     DWORD cflag = 0;
