@@ -277,6 +277,10 @@ function check_interfaces()
     check_module_cfuncs("posix", "unistd.h",                         "getdtablesize")
     check_module_cfuncs("posix", "sys/resource.h",                   "getrlimit")
     check_module_cfuncs("posix", "netdb.h",                          "getaddrinfo", "getnameinfo", "gethostbyname", "gethostbyaddr")
+    check_module_cfuncs("posix", "fcntl.h",                          "fcntl")
+
+    -- add the interfaces for freebsd
+    check_module_cfuncs("freebsd", {"sys/file.h", "fcntl.h"},        "flock")
 
     -- add the interfaces for systemv
     check_module_cfuncs("systemv", {"sys/sem.h", "sys/ipc.h"},       "semget", "semtimedop")

@@ -46,6 +46,7 @@
 #include "dynamic.h"
 #include "process.h"
 #include "stdfile.h"
+#include "filelock.h"
 #include "syserror.h"
 #include "addrinfo.h"
 #include "spinlock.h"

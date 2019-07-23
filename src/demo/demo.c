@@ -163,6 +163,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_barrier)
 ,   TB_DEMO_MAIN_ITEM(platform_atomic64)
 ,   TB_DEMO_MAIN_ITEM(platform_ifaddrs)
+,   TB_DEMO_MAIN_ITEM(platform_filelock)
 ,   TB_DEMO_MAIN_ITEM(platform_addrinfo)
 ,   TB_DEMO_MAIN_ITEM(platform_hostname)
 ,   TB_DEMO_MAIN_ITEM(platform_backtrace)
