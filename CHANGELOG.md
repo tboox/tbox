@@ -12,6 +12,7 @@
 
 * Optimize queue_buffer module
 * Improve stream interfaces
+* Improve charset encoding and add ANSI support
 
 ## v1.6.3
 
@@ -186,6 +187,7 @@
 
 * 优化queue_buffer模块
 * 改进stream接口实现
+* 改进字符集编码转换，以及增加对ANSI编码的支持
 
 ## v1.6.3
 
