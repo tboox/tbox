@@ -32,7 +32,7 @@ tb_filelock_ref_t tb_filelock_init(tb_file_ref_t file)
     tb_trace_noimpl();
     return tb_null;
 }
-tb_filelock_ref_t tb_filelock_init_from_path(tb_char_t const* path)
+tb_filelock_ref_t tb_filelock_init_from_path(tb_char_t const* path, tb_size_t mode)
 {
     tb_trace_noimpl();
     return tb_null;
@@ -51,7 +51,8 @@ tb_bool_t tb_filelock_enter_try(tb_filelock_ref_t lock, tb_size_t mode)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_void_t tb_filelock_leave(tb_filelock_ref_t lock)
+tb_bool_t tb_filelock_leave(tb_filelock_ref_t lock)
 {
     tb_trace_noimpl();
+    return tb_false;
 }

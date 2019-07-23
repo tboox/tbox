@@ -63,10 +63,11 @@ tb_filelock_ref_t   tb_filelock_init(tb_file_ref_t file);
 /*! init the file lock from the file path
  *
  * @param path      the file path
+ * @param mode      the file mode
  * 
  * @return          the file lock 
  */
-tb_filelock_ref_t   tb_filelock_init_from_path(tb_char_t const* path);
+tb_filelock_ref_t   tb_filelock_init_from_path(tb_char_t const* path, tb_size_t mode);
 
 /*! exit the file lock
  * 
@@ -95,8 +96,10 @@ tb_bool_t           tb_filelock_enter_try(tb_filelock_ref_t lock, tb_size_t mode
 /*! leave the file lock
  * 
  * @param lock      the file lock
+ *
+ * @return          tb_true or tb_false
  */
-tb_void_t           tb_filelock_leave(tb_filelock_ref_t lock);
+tb_bool_t           tb_filelock_leave(tb_filelock_ref_t lock);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
