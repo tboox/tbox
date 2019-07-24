@@ -98,6 +98,7 @@ tb_bool_t tb_filelock_enter(tb_filelock_ref_t self, tb_size_t mode)
     tb_filelock_t* lock = (tb_filelock_t*)self;
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
+    // lock it
     return flock(tb_file2fd(lock->file), (mode == TB_FILELOCK_MODE_EX)? LOCK_EX : LOCK_SH) == 0;
 }
 tb_bool_t tb_filelock_enter_try(tb_filelock_ref_t self, tb_size_t mode)
@@ -106,6 +107,7 @@ tb_bool_t tb_filelock_enter_try(tb_filelock_ref_t self, tb_size_t mode)
     tb_filelock_t* lock = (tb_filelock_t*)self;
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
+    // try to lock it
     return flock(tb_file2fd(lock->file), ((mode == TB_FILELOCK_MODE_EX)? LOCK_EX : LOCK_SH) | LOCK_NB) == 0;
 }
 tb_bool_t tb_filelock_leave(tb_filelock_ref_t self)
@@ -114,5 +116,6 @@ tb_bool_t tb_filelock_leave(tb_filelock_ref_t self)
     tb_filelock_t* lock = (tb_filelock_t*)self;
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
+    // unlock it
     return flock(tb_file2fd(lock->file), LOCK_UN) == 0;
 }

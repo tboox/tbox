@@ -8,7 +8,7 @@
  */ 
 tb_int_t tb_demo_platform_filelock_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_filelock_ref_t lock = tb_filelock_init_from_path(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT);
+    tb_filelock_ref_t lock = tb_filelock_init_from_path(argv[1], tb_file_info(argv[1], tb_null)? TB_FILE_MODE_RO : TB_FILE_MODE_RW | TB_FILE_MODE_CREAT);
     if (lock)
     {
         // trace

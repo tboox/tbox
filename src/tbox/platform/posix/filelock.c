@@ -94,6 +94,7 @@ tb_bool_t tb_filelock_enter(tb_filelock_ref_t self, tb_size_t mode)
     tb_filelock_t* lock = (tb_filelock_t*)self;
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
+    // lock it
     struct flock flk = {0};
     flk.l_type       = (mode == TB_FILELOCK_MODE_EX)? F_WRLCK : F_RDLCK;
     flk.l_start      = 0;
@@ -108,6 +109,7 @@ tb_bool_t tb_filelock_enter_try(tb_filelock_ref_t self, tb_size_t mode)
     tb_filelock_t* lock = (tb_filelock_t*)self;
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
+    // try to lock it
     struct flock flk = {0};
     flk.l_type       = (mode == TB_FILELOCK_MODE_EX)? F_WRLCK : F_RDLCK;
     flk.l_start      = 0;
@@ -122,6 +124,7 @@ tb_bool_t tb_filelock_leave(tb_filelock_ref_t self)
     tb_filelock_t* lock = (tb_filelock_t*)self;
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
+    // unlock it
     struct flock flk = {0};
     flk.l_type       = F_UNLCK;
     flk.l_start      = 0;
