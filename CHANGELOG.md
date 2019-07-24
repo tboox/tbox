@@ -7,6 +7,7 @@
 * [#70](https://github.com/tboox/tbox/issues/70): Add `tb_stream_init_from_sock_ref()` to open a given socket as stream
 * Add stdfile api to read/write stdin, stdout and stderr.
 * [#81](https://github.com/tboox/tbox/issues/81): Add set/get thread/process cpu affinity 
+* Add filelock api
 
 ### Changes
 
@@ -182,6 +183,7 @@
 * [#70](https://github.com/tboox/tbox/issues/70): 添加`tb_stream_init_from_sock_ref()`接口去直接打开一个socket作为stream去读取数据。
 * 添加stdfile接口去读写stdin, stdout和stderr。
 * [#81](https://github.com/tboox/tbox/issues/81): 添加对进程和线程的cpu亲缘性设置和获取
+* 添加filelock文件锁跨平台api接口
 
 ### 改进
 
