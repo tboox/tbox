@@ -35,14 +35,14 @@ tb_int_t tb_demo_platform_timer_main(tb_int_t argc, tb_char_t** argv)
     tb_timer_task_ref_t after = tb_timer_task_init_after(tb_timer(), 10000, 5000, tb_true, tb_demo_timer_task_func, "after");
 
     // wait some time
-    getchar();
+    tb_getchar();
 
     // kil the task
     if (one) tb_timer_task_kill(tb_timer(), one);
     if (after) tb_timer_task_kill(tb_timer(), after);
 
     // wait some time
-    getchar();
+    tb_getchar();
 
     // del the task
     if (one) tb_timer_task_exit(tb_timer(), one);

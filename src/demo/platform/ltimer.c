@@ -64,14 +64,14 @@ tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
         tb_thread_init(tb_null, tb_demo_ltimer_loop, timer, 0);
 
         // wait some time
-        getchar();
+        tb_getchar();
 
         // kil the task
         if (one) tb_ltimer_task_kill(timer, one);
         if (after) tb_ltimer_task_kill(timer, after);
 
         // wait some time
-        getchar();
+        tb_getchar();
 
         // del the task
         if (one) tb_ltimer_task_exit(timer, one);

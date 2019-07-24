@@ -69,6 +69,18 @@ do \
  * interfaces
  */
 
+/*! returns the next character from the standard input (stdin).
+ *
+ * @returns          the next character or TB_EOF
+ */
+tb_int_t             tb_getchar(tb_noarg_t);
+
+/*! writes a character to the standard output (stdout).
+ *
+ * @returns          the character written is returned, or TB_EOF
+ */
+tb_int_t             tb_putchar(tb_int_t ch);
+
 /*! puts
  *
  * @param string    the string

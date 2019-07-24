@@ -36,7 +36,7 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
     tb_thread_pool_task_post(tb_thread_pool(), "1000ms", tb_demo_task_time_done, tb_demo_task_time_exit, (tb_cpointer_t)1000, tb_false);
 
     // wait some time
-    getchar();
+    tb_getchar();
 
 #else
 

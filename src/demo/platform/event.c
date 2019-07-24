@@ -36,7 +36,7 @@ static tb_char_t const* tb_demo_gets(tb_char_t* line, tb_size_t maxn)
     while (p < e)
     {
         // get character
-        tb_char_t ch = getchar(); if (ch == '\r') getchar();
+        tb_char_t ch = tb_getchar(); if (ch == '\r') tb_getchar();
         tb_check_break(ch != '\r' && ch != '\n');
 
         // append digit

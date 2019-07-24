@@ -82,6 +82,6 @@ tb_int_t tb_demo_platform_thread_local_main(tb_int_t argc, tb_char_t** argv)
     tb_thread_init(tb_null, tb_demo_thread_local_stub, tb_null, 0);
 
     // wait
-    getchar();
+    tb_getchar();
     return 0;
 }

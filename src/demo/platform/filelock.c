@@ -21,8 +21,7 @@ tb_int_t tb_demo_platform_filelock_main(tb_int_t argc, tb_char_t** argv)
             tb_trace_i("filelock: enter ok");
 
             // wait ..
-            tb_char_t ch;
-            tb_stdfile_getc(tb_stdfile_input(), &ch);
+            tb_getchar();
 
             // leave lock
             tb_filelock_leave(lock);
