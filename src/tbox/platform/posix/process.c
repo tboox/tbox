@@ -251,7 +251,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             }
 
             // redirect the stderr
-            if (attr && attr->outfile)
+            if (attr && attr->errfile)
             {
                 // open file
                 process->errfd = open(attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
