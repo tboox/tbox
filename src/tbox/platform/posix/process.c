@@ -258,7 +258,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                 tb_assertf_pass_and_check_break(process->errfd, "cannot redirect stderr to file: %s, error: %d", attr->errfile, errno);
 
                 // redirect it
-                dup2(process->errfd, STDOUT_FILENO);
+                dup2(process->errfd, STDERR_FILENO);
             }
 
             // get environment 
