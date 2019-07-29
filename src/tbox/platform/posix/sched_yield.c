@@ -31,7 +31,6 @@
  */
 tb_bool_t tb_sched_yield()
 {
-    // yield it in thread
     return !sched_yield()? tb_true : tb_false;
 }
 

@@ -41,8 +41,8 @@
 #else
 tb_bool_t tb_sched_yield()
 {
-    tb_trace_noimpl();
-    return tb_false;
+    tb_usleep(1);
+    return tb_true;
 }
 #endif
 
