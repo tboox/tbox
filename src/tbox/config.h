@@ -26,6 +26,30 @@
  */
 #include "tbox.config.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// is linux?
+#if !defined(TB_CONFIG_OS_LINUX) && (defined(__linux__) || defined(__linux) || defined(linux))
+#   define TB_CONFIG_OS_LINUX       (1)
+#endif
+
+// is android?
+#if !defined(TB_CONFIG_OS_ANDROID) && defined(__ANDROID__) 
+#   define TB_CONFIG_OS_ANDROID     (1)
+#endif
+
+// is macosx?
+#if !defined(TB_CONFIG_OS_MACOSX) && defined(__MACH__) 
+#   define TB_CONFIG_OS_MACOSX      (1)
+#endif
+
+// is windows?
+#if !defined(TB_CONFIG_OS_WINDOWS) && defined(_MSC_VER) 
+#   define TB_CONFIG_OS_WINDOWS     (1)
+#endif
+
 #endif
 
 
