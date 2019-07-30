@@ -160,7 +160,6 @@ TB_DEMO_MAIN_DECL(platform_ltimer);
 TB_DEMO_MAIN_DECL(platform_atomic);
 TB_DEMO_MAIN_DECL(platform_stdfile);
 TB_DEMO_MAIN_DECL(platform_process);
-TB_DEMO_MAIN_DECL(platform_barrier);
 TB_DEMO_MAIN_DECL(platform_atomic64);
 TB_DEMO_MAIN_DECL(platform_ifaddrs);
 TB_DEMO_MAIN_DECL(platform_filelock);

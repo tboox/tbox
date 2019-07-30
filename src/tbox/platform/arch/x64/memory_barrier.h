@@ -15,22 +15,17 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        barrier.h
+ * @file        memory_barrier.h
  *
  */
-#ifndef TB_PLATFORM_MACH_BARRIER_H
-#define TB_PLATFORM_MACH_BARRIER_H
+#ifndef TB_PLATFORM_ARCH_x64_MEMORY_BARRIER_H
+#define TB_PLATFORM_ARCH_x64_MEMORY_BARRIER_H
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include <libkern/OSAtomic.h>
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#define tb_barrier()        OSMemoryBarrier()
+#include "../x86/memory_barrier.h"
 
 
 #endif

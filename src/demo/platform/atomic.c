@@ -28,6 +28,6 @@ tb_int_t tb_demo_platform_atomic_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("%ld", tb_atomic_and_and_fetch(&a, 0xff));
     tb_trace_i("%ld", tb_atomic_xor_and_fetch(&a, 0xff));
     tb_trace_i("%ld", tb_atomic_or_and_fetch(&a, 0xff));
-
+    tb_memory_barrier();
     return 0;
 }

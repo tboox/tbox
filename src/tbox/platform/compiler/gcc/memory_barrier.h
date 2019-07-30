@@ -15,11 +15,11 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        barrier.h
+ * @file        memory_barrier.h
  *
  */
-#ifndef TB_PLATFORM_COMPILER_GCC_BARRIER_H
-#define TB_PLATFORM_COMPILER_GCC_BARRIER_H
+#ifndef TB_PLATFORM_COMPILER_GCC_MEMORY_BARRIER_H
+#define TB_PLATFORM_COMPILER_GCC_MEMORY_BARRIER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -30,8 +30,8 @@
  * macros
  */
 
-#ifndef tb_barrier
-#   define tb_barrier()         __sync_synchronize()
+#ifndef tb_memory_barrier
+#   define tb_memory_barrier()         __sync_synchronize()
 #endif
 
 #endif

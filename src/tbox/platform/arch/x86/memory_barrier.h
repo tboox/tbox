@@ -15,32 +15,25 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        barrier.h
- * @ingroup     platform
+ * @file        memory_barrier.h
  *
  */
-#ifndef TB_PLATFORM_BARRIER_H
-#define TB_PLATFORM_BARRIER_H
+#ifndef TB_PLATFORM_ARCH_x86_MEMORY_BARRIER_H
+#define TB_PLATFORM_ARCH_x86_MEMORY_BARRIER_H
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#if defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
-#   include "mach/barrier.h"
-#elif defined(TB_COMPILER_IS_GCC) \
-    &&  TB_COMPILER_VERSION_BE(4, 1)
-#   include "compiler/gcc/barrier.h"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/barrier.h"
-#endif
-#include "arch/barrier.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * macros
  */
-#ifndef tb_barrier
-#   define tb_barrier()         
+#ifdef TB_ASSEMBLER_IS_GAS
+#   ifndef tb_memory_barrier
+#       define tb_memory_barrier()             __tb_asm__ __tb_volatile__ ("" ::: "memory")
+#   endif
 #endif
 
 

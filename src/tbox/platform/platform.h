@@ -42,7 +42,6 @@
 #include "poller.h"
 #include "context.h"
 #include "ifaddrs.h"
-#include "barrier.h"
 #include "dynamic.h"
 #include "process.h"
 #include "stdfile.h"

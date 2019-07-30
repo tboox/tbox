@@ -15,11 +15,11 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        barrier.h
+ * @file        memory_barrier.h
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_BARRIER_H
-#define TB_PLATFORM_WINDOWS_BARRIER_H
+#ifndef TB_PLATFORM_WINDOWS_MEMORY_BARRIER_H
+#define TB_PLATFORM_WINDOWS_MEMORY_BARRIER_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -30,11 +30,11 @@
  * macros
  */
 #if defined(MemoryBarrier)
-#   define tb_barrier()         MemoryBarrier()
+#   define tb_memory_barrier()         MemoryBarrier()
 #elif defined(_AMD64_)
-#   define tb_barrier()         __faststorefence()
+#   define tb_memory_barrier()         __faststorefence()
 #elif defined(_IA64_)
-#   define tb_barrier()         __mf()
+#   define tb_memory_barrier()         __mf()
 #endif
 
 

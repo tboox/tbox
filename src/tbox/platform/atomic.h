@@ -34,9 +34,23 @@
 #endif
 #include "arch/atomic.h"
 
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/memory_barrier.h"
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
+#   include "mach/memory_barrier.h"
+#elif defined(TB_COMPILER_IS_GCC) \
+    &&  TB_COMPILER_VERSION_BE(4, 1)
+#   include "compiler/gcc/memory_barrier.h"
+#endif
+#include "arch/memory_barrier.h"
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
+
+#ifndef tb_memory_barrier
+#   define tb_memory_barrier()         
+#endif
 
 #ifndef tb_atomic_fetch_and_pset
 #   define tb_atomic_fetch_and_pset(a, p, v)  tb_atomic_fetch_and_pset_generic(a, p, v)
