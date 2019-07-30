@@ -38,6 +38,14 @@
  * macros
  */
 
+/*!initializes the default-constructed atomic object obj with the value desired. 
+ *
+ * the function is not atomic: concurrent access from another thread, even through an atomic operation, is a data race.
+ */
+#ifndef tb_atomic_init
+#   define tb_atomic_init(a, v)               do { *(a) = (v); } while (0)
+#endif
+
 #ifndef tb_atomic_fetch_and_pset
 #   define tb_atomic_fetch_and_pset(a, p, v)  tb_atomic_fetch_and_pset_generic(a, p, v)
 #endif

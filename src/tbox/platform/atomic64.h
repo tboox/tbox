@@ -47,6 +47,8 @@ __tb_extern_c_enter__
 
 #if TB_CPU_BIT64
 
+#   define tb_atomic64_init(a, v)               tb_atomic_init(a, v)
+
 #   define tb_atomic64_get(a)                   tb_atomic_get(a)
 #   define tb_atomic64_set(a, v)                tb_atomic_set(a, v)
 #   define tb_atomic64_pset(a, p, v)            tb_atomic_pset(a, p, v)
@@ -59,6 +61,14 @@ __tb_extern_c_enter__
 #   define tb_atomic64_fetch_and_xor(a, v)      tb_atomic_fetch_and_xor(a, v)
 #   define tb_atomic64_fetch_and_and(a, v)      tb_atomic_fetch_and_and(a, v)
 
+#endif
+
+/*!initializes the default-constructed atomic object obj with the value desired. 
+ *
+ * the function is not atomic: concurrent access from another thread, even through an atomic operation, is a data race.
+ */
+#ifndef tb_atomic64_init
+#   define tb_atomic64_init(a, v)               do { *(a) = (v); } while (0)
 #endif
 
 #ifndef tb_atomic64_fetch_and_pset
