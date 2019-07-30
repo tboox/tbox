@@ -26,7 +26,7 @@ target("tbox")
     add_packages("mbedtls", "polarssl", "openssl", "pcre2", "pcre", "zlib", "mysql", "sqlite3")
 
     -- add options
-    add_options("info", "float", "wchar", "exception", "force-utf8")
+    add_options("info", "float", "wchar", "exception", "force-utf8", "deprecated")
 
     -- add modules
     add_options("xml", "zip", "hash", "regex", "coroutine", "object", "charset", "database")
