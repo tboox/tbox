@@ -337,6 +337,8 @@ tb_ltimer_ref_t tb_ltimer_init(tb_size_t grow, tb_size_t tick, tb_bool_t ctime)
         timer->ctime    = ctime;
         timer->tick     = tick;
         timer->btime    = tb_ltimer_now(timer);
+        tb_atomic_init(&timer->stop, 0);
+        tb_atomic_init(&timer->work, 0);
 
         // init lock
         if (!tb_spinlock_init(&timer->lock)) break;

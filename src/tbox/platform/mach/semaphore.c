@@ -62,7 +62,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
         if (KERN_SUCCESS != semaphore_create(mach_task_self(), &(impl->semaphore), SYNC_POLICY_FIFO, init)) break;
 
         // init value
-        impl->value = init;
+        tb_atomic_init(&impl->value, init);
 
         // ok
         ok = tb_true;

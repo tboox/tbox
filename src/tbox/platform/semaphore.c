@@ -47,7 +47,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t value)
     tb_assert_and_check_return_val(semaphore, tb_null);
 
     // init
-    *semaphore = value;
+    tb_atomic_init(semaphore, value);
 
     // ok
     return (tb_semaphore_ref_t)semaphore;

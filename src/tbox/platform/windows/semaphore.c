@@ -68,7 +68,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
         tb_assert_and_check_break(impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE);
 
         // init value
-        impl->value = init;
+        tb_atomic_init(&impl->value, init);
 
         // ok
         ok = tb_true;

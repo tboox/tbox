@@ -53,7 +53,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_ref_t lock)
     tb_assert(lock);
 
     // init 
-    *lock = 0;
+    tb_atomic_init(lock, 0);
 
     // ok
     return tb_true;
@@ -68,8 +68,8 @@ static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_ref_t lock)
     // check
     tb_assert(lock);
 
-    // exit 
-    *lock = 0;
+    // reinit it 
+    tb_atomic_init(lock, 0);
 }
 
 /*! enter spinlock

@@ -225,6 +225,8 @@ tb_timer_ref_t tb_timer_init(tb_size_t grow, tb_bool_t ctime)
         // init timer
         timer->grow         = tb_max(grow, 16);
         timer->ctime        = ctime;
+        tb_atomic_init(&timer->stop, 0);
+        tb_atomic_init(&timer->work, 0);
 
         // init lock
         if (!tb_spinlock_init(&timer->lock)) break;

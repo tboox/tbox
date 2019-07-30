@@ -677,8 +677,8 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
         tb_assert_and_check_break(job);
 
         // init job
-        job->refn   = 1;
-        job->state  = TB_STATE_WAITING;
+        tb_atomic_init(&job->refn, 1);
+        tb_atomic_init(&job->state, TB_STATE_WAITING);
         job->task   = *task;
 
         // non-urgent job? 
