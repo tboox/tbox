@@ -78,10 +78,6 @@
 #   define tb_atomic_set(a, v)                tb_atomic_fetch_and_set(a, v)
 #endif
 
-#ifndef tb_atomic_pset
-#   define tb_atomic_pset(a, p, v)            tb_atomic_fetch_and_pset(a, p, v)
-#endif
-
 #ifndef tb_atomic_fetch_and_sub
 #   define tb_atomic_fetch_and_sub(a, v)      tb_atomic_fetch_and_add(a, -(v))
 #endif

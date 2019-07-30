@@ -51,7 +51,6 @@ __tb_extern_c_enter__
 
 #   define tb_atomic64_get(a)                   tb_atomic_get(a)
 #   define tb_atomic64_set(a, v)                tb_atomic_set(a, v)
-#   define tb_atomic64_pset(a, p, v)            tb_atomic_pset(a, p, v)
 #   define tb_atomic64_fetch_and_set(a, v)      tb_atomic_fetch_and_set(a, v)
 #   define tb_atomic64_fetch_and_pset(a, p, v)  tb_atomic_fetch_and_pset(a, p, v)
 
@@ -101,10 +100,6 @@ __tb_extern_c_enter__
 
 #ifndef tb_atomic64_set
 #   define tb_atomic64_set(a, v)                tb_atomic64_fetch_and_set(a, v)
-#endif
-
-#ifndef tb_atomic64_pset
-#   define tb_atomic64_pset(a, p, v)            tb_atomic64_fetch_and_pset(a, p, v)
 #endif
 
 #ifndef tb_atomic64_fetch_and_sub

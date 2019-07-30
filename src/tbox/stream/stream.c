@@ -600,7 +600,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t self)
     else 
     {
         // closed? killed
-        tb_atomic_pset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
+        tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
     }
 }
 tb_bool_t tb_stream_open(tb_stream_ref_t self)
