@@ -28,7 +28,7 @@
 #include "../atomic.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
+ * macros
  */
 #ifndef tb_atomic_set0
 #   define tb_atomic_set0(a)                  tb_atomic_set(a, 0)
