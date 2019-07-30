@@ -113,7 +113,7 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
         }
 
         // -1
-        tb_atomic_fetch_and_dec(&impl->value);
+        tb_atomic_fetch_and_sub(&impl->value, 1);
     }
 
     // ok
@@ -156,7 +156,7 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&impl->value) > 0, -1);
     
     // value--
-    tb_atomic_fetch_and_dec(&impl->value);
+    tb_atomic_fetch_and_sub(&impl->value, 1);
     
     // ok
     return 1;

@@ -102,7 +102,7 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t self, tb_long_t timeout)
         if (post > 0) 
         {
             // semaphore--
-            tb_atomic_fetch_and_dec(semaphore);
+            tb_atomic_fetch_and_sub(semaphore, 1);
 
             // ok
             r = post;

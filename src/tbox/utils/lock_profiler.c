@@ -195,7 +195,7 @@ tb_void_t tb_lock_profiler_occupied(tb_handle_t handle, tb_pointer_t lock)
         if (lock == (tb_pointer_t)tb_atomic_get(&item->lock))
         {
             // occupied++
-            tb_atomic_fetch_and_inc(&item->size);
+            tb_atomic_fetch_and_add(&item->size, 1);
 
             // ok
             break;

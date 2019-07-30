@@ -42,14 +42,6 @@
 #   define tb_atomic_fetch_and_add(a, v)        tb_atomic_fetch_and_add_windows(a, v)
 #endif
 
-#if !defined(tb_atomic_inc_and_fetch) && !TB_CPU_BIT64
-#   define tb_atomic_inc_and_fetch(a)           tb_atomic_inc_and_fetch_windows(a)
-#endif
-
-#if !defined(tb_atomic_dec_and_fetch) && !TB_CPU_BIT64
-#   define tb_atomic_dec_and_fetch(a)           tb_atomic_dec_and_fetch_windows(a)
-#endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
@@ -74,14 +66,6 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_windows(tb_atomic_t* a, 
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_windows(tb_atomic_t* a, tb_long_t v)
 {
     return (tb_long_t)InterlockedExchangeAdd((LONG __tb_volatile__*)a, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_inc_and_fetch_windows(tb_atomic_t* a)
-{
-    return (tb_long_t)InterlockedIncrement((LONG __tb_volatile__*)a);
-}
-static __tb_inline__ tb_long_t tb_atomic_dec_and_fetch_windows(tb_atomic_t* a)
-{
-    return (tb_long_t)InterlockedDecrement((LONG __tb_volatile__*)a);
 }
 #endif
 

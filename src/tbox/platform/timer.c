@@ -485,7 +485,7 @@ tb_void_t tb_timer_loop(tb_timer_ref_t self)
     tb_assert_and_check_return(timer);
 
     // work++
-    tb_atomic_fetch_and_inc(&timer->work);
+    tb_atomic_fetch_and_add(&timer->work, 1);
 
     // init event 
     tb_spinlock_enter(&timer->lock);
@@ -517,7 +517,7 @@ tb_void_t tb_timer_loop(tb_timer_ref_t self)
     }
 
     // work--
-    tb_atomic_fetch_and_dec(&timer->work);
+    tb_atomic_fetch_and_sub(&timer->work, 1);
 }
 tb_timer_task_ref_t tb_timer_task_init(tb_timer_ref_t self, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {

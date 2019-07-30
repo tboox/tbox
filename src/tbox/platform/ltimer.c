@@ -580,7 +580,7 @@ tb_void_t tb_ltimer_loop(tb_ltimer_ref_t self)
     tb_assert_and_check_return(timer);
 
     // work++
-    tb_atomic_fetch_and_inc(&timer->work);
+    tb_atomic_fetch_and_add(&timer->work, 1);
 
     // loop
     while (!tb_atomic_get(&timer->stop))
@@ -600,7 +600,7 @@ tb_void_t tb_ltimer_loop(tb_ltimer_ref_t self)
     }
 
     // work--
-    tb_atomic_fetch_and_dec(&timer->work);
+    tb_atomic_fetch_and_sub(&timer->work, 1);
 }
 tb_ltimer_task_ref_t tb_ltimer_task_init(tb_ltimer_ref_t self, tb_size_t delay, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_cpointer_t priv)
 {

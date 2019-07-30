@@ -55,21 +55,11 @@ __tb_extern_c_enter__
 #   define tb_atomic64_fetch_and_set(a, v)      tb_atomic_fetch_and_set(a, v)
 #   define tb_atomic64_fetch_and_pset(a, p, v)  tb_atomic_fetch_and_pset(a, p, v)
 
-#   define tb_atomic64_fetch_and_inc(a)         tb_atomic_fetch_and_inc(a)
-#   define tb_atomic64_fetch_and_dec(a)         tb_atomic_fetch_and_dec(a)
 #   define tb_atomic64_fetch_and_add(a, v)      tb_atomic_fetch_and_add(a, v)
 #   define tb_atomic64_fetch_and_sub(a, v)      tb_atomic_fetch_and_sub(a, v)
 #   define tb_atomic64_fetch_and_or(a, v)       tb_atomic_fetch_and_or(a, v)
 #   define tb_atomic64_fetch_and_xor(a, v)      tb_atomic_fetch_and_xor(a, v)
 #   define tb_atomic64_fetch_and_and(a, v)      tb_atomic_fetch_and_and(a, v)
-
-#   define tb_atomic64_inc_and_fetch(a)         tb_atomic_inc_and_fetch(a)
-#   define tb_atomic64_dec_and_fetch(a)         tb_atomic_dec_and_fetch(a)
-#   define tb_atomic64_add_and_fetch(a, v)      tb_atomic_add_and_fetch(a, v)
-#   define tb_atomic64_sub_and_fetch(a, v)      tb_atomic_sub_and_fetch(a, v)
-#   define tb_atomic64_or_and_fetch(a, v)       tb_atomic_or_and_fetch(a, v)
-#   define tb_atomic64_xor_and_fetch(a, v)      tb_atomic_xor_and_fetch(a, v)
-#   define tb_atomic64_and_and_fetch(a, v)      tb_atomic_and_and_fetch(a, v)
 
 #endif
 
@@ -117,44 +107,8 @@ __tb_extern_c_enter__
 #   define tb_atomic64_fetch_and_set0(a)        tb_atomic64_fetch_and_set(a, 0)
 #endif
 
-#ifndef tb_atomic64_fetch_and_inc
-#   define tb_atomic64_fetch_and_inc(a)         tb_atomic64_fetch_and_add(a, 1)
-#endif
-
-#ifndef tb_atomic64_fetch_and_dec
-#   define tb_atomic64_fetch_and_dec(a)         tb_atomic64_fetch_and_add(a, -1)
-#endif
-
 #ifndef tb_atomic64_fetch_and_sub
 #   define tb_atomic64_fetch_and_sub(a, v)      tb_atomic64_fetch_and_add(a, -(v))
-#endif
-
-#ifndef tb_atomic64_add_and_fetch
-#   define tb_atomic64_add_and_fetch(a, v)      (tb_atomic64_fetch_and_add(a, v) + (v))
-#endif
-
-#ifndef tb_atomic64_inc_and_fetch
-#   define tb_atomic64_inc_and_fetch(a)         tb_atomic64_add_and_fetch(a, 1)
-#endif
-
-#ifndef tb_atomic64_dec_and_fetch
-#   define tb_atomic64_dec_and_fetch(a)         tb_atomic64_add_and_fetch(a, -1)
-#endif
-
-#ifndef tb_atomic64_sub_and_fetch
-#   define tb_atomic64_sub_and_fetch(a, v)      tb_atomic64_add_and_fetch(a, -(v))
-#endif
-
-#ifndef tb_atomic64_or_and_fetch
-#   define tb_atomic64_or_and_fetch(a, v)       (tb_atomic64_fetch_and_or(a, v) | (v))
-#endif
-
-#ifndef tb_atomic64_xor_and_fetch
-#   define tb_atomic64_xor_and_fetch(a, v)      (tb_atomic64_fetch_and_xor(a, v) ^ (v))
-#endif
-
-#ifndef tb_atomic64_and_and_fetch
-#   define tb_atomic64_and_and_fetch(a, v)      (tb_atomic64_fetch_and_and(a, v) & (v))
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
