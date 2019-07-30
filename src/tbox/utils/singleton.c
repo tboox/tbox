@@ -113,7 +113,7 @@ tb_void_t tb_singleton_exit()
         if (g_singletons[i].exit) 
         {
             // the instance
-            tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_set0(&g_singletons[i].instance);
+            tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_set(&g_singletons[i].instance, 0);
             if (instance && instance != (tb_handle_t)1) 
             {
                 // trace
