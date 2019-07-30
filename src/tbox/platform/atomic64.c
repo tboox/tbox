@@ -82,8 +82,11 @@ static __tb_inline_force__ tb_spinlock_ref_t tb_atomic64_lock(tb_atomic64_t* a)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
+tb_bool_t tb_atomic64_compare_and_set_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
 {
+    // check
+    tb_assert(a && p);
+
     // the lock
     tb_spinlock_ref_t lock = tb_atomic64_lock(a);
 
@@ -91,76 +94,19 @@ tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_h
     tb_spinlock_enter(lock);
 
     // set value
-    tb_hong_t o = (tb_hong_t)*a; if (o == p) *a = (tb_atomic64_t)v;
+    tb_bool_t ok = tb_false;
+    tb_atomic64_t o = *a;
+    if (o == *p) 
+    {
+        *a = v;
+        ok = tb_true;
+    }
+    else *p = o;
 
     // leave
     tb_spinlock_leave(lock);
 
     // ok?
-    return o;
+    return ok;
 }
-tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // done
-    tb_hong_t o;
-    do
-    {
-        o = *a;
 
-    } while (tb_atomic64_fetch_and_pset(a, o, v) != o);
-
-    // ok
-    return o;
-}
-tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // done
-    tb_hong_t o;
-    do
-    {
-        o = *a;
-
-    } while (tb_atomic64_fetch_and_pset(a, o, o + v) != o);
-
-    // ok
-    return o;
-}
-tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // done
-    tb_hong_t o;
-    do
-    {
-        o = *a;
-
-    } while (tb_atomic64_fetch_and_pset(a, o, o ^ v) != o);
-
-    // ok
-    return o;
-}
-tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // done
-    tb_hong_t o;
-    do
-    {
-        o = *a;
-
-    } while (tb_atomic64_fetch_and_pset(a, o, o & v) != o);
-
-    // ok
-    return o;
-}
-tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-    // done
-    tb_hong_t o;
-    do
-    {
-        o = *a;
-
-    } while (tb_atomic64_fetch_and_pset(a, o, o | v) != o);
-
-    // ok
-    return o;
-}

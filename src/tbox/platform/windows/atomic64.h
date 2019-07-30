@@ -35,37 +35,37 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#if !defined(tb_atomic64_fetch_and_pset)
-#   define tb_atomic64_fetch_and_pset(a, p, v)      tb_atomic64_fetch_and_pset_windows(a, p, v)
+#if !defined(tb_atomic64_compare_set)
+#   define tb_atomic64_compare_set(a, p, v)      tb_atomic64_compare_and_set_windows(a, p, v)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
+tb_bool_t tb_atomic64_compare_and_set_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
+ * inline implementation
  */
 
-/* fetch and set the 64bits value if old_value == p
- *
- * @param a                     the atomic value
- * @param p                     the compared value
- * @param v                     the assigned value
- *
- * @return                      the old value
- */
-static __tb_inline__ tb_hong_t  tb_atomic64_fetch_and_pset_windows(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_windows(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
 {
+    // check
+    tb_assert(a && p);
+
     // the InterlockedCompareExchange64 func
     tb_kernel32_InterlockedCompareExchange64_t pInterlockedCompareExchange64 = tb_kernel32()->InterlockedCompareExchange64;
 
     // done
-    if (pInterlockedCompareExchange64) return (tb_hong_t)pInterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
+    if (pInterlockedCompareExchange64) 
+    {
+        tb_hong_t e = *p;
+        *p = (tb_long_t)pInterlockedCompareExchange64((LONG __tb_volatile__*)a, v, e);
+        return *p == e;
+    }
 
     // using the generic implementation
-    return tb_atomic64_fetch_and_pset_generic(a, p, v);
+    return tb_atomic64_compare_and_set_generic(a, p, v);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
