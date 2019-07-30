@@ -36,8 +36,8 @@
 #   define tb_atomic_fetch_and_set(a, v)        tb_atomic_fetch_and_set_x86(a, v)
 #endif
 
-#ifndef tb_atomic_fetch_and_pset
-#   define tb_atomic_fetch_and_pset(a, p, v)    tb_atomic_fetch_and_pset_x86(a, p, v)
+#ifndef tb_atomic_compare_and_set
+#   define tb_atomic_compare_and_set(a, p, v)   tb_atomic_compare_and_set_x86(a, p, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_add
@@ -49,6 +49,9 @@
  */
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_long_t v)
 {
+    // check
+    tb_assert(a);
+
     __tb_asm__ __tb_volatile__ 
     (
 #if TB_CPU_BITSIZE == 64
@@ -64,8 +67,11 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_lo
 
     return v;
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_long_t p, tb_long_t v)
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_x86(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
 {
+    // check
+    tb_assert(a && p);
+
     /*
      * cmpxchgl v, [a]:
      *
@@ -82,6 +88,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_l
      *
      */
     tb_long_t o;
+    tb_long_t e = *p;
     __tb_asm__ __tb_volatile__ 
     (
 #if TB_CPU_BITSIZE == 64
@@ -91,14 +98,17 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_l
 #endif
 
         : "=a" (o) 
-        : "m" (*a), "a" (p), "r" (v) 
+        : "m" (*a), "a" (e), "r" (v) 
         : "cc", "memory"                //!< "cc" means that flags were changed.
     );
-
-    return o;
+    *p = o;
+    return o == e;
 }
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_x86(tb_atomic_t* a, tb_long_t v)
 {
+    // check
+    tb_assert(a);
+
     /*
      * xaddl v, [a]:
      *

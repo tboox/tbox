@@ -34,8 +34,8 @@
 #   define tb_atomic_fetch_and_set(a, v)        tb_atomic_fetch_and_set_windows(a, v)
 #endif
 
-#if !defined(tb_atomic_fetch_and_pset)
-#   define tb_atomic_fetch_and_pset(a, p, v)    tb_atomic_fetch_and_pset_windows(a, p, v)
+#if !defined(tb_atomic_compare_and_set)
+#   define tb_atomic_compare_and_set(a, p, v)   tb_atomic_compare_and_set_windows(a, p, v)
 #endif
 
 #if !defined(tb_atomic_fetch_and_add) && !TB_CPU_BIT64
@@ -49,19 +49,24 @@
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_windows(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
     // check
+    tb_assert(a && p);
     tb_assert_static(sizeof(tb_atomic_t) == sizeof(LONGLONG));
 
-    // done
-    return (tb_long_t)InterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, p);
+    tb_long_t e = *p;
+    *p = (tb_long_t)InterlockedCompareExchange64((LONG __tb_volatile__*)a, v, e);
+    return *p == e;
 }
 #else
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_windows(tb_atomic_t* a, tb_long_t v)
 {
     return (tb_long_t)InterlockedExchange((LONG __tb_volatile__*)a, v);
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_windows(tb_atomic_t* a, tb_long_t p, tb_long_t v)
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_windows(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
 {
-    return (tb_long_t)InterlockedCompareExchange((LONG __tb_volatile__*)a, v, p);
+    tb_assert(a && p);
+    tb_long_t e = *p;
+    *p = (tb_long_t)InterlockedCompareExchange((LONG __tb_volatile__*)a, v, e);
+    return *p == e;
 }
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_windows(tb_atomic_t* a, tb_long_t v)
 {

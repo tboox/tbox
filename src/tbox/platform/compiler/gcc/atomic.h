@@ -31,8 +31,7 @@
  * macros
  */
 
-#define tb_atomic_fetch_and_set(a, v)       tb_atomic_fetch_and_set_sync(a, v)
-#define tb_atomic_fetch_and_pset(a, p, v)   tb_atomic_fetch_and_pset_sync(a, p, v)
+#define tb_atomic_compare_and_set(a, p, v)  tb_atomic_compare_and_set_sync(a, p, v)
 
 #define tb_atomic_fetch_and_add(a, v)       tb_atomic_fetch_and_add_sync(a, v)
 #define tb_atomic_fetch_and_sub(a, v)       tb_atomic_fetch_and_sub_sync(a, v)
@@ -47,13 +46,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_sync(tb_atomic_t* a, tb_long_t v)
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_sync(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
 {
-    return __sync_lock_test_and_set(a, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_sync(tb_atomic_t* a, tb_long_t p, tb_long_t v)
-{
-    return __sync_val_compare_and_swap(a, p, v);
+    tb_assert(a && p);
+    tb_long_t e = *p;
+    *p = __sync_val_compare_and_swap(a, e, v);
+    return *p == e;
 }
 static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_sync(tb_atomic_t* a, tb_long_t v)
 {

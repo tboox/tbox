@@ -88,7 +88,7 @@
  * - fail	    the memory synchronization ordering for the load operation if the comparison fails. Cannot be memory_order_release or memory_order_acq_rel and cannot specify stronger ordering than succ
  */
 #ifndef tb_atomic_compare_and_set_weak
-#   define tb_atomic_compare_and_set_weak(a, p, v)      tb_atomic_compare_and_set_generic(a, p, v)
+#   define tb_atomic_compare_and_set_weak(a, p, v)      tb_atomic_compare_and_set(a, p, v)
 #endif
 
 // @deprecated
