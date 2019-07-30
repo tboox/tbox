@@ -60,5 +60,6 @@
 #include "environment.h"
 #include "thread_pool.h"
 #include "thread_local.h"
+#include "memory_barrier.h"
 
 #endif
