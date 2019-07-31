@@ -41,15 +41,27 @@
 
 #define tb_atomic_init(a, v)                        atomic_init(a, v)
 #define tb_atomic_get(a)                            atomic_load(a)
+#define tb_atomic_get_explicit(a, mo)               atomic_load_explicit(a, mo)
 #define tb_atomic_set(a, v)                         atomic_store(a, v)
+#define tb_atomic_set_explicit(a, v, mo)            atomic_store_explicit(a, v, mo)
 #define tb_atomic_compare_and_set(a, p, v)          atomic_compare_exchange_strong(a, p, v)
+#define tb_atomic_compare_and_set_explicit(a, p, v, succ, fail) \
+                                                    atomic_compare_exchange_strong_explicit(a, p, v, succ, fail)
 #define tb_atomic_compare_and_set_weak(a, p, v)     atomic_compare_exchange_weak(a, p, v)
+#define tb_atomic_compare_and_set_weak_explicit(a, p, v, succ, fail) \
+                                                    atomic_compare_exchange_weak_explicit(a, p, v, succ, fail)
 #define tb_atomic_fetch_and_set(a, v)               atomic_exchange(a, v)
+#define tb_atomic_fetch_and_set_explicit(a, v, mo)  atomic_exchange_explicit(a, v, mo)
 #define tb_atomic_fetch_and_add(a, v)               atomic_fetch_add(a, v)
+#define tb_atomic_fetch_and_add_explicit(a, v, mo)  atomic_fetch_add_explicit(a, v, mo)
 #define tb_atomic_fetch_and_sub(a, v)               atomic_fetch_sub(a, v)
+#define tb_atomic_fetch_and_sub_explicit(a, v, mo)  atomic_fetch_sub_explicit(a, v, mo)
 #define tb_atomic_fetch_and_or(a, v)                atomic_fetch_or(a, v)
+#define tb_atomic_fetch_and_or_explicit(a, v, mo)   atomic_fetch_or_explicit(a, v, mo)
 #define tb_atomic_fetch_and_and(a, v)               atomic_fetch_and(a, v)
+#define tb_atomic_fetch_and_and_explicit(a, v, mo)  atomic_fetch_and_explicit(a, v, mo)
 #define tb_atomic_fetch_and_xor(a, v)               atomic_fetch_xor(a, v)
+#define tb_atomic_fetch_and_xor_explicit(a, v, mo)  atomic_fetch_xor_explicit(a, v, mo)
 #define tb_memory_barrier()                         atomic_thread_fence(memory_order_seq_cst)
 
 

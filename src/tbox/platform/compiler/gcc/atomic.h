@@ -42,15 +42,27 @@
 
 #   define tb_atomic_init(a, v)                         tb_atomic_set_explicit_gcc(a, v, __ATOMIC_RELAXED)
 #   define tb_atomic_get(a)                             tb_atomic_get_explicit_gcc(a, __ATOMIC_SEQ_CST)
+#   define tb_atomic_get_explicit(a, mo)                tb_atomic_get_explicit_gcc(a, mo)
 #   define tb_atomic_set(a, v)                          tb_atomic_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_set_explicit(a, v, mo)             tb_atomic_set_explicit_gcc(a, v, mo)
 #   define tb_atomic_compare_and_set(a, p, v)           tb_atomic_compare_and_set_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic_compare_and_set_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic_compare_and_set_explicit_gcc(a, p, v, succ, fail)
 #   define tb_atomic_compare_and_set_weak(a, p, v)      tb_atomic_compare_and_set_weak_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic_compare_and_set_weak_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic_compare_and_set_weak_explicit_gcc(a, p, v, succ, fail)
 #   define tb_atomic_fetch_and_set(a, v)                tb_atomic_fetch_and_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_set_explicit(a, v, mo)   tb_atomic_fetch_and_set_explicit_gcc(a, v, mo)
 #   define tb_atomic_fetch_and_add(a, v)                __atomic_fetch_add(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_add_explicit(a, v, mo)   __atomic_fetch_add(a, v, mo)
 #   define tb_atomic_fetch_and_sub(a, v)                __atomic_fetch_sub(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_sub_explicit(a, v, mo)   __atomic_fetch_sub(a, v, mo)
 #   define tb_atomic_fetch_and_or(a, v)                 __atomic_fetch_or(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_or_explicit(a, v, mo)    __atomic_fetch_or(a, v, mo)
 #   define tb_atomic_fetch_and_and(a, v)                __atomic_fetch_and(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_and_explicit(a, v, mo)   __atomic_fetch_and(a, v, mo)
 #   define tb_atomic_fetch_and_xor(a, v)                __atomic_fetch_xor(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_xor_explicit(a, v, mo)   __atomic_fetch_xor(a, v, mo)
 #   define tb_memory_barrier()                          __atomic_thread_fence(__ATOMIC_SEQ_CST)
 
 #else
