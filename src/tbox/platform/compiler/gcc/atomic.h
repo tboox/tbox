@@ -33,6 +33,13 @@
 
 #ifdef __ATOMIC_SEQ_CST
 
+#   define TB_ATOMIC_RELAXED                            __ATOMIC_RELAXED
+#   define TB_ATOMIC_CONSUME                            __ATOMIC_CONSUME
+#   define TB_ATOMIC_ACQUIRE                            __ATOMIC_ACQUIRE
+#   define TB_ATOMIC_RELEASE                            __ATOMIC_RELEASE
+#   define TB_ATOMIC_ACQ_REL                            __ATOMIC_ACQ_REL
+#   define TB_ATOMIC_SEQ_CST                            __ATOMIC_SEQ_CST
+
 #   define tb_atomic_init(a, v)                         tb_atomic_set_explicit_gcc(a, v, __ATOMIC_RELAXED)
 #   define tb_atomic_get(a)                             tb_atomic_get_explicit_gcc(a, __ATOMIC_SEQ_CST)
 #   define tb_atomic_set(a, v)                          tb_atomic_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)

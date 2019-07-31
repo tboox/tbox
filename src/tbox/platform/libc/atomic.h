@@ -32,6 +32,13 @@
  * macros
  */
 
+#define TB_ATOMIC_RELAXED                           memory_order_relaxed
+#define TB_ATOMIC_CONSUME                           memory_order_consume
+#define TB_ATOMIC_ACQUIRE                           memory_order_acquire
+#define TB_ATOMIC_RELEASE                           memory_order_release
+#define TB_ATOMIC_ACQ_REL                           memory_order_acq_rel
+#define TB_ATOMIC_SEQ_CST                           memory_order_seq_cst
+
 #define tb_atomic_init(a, v)                        atomic_init(a, v)
 #define tb_atomic_get(a)                            atomic_load(a)
 #define tb_atomic_set(a, v)                         atomic_store(a, v)

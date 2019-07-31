@@ -40,6 +40,36 @@
  * macros
  */
 
+// no barriers or synchronization. 
+#ifndef TB_ATOMIC_RELAXED
+#   define TB_ATOMIC_RELAXED        (1)
+#endif
+
+// data dependency only for both barrier and synchronization with another thread. 
+#ifndef TB_ATOMIC_CONSUME
+#   define TB_ATOMIC_CONSUME        (2)
+#endif
+
+// barrier to hoisting of code and synchronizes with release (or stronger) semantic stores from another thread. 
+#ifndef TB_ATOMIC_ACQUIRE
+#   define TB_ATOMIC_ACQUIRE        (3)
+#endif
+
+// barrier to sinking of code and synchronizes with acquire (or stronger) semantic loads from another thread. 
+#ifndef TB_ATOMIC_RELEASE
+#   define TB_ATOMIC_RELEASE        (4)
+#endif
+
+// full barrier in both directions and synchronizes with acquire loads and release stores in another thread. 
+#ifndef TB_ATOMIC_ACQ_REL
+#   define TB_ATOMIC_ACQ_REL        (5)
+#endif
+
+// full barrier in both directions and synchronizes with acquire loads and release stores in all threads.
+#ifndef TB_ATOMIC_SEQ_CST
+#   define TB_ATOMIC_SEQ_CST        (6)
+#endif
+
 // memory barrier (full barrier)
 #ifndef tb_memory_barrier
 #   define tb_memory_barrier()         
