@@ -36,7 +36,7 @@
 #endif
 
 #ifndef tb_atomic64_fetch_and_pset
-#   define tb_atomic64_fetch_and_pset(a, p, v)  tb_atomic64_fetch_and_pset_generic(a, p, v)
+#   define tb_atomic64_fetch_and_pset(a, p, v)  tb_atomic64_fetch_and_cmpset(a, p, v)
 #endif
 
 #ifndef tb_atomic64_pset
@@ -82,14 +82,5 @@
 #ifndef tb_atomic64_and_and_fetch
 #   define tb_atomic64_and_and_fetch(a, v)      (tb_atomic64_fetch_and_and(a, v) & (v))
 #endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * inline interfaces
- */
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
-{
-    tb_atomic64_compare_and_set(a, &p, v);
-    return p;
-}
 
 #endif

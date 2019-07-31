@@ -95,12 +95,10 @@ tb_handle_t tb_lock_profiler()
 }
 tb_handle_t tb_lock_profiler_init()
 {
-    // init profiler
     return (tb_handle_t)tb_native_memory_malloc0(sizeof(tb_lock_profiler_t));
 }
 tb_void_t tb_lock_profiler_exit(tb_handle_t handle)
 {
-    // exit profiler
     if (handle) tb_native_memory_free(handle);
 }
 tb_void_t tb_lock_profiler_dump(tb_handle_t handle)
@@ -152,7 +150,8 @@ tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_ch
         tb_lock_profiler_item_t* item = &profiler->list[addr & (TB_LOCK_PROFILER_MAXN - 1)];
 
         // try to register the lock
-        if (!tb_atomic_fetch_and_pset(&item->lock, 0, (tb_long_t)lock))
+        tb_long_t zero = 0;
+        if (tb_atomic_compare_and_set(&item->lock, &zero, (tb_long_t)lock))
         {
             // init name
             tb_atomic_set(&item->name, (tb_long_t)name);

@@ -34,6 +34,10 @@
 #   define tb_atomic_set0(a)                  tb_atomic_set(a, 0)
 #endif
 
+#ifndef tb_atomic_fetch_and_pset
+#   define tb_atomic_fetch_and_pset(a, p, v)  tb_atomic_fetch_and_cmpset(a, p, v)
+#endif
+
 #ifndef tb_atomic_fetch_and_set0
 #   define tb_atomic_fetch_and_set0(a)        tb_atomic_fetch_and_set(a, 0)
 #endif

@@ -115,6 +115,10 @@ __tb_extern_c_enter__
 #   define tb_atomic64_compare_and_set_weak(a, p, v)        tb_atomic64_compare_and_set(a, p, v)
 #endif
 
+#ifndef tb_atomic64_fetch_and_cmpset
+#   define tb_atomic64_fetch_and_cmpset(a, p, v)            tb_atomic64_fetch_and_cmpset_generic(a, p, v)
+#endif
+
 #ifndef tb_atomic64_fetch_and_set
 #   define tb_atomic64_fetch_and_set(a, v)                  tb_atomic64_fetch_and_set_generic(a, v)
 #endif
@@ -150,11 +154,15 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline interfaces
  */
-
 static __tb_inline__ tb_hong_t tb_atomic64_get_generic(tb_atomic64_t* a)
 {
     tb_hong_t p = 0;
     tb_atomic64_compare_and_set(a, &p, 0);
+    return p;
+}
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_cmpset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
+{
+    tb_atomic64_compare_and_set(a, &p, v);
     return p;
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v)

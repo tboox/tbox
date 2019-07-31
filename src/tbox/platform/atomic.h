@@ -91,9 +91,8 @@
 #   define tb_atomic_compare_and_set_weak(a, p, v)      tb_atomic_compare_and_set(a, p, v)
 #endif
 
-// @deprecated
-#ifndef tb_atomic_fetch_and_pset
-#   define tb_atomic_fetch_and_pset(a, p, v)            tb_atomic_fetch_and_pset_generic(a, p, v)
+#ifndef tb_atomic_fetch_and_cmpset
+#   define tb_atomic_fetch_and_cmpset(a, p, v)          tb_atomic_fetch_and_cmpset_generic(a, p, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_set
@@ -148,7 +147,7 @@ static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_generic(tb_atomic_t* a,
         return tb_false;
     }
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_generic(tb_atomic_t* a, tb_long_t p, tb_long_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_cmpset_generic(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
     tb_atomic_compare_and_set(a, &p, v);
     return p;
