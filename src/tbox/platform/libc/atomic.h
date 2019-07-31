@@ -26,61 +26,23 @@
  * includes
  */
 #include "prefix.h"
+#include <stdatomic.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
 
-#define tb_atomic_compare_and_set(a, p, v)  tb_atomic_compare_and_set_sync(a, p, v)
-#define tb_atomic_fetch_and_cmpset(a, p, v) tb_atomic_fetch_and_cmpset_sync(a, p, v)
-
-#define tb_atomic_fetch_and_add(a, v)       tb_atomic_fetch_and_add_sync(a, v)
-#define tb_atomic_fetch_and_sub(a, v)       tb_atomic_fetch_and_sub_sync(a, v)
-#define tb_atomic_fetch_and_or(a, v)        tb_atomic_fetch_and_or_sync(a, v)
-#define tb_atomic_fetch_and_and(a, v)       tb_atomic_fetch_and_and_sync(a, v)
-
-// FIXME: ios armv6: no defined refernece?
-#if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
-#   define tb_atomic_fetch_and_xor(a, v)    tb_atomic_fetch_and_xor_sync(a, v)
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
- */
-static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_sync(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
-{
-    tb_assert(a && p);
-    tb_long_t e = *p;
-    *p = __sync_val_compare_and_swap(a, e, v);
-    return *p == e;
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_cmpset_sync(tb_atomic_t* a, tb_long_t p, tb_long_t v)
-{
-    tb_assert(a);
-    return __sync_val_compare_and_swap(a, p, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_add(a, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_sub_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_sub(a, v);
-}
-#if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_xor_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_xor(a, v);
-}
-#endif
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_and_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_and(a, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_or_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_or(a, v);
-}
+#define tb_atomic_init(a, v)                        atomic_init(a, v)
+#define tb_atomic_get(a)                            atomic_load(a)
+#define tb_atomic_set(a, v)                         atomic_store(a, v)
+#define tb_atomic_compare_and_set(a, p, v)          atomic_compare_exchange_strong(a, p, v)
+#define tb_atomic_compare_and_set_weak(a, p, v)     atomic_compare_exchange_weak(a, p, v)
+#define tb_atomic_fetch_and_set(a, v)               atomic_exchange(a, v)
+#define tb_atomic_fetch_and_add(a, v)               atomic_fetch_add(a, v)
+#define tb_atomic_fetch_and_sub(a, v)               atomic_fetch_sub(a, v)
+#define tb_atomic_fetch_and_or(a, v)                atomic_fetch_or(a, v)
+#define tb_atomic_fetch_and_and(a, v)               atomic_fetch_and(a, v)
+#define tb_atomic_fetch_and_xor(a, v)               atomic_fetch_xor(a, v)
 
 
 #endif
