@@ -28,7 +28,9 @@
 #include "prefix.h"
 #include "atomic.h"
 #if !TB_CPU_BIT64
-#   if defined(TB_CONFIG_OS_WINDOWS)
+#   if __tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)
+#       include "libc/atomic64.h"
+#   elif defined(TB_CONFIG_OS_WINDOWS)
 #       include "windows/atomic64.h"
 #   elif defined(TB_COMPILER_IS_GCC) \
         && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8) && __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
@@ -140,7 +142,7 @@ __tb_extern_c_enter__
 #endif
 
 #ifndef tb_atomic64_get
-#   define tb_atomic64_get(a)                               tb_atomic64_get_generic(a)
+#   define tb_atomic64_get(a)                               tb_atomic64_fetch_and_cmpset(a, 0, 0)
 #endif
 
 #ifndef tb_atomic64_set
@@ -158,12 +160,6 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline interfaces
  */
-static __tb_inline__ tb_hong_t tb_atomic64_get_generic(tb_atomic64_t* a)
-{
-    tb_hong_t p = 0;
-    tb_atomic64_compare_and_set(a, &p, 0);
-    return p;
-}
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_cmpset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
     tb_atomic64_compare_and_set(a, &p, v);
