@@ -31,58 +31,80 @@
  * macros
  */
 
-#define tb_atomic_compare_and_set(a, p, v)  tb_atomic_compare_and_set_sync(a, p, v)
-#define tb_atomic_fetch_and_cmpset(a, p, v) tb_atomic_fetch_and_cmpset_sync(a, p, v)
+#ifdef __ATOMIC_SEQ_CST
 
-#define tb_atomic_fetch_and_add(a, v)       tb_atomic_fetch_and_add_sync(a, v)
-#define tb_atomic_fetch_and_sub(a, v)       tb_atomic_fetch_and_sub_sync(a, v)
-#define tb_atomic_fetch_and_or(a, v)        tb_atomic_fetch_and_or_sync(a, v)
-#define tb_atomic_fetch_and_and(a, v)       tb_atomic_fetch_and_and_sync(a, v)
+#   define tb_atomic_init(a, v)                         tb_atomic_set_explicit_gcc(a, v, __ATOMIC_RELAXED)
+#   define tb_atomic_get(a)                             tb_atomic_get_explicit_gcc(a, __ATOMIC_SEQ_CST)
+#   define tb_atomic_set(a, v)                          tb_atomic_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_compare_and_set(a, p, v)           tb_atomic_compare_and_set_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic_compare_and_set_weak(a, p, v)      tb_atomic_compare_and_set_weak_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_set(a, v)                tb_atomic_fetch_and_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_add(a, v)                __atomic_fetch_add(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_sub(a, v)                __atomic_fetch_sub(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_or(a, v)                 __atomic_fetch_or(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_and(a, v)                __atomic_fetch_and(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic_fetch_and_xor(a, v)                __atomic_fetch_xor(a, v, __ATOMIC_SEQ_CST)
+#   define tb_memory_barrier()                          __atomic_thread_fence(__ATOMIC_SEQ_CST)
+
+#else
+
+#   define tb_atomic_compare_and_set(a, p, v)           tb_atomic_compare_and_set_gcc(a, p, v)
+#   define tb_atomic_fetch_and_cmpset(a, p, v)          __sync_val_compare_and_swap(a, p, v)
+
+#   define tb_atomic_fetch_and_add(a, v)                __sync_fetch_and_add(a, v)
+#   define tb_atomic_fetch_and_sub(a, v)                __sync_fetch_and_sub(a, v)
+#   define tb_atomic_fetch_and_or(a, v)                 __sync_fetch_and_or(a, v)
+#   define tb_atomic_fetch_and_and(a, v)                __sync_fetch_and_and(a, v)
 
 // FIXME: ios armv6: no defined refernece?
-#if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
-#   define tb_atomic_fetch_and_xor(a, v)    tb_atomic_fetch_and_xor_sync(a, v)
+#   if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
+#       define tb_atomic_fetch_and_xor(a, v)            __sync_fetch_and_xor(a, v)
+#   endif
+
+#   define tb_memory_barrier()                          __sync_synchronize()
 #endif
 
-#define tb_memory_barrier()                 __sync_synchronize()
-
 /* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
+ * inline implementation
  */
-static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_sync(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
+#ifdef __ATOMIC_SEQ_CST
+static __tb_inline__ tb_long_t tb_atomic_get_explicit_gcc(tb_atomic_t* a, tb_size_t mo)
+{
+    tb_assert(a);
+    tb_long_t t;
+    __atomic_load(a, &t, mo);
+    return t;
+}
+static __tb_inline__ tb_void_t tb_atomic_set_explicit_gcc(tb_atomic_t* a, tb_long_t v, tb_size_t mo)
+{
+    tb_assert(a);
+    __atomic_store(a, &v, mo);
+}
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_explicit_gcc(tb_atomic_t* a, tb_long_t* p, tb_long_t v, tb_size_t succ, tb_size_t fail)
+{
+    tb_assert(a);
+    return __atomic_compare_exchange(a, p, &v, 0, succ, fail);	
+}
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_weak_explicit_gcc(tb_atomic_t* a, tb_long_t* p, tb_long_t v, tb_size_t succ, tb_size_t fail)
+{
+    tb_assert(a);
+    return __atomic_compare_exchange(a, p, &v, 1, succ, fail);	
+}
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_explicit_gcc(tb_atomic_t* a, tb_long_t v, tb_size_t mo)
+{
+    tb_assert(a);
+    tb_long_t o;
+    __atomic_exchange(a, &v, &o, mo);	
+    return o;
+}
+#else
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_gcc(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
 {
     tb_assert(a && p);
     tb_long_t e = *p;
     *p = __sync_val_compare_and_swap(a, e, v);
     return *p == e;
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_cmpset_sync(tb_atomic_t* a, tb_long_t p, tb_long_t v)
-{
-    tb_assert(a);
-    return __sync_val_compare_and_swap(a, p, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_add(a, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_sub_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_sub(a, v);
-}
-#if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_xor_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_xor(a, v);
-}
 #endif
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_and_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_and(a, v);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_or_sync(tb_atomic_t* a, tb_long_t v)
-{
-    return __sync_fetch_and_or(a, v);
-}
-
 
 #endif
