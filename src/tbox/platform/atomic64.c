@@ -82,7 +82,7 @@ static __tb_inline_force__ tb_spinlock_ref_t tb_atomic64_lock(tb_atomic64_t* a)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_atomic64_compare_and_set_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
+tb_bool_t tb_atomic64_compare_and_set_explicit_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
 {
     // check
     tb_assert(a && p);

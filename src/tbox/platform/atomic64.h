@@ -49,16 +49,26 @@ __tb_extern_c_enter__
 
 #if TB_CPU_BIT64
 
-#   define tb_atomic64_init(a, v)               tb_atomic_init(a, v)
-#   define tb_atomic64_get(a)                   tb_atomic_get(a)
-#   define tb_atomic64_set(a, v)                tb_atomic_set(a, v)
-#   define tb_atomic64_fetch_and_set(a, v)      tb_atomic_fetch_and_set(a, v)
-#   define tb_atomic64_compare_and_set(a, p, v) tb_atomic_compare_and_set(a, p, v)
-#   define tb_atomic64_fetch_and_add(a, v)      tb_atomic_fetch_and_add(a, v)
-#   define tb_atomic64_fetch_and_sub(a, v)      tb_atomic_fetch_and_sub(a, v)
-#   define tb_atomic64_fetch_and_or(a, v)       tb_atomic_fetch_and_or(a, v)
-#   define tb_atomic64_fetch_and_xor(a, v)      tb_atomic_fetch_and_xor(a, v)
-#   define tb_atomic64_fetch_and_and(a, v)      tb_atomic_fetch_and_and(a, v)
+#   define tb_atomic64_init(a, v)                       tb_atomic_init(a, v)
+#   define tb_atomic64_get(a)                           tb_atomic_get(a)
+#   define tb_atomic64_get_explicit(a, mo)              tb_atomic_get_explicit(a, mo)
+#   define tb_atomic64_set(a, v)                        tb_atomic_set(a, v)
+#   define tb_atomic64_set_explicit(a, v, mo)           tb_atomic_set_explicit(a, v, mo)
+#   define tb_atomic64_fetch_and_set(a, v)              tb_atomic_fetch_and_set(a, v)
+#   define tb_atomic64_fetch_and_set_explicit(a, v, mo) tb_atomic_fetch_and_set_explicit(a, v, mo)
+#   define tb_atomic64_compare_and_set(a, p, v)         tb_atomic_compare_and_set(a, p, v)
+#   define tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic_compare_and_set_explicit(a, p, v, succ, fail)
+#   define tb_atomic64_fetch_and_add(a, v)              tb_atomic_fetch_and_add(a, v)
+#   define tb_atomic64_fetch_and_add_explicit(a, v, mo) tb_atomic_fetch_and_add_explicit(a, v, mo)
+#   define tb_atomic64_fetch_and_sub(a, v)              tb_atomic_fetch_and_sub(a, v)
+#   define tb_atomic64_fetch_and_sub_explicit(a, v, mo) tb_atomic_fetch_and_sub_explicit(a, v, mo)
+#   define tb_atomic64_fetch_and_or(a, v)               tb_atomic_fetch_and_or(a, v)
+#   define tb_atomic64_fetch_and_or_explicit(a, v, mo)  tb_atomic_fetch_and_or_explicit(a, v, mo)
+#   define tb_atomic64_fetch_and_xor(a, v)              tb_atomic_fetch_and_xor(a, v)
+#   define tb_atomic64_fetch_and_xor_explicit(a, v, mo) tb_atomic_fetch_and_xor_explicit(a, v, mo)
+#   define tb_atomic64_fetch_and_and(a, v)              tb_atomic_fetch_and_and(a, v)
+#   define tb_atomic64_fetch_and_and_explicit(a, v, mo) tb_atomic_fetch_and_and_explicit(a, v, mo)
 
 #endif
 
@@ -94,8 +104,12 @@ __tb_extern_c_enter__
  *   }
  * @endcode
  */
+#ifndef tb_atomic64_compare_and_set_explicit
+#   define tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_compare_and_set_explicit_generic(a, p, v, succ, fail)
+#endif
 #ifndef tb_atomic64_compare_and_set
-#   define tb_atomic64_compare_and_set(a, p, v)             tb_atomic64_compare_and_set_generic(a, p, v)
+#   define tb_atomic64_compare_and_set(a, p, v)             tb_atomic64_compare_and_set_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
 #endif
 
 /*! like tb_atomic_compare_and_set(), but it's allowed to fail spuriously, that is, act as if *obj != *p even if they are equal. 
@@ -111,44 +125,85 @@ __tb_extern_c_enter__
  * - succ	    the memory synchronization ordering for the read-modify-write operation if the comparison succeeds. All values are permitted.
  * - fail	    the memory synchronization ordering for the load operation if the comparison fails. Cannot be memory_order_release or memory_order_acq_rel and cannot specify stronger ordering than succ
  */
+#ifndef tb_atomic64_compare_and_set_weak_explicit
+#   define tb_atomic64_compare_and_set_weak_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail)
+#endif
 #ifndef tb_atomic64_compare_and_set_weak
-#   define tb_atomic64_compare_and_set_weak(a, p, v)        tb_atomic64_compare_and_set(a, p, v)
+#   define tb_atomic64_compare_and_set_weak(a, p, v)        tb_atomic64_compare_and_set_weak_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
 #endif
 
+/// fetch the atomic value and compare and set value
+#ifndef tb_atomic64_fetch_and_cmpset_explicit
+#   define tb_atomic64_fetch_and_cmpset_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_fetch_and_cmpset_explicit_generic(a, p, v, succ, fail)
+#endif
 #ifndef tb_atomic64_fetch_and_cmpset
-#   define tb_atomic64_fetch_and_cmpset(a, p, v)            tb_atomic64_fetch_and_cmpset_generic(a, p, v)
+#   define tb_atomic64_fetch_and_cmpset(a, p, v)            tb_atomic64_fetch_and_cmpset_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
 #endif
 
+/// fetch the atomic value and set value
+#ifndef tb_atomic64_fetch_and_set_explicit
+#   define tb_atomic64_fetch_and_set_explicit(a, v, mo)     tb_atomic64_fetch_and_set_explicit_generic(a, v, mo)
+#endif
 #ifndef tb_atomic64_fetch_and_set
-#   define tb_atomic64_fetch_and_set(a, v)                  tb_atomic64_fetch_and_set_generic(a, v)
+#   define tb_atomic64_fetch_and_set(a, v)                  tb_atomic64_fetch_and_set_explicit(a, v, TB_ATOMIC_SEQ_CST)
 #endif
 
+/// fetch the atomic value and compute add value
+#ifndef tb_atomic64_fetch_and_add_explicit
+#   define tb_atomic64_fetch_and_add_explicit(a, v, mo)     tb_atomic64_fetch_and_add_explicit_generic(a, v, mo)
+#endif
 #ifndef tb_atomic64_fetch_and_add
-#   define tb_atomic64_fetch_and_add(a, v)                  tb_atomic64_fetch_and_add_generic(a, v)
+#   define tb_atomic64_fetch_and_add(a, v)                  tb_atomic64_fetch_and_add_explicit(a, v, TB_ATOMIC_SEQ_CST)
 #endif
 
-#ifndef tb_atomic64_fetch_and_or
-#   define tb_atomic64_fetch_and_or(a, v)                   tb_atomic64_fetch_and_or_generic(a, v)
+/// fetch the atomic value and compute sub value
+#ifndef tb_atomic64_fetch_and_sub_explicit
+#   define tb_atomic64_fetch_and_sub_explicit(a, v, mo)     tb_atomic64_fetch_and_add_explicit(a, -(v), mo)
 #endif
-
-#ifndef tb_atomic64_fetch_and_xor
-#   define tb_atomic64_fetch_and_xor(a, v)                  tb_atomic64_fetch_and_xor_generic(a, v)
-#endif
-
-#ifndef tb_atomic64_fetch_and_and
-#   define tb_atomic64_fetch_and_and(a, v)                  tb_atomic64_fetch_and_and_generic(a, v)
-#endif
-
-#ifndef tb_atomic64_get
-#   define tb_atomic64_get(a)                               tb_atomic64_fetch_and_cmpset(a, 0, 0)
-#endif
-
-#ifndef tb_atomic64_set
-#   define tb_atomic64_set(a, v)                            tb_atomic64_fetch_and_set(a, v)
-#endif
-
 #ifndef tb_atomic64_fetch_and_sub
-#   define tb_atomic64_fetch_and_sub(a, v)                  tb_atomic64_fetch_and_add(a, -(v))
+#   define tb_atomic64_fetch_and_sub(a, v)                  tb_atomic64_fetch_and_sub_explicit(a, v, TB_ATOMIC_SEQ_CST)
+#endif
+
+/// fetch the atomic value and compute or value
+#ifndef tb_atomic64_fetch_and_or_explicit
+#   define tb_atomic64_fetch_and_or_explicit(a, v, mo)      tb_atomic64_fetch_and_or_explicit_generic(a, v, mo)
+#endif
+#ifndef tb_atomic64_fetch_and_or
+#   define tb_atomic64_fetch_and_or(a, v)                   tb_atomic64_fetch_and_or_explicit(a, v, TB_ATOMIC_SEQ_CST)
+#endif
+
+/// fetch the atomic value and compute xor operation
+#ifndef tb_atomic64_fetch_and_xor_explicit
+#   define tb_atomic64_fetch_and_xor_explicit(a, v, mo)     tb_atomic64_fetch_and_xor_explicit_generic(a, v, mo)
+#endif
+#ifndef tb_atomic64_fetch_and_xor
+#   define tb_atomic64_fetch_and_xor(a, v)                  tb_atomic64_fetch_and_xor_explicit(a, v, TB_ATOMIC_SEQ_CST)
+#endif
+
+/// fetch the atomic value and compute and operation
+#ifndef tb_atomic64_fetch_and_and_explicit
+#   define tb_atomic64_fetch_and_and_explicit(a, v, mo)     tb_atomic64_fetch_and_and_explicit_generic(a, v, mo)
+#endif
+#ifndef tb_atomic64_fetch_and_and
+#   define tb_atomic64_fetch_and_and(a, v)                  tb_atomic64_fetch_and_and_explicit(a, v, TB_ATOMIC_SEQ_CST)
+#endif
+
+/// get the atomic value
+#ifndef tb_atomic64_get_explicit
+#   define tb_atomic64_get_explicit(a, mo)                  tb_atomic64_fetch_and_cmpset_explicit(a, 0, 0, mo, mo)
+#endif
+#ifndef tb_atomic64_get
+#   define tb_atomic64_get(a)                               tb_atomic64_get_explicit(a, TB_ATOMIC_SEQ_CST)
+#endif
+
+/// set the atomic value
+#ifndef tb_atomic64_set_explicit
+#   define tb_atomic64_set_explicit(a, v, mo)               tb_atomic64_fetch_and_set_explicit(a, v, mo)
+#endif
+#ifndef tb_atomic64_set
+#   define tb_atomic64_set(a, v)                            tb_atomic64_set_explicit(a, v, TB_ATOMIC_SEQ_CST)
 #endif
 
 #ifdef TB_CONFIG_API_HAVE_DEPRECATED
@@ -158,35 +213,35 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline interfaces
  */
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_cmpset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_cmpset_explicit_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
 {
-    tb_atomic64_compare_and_set(a, &p, v);
+    tb_atomic64_compare_and_set_explicit(a, &p, v, succ, fail);
     return p;
 }
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
     tb_hong_t o;
-    do { o = *a; } while (!tb_atomic64_compare_and_set_weak(a, &o, v));
+    do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, v, mo, mo));
     return o;
 }
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_add_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak(a, &o, o + v));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o + v, mo, mo));
     return o;
 }
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_xor_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak(a, &o, o ^ v));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o ^ v, mo, mo));
     return o;
 }
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_and_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak(a, &o, o & v));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o & v, mo, mo));
     return o;
 }
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v)
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_or_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak(a, &o, o | v));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o | v, mo, mo));
     return o;
 }
 
@@ -199,10 +254,12 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a
  * @param a     pointer to the atomic object to test and modify
  * @param p     pointer to the value expected to be found in the atomic object
  * @param v     the value to store in the atomic object if it is as expected
+ * @param succ  the memory order if be successful
+ * @param fail  the memory order if be failed
  *
  * @return      the result of the comparison: true if *a was equal to *p, false otherwise.
  */
-tb_bool_t       tb_atomic64_compare_and_set_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v);
+tb_bool_t       tb_atomic64_compare_and_set_explicit_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail);
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
