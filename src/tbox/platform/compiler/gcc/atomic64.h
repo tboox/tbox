@@ -31,7 +31,8 @@
  * macros
  */
 
-#define tb_atomic64_compare_set(a, p, v)        tb_atomic64_compare_set_sync(a, p, v)
+#define tb_atomic64_compare_and_set(a, p, v)    tb_atomic64_compare_and_set_sync(a, p, v)
+#define tb_atomic64_fetch_and_cmpset(a, p, v)   tb_atomic64_fetch_and_cmpset_sync(a, p, v)
 
 #define tb_atomic64_fetch_and_add(a, v)         tb_atomic64_fetch_and_add_sync(a, v)
 #define tb_atomic64_fetch_and_sub(a, v)         tb_atomic64_fetch_and_sub_sync(a, v)
@@ -46,12 +47,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_atomic64_compare_set_sync(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_sync(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
 {
     tb_assert(a && p);
     tb_hong_t e = *p;
     *p = __sync_val_compare_and_swap_8(a, e, v);
     return *p == e;
+}
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_cmpset_sync(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
+{
+    tb_assert(a);
+    return __sync_val_compare_and_swap_8(a, p, v);
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_add_sync(tb_atomic64_t* a, tb_hong_t v)
 {
