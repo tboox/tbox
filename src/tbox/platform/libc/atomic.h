@@ -43,6 +43,7 @@
 #define tb_atomic_fetch_and_or(a, v)                atomic_fetch_or(a, v)
 #define tb_atomic_fetch_and_and(a, v)               atomic_fetch_and(a, v)
 #define tb_atomic_fetch_and_xor(a, v)               atomic_fetch_xor(a, v)
+#define tb_memory_barrier()                         atomic_thread_fence(memory_order_seq_cst)
 
 
 #endif

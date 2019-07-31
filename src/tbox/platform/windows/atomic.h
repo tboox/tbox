@@ -46,6 +46,14 @@
 #   define tb_atomic_fetch_and_add(a, v)        tb_atomic_fetch_and_add_windows(a, v)
 #endif
 
+#if defined(MemoryBarrier)
+#   define tb_memory_barrier()                  MemoryBarrier()
+#elif defined(_AMD64_)
+#   define tb_memory_barrier()                  __faststorefence()
+#elif defined(_IA64_)
+#   define tb_memory_barrier()                  __mf()
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */

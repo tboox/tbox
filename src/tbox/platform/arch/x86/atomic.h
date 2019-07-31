@@ -44,6 +44,10 @@
 #   define tb_atomic_fetch_and_add(a, v)        tb_atomic_fetch_and_add_x86(a, v)
 #endif
 
+#ifndef tb_memory_barrier
+#   define tb_memory_barrier()                  __tb_asm__ __tb_volatile__ ("" ::: "memory")
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */

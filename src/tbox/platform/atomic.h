@@ -40,6 +40,11 @@
  * macros
  */
 
+// memory barrier (full barrier)
+#ifndef tb_memory_barrier
+#   define tb_memory_barrier()         
+#endif
+
 /*! initializes the default-constructed atomic object obj with the value desired. 
  *
  * the function is not atomic: concurrent access from another thread, even through an atomic operation, is a data race.

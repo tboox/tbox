@@ -44,6 +44,8 @@
 #   define tb_atomic_fetch_and_xor(a, v)    tb_atomic_fetch_and_xor_sync(a, v)
 #endif
 
+#define tb_memory_barrier()                 __sync_synchronize()
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
