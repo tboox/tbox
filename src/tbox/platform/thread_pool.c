@@ -628,8 +628,7 @@ static tb_bool_t tb_thread_pool_jobs_walk_kill_all(tb_pointer_t item, tb_cpointe
     tb_trace_d("task[%p:%s]: kill: ..", job->task.done, job->task.name);
 
     // kill it if be waiting
-    tb_long_t expected = TB_STATE_WAITING;
-    tb_atomic_compare_and_set(&job->state, &expected, TB_STATE_KILLING);
+    tb_atomic_fetch_and_cmpset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
 
     // ok
     return tb_true;
@@ -1127,8 +1126,7 @@ tb_void_t tb_thread_pool_task_kill(tb_thread_pool_ref_t pool, tb_thread_pool_tas
     tb_trace_d("task[%p:%s]: kill: state: %s: ..", job->task.done, job->task.name, tb_state_cstr(tb_atomic_get(&job->state)));
 
     // kill it if be waiting
-    tb_long_t expected = TB_STATE_WAITING;
-    tb_atomic_compare_and_set(&job->state, &expected, TB_STATE_KILLING);
+    tb_atomic_fetch_and_cmpset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
 }
 tb_void_t tb_thread_pool_task_kill_all(tb_thread_pool_ref_t pool)
 {

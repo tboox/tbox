@@ -127,6 +127,10 @@
 #   define tb_atomic_fetch_and_sub(a, v)                tb_atomic_fetch_and_add(a, -(v))
 #endif
 
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
+#   include "deprecated/atomic.h"
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */

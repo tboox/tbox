@@ -151,6 +151,10 @@ __tb_extern_c_enter__
 #   define tb_atomic64_fetch_and_sub(a, v)                  tb_atomic64_fetch_and_add(a, -(v))
 #endif
 
+#ifdef TB_CONFIG_API_HAVE_DEPRECATED
+#   include "deprecated/atomic64.h"
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline interfaces
  */

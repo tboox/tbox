@@ -137,7 +137,7 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
 tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mode, tb_hize_t build)
 {
     // have been inited?
-    if (TB_STATE_OK == tb_atomic_fetch_and_pset(&g_state, TB_STATE_END, TB_STATE_OK)) return tb_true;
+    if (TB_STATE_OK == tb_atomic_fetch_and_cmpset(&g_state, TB_STATE_END, TB_STATE_OK)) return tb_true;
 
     // init trace
     if (!tb_trace_init()) return tb_false;
@@ -203,7 +203,7 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
 tb_void_t tb_exit()
 {
     // have been exited?
-    if (TB_STATE_OK != tb_atomic_fetch_and_pset(&g_state, TB_STATE_OK, TB_STATE_EXITING)) return ;
+    if (TB_STATE_OK != tb_atomic_fetch_and_cmpset(&g_state, TB_STATE_OK, TB_STATE_EXITING)) return ;
 
     // kill singleton
     tb_singleton_kill();

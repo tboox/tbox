@@ -580,7 +580,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t self)
     tb_trace_d("kill: %s: state: %s: ..", tb_url_cstr(&stream->url), tb_state_cstr(tb_atomic_get(&stream->istate)));
 
     // opened? kill it
-    if (TB_STATE_OPENED == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING))
+    if (TB_STATE_OPENED == tb_atomic_fetch_and_cmpset(&stream->istate, TB_STATE_OPENED, TB_STATE_KILLING))
     {
         // kill it
         if (stream->kill) stream->kill(self);
@@ -589,7 +589,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t self)
         tb_trace_d("kill: %s: ok", tb_url_cstr(&stream->url));
     }
     // opening? kill it
-    else if (TB_STATE_OPENING == tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_OPENING, TB_STATE_KILLING))
+    else if (TB_STATE_OPENING == tb_atomic_fetch_and_cmpset(&stream->istate, TB_STATE_OPENING, TB_STATE_KILLING))
     {
         // kill it
         if (stream->kill) stream->kill(self);
@@ -600,7 +600,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t self)
     else 
     {
         // closed? killed
-        tb_atomic_fetch_and_pset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
+        tb_atomic_fetch_and_cmpset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
     }
 }
 tb_bool_t tb_stream_open(tb_stream_ref_t self)

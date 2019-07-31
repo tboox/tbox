@@ -90,7 +90,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
 #endif
 
     // lock it
-    while (tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1))
+    while (tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1))
     {
 #ifdef TB_LOCK_PROFILER_ENABLE
         // occupied
@@ -133,7 +133,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
     tb_size_t tryn = 5;
     
     // lock it
-    while (tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1))
+    while (tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1))
     {
         // yield the processor
         if (!tryn--)
@@ -161,10 +161,10 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_ref_t loc
 
 #ifndef TB_LOCK_PROFILER_ENABLE
     // try locking it
-    return !tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1);
+    return !tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1);
 #else
     // try locking it
-    tb_bool_t ok = !tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1);
+    tb_bool_t ok = !tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1);
 
     // occupied?
     if (!ok) tb_lock_profiler_occupied(tb_lock_profiler(), (tb_pointer_t)lock);
@@ -186,7 +186,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_s
     tb_assert(lock);
 
     // try locking it
-    return !tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1);
+    return !tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1);
 }
 
 /*! leave spinlock

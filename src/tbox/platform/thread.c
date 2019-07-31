@@ -190,7 +190,7 @@ tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb
      * 2: have been called and ok
      * -2: have been called and failed
      */
-    tb_atomic_t called = tb_atomic_fetch_and_pset(lock, 0, 1);
+    tb_atomic_t called = tb_atomic_fetch_and_cmpset(lock, 0, 1);
 
     // called?
     if (called && called != 1) return called == 2;

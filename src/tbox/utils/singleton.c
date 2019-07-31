@@ -134,7 +134,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     tb_check_return_val(type < TB_SINGLETON_TYPE_MAXN, tb_null);
     
     // the instance
-    tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_pset(&g_singletons[type].instance, 0, 1);
+    tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_cmpset(&g_singletons[type].instance, 0, 1);
 
     // ok?
     if (instance && instance != (tb_handle_t)1) return instance;
@@ -183,7 +183,7 @@ tb_bool_t tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, t
     tb_check_return_val(binited && instance, tb_false);
 
     // inited?
-    tb_atomic_t inited = tb_atomic_fetch_and_pset(binited, 0, 1);
+    tb_atomic_t inited = tb_atomic_fetch_and_cmpset(binited, 0, 1);
 
     // ok?
     if (inited && inited != 1) return tb_true;
