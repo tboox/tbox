@@ -50,12 +50,10 @@ __tb_extern_c_enter__
 #if TB_CPU_BIT64
 
 #   define tb_atomic64_init(a, v)               tb_atomic_init(a, v)
-
 #   define tb_atomic64_get(a)                   tb_atomic_get(a)
 #   define tb_atomic64_set(a, v)                tb_atomic_set(a, v)
 #   define tb_atomic64_fetch_and_set(a, v)      tb_atomic_fetch_and_set(a, v)
 #   define tb_atomic64_compare_and_set(a, p, v) tb_atomic_compare_and_set(a, p, v)
-
 #   define tb_atomic64_fetch_and_add(a, v)      tb_atomic_fetch_and_add(a, v)
 #   define tb_atomic64_fetch_and_sub(a, v)      tb_atomic_fetch_and_sub(a, v)
 #   define tb_atomic64_fetch_and_or(a, v)       tb_atomic_fetch_and_or(a, v)

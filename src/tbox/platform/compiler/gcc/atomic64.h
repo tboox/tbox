@@ -31,22 +31,69 @@
  * macros
  */
 
-#define tb_atomic64_compare_and_set(a, p, v)    tb_atomic64_compare_and_set_gcc(a, p, v)
-#define tb_atomic64_fetch_and_cmpset(a, p, v)   __sync_val_compare_and_swap_8(a, p, v)
+#ifdef __ATOMIC_SEQ_CST
 
-#define tb_atomic64_fetch_and_add(a, v)         __sync_fetch_and_add_8(a, v)
-#define tb_atomic64_fetch_and_sub(a, v)         __sync_fetch_and_sub_8(a, v)
-#define tb_atomic64_fetch_and_or(a, v)          __sync_fetch_and_or_8(a, v)
-#define tb_atomic64_fetch_and_and(a, v)         __sync_fetch_and_and_8(a, v)
+#   define tb_atomic64_init(a, v)                       tb_atomic64_set_explicit_gcc(a, v, __ATOMIC_RELAXED)
+#   define tb_atomic64_get(a)                           tb_atomic64_get_explicit_gcc(a, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_set(a, v)                        tb_atomic64_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_compare_and_set(a, p, v)         tb_atomic64_compare_and_set_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_compare_and_set_weak(a, p, v)    tb_atomic64_compare_and_set_weak_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_fetch_and_set(a, v)              tb_atomic64_fetch_and_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_fetch_and_add(a, v)              __atomic_fetch_add(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_fetch_and_sub(a, v)              __atomic_fetch_sub(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_fetch_and_or(a, v)               __atomic_fetch_or(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_fetch_and_and(a, v)              __atomic_fetch_and(a, v, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_fetch_and_xor(a, v)              __atomic_fetch_xor(a, v, __ATOMIC_SEQ_CST)
+
+#else
+#   define tb_atomic64_compare_and_set(a, p, v)         tb_atomic64_compare_and_set_gcc(a, p, v)
+#   define tb_atomic64_fetch_and_cmpset(a, p, v)        __sync_val_compare_and_swap_8(a, p, v)
+
+#   define tb_atomic64_fetch_and_add(a, v)              __sync_fetch_and_add_8(a, v)
+#   define tb_atomic64_fetch_and_sub(a, v)              __sync_fetch_and_sub_8(a, v)
+#   define tb_atomic64_fetch_and_or(a, v)               __sync_fetch_and_or_8(a, v)
+#   define tb_atomic64_fetch_and_and(a, v)              __sync_fetch_and_and_8(a, v)
 
 // FIXME: ios armv6: no defined refernece?
-#if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
-#   define tb_atomic64_fetch_and_xor(a, v)      __sync_fetch_and_xor_8(a, v)
+#   if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
+#       define tb_atomic64_fetch_and_xor(a, v)          __sync_fetch_and_xor_8(a, v)
+#   endif
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation
  */
+#ifdef __ATOMIC_SEQ_CST
+static __tb_inline__ tb_hong_t tb_atomic64_get_explicit_gcc(tb_atomic64_t* a, tb_size_t mo)
+{
+    tb_assert(a);
+    tb_hong_t t;
+    __atomic_load(a, &t, mo);
+    return t;
+}
+static __tb_inline__ tb_void_t tb_atomic64_set_explicit_gcc(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
+{
+    tb_assert(a);
+    __atomic_store(a, &v, mo);
+}
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+{
+    tb_assert(a);
+    return __atomic_compare_exchange(a, p, &v, 0, succ, fail);	
+}
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_weak_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+{
+    tb_assert(a);
+    return __atomic_compare_exchange(a, p, &v, 1, succ, fail);	
+}
+static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_explicit_gcc(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
+{
+    tb_assert(a);
+    tb_hong_t o;
+    __atomic_exchange(a, &v, &o, mo);	
+    return o;
+}
+#else
 static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
 {
     tb_assert(a && p);
@@ -54,5 +101,6 @@ static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_gcc(tb_atomic64_t* a,
     *p = __sync_val_compare_and_swap_8(a, e, v);
     return *p == e;
 }
+#endif
 
 #endif
