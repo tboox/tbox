@@ -15,15 +15,19 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        atomic.h
+ * @file        atomic64.h
  *
  */
-#ifndef TB_PLATFORM_ARCH_x64_ATOMIC_H
-#define TB_PLATFORM_ARCH_x64_ATOMIC_H
+#ifndef TB_PLATFORM_ARCH_ATOMIC64_H
+#define TB_PLATFORM_ARCH_ATOMIC64_H
+
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../x86/atomic.h"
+#include "prefix.h"
+#if defined(TB_ARCH_x64)
+#   include "x64/atomic64.h"
+#endif
 
 #endif

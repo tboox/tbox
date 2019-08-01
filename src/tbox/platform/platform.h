@@ -38,7 +38,6 @@
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"
-#include "atomic64.h"
 #include "memory.h"
 #include "poller.h"
 #include "context.h"

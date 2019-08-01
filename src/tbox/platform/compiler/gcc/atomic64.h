@@ -76,40 +76,40 @@
  * inline implementation
  */
 #ifdef __ATOMIC_SEQ_CST
-static __tb_inline__ tb_hong_t tb_atomic64_get_explicit_gcc(tb_atomic64_t* a, tb_size_t mo)
+static __tb_inline__ tb_int64_t tb_atomic64_get_explicit_gcc(tb_atomic64_t* a, tb_int_t mo)
 {
     tb_assert(a);
-    tb_hong_t t;
+    tb_int64_t t;
     __atomic_load(a, &t, mo);
     return t;
 }
-static __tb_inline__ tb_void_t tb_atomic64_set_explicit_gcc(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
+static __tb_inline__ tb_void_t tb_atomic64_set_explicit_gcc(tb_atomic64_t* a, tb_int64_t v, tb_int_t mo)
 {
     tb_assert(a);
     __atomic_store(a, &v, mo);
 }
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_gcc(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
 {
     tb_assert(a);
     return __atomic_compare_exchange(a, p, &v, 0, succ, fail);	
 }
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_weak_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_weak_explicit_gcc(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
 {
     tb_assert(a);
     return __atomic_compare_exchange(a, p, &v, 1, succ, fail);	
 }
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_explicit_gcc(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
+static __tb_inline__ tb_int64_t tb_atomic64_fetch_and_set_explicit_gcc(tb_atomic64_t* a, tb_int64_t v, tb_int_t mo)
 {
     tb_assert(a);
-    tb_hong_t o;
+    tb_int64_t o;
     __atomic_exchange(a, &v, &o, mo);	
     return o;
 }
 #else
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_gcc(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v)
 {
     tb_assert(a && p);
-    tb_hong_t e = *p;
+    tb_int64_t e = *p;
     *p = __sync_val_compare_and_swap_8(a, e, v);
     return *p == e;
 }

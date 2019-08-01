@@ -142,21 +142,22 @@ typedef tb_int32_t                  tb_fixed16_t;
 typedef tb_int32_t                  tb_fixed30_t;
 typedef tb_fixed16_t                tb_fixed_t;
 
-/// the atomic type
-#if __tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)
-typedef _Atomic tb_long_t                               tb_atomic_t;
-#elif TB_CPU_BIT64
-typedef __tb_volatile__ __tb_aligned__(8) tb_long_t     tb_atomic_t;
+/// the atomic32 type, need be aligned for arm, ..
+#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__))
+typedef _Atomic tb_int32_t                              tb_atomic32_t;
 #else
-typedef __tb_volatile__ __tb_aligned__(4) tb_long_t     tb_atomic_t;
+typedef __tb_volatile__  __tb_aligned__(4) tb_int32_t   tb_atomic32_t;
 #endif
 
 /// the atomic64 type, need be aligned for arm, ..
-#if __tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)
-typedef _Atomic tb_hong_t                               tb_atomic64_t;
+#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)) 
+typedef  _Atomic tb_int64_t                             tb_atomic64_t;
 #else
-typedef __tb_volatile__  __tb_aligned__(8) tb_hong_t    tb_atomic64_t;
+typedef __tb_volatile__  __tb_aligned__(8) tb_int64_t   tb_atomic64_t;
 #endif
+
+/// the atomic type
+typedef tb_atomic32_t               tb_atomic_t;
 
 /// the spinlock type
 typedef tb_atomic_t                 tb_spinlock_t;

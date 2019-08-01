@@ -24,7 +24,7 @@
  * includes
  */
 #include "prefix.h"
-#include "spinlock.h"
+#include "../spinlock.h"
 #include "atomic64.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ static __tb_inline_force__ tb_spinlock_ref_t tb_atomic64_lock(tb_atomic64_t* a)
     tb_trace1_w("using generic atomic64, maybe slower!");
 
     // the addr
-    tb_size_t addr = (tb_size_t)a;
+    tb_int_t addr = (tb_int_t)a;
 
     // compile the hash value
     addr >>= TB_L1_CACHE_SHIFT;
@@ -82,7 +82,7 @@ static __tb_inline_force__ tb_spinlock_ref_t tb_atomic64_lock(tb_atomic64_t* a)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
 {
     // check
     tb_assert(a && p);

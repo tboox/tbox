@@ -21,15 +21,16 @@
 #ifndef TB_PLATFORM_ARCH_ATOMIC_H
 #define TB_PLATFORM_ARCH_ATOMIC_H
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#if defined(TB_ARCH_x86)
-#   include "x86/atomic.h"
-#elif defined(TB_ARCH_x64)
-#   include "x64/atomic.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#if !defined(tb_memory_barrier) && defined(TB_ASSEMBLER_IS_GAS) && (defined(TB_ARCH_x86) || defined(TB_ARCH_x64))
+#   define tb_memory_barrier()                  __tb_asm__ __tb_volatile__ ("" ::: "memory")
 #endif
 
 #endif

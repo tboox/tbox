@@ -15,31 +15,18 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        atomic.h
+ * @file        atomic32.h
  *
  */
-#ifndef TB_PLATFORM_COMPILER_LIBC_ATOMIC_H
-#define TB_PLATFORM_COMPILER_LIBC_ATOMIC_H
-
+#ifndef TB_PLATFORM_ARCH_ATOMIC32_H
+#define TB_PLATFORM_ARCH_ATOMIC32_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include <stdatomic.h>
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-#define TB_ATOMIC_RELAXED                           memory_order_relaxed
-#define TB_ATOMIC_CONSUME                           memory_order_consume
-#define TB_ATOMIC_ACQUIRE                           memory_order_acquire
-#define TB_ATOMIC_RELEASE                           memory_order_release
-#define TB_ATOMIC_ACQ_REL                           memory_order_acq_rel
-#define TB_ATOMIC_SEQ_CST                           memory_order_seq_cst
-
-#define tb_memory_barrier()                         atomic_thread_fence(memory_order_seq_cst)
-
+#if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
+#   include "x86/atomic32.h"
+#endif
 
 #endif

@@ -42,13 +42,13 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_bool_t tb_atomic64_compare_and_swap_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v);
+tb_bool_t tb_atomic64_compare_and_swap_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation
  */
 
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_windows(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_windows(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v)
 {
     // check
     tb_assert(a && p);
@@ -59,8 +59,8 @@ static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_windows(tb_atomic64_
     // done
     if (pInterlockedCompareExchange64) 
     {
-        tb_hong_t e = *p;
-        *p = (tb_long_t)pInterlockedCompareExchange64((LONG __tb_volatile__*)a, v, e);
+        tb_int64_t e = *p;
+        *p = (tb_int64_t)pInterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, e);
         return *p == e;
     }
 

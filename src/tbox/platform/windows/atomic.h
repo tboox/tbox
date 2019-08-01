@@ -30,22 +30,6 @@
  * macros
  */
 
-#if !defined(tb_atomic_fetch_and_set) && !TB_CPU_BIT64
-#   define tb_atomic_fetch_and_set(a, v)        tb_atomic_fetch_and_set_windows(a, v)
-#endif
-
-#if !defined(tb_atomic_compare_and_swap)
-#   define tb_atomic_compare_and_swap(a, p, v)  tb_atomic_compare_and_swap_windows(a, p, v)
-#endif
-
-#if !defined(tb_atomic_fetch_and_cmpset)
-#   define tb_atomic_fetch_and_cmpset(a, p, v)  tb_atomic_fetch_and_cmpset_windows(a, p, v)
-#endif
-
-#if !defined(tb_atomic_fetch_and_add) && !TB_CPU_BIT64
-#   define tb_atomic_fetch_and_add(a, v)        tb_atomic_fetch_and_add_windows(a, v)
-#endif
-
 #if defined(MemoryBarrier)
 #   define tb_memory_barrier()                  MemoryBarrier()
 #elif defined(_AMD64_)
@@ -54,41 +38,5 @@
 #   define tb_memory_barrier()                  __mf()
 #endif
 
-/* //////////////////////////////////////////////////////////////////////////////////////
- * inlines
- */
-#if TB_CPU_BIT64
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_windows(tb_atomic_t* a, tb_long_t p, tb_long_t v)
-{
-    // check
-    tb_assert(a && p);
-    tb_assert_static(sizeof(tb_atomic_t) == sizeof(LONGLONG));
-
-    tb_long_t e = *p;
-    *p = (tb_long_t)InterlockedCompareExchange64((LONG __tb_volatile__*)a, v, e);
-    return *p == e;
-}
-#else
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_windows(tb_atomic_t* a, tb_long_t v)
-{
-    return (tb_long_t)InterlockedExchange((LONG __tb_volatile__*)a, v);
-}
-static __tb_inline__ tb_bool_t tb_atomic_compare_and_swap_windows(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
-{
-    tb_assert(a && p);
-    tb_long_t e = *p;
-    *p = (tb_long_t)InterlockedCompareExchange((LONG __tb_volatile__*)a, v, e);
-    return *p == e;
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_cmpset_windows(tb_atomic_t* a, tb_long_t p, tb_long_t v)
-{
-    tb_assert(a);
-    return (tb_long_t)InterlockedCompareExchange((LONG __tb_volatile__*)a, v, p);
-}
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_windows(tb_atomic_t* a, tb_long_t v)
-{
-    return (tb_long_t)InterlockedExchangeAdd((LONG __tb_volatile__*)a, v);
-}
-#endif
 
 #endif

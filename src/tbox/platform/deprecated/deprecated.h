@@ -25,7 +25,5 @@
  * includes
  */
 #include "prefix.h"
-#include "atomic.h"
-#include "atomic64.h"
 
 #endif

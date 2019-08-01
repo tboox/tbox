@@ -25,7 +25,7 @@
  */
 #include "cache_time.h"
 #include "time.h"
-#include "atomic64.h"
+#include "atomic.h"
 #include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
