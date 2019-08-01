@@ -35,20 +35,20 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#if !defined(tb_atomic64_compare_set)
-#   define tb_atomic64_compare_set(a, p, v)      tb_atomic64_compare_and_swap_windows(a, p, v)
+#ifndef tb_atomic64_compare_and_swap_explicit
+#   define tb_atomic64_compare_and_swap_explicit(a, p, v, succ, fail)      tb_atomic64_compare_and_swap_explicit_windows(a, p, v, succ, fail)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_bool_t tb_atomic64_compare_and_swap_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v);
+tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation
  */
 
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_windows(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_windows(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
 {
     // check
     tb_assert(a && p);
@@ -65,7 +65,7 @@ static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_windows(tb_atomic64_
     }
 
     // using the generic implementation
-    return tb_atomic64_compare_and_swap_generic(a, p, v);
+    return tb_atomic64_compare_and_swap_explicit_generic(a, p, v, succ, fail);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -134,6 +134,23 @@ __tb_extern_c_enter__
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/* compare and set the 64bits value 
+ *
+ * @param a     pointer to the atomic object to test and modify
+ * @param p     pointer to the value expected to be found in the atomic object
+ * @param v     the value to store in the atomic object if it is as expected
+ * @param succ  the memory order if be successful
+ * @param fail  the memory order if be failed
+ *
+ * @return      the result of the comparison: true if *a was equal to *p, false otherwise.
+ */
+tb_bool_t       tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail);
+
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * inline interfaces
  */
 static __tb_inline__ tb_int64_t tb_atomic64_fetch_and_cmpset_explicit_generic(tb_atomic64_t* a, tb_int64_t p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
@@ -167,23 +184,6 @@ static __tb_inline__ tb_int64_t tb_atomic64_fetch_and_or_explicit_generic(tb_ato
     tb_int64_t o; do { o = *a; } while (!tb_atomic64_compare_and_swap_weak_explicit(a, &o, o | v, mo, mo));
     return o;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/* compare and set the 64bits value 
- *
- * @param a     pointer to the atomic object to test and modify
- * @param p     pointer to the value expected to be found in the atomic object
- * @param v     the value to store in the atomic object if it is as expected
- * @param succ  the memory order if be successful
- * @param fail  the memory order if be failed
- *
- * @return      the result of the comparison: true if *a was equal to *p, false otherwise.
- */
-tb_bool_t       tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail);
-
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

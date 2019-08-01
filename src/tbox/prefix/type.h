@@ -157,7 +157,11 @@ typedef __tb_volatile__  __tb_aligned__(8) tb_int64_t   tb_atomic64_t;
 #endif
 
 /// the atomic type
+#if TB_CPU_BIT64
+typedef tb_atomic64_t               tb_atomic_t;
+#else
 typedef tb_atomic32_t               tb_atomic_t;
+#endif
 
 /// the spinlock type
 typedef tb_atomic_t                 tb_spinlock_t;

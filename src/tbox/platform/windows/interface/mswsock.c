@@ -24,6 +24,7 @@
  */
 #include "mswsock.h"
 #include "ws2_32.h"
+#include "../../atomic.h"
 #include "../../socket.h"
 #include "../../../utils/utils.h"
 

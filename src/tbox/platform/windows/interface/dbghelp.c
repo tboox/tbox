@@ -23,6 +23,7 @@
  * includes
  */
 #include "dbghelp.h"
+#include "../../atomic.h"
 #include "../../../utils/singleton.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////

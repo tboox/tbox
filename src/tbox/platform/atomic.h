@@ -89,7 +89,11 @@
  *
  * the function is not atomic: concurrent access from another thread, even through an atomic operation, is a data race.
  */
-#define tb_atomic_init(a, v)                            tb_atomic32_init(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_init(a, v)                            tb_atomic64_init(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_init(a, v)                            tb_atomic32_init(a, (tb_int32_t)(v))
+#endif
 
 /*! atomically compares the contents of memory pointed to by obj with the contents of memory pointed to by expected, 
  * and if those are bitwise equal, replaces the former with desired (performs read-modify-write operation).
@@ -115,9 +119,15 @@
  *   }
  * @endcode
  */
-#define tb_atomic_compare_and_swap_explicit(a, p, v, succ, fail) \
-                                                        tb_atomic32_compare_and_swap_explicit(a, p, v, succ, fail)
-#define tb_atomic_compare_and_swap(a, p, v)             tb_atomic32_compare_and_swap(a, p, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic64_compare_and_swap_explicit(a, (tb_int64_t*)(p), (tb_int64_t)(v), succ, fail)
+#   define tb_atomic_compare_and_swap(a, p, v)          tb_atomic64_compare_and_swap(a, (tb_int64_t*)(p), (tb_int64_t)(v))
+#else
+#   define tb_atomic_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic32_compare_and_swap_explicit(a, (tb_int32_t*)(p), (tb_int32_t)(v), succ, fail)
+#   define tb_atomic_compare_and_swap(a, p, v)          tb_atomic32_compare_and_swap(a, (tb_int32_t*)(p), (tb_int32_t)(v))
+#endif
 
 /*! like tb_atomic_compare_and_swap(), but it's allowed to fail spuriously, that is, act as if *obj != *p even if they are equal. 
  *
@@ -132,46 +142,98 @@
  * - succ	    the memory synchronization ordering for the read-modify-write operation if the comparison succeeds. All values are permitted.
  * - fail	    the memory synchronization ordering for the load operation if the comparison fails. Cannot be memory_order_release or memory_order_acq_rel and cannot specify stronger ordering than succ
  */
-#define tb_atomic_compare_and_swap_weak_explicit(a, p, v, succ, fail) \
-                                                        tb_atomic32_compare_and_swap_weak_explicit(a, p, v, succ, fail)
-#define tb_atomic_compare_and_swap_weak(a, p, v)        tb_atomic32_compare_and_swap_weak(a, p, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_compare_and_swap_weak_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic64_compare_and_swap_weak_explicit(a, (tb_int64_t*)(p), (tb_int64_t)(v), succ, fail)
+#   define tb_atomic_compare_and_swap_weak(a, p, v)     tb_atomic64_compare_and_swap_weak(a, (tb_int64_t*)(p), (tb_int64_t)(v))
+#else
+#   define tb_atomic_compare_and_swap_weak_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic32_compare_and_swap_weak_explicit(a, (tb_int32_t*)(p), (tb_int32_t)(v), succ, fail)
+#   define tb_atomic_compare_and_swap_weak(a, p, v)     tb_atomic32_compare_and_swap_weak(a, (tb_int32_t*)(p), (tb_int32_t)(v))
+#endif
 
 /// fetch the atomic value and compare and set value
-#define tb_atomic_fetch_and_cmpset_explicit(a, p, v, succ, fail) \
-                                                        tb_atomic32_fetch_and_cmpset_explicit(a, p, v, succ, fail)
-#define tb_atomic_fetch_and_cmpset(a, p, v)             tb_atomic32_fetch_and_cmpset(a, p, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_cmpset_explicit(a, p, v, succ, fail) \
+                                                        (tb_long_t)tb_atomic64_fetch_and_cmpset_explicit(a, (tb_int64_t)(p), (tb_int64_t)(v), succ, fail)
+#   define tb_atomic_fetch_and_cmpset(a, p, v)          (tb_long_t)tb_atomic64_fetch_and_cmpset(a, (tb_int64_t)(p), (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_cmpset_explicit(a, p, v, succ, fail) \
+                                                        (tb_long_t)tb_atomic32_fetch_and_cmpset_explicit(a, (tb_int32_t)(p), (tb_int32_t)(v), succ, fail)
+#   define tb_atomic_fetch_and_cmpset(a, p, v)          (tb_long_t)tb_atomic32_fetch_and_cmpset(a, (tb_int32_t)(p), (tb_long_t)(v))
+#endif
 
 /// fetch the atomic value and set value
-#define tb_atomic_fetch_and_set_explicit(a, v, mo)      tb_atomic32_fetch_and_set_explicit(a, v, mo)
-#define tb_atomic_fetch_and_set(a, v)                   tb_atomic32_fetch_and_set(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_set_explicit(a, v, mo)   (tb_long_t)tb_atomic64_fetch_and_set_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_fetch_and_set(a, v)                (tb_long_t)tb_atomic64_fetch_and_set(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_set_explicit(a, v, mo)   (tb_long_t)tb_atomic32_fetch_and_set_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_fetch_and_set(a, v)                (tb_long_t)tb_atomic32_fetch_and_set(a, (tb_int32_t)(v))
+#endif
 
 /// fetch the atomic value and compute add value
-#define tb_atomic_fetch_and_add_explicit(a, v, mo)      tb_atomic32_fetch_and_add_explicit(a, v, mo)
-#define tb_atomic_fetch_and_add(a, v)                   tb_atomic32_fetch_and_add(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_add_explicit(a, v, mo)   (tb_long_t)tb_atomic64_fetch_and_add_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_fetch_and_add(a, v)                (tb_long_t)tb_atomic64_fetch_and_add(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_add_explicit(a, v, mo)   (tb_long_t)tb_atomic32_fetch_and_add_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_fetch_and_add(a, v)                (tb_long_t)tb_atomic32_fetch_and_add(a, (tb_int32_t)(v))
+#endif
 
 /// fetch the atomic value and compute sub value
-#define tb_atomic_fetch_and_sub_explicit(a, v, mo)      tb_atomic32_fetch_and_sub_explicit(a, v, mo)
-#define tb_atomic_fetch_and_sub(a, v)                   tb_atomic32_fetch_and_sub(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_sub_explicit(a, v, mo)   (tb_long_t)tb_atomic64_fetch_and_sub_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_fetch_and_sub(a, v)                (tb_long_t)tb_atomic64_fetch_and_sub(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_sub_explicit(a, v, mo)   (tb_long_t)tb_atomic32_fetch_and_sub_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_fetch_and_sub(a, v)                (tb_long_t)tb_atomic32_fetch_and_sub(a, (tb_int32_t)(v))
+#endif
 
 /// fetch the atomic value and compute or value
-#define tb_atomic_fetch_and_or_explicit(a, v, mo)       tb_atomic32_fetch_and_or_explicit(a, v, mo)
-#define tb_atomic_fetch_and_or(a, v)                    tb_atomic32_fetch_and_or(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_or_explicit(a, v, mo)    (tb_long_t)tb_atomic64_fetch_and_or_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_fetch_and_or(a, v)                 (tb_long_t)tb_atomic64_fetch_and_or(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_or_explicit(a, v, mo)    (tb_long_t)tb_atomic32_fetch_and_or_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_fetch_and_or(a, v)                 (tb_long_t)tb_atomic32_fetch_and_or(a, (tb_int32_t)(v))
+#endif
 
 /// fetch the atomic value and compute xor operation
-#define tb_atomic_fetch_and_xor_explicit(a, v, mo)      tb_atomic32_fetch_and_xor_explicit(a, v, mo)
-#define tb_atomic_fetch_and_xor(a, v)                   tb_atomic32_fetch_and_xor(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_xor_explicit(a, v, mo)   (tb_long_t)tb_atomic64_fetch_and_xor_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_fetch_and_xor(a, v)                (tb_long_t)tb_atomic64_fetch_and_xor(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_xor_explicit(a, v, mo)   (tb_long_t)tb_atomic32_fetch_and_xor_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_fetch_and_xor(a, v)                (tb_long_t)tb_atomic32_fetch_and_xor(a, (tb_int32_t)(v))
+#endif
 
 /// fetch the atomic value and compute and operation
-#define tb_atomic_fetch_and_and_explicit(a, v, mo)      tb_atomic32_fetch_and_and_explicit(a, v, mo)
-#define tb_atomic_fetch_and_and(a, v)                   tb_atomic32_fetch_and_and(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_fetch_and_and_explicit(a, v, mo)   (tb_long_t)tb_atomic64_fetch_and_and_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_fetch_and_and(a, v)                (tb_long_t)tb_atomic64_fetch_and_and(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_fetch_and_and_explicit(a, v, mo)   (tb_long_t)tb_atomic32_fetch_and_and_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_fetch_and_and(a, v)                (tb_long_t)tb_atomic32_fetch_and_and(a, (tb_int32_t)(v))
+#endif
 
 /// get the atomic value
-#define tb_atomic_get_explicit(a, mo)                   tb_atomic32_get_explicit(a, mo)
-#define tb_atomic_get(a)                                tb_atomic32_get(a)
+#if TB_CPU_BIT64
+#   define tb_atomic_get_explicit(a, mo)                (tb_long_t)tb_atomic64_get_explicit(a, mo)
+#   define tb_atomic_get(a)                             (tb_long_t)tb_atomic64_get(a)
+#else
+#   define tb_atomic_get_explicit(a, mo)                (tb_long_t)tb_atomic32_get_explicit(a, mo)
+#   define tb_atomic_get(a)                             (tb_long_t)tb_atomic32_get(a)
+#endif
 
 /// set the atomic value
-#define tb_atomic_set_explicit(a, v, mo)                tb_atomic32_set_explicit(a, v, mo)
-#define tb_atomic_set(a, v)                             tb_atomic32_set(a, v)
+#if TB_CPU_BIT64
+#   define tb_atomic_set_explicit(a, v, mo)             tb_atomic64_set_explicit(a, (tb_int64_t)(v), mo)
+#   define tb_atomic_set(a, v)                          tb_atomic64_set(a, (tb_int64_t)(v))
+#else
+#   define tb_atomic_set_explicit(a, v, mo)             tb_atomic32_set_explicit(a, (tb_int32_t)(v), mo)
+#   define tb_atomic_set(a, v)                          tb_atomic32_set(a, (tb_int32_t)(v))
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
