@@ -151,7 +151,7 @@ tb_void_t tb_lock_profiler_register(tb_handle_t handle, tb_pointer_t lock, tb_ch
 
         // try to register the lock
         tb_long_t zero = 0;
-        if (tb_atomic_compare_and_set(&item->lock, &zero, (tb_long_t)lock))
+        if (tb_atomic_compare_and_swap(&item->lock, &zero, (tb_long_t)lock))
         {
             // init name
             tb_atomic_set(&item->name, (tb_long_t)name);

@@ -56,9 +56,9 @@ __tb_extern_c_enter__
 #   define tb_atomic64_set_explicit(a, v, mo)           tb_atomic_set_explicit(a, v, mo)
 #   define tb_atomic64_fetch_and_set(a, v)              tb_atomic_fetch_and_set(a, v)
 #   define tb_atomic64_fetch_and_set_explicit(a, v, mo) tb_atomic_fetch_and_set_explicit(a, v, mo)
-#   define tb_atomic64_compare_and_set(a, p, v)         tb_atomic_compare_and_set(a, p, v)
-#   define tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail) \
-                                                        tb_atomic_compare_and_set_explicit(a, p, v, succ, fail)
+#   define tb_atomic64_compare_and_swap(a, p, v)        tb_atomic_compare_and_swap(a, p, v)
+#   define tb_atomic64_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                        tb_atomic_compare_and_swap_explicit(a, p, v, succ, fail)
 #   define tb_atomic64_fetch_and_add(a, v)              tb_atomic_fetch_and_add(a, v)
 #   define tb_atomic64_fetch_and_add_explicit(a, v, mo) tb_atomic_fetch_and_add_explicit(a, v, mo)
 #   define tb_atomic64_fetch_and_sub(a, v)              tb_atomic_fetch_and_sub(a, v)
@@ -94,28 +94,28 @@ __tb_extern_c_enter__
  * - fail	    the memory synchronization ordering for the load operation if the comparison fails. Cannot be memory_order_release or memory_order_acq_rel and cannot specify stronger ordering than succ
  *
  * @code
- *   tb_atomic_init(&a, 1);
+ *   tb_atomic64_init(&a, 1);
  *
- *   tb_long_t expected = 1;
- *   if (tb_atomic_compare_and_set(&a, &expected, 2)) {
+ *   tb_hong_t expected = 1;
+ *   if (tb_atomic64_compare_and_swap(&a, &expected, 2)) {
  *      // *a = 2
  *   } else {
  *      // expected = *a
  *   }
  * @endcode
  */
-#ifndef tb_atomic64_compare_and_set_explicit
-#   define tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail) \
-                                                            tb_atomic64_compare_and_set_explicit_generic(a, p, v, succ, fail)
+#ifndef tb_atomic64_compare_and_swap_explicit
+#   define tb_atomic64_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_compare_and_swap_explicit_generic(a, p, v, succ, fail)
 #endif
-#ifndef tb_atomic64_compare_and_set
-#   define tb_atomic64_compare_and_set(a, p, v)             tb_atomic64_compare_and_set_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
+#ifndef tb_atomic64_compare_and_swap
+#   define tb_atomic64_compare_and_swap(a, p, v)            tb_atomic64_compare_and_swap_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
 #endif
 
-/*! like tb_atomic_compare_and_set(), but it's allowed to fail spuriously, that is, act as if *obj != *p even if they are equal. 
+/*! like tb_atomic_compare_and_swap(), but it's allowed to fail spuriously, that is, act as if *obj != *p even if they are equal. 
  *
- * when a compare-and-exchange is in a loop, the weak version will yield better performance on some platforms. 
- * when a weak compare-and-exchange would require a loop and a strong one would not, the strong one is preferable.
+ * when a compare-and-swap is in a loop, the weak version will yield better performance on some platforms. 
+ * when a weak compare-and-swap would require a loop and a strong one would not, the strong one is preferable.
  *
  * @param a     pointer to the atomic object to test and modify
  * @param p     pointer to the value expected to be found in the atomic object
@@ -125,12 +125,12 @@ __tb_extern_c_enter__
  * - succ	    the memory synchronization ordering for the read-modify-write operation if the comparison succeeds. All values are permitted.
  * - fail	    the memory synchronization ordering for the load operation if the comparison fails. Cannot be memory_order_release or memory_order_acq_rel and cannot specify stronger ordering than succ
  */
-#ifndef tb_atomic64_compare_and_set_weak_explicit
-#   define tb_atomic64_compare_and_set_weak_explicit(a, p, v, succ, fail) \
-                                                            tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail)
+#ifndef tb_atomic64_compare_and_swap_weak_explicit
+#   define tb_atomic64_compare_and_swap_weak_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_compare_and_swap_explicit(a, p, v, succ, fail)
 #endif
-#ifndef tb_atomic64_compare_and_set_weak
-#   define tb_atomic64_compare_and_set_weak(a, p, v)        tb_atomic64_compare_and_set_weak_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
+#ifndef tb_atomic64_compare_and_swap_weak
+#   define tb_atomic64_compare_and_swap_weak(a, p, v)       tb_atomic64_compare_and_swap_weak_explicit(a, p, v, TB_ATOMIC_SEQ_CST, TB_ATOMIC_SEQ_CST)
 #endif
 
 /// fetch the atomic value and compare and set value
@@ -215,33 +215,33 @@ __tb_extern_c_enter__
  */
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_cmpset_explicit_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
 {
-    tb_atomic64_compare_and_set_explicit(a, &p, v, succ, fail);
+    tb_atomic64_compare_and_swap_explicit(a, &p, v, succ, fail);
     return p;
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
     tb_hong_t o;
-    do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, v, mo, mo));
+    do { o = *a; } while (!tb_atomic64_compare_and_swap_weak_explicit(a, &o, v, mo, mo));
     return o;
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_add_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o + v, mo, mo));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_swap_weak_explicit(a, &o, o + v, mo, mo));
     return o;
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_xor_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o ^ v, mo, mo));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_swap_weak_explicit(a, &o, o ^ v, mo, mo));
     return o;
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_and_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o & v, mo, mo));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_swap_weak_explicit(a, &o, o & v, mo, mo));
     return o;
 }
 static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_or_explicit_generic(tb_atomic64_t* a, tb_hong_t v, tb_size_t mo)
 {
-    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_set_weak_explicit(a, &o, o | v, mo, mo));
+    tb_hong_t o; do { o = *a; } while (!tb_atomic64_compare_and_swap_weak_explicit(a, &o, o | v, mo, mo));
     return o;
 }
 
@@ -259,7 +259,7 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_or_explicit_generic(tb_atom
  *
  * @return      the result of the comparison: true if *a was equal to *p, false otherwise.
  */
-tb_bool_t       tb_atomic64_compare_and_set_explicit_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail);
+tb_bool_t       tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail);
 
 
 /* //////////////////////////////////////////////////////////////////////////////////////

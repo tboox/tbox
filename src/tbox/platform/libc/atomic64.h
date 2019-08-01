@@ -36,11 +36,11 @@
 #define tb_atomic64_get_explicit(a, mo)               atomic_load_explicit(a, mo)
 #define tb_atomic64_set(a, v)                         atomic_store(a, v)
 #define tb_atomic64_set_explicit(a, v, mo)            atomic_store_explicit(a, v, mo)
-#define tb_atomic64_compare_and_set(a, p, v)          atomic_compare_exchange_strong(a, p, v)
-#define tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail) \
+#define tb_atomic64_compare_and_swap(a, p, v)         atomic_compare_exchange_strong(a, p, v)
+#define tb_atomic64_compare_and_swap_explicit(a, p, v, succ, fail) \
                                                       atomic_compare_exchange_strong_explicit(a, p, v, succ, fail)
-#define tb_atomic64_compare_and_set_weak(a, p, v)     atomic_compare_exchange_weak(a, p, v)
-#define tb_atomic64_compare_and_set_weak_explicit(a, p, v, succ, fail) \
+#define tb_atomic64_compare_and_swap_weak(a, p, v)    atomic_compare_exchange_weak(a, p, v)
+#define tb_atomic64_compare_and_swap_weak_explicit(a, p, v, succ, fail) \
                                                       atomic_compare_exchange_weak_explicit(a, p, v, succ, fail)
 #define tb_atomic64_fetch_and_set(a, v)               atomic_exchange(a, v)
 #define tb_atomic64_fetch_and_set_explicit(a, v, mo)  atomic_exchange_explicit(a, v, mo)

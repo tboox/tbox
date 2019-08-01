@@ -39,18 +39,18 @@ static tb_void_t tb_test_atomic64_fetch_and_cmpset()
     tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 10, 1000) == 2);
     tb_trace_i("atomic64_fetch_and_cmpset(): test ok!");
 }
-static tb_void_t tb_test_atomic64_compare_and_set()
+static tb_void_t tb_test_atomic64_compare_and_swap()
 {
-    tb_trace_i("atomic64_compare_and_set(): test ..");
+    tb_trace_i("atomic64_compare_and_swap(): test ..");
     tb_atomic64_t a;
     tb_atomic64_init(&a, 0);
     tb_hong_t p = 0;
-    tb_assert_and_check_return(tb_atomic64_compare_and_set(&a, &p, 1) && p == 0);
+    tb_assert_and_check_return(tb_atomic64_compare_and_swap(&a, &p, 1) && p == 0);
     p = 1;
-    tb_assert_and_check_return(tb_atomic64_compare_and_set(&a, &p, 2) && p == 1);
+    tb_assert_and_check_return(tb_atomic64_compare_and_swap(&a, &p, 2) && p == 1);
     p = 10;
-    tb_assert_and_check_return(!tb_atomic64_compare_and_set(&a, &p, 1000) && p == 2);
-    tb_trace_i("atomic64_compare_and_set(): test ok!");
+    tb_assert_and_check_return(!tb_atomic64_compare_and_swap(&a, &p, 1000) && p == 2);
+    tb_trace_i("atomic64_compare_and_swap(): test ok!");
 }
 static tb_void_t tb_test_atomic64_fetch_and_add()
 {
@@ -120,7 +120,7 @@ static tb_void_t tb_test_memory_barrier()
 tb_int_t tb_demo_platform_atomic64_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_test_atomic64_get();
-    tb_test_atomic64_compare_and_set();
+    tb_test_atomic64_compare_and_swap();
     tb_test_atomic64_fetch_and_set();
     tb_test_atomic64_fetch_and_cmpset();
     tb_test_atomic64_fetch_and_add();

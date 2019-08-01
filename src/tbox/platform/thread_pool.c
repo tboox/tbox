@@ -503,7 +503,7 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 
                 // the job is waiting? work it
                 tb_long_t state = TB_STATE_WAITING;
-                if (tb_atomic_compare_and_set(&job->state, &state, TB_STATE_WORKING))
+                if (tb_atomic_compare_and_swap(&job->state, &state, TB_STATE_WORKING))
                 {
                     // trace
                     tb_trace_d("worker[%lu]: done: task[%p:%s]: ..", worker->id, job->task.done, job->task.name);

@@ -36,8 +36,8 @@
 #   define tb_atomic_fetch_and_set(a, v)        tb_atomic_fetch_and_set_x86(a, v)
 #endif
 
-#ifndef tb_atomic_compare_and_set
-#   define tb_atomic_compare_and_set(a, p, v)   tb_atomic_compare_and_set_x86(a, p, v)
+#ifndef tb_atomic_compare_and_swap
+#   define tb_atomic_compare_and_swap(a, p, v)   tb_atomic_compare_and_swap_x86(a, p, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_add
@@ -71,7 +71,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_lo
 
     return v;
 }
-static __tb_inline__ tb_bool_t tb_atomic_compare_and_set_x86(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
+static __tb_inline__ tb_bool_t tb_atomic_compare_and_swap_x86(tb_atomic_t* a, tb_long_t* p, tb_long_t v)
 {
     // check
     tb_assert(a && p);

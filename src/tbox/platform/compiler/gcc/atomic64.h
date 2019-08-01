@@ -38,12 +38,12 @@
 #   define tb_atomic64_get_explicit(a, mo)                  tb_atomic64_get_explicit_gcc(a, mo)
 #   define tb_atomic64_set(a, v)                            tb_atomic64_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
 #   define tb_atomic64_set_explicit(a, v, mo)               tb_atomic64_set_explicit_gcc(a, v, mo)
-#   define tb_atomic64_compare_and_set(a, p, v)             tb_atomic64_compare_and_set_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#   define tb_atomic64_compare_and_set_explicit(a, p, v, succ, fail) \
-                                                            tb_atomic64_compare_and_set_explicit_gcc(a, p, v, succ, fail)
-#   define tb_atomic64_compare_and_set_weak(a, p, v)        tb_atomic64_compare_and_set_weak_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#   define tb_atomic64_compare_and_set_weak_explicit(a, p, v, succ, fail) \
-                                                            tb_atomic64_compare_and_set_weak_explicit_gcc(a, p, v, succ, fail)
+#   define tb_atomic64_compare_and_swap(a, p, v)            tb_atomic64_compare_and_swap_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_compare_and_swap_explicit_gcc(a, p, v, succ, fail)
+#   define tb_atomic64_compare_and_swap_weak(a, p, v)       tb_atomic64_compare_and_swap_weak_explicit_gcc(a, p, v, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#   define tb_atomic64_compare_and_swap_weak_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic64_compare_and_swap_weak_explicit_gcc(a, p, v, succ, fail)
 #   define tb_atomic64_fetch_and_set(a, v)                  tb_atomic64_fetch_and_set_explicit_gcc(a, v, __ATOMIC_SEQ_CST)
 #   define tb_atomic64_fetch_and_set_explicit(a, v, mo)     tb_atomic64_fetch_and_set_explicit_gcc(a, v, mo)
 #   define tb_atomic64_fetch_and_add(a, v)                  __atomic_fetch_add(a, v, __ATOMIC_SEQ_CST)
@@ -58,7 +58,7 @@
 #   define tb_atomic64_fetch_and_xor_explicit(a, v, mo)     __atomic_fetch_xor(a, v, mo)
 
 #else
-#   define tb_atomic64_compare_and_set(a, p, v)             tb_atomic64_compare_and_set_gcc(a, p, v)
+#   define tb_atomic64_compare_and_swap(a, p, v)             tb_atomic64_compare_and_swap_gcc(a, p, v)
 #   define tb_atomic64_fetch_and_cmpset(a, p, v)            __sync_val_compare_and_swap_8(a, p, v)
 
 #   define tb_atomic64_fetch_and_add(a, v)                  __sync_fetch_and_add_8(a, v)
@@ -88,12 +88,12 @@ static __tb_inline__ tb_void_t tb_atomic64_set_explicit_gcc(tb_atomic64_t* a, tb
     tb_assert(a);
     __atomic_store(a, &v, mo);
 }
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
 {
     tb_assert(a);
     return __atomic_compare_exchange(a, p, &v, 0, succ, fail);	
 }
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_weak_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_weak_explicit_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v, tb_size_t succ, tb_size_t fail)
 {
     tb_assert(a);
     return __atomic_compare_exchange(a, p, &v, 1, succ, fail);	
@@ -106,7 +106,7 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_set_explicit_gcc(tb_atomic6
     return o;
 }
 #else
-static __tb_inline__ tb_bool_t tb_atomic64_compare_and_set_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
+static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_gcc(tb_atomic64_t* a, tb_hong_t* p, tb_hong_t v)
 {
     tb_assert(a && p);
     tb_hong_t e = *p;
