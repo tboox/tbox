@@ -170,7 +170,7 @@ typedef tb_atomic32_t                                   tb_atomic_t;
 #if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)) 
 typedef __tb_volatile__ atomic_flag                     tb_atomic_flag_t;
 #elif defined(TB_COMPILER_IS_GCC) && defined(__ATOMIC_SEQ_CST) 
-typedef __tb_volatile__ _Atomic struct __tb_atomic_flag_t
+typedef __tb_volatile__ struct __tb_atomic_flag_t
 {
     unsigned char __val;
 }                                                       tb_atomic_flag_t;
