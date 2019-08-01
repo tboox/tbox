@@ -44,7 +44,7 @@ static tb_void_t tb_test_atomic64_compare_and_swap()
     tb_trace_i("atomic64_compare_and_swap(): test ..");
     tb_atomic64_t a;
     tb_atomic64_init(&a, 0);
-    tb_hong_t p = 0;
+    tb_int64_t p = 0;
     tb_assert_and_check_return(tb_atomic64_compare_and_swap(&a, &p, 1) && p == 0);
     p = 1;
     tb_assert_and_check_return(tb_atomic64_compare_and_swap(&a, &p, 2) && p == 1);
@@ -107,12 +107,6 @@ static tb_void_t tb_test_atomic64_fetch_and_or()
     tb_assert_and_check_return(tb_atomic64_fetch_and_or(&a, 1000) == 3);
     tb_trace_i("atomic64_fetch_and_or(): test ok!");
 }
-static tb_void_t tb_test_memory_barrier()
-{
-    tb_trace_i("memory_barrier(): test ..");
-    tb_memory_barrier();
-    tb_trace_i("memory_barrier(): test ok!");
-}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
@@ -128,6 +122,5 @@ tb_int_t tb_demo_platform_atomic64_main(tb_int_t argc, tb_char_t** argv)
     tb_test_atomic64_fetch_and_and();
     tb_test_atomic64_fetch_and_xor();
     tb_test_atomic64_fetch_and_or();
-    tb_test_memory_barrier();
     return 0;
 }

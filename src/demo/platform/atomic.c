@@ -107,6 +107,17 @@ static tb_void_t tb_test_atomic_fetch_and_or()
     tb_assert_and_check_return(tb_atomic_fetch_and_or(&a, 1000) == 3);
     tb_trace_i("atomic_fetch_and_or(): test ok!");
 }
+static tb_void_t tb_test_atomic_flag_test_and_set()
+{
+    tb_trace_i("atomic_flag_test_and_set(): test ..");
+    tb_atomic_flag_t a = TB_ATOMIC_FLAG_INIT;
+    tb_assert_and_check_return(!tb_atomic_flag_test_and_set(&a));
+    tb_assert_and_check_return(tb_atomic_flag_test_and_set(&a));
+    tb_atomic_flag_clear(&a);
+    tb_assert_and_check_return(!tb_atomic_flag_test_and_set(&a));
+    tb_assert_and_check_return(tb_atomic_flag_test_and_set(&a));
+    tb_trace_i("atomic_flag_test_and_set(): test ok!");
+}
 static tb_void_t tb_test_memory_barrier()
 {
     tb_trace_i("memory_barrier(): test ..");
@@ -128,6 +139,7 @@ tb_int_t tb_demo_platform_atomic_main(tb_int_t argc, tb_char_t** argv)
     tb_test_atomic_fetch_and_and();
     tb_test_atomic_fetch_and_xor();
     tb_test_atomic_fetch_and_or();
+    tb_test_atomic_flag_test_and_set();
     tb_test_memory_barrier();
     return 0;
 }

@@ -40,6 +40,11 @@
  * macros
  */
 
+/// the atomic flag initialize value
+#ifndef TB_ATOMIC_FLAG_INIT
+#   define TB_ATOMIC_FLAG_INIT      {0}
+#endif
+
 /// no barriers or synchronization. 
 #ifndef TB_ATOMIC_RELAXED
 #   define TB_ATOMIC_RELAXED        (1)
@@ -235,6 +240,24 @@
 #   define tb_atomic_set(a, v)                          tb_atomic32_set(a, (tb_int32_t)(v))
 #endif
 
+/// sets an atomic_flag to true and returns the old value 
+#ifndef tb_atomic_flag_test_and_set_explicit
+#   define tb_atomic_flag_test_and_set_explicit_generic_impl
+#   define tb_atomic_flag_test_and_set_explicit(a, mo)  tb_atomic_flag_test_and_set_explicit_generic(a, mo)
+#endif
+#ifndef tb_atomic_flag_test_and_set
+#   define tb_atomic_flag_test_and_set(a)               tb_atomic_flag_test_and_set_explicit(a, TB_ATOMIC_SEQ_CST)
+#endif
+
+/// sets an atomic_flag to false 
+#ifndef tb_atomic_flag_clear_explicit
+#   define tb_atomic_flag_clear_explicit_generic_impl
+#   define tb_atomic_flag_clear_explicit(a, mo)         tb_atomic_flag_clear_explicit_generic(a, mo)
+#endif
+#ifndef tb_atomic_flag_clear
+#   define tb_atomic_flag_clear(a)                      tb_atomic_flag_clear_explicit(a, TB_ATOMIC_SEQ_CST)
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -242,5 +265,25 @@
 #   include "deprecated/atomic.h"
 #endif
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inline implementation
+ */
+#ifdef tb_atomic_flag_test_and_set_explicit_generic_impl
+static __tb_inline__ tb_bool_t tb_atomic_flag_test_and_set_explicit_generic(tb_atomic_flag_t* a, tb_int_t mo)
+{
+    tb_assert(a);
+    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_atomic32_t));
+    return (tb_bool_t)tb_atomic32_fetch_and_set_explicit((tb_atomic32_t*)a, 1, mo);
+}
+#endif
+
+#ifdef tb_atomic_flag_clear_explicit_generic_impl
+static __tb_inline__ tb_void_t tb_atomic_flag_clear_explicit_generic(tb_atomic_flag_t* a, tb_int_t mo)
+{
+    tb_assert(a);
+    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_atomic32_t));
+    tb_atomic32_set_explicit((tb_atomic32_t*)a, 0, mo);
+}
+#endif
 
 #endif

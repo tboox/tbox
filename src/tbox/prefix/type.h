@@ -28,6 +28,9 @@
 #include "keyword.h"
 #include "compiler.h"
 #include "cpu.h"
+#if __tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)
+#   include <stdatomic.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -144,23 +147,38 @@ typedef tb_fixed16_t                tb_fixed_t;
 
 /// the atomic32 type, need be aligned for arm, ..
 #if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__))
-typedef _Atomic tb_int32_t                              tb_atomic32_t;
+typedef __tb_volatile__ _Atomic tb_int32_t              tb_atomic32_t;
 #else
 typedef __tb_volatile__  __tb_aligned__(4) tb_int32_t   tb_atomic32_t;
 #endif
 
 /// the atomic64 type, need be aligned for arm, ..
 #if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)) 
-typedef  _Atomic tb_int64_t                             tb_atomic64_t;
+typedef __tb_volatile__ _Atomic tb_int64_t              tb_atomic64_t;
 #else
-typedef __tb_volatile__  __tb_aligned__(8) tb_int64_t   tb_atomic64_t;
+typedef __tb_volatile__ __tb_aligned__(8) tb_int64_t    tb_atomic64_t;
 #endif
 
 /// the atomic type
 #if TB_CPU_BIT64
-typedef tb_atomic64_t               tb_atomic_t;
+typedef tb_atomic64_t                                   tb_atomic_t;
 #else
-typedef tb_atomic32_t               tb_atomic_t;
+typedef tb_atomic32_t                                   tb_atomic_t;
+#endif
+
+/// the atomic flag type
+#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)) 
+typedef __tb_volatile__ atomic_flag                     tb_atomic_flag_t;
+#elif defined(TB_COMPILER_IS_GCC) && defined(__ATOMIC_SEQ_CST) 
+typedef __tb_volatile__ _Atomic struct __tb_atomic_flag_t
+{
+    unsigned char __val;
+}                                                       tb_atomic_flag_t;
+#else
+typedef __tb_volatile__ struct __tb_atomic_flag_t
+{
+    tb_atomic32_t __val;
+}                                                       tb_atomic_flag_t;
 #endif
 
 /// the spinlock type
