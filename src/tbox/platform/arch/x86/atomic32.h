@@ -21,7 +21,6 @@
 #ifndef TB_PLATFORM_ARCH_x86_ATOMIC32_H
 #define TB_PLATFORM_ARCH_x86_ATOMIC32_H
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -32,22 +31,23 @@
  */
 #ifdef TB_ASSEMBLER_IS_GAS
 
-#ifndef tb_atomic32_fetch_and_set
-#   define tb_atomic32_fetch_and_set(a, v)          tb_atomic32_fetch_and_set_x86(a, v)
+#ifndef tb_atomic32_fetch_and_set_explicit
+#   define tb_atomic32_fetch_and_set_explicit(a, v, mo)         tb_atomic32_fetch_and_set_explicit_x86(a, v, mo)
 #endif
 
-#ifndef tb_atomic32_compare_and_swap
-#   define tb_atomic32_compare_and_swap(a, p, v)    tb_atomic32_compare_and_swap_x86(a, p, v)
+#ifndef tb_atomic32_compare_and_swap_explicit
+#   define tb_atomic32_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                                tb_atomic32_compare_and_swap_explicit_x86(a, p, v, succ, fail)
 #endif
 
-#ifndef tb_atomic32_fetch_and_add
-#   define tb_atomic32_fetch_and_add(a, v)          tb_atomic32_fetch_and_add_x86(a, v)
+#ifndef tb_atomic32_fetch_and_add_explicit
+#   define tb_atomic32_fetch_and_add_explicit(a, v, mo)         tb_atomic32_fetch_and_add_explicit_x86(a, v, mo)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_set_x86(tb_atomic32_t* a, tb_int32_t v)
+static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_set_explicit_x86(tb_atomic32_t* a, tb_int32_t v, tb_int_t mo)
 {
     // check
     tb_assert(a);
@@ -62,7 +62,8 @@ static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_set_x86(tb_atomic32_t* a, 
 
     return v;
 }
-static __tb_inline__ tb_bool_t tb_atomic32_compare_and_swap_x86(tb_atomic32_t* a, tb_int32_t* p, tb_int32_t v)
+
+static __tb_inline__ tb_bool_t tb_atomic32_compare_and_swap_explicit_x86(tb_atomic32_t* a, tb_int32_t* p, tb_int32_t v, tb_int_t succ, tb_int_t fail)
 {
     // check
     tb_assert(a && p);
@@ -94,7 +95,8 @@ static __tb_inline__ tb_bool_t tb_atomic32_compare_and_swap_x86(tb_atomic32_t* a
     *p = o;
     return o == e;
 }
-static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_add_x86(tb_atomic32_t* a, tb_int32_t v)
+
+static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_add_explicit_x86(tb_atomic32_t* a, tb_int32_t v, tb_int_t mo)
 {
     // check
     tb_assert(a);

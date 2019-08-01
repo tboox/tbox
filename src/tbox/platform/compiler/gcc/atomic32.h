@@ -59,17 +59,18 @@
 
 #else
 
-#   define tb_atomic32_compare_and_swap(a, p, v)            tb_atomic32_compare_and_swap_gcc(a, p, v)
-#   define tb_atomic32_fetch_and_cmpset(a, p, v)            __sync_val_compare_and_swap(a, p, v)
-
-#   define tb_atomic32_fetch_and_add(a, v)                  __sync_fetch_and_add(a, v)
-#   define tb_atomic32_fetch_and_sub(a, v)                  __sync_fetch_and_sub(a, v)
-#   define tb_atomic32_fetch_and_or(a, v)                   __sync_fetch_and_or(a, v)
-#   define tb_atomic32_fetch_and_and(a, v)                  __sync_fetch_and_and(a, v)
+#   define tb_atomic32_compare_and_swap_explicit(a, p, v, succ, fail) \
+                                                            tb_atomic32_compare_and_swap_gcc(a, p, v)
+#   define tb_atomic32_fetch_and_cmpset_explicit(a, p, v, succ, fail) \
+                                                            __sync_val_compare_and_swap(a, p, v)
+#   define tb_atomic32_fetch_and_add_explicit(a, v, mo)     __sync_fetch_and_add(a, v)
+#   define tb_atomic32_fetch_and_sub_explicit(a, v, mo)     __sync_fetch_and_sub(a, v)
+#   define tb_atomic32_fetch_and_or_explicit(a, v, mo)      __sync_fetch_and_or(a, v)
+#   define tb_atomic32_fetch_and_and_explicit(a, v, mo)     __sync_fetch_and_and(a, v)
 
 // FIXME: ios armv6: no defined refernece?
 #   if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
-#       define tb_atomic32_fetch_and_xor(a, v)              __sync_fetch_and_xor(a, v)
+#       define tb_atomic32_fetch_and_xor_explicit(a, v, mo) __sync_fetch_and_xor(a, v)
 #   endif
 
 #endif

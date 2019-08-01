@@ -21,7 +21,6 @@
 #ifndef TB_PLATFORM_COMPILER_LIBC_ATOMIC32_H
 #define TB_PLATFORM_COMPILER_LIBC_ATOMIC32_H
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
