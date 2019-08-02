@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "interface/interface.h"
+#include "interface/kernel32.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -53,10 +53,8 @@ static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_windows(tb_
     // check
     tb_assert(a && p);
 
-    // the InterlockedCompareExchange64 func
+    // try to use InterlockedCompareExchange64 if exists
     tb_kernel32_InterlockedCompareExchange64_t pInterlockedCompareExchange64 = tb_kernel32()->InterlockedCompareExchange64;
-
-    // done
     if (pInterlockedCompareExchange64) 
     {
         tb_int64_t e = *p;

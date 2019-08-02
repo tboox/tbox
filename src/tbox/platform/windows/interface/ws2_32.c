@@ -36,10 +36,9 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance, tb_cpointer_t priv)
+static tb_bool_t tb_ws2_32_instance_init(tb_ws2_32_ref_t ws2_32)
 {
     // check
-    tb_ws2_32_ref_t ws2_32 = (tb_ws2_32_ref_t)instance;
     tb_assert_and_check_return_val(ws2_32, tb_false);
 
     // the ws2_32 module
@@ -90,14 +89,10 @@ static tb_bool_t tb_ws2_32_instance_init(tb_handle_t instance, tb_cpointer_t pri
  */
 tb_ws2_32_ref_t tb_ws2_32()
 {
-    // init
-    static tb_atomic_t      s_binited = 0;
-    static tb_ws2_32_t      s_ws2_32 = {0};
-
-    // init the static instance
-    tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_ws2_32, tb_ws2_32_instance_init, tb_null);
-    tb_assert(ok); tb_used(ok);
-
-    // ok
-    return &s_ws2_32;
+    // we will pre-initialize it in tb_platform_init()
+    static tb_bool_t      s_binited = tb_false;
+    static tb_ws2_32_t    s_ws2_32 = {0};
+    if (!s_binited)
+        s_binited = tb_ws2_32_instance_init(&s_ws2_32);
+    return s_binited? &s_ws2_32 : tb_null;
 }

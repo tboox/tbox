@@ -130,6 +130,7 @@ target("tbox")
 
     -- add the source files for the windows 
     if is_os("windows") then
+        add_files("platform/windows/windows.c")
         add_files("platform/windows/iocp_object.c")
         add_files("platform/windows/socket_pool.c")
         add_files("platform/windows/interface/*.c")
