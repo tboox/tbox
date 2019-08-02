@@ -166,6 +166,11 @@ function check_module_cfuncs(module, includes, ...)
     end
 end
 
+-- check c snippet in the given module
+function check_module_csnippet(module, includes, name, snippet)
+    configvar_check_csnippets(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), snippet, {name = module .. "_" .. name, includes = includes, defines = "_GNU_SOURCE=1"})
+end
+
 -- check interfaces
 function check_interfaces()
 
@@ -278,6 +283,22 @@ function check_interfaces()
     check_module_cfuncs("posix", "sys/resource.h",                   "getrlimit")
     check_module_cfuncs("posix", "netdb.h",                          "getaddrinfo", "getnameinfo", "gethostbyname", "gethostbyaddr")
     check_module_cfuncs("posix", "fcntl.h",                          "fcntl")
+
+    -- add the interfaces for windows
+    if is_os("windows") then
+        check_module_csnippet("windows", "windows.h", "_InterlockedExchange8", [[
+            #pragma intrinsic(_InterlockedExchange8)
+            CHAR _InterlockedExchange8(CHAR volatile* Destination, CHAR Exchange);
+            void test() {
+                _InterlockedExchange8(0, 0);
+            }]])
+        check_module_csnippet("windows", "windows.h", "_InterlockedCompareExchange64", [[
+            #pragma intrinsic(_InterlockedCompareExchange64)
+            __int64 _InterlockedCompareExchange64(__int64 volatile* Destination, __int64 Exchange, __int64 Comperand);
+            void test() {
+                _InterlockedCompareExchange64(0, 0, 0);
+            }]])
+    end
 
     -- add the interfaces for freebsd
     check_module_cfuncs("freebsd", {"sys/file.h", "fcntl.h"},        "flock")

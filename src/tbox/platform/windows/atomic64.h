@@ -43,6 +43,10 @@ __tb_extern_c_enter__
  * declaration
  */
 tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail);
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64
+#   pragma intrinsic(_InterlockedCompareExchange64)
+__int64 _InterlockedCompareExchange64(__int64 __tb_volatile__* Destination, __int64 Exchange, __int64 Comperand);
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation
@@ -53,14 +57,14 @@ static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_windows(tb_
     // check
     tb_assert(a && p);
 
-    // try to use InterlockedCompareExchange64 if exists
-    tb_kernel32_InterlockedCompareExchange64_t pInterlockedCompareExchange64 = tb_kernel32()->InterlockedCompareExchange64;
-    if (pInterlockedCompareExchange64) 
+    // try to use _InterlockedCompareExchange64 if exists
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64
     {
         tb_int64_t e = *p;
-        *p = (tb_int64_t)pInterlockedCompareExchange64((LONGLONG __tb_volatile__*)a, v, e);
+        *p = (tb_int64_t)_InterlockedCompareExchange64((__int64 __tb_volatile__*)a, v, e);
         return *p == e;
     }
+#endif
 
     // using the generic implementation
     return tb_atomic64_compare_and_swap_explicit_generic(a, p, v, succ, fail);

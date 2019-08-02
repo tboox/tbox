@@ -43,7 +43,6 @@ static tb_bool_t tb_kernel32_instance_init(tb_kernel32_ref_t kernel32)
     TB_INTERFACE_LOAD(kernel32, RtlCaptureStackBackTrace);
     TB_INTERFACE_LOAD(kernel32, GetFileSizeEx);
     TB_INTERFACE_LOAD(kernel32, GetQueuedCompletionStatusEx);
-    TB_INTERFACE_LOAD(kernel32, InterlockedCompareExchange64);
     TB_INTERFACE_LOAD(kernel32, GetEnvironmentVariableW);
     TB_INTERFACE_LOAD(kernel32, SetEnvironmentVariableW);
     TB_INTERFACE_LOAD(kernel32, CreateProcessW);

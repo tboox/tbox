@@ -73,4 +73,12 @@ target("demo")
 
     -- add the source files for the database module
     if has_config("database") then add_files("database/sql.c") end
-    
+
+    -- enable xp compatibility mode
+    if is_plat("windows") then
+        if is_arch("x86") then
+            add_ldflags("/subsystem:console,5.01")
+        else
+            add_ldflags("/subsystem:console,5.02")
+        end
+    end
