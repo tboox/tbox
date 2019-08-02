@@ -44,8 +44,8 @@ __tb_extern_c_enter__
  */
 tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail);
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64
-#   pragma intrinsic(_InterlockedCompareExchange64)
 __int64 _InterlockedCompareExchange64(__int64 __tb_volatile__* Destination, __int64 Exchange, __int64 Comperand);
+#   pragma intrinsic(_InterlockedCompareExchange64)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

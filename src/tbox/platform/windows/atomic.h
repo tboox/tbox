@@ -50,8 +50,8 @@
  * declarations
  */
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
-#   pragma intrinsic(_InterlockedExchange8)
 CHAR _InterlockedExchange8(CHAR __tb_volatile__* Destination, CHAR Exchange);
+#   pragma intrinsic(_InterlockedExchange8)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

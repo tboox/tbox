@@ -167,8 +167,8 @@ function check_module_cfuncs(module, includes, ...)
 end
 
 -- check c snippet in the given module
-function check_module_csnippet(module, includes, name, snippet)
-    configvar_check_csnippets(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), snippet, {name = module .. "_" .. name, includes = includes, defines = "_GNU_SOURCE=1"})
+function check_module_csnippet(module, includes, name, snippet, opt)
+    configvar_check_csnippets(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), snippet, table.join({name = module .. "_" .. name, includes = includes, defines = "_GNU_SOURCE=1"}, opt))
 end
 
 -- check interfaces
@@ -287,17 +287,17 @@ function check_interfaces()
     -- add the interfaces for windows
     if is_os("windows") then
         check_module_csnippet("windows", "windows.h", "_InterlockedExchange8", [[
-            #pragma intrinsic(_InterlockedExchange8)
             CHAR _InterlockedExchange8(CHAR volatile* Destination, CHAR Exchange);
+            #pragma intrinsic(_InterlockedExchange8)
             void test() {
                 _InterlockedExchange8(0, 0);
-            }]])
+            }]], {cxflags = "-WX -W3"})
         check_module_csnippet("windows", "windows.h", "_InterlockedCompareExchange64", [[
-            #pragma intrinsic(_InterlockedCompareExchange64)
             __int64 _InterlockedCompareExchange64(__int64 volatile* Destination, __int64 Exchange, __int64 Comperand);
+            #pragma intrinsic(_InterlockedCompareExchange64)
             void test() {
                 _InterlockedCompareExchange64(0, 0, 0);
-            }]])
+            }]], {cxflags = "-WX -W3"})
     end
 
     -- add the interfaces for freebsd
