@@ -69,7 +69,7 @@ static __tb_inline_force__ tb_spinlock_ref_t tb_atomic64_lock(tb_atomic64_t* a)
     tb_trace1_w("using generic atomic64, maybe slower!");
 
     // the addr
-    tb_int_t addr = (tb_int_t)a;
+    tb_size_t addr = (tb_size_t)a;
 
     // compile the hash value
     addr >>= TB_L1_CACHE_SHIFT;
