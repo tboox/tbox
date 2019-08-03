@@ -249,6 +249,14 @@
 #   define tb_atomic_flag_test_and_set(a)               tb_atomic_flag_test_and_set_explicit(a, TB_ATOMIC_SEQ_CST)
 #endif
 
+/// returns the test result of an atomic_flag 
+#ifndef tb_atomic_flag_test_explicit
+#   define tb_atomic_flag_test_explicit(a, mo)          tb_atomic_flag_test_explicit_generic(a, mo)
+#endif
+#ifndef tb_atomic_flag_test
+#   define tb_atomic_flag_test(a)                       tb_atomic_flag_test_explicit(a, TB_ATOMIC_SEQ_CST)
+#endif
+
 /// sets an atomic_flag to false 
 #ifndef tb_atomic_flag_clear_explicit
 #   define tb_atomic_flag_clear_explicit_generic_impl
