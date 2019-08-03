@@ -53,7 +53,7 @@ static tb_bool_t tb_ole32_instance_init(tb_handle_t instance, tb_cpointer_t priv
 tb_ole32_ref_t tb_ole32()
 {
     // init
-    static tb_atomic_t  s_binited = 0;
+    static tb_atomic32_t  s_binited = 0;
     static tb_ole32_t   s_ole32 = {0};
 
     // init the static instance

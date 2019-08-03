@@ -55,7 +55,7 @@ static tb_bool_t tb_iphlpapi_instance_init(tb_handle_t instance, tb_cpointer_t p
 tb_iphlpapi_ref_t tb_iphlpapi()
 {
     // init
-    static tb_atomic_t      s_binited = 0;
+    static tb_atomic32_t      s_binited = 0;
     static tb_iphlpapi_t    s_iphlpapi = {0};
 
     // init the static instance

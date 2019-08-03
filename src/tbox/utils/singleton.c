@@ -177,13 +177,13 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     // ok?
     return instance;
 }
-tb_bool_t tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, tb_singleton_static_init_func_t init, tb_cpointer_t priv)
+tb_bool_t tb_singleton_static_init(tb_atomic32_t* binited, tb_handle_t instance, tb_singleton_static_init_func_t init, tb_cpointer_t priv)
 {
     // check
     tb_check_return_val(binited && instance, tb_false);
 
     // inited?
-    tb_atomic_t inited = tb_atomic_fetch_and_cmpset(binited, 0, 1);
+    tb_atomic32_t inited = tb_atomic32_fetch_and_cmpset(binited, 0, 1);
 
     // ok?
     if (inited && inited != 1) return tb_true;
@@ -197,21 +197,21 @@ tb_bool_t tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, t
         if (!init(instance, priv)) return tb_false;
 
         // init ok
-        tb_atomic_set(binited, 2);
+        tb_atomic32_set(binited, 2);
     }
     // initing? wait it
     else
     {
         // try getting it
         tb_size_t tryn = 50;
-        while ((1 == tb_atomic_get(binited)) && tryn--)
+        while ((1 == tb_atomic32_get(binited)) && tryn--)
         {
             // wait some time
             tb_msleep(100);
         }
 
         // failed?
-        if (tb_atomic_get(binited) == 1 || !instance)
+        if (tb_atomic32_get(binited) == 1 || !instance)
             return tb_false;
     }
 

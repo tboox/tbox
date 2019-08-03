@@ -185,7 +185,7 @@ tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_singleton_static_init(tb_atomic_t* binited, tb_handle_t instance, tb_singleton_static_init_func_t init, tb_cpointer_t priv);
+tb_bool_t           tb_singleton_static_init(tb_atomic32_t* binited, tb_handle_t instance, tb_singleton_static_init_func_t init, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
