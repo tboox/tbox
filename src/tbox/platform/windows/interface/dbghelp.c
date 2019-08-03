@@ -61,7 +61,7 @@ static tb_bool_t tb_dbghelp_instance_init(tb_handle_t instance, tb_cpointer_t pr
 tb_dbghelp_ref_t tb_dbghelp()
 {
     // init
-    static tb_atomic32_t      s_binited = 0;
+    static tb_atomic32_t    s_binited = 0;
     static tb_dbghelp_t     s_dbghelp = {0};
 
     // init the static instance

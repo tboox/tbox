@@ -41,7 +41,7 @@ typedef struct __tb_semaphore_impl_t
     HANDLE          semaphore;
 
     // the semaphore value
-    tb_atomic_t     value;
+    tb_atomic32_t   value;
 
 }tb_semaphore_impl_t;
 
@@ -68,7 +68,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
         tb_assert_and_check_break(impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE);
 
         // init value
-        tb_atomic_init(&impl->value, init);
+        tb_atomic32_init(&impl->value, (tb_int32_t)init);
 
         // ok
         ok = tb_true;
@@ -106,14 +106,14 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
     tb_assert_and_check_return_val(semaphore && impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE && post, tb_false);
     
     // += post
-    tb_atomic_fetch_and_add(&impl->value, post);
+    tb_atomic32_fetch_and_add(&impl->value, post);
     
     // post
     LONG prev = 0;
     if (!ReleaseSemaphore(impl->semaphore, (LONG)post, &prev) && prev >= 0) 
     {
         // restore
-        tb_atomic_fetch_and_sub(&impl->value, (tb_long_t)post);
+        tb_atomic32_fetch_and_sub(&impl->value, (tb_long_t)post);
         return tb_false;
     }
 
@@ -121,7 +121,7 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
     tb_assert_and_check_return_val(prev + post <= TB_SEMAPHORE_VALUE_MAXN, tb_false);
     
     // save value
-    tb_atomic_set(&impl->value, prev + post);
+    tb_atomic32_set(&impl->value, prev + post);
     
     // ok
     return tb_true;
@@ -133,7 +133,7 @@ tb_long_t tb_semaphore_value(tb_semaphore_ref_t semaphore)
     tb_assert_and_check_return_val(semaphore, -1);
 
     // get value
-    return (tb_long_t)tb_atomic_get(&impl->value);
+    return (tb_long_t)tb_atomic32_get(&impl->value);
 }
 tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 {
@@ -152,10 +152,10 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
     // check value
-    tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&impl->value) > 0, -1);
+    tb_assert_and_check_return_val((tb_long_t)tb_atomic32_get(&impl->value) > 0, -1);
     
     // value--
-    tb_atomic_fetch_and_sub(&impl->value, 1);
+    tb_atomic32_fetch_and_sub(&impl->value, 1);
     
     // ok
     return 1;

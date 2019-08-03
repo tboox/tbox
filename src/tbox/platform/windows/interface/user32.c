@@ -53,7 +53,7 @@ static tb_bool_t tb_user32_instance_init(tb_handle_t instance, tb_cpointer_t pri
 tb_user32_ref_t tb_user32()
 {
     // init
-    static tb_atomic32_t      s_binited = 0;
+    static tb_atomic32_t    s_binited = 0;
     static tb_user32_t      s_user32 = {0};
 
     // init the static instance

@@ -54,7 +54,7 @@ tb_ole32_ref_t tb_ole32()
 {
     // init
     static tb_atomic32_t  s_binited = 0;
-    static tb_ole32_t   s_ole32 = {0};
+    static tb_ole32_t     s_ole32 = {0};
 
     // init the static instance
     tb_bool_t ok = tb_singleton_static_init(&s_binited, &s_ole32, tb_ole32_instance_init, tb_null);

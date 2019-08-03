@@ -136,7 +136,7 @@ static tb_bool_t tb_mswsock_instance_init(tb_handle_t instance, tb_cpointer_t pr
 tb_mswsock_ref_t tb_mswsock()
 {
     // init
-    static tb_atomic32_t      s_binited = 0;
+    static tb_atomic32_t    s_binited = 0;
     static tb_mswsock_t     s_mswsock = {0};
 
     // init the static instance

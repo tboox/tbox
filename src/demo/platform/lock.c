@@ -18,7 +18,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-static __tb_volatile__ tb_atomic_t g_value = 0;
+static __tb_volatile__ tb_atomic32_t g_value = 0;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * loop
@@ -57,7 +57,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
             tb_spinlock_leave((tb_spinlock_ref_t)&lock);
         }
 #elif defined(TB_TEST_LOCK_ATOMIC)
-        tb_atomic_fetch_and_add(&g_value, 1);
+        tb_atomic32_fetch_and_add(&g_value, 1);
 #else
         // value++
         g_value++;

@@ -54,7 +54,7 @@ static tb_bool_t tb_shell32_instance_init(tb_handle_t instance, tb_cpointer_t pr
 tb_shell32_ref_t tb_shell32()
 {
     // init
-    static tb_atomic32_t      s_binited = 0;
+    static tb_atomic32_t    s_binited = 0;
     static tb_shell32_t     s_shell32 = {0};
 
     // init the static instance
