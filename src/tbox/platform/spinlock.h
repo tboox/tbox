@@ -35,7 +35,7 @@
  */
 
 // the initial value
-#define TB_SPINLOCK_INIT            (0)
+#define TB_SPINLOCK_INIT            TB_ATOMIC_FLAG_INIT
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -51,11 +51,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert(lock);
-
-    // init 
-    tb_atomic_init(lock, 0);
-
-    // ok
+    tb_atomic_flag_clear_explicit(lock, TB_ATOMIC_RELAXED);
     return tb_true;
 }
 
@@ -67,9 +63,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_ref_t lock)
 {
     // check
     tb_assert(lock);
-
-    // reinit it 
-    tb_atomic_init(lock, 0);
+    tb_atomic_flag_clear_explicit(lock, TB_ATOMIC_RELAXED);
 }
 
 /*! enter spinlock
@@ -90,7 +84,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
 #endif
 
     // lock it
-    while (tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1))
+    while (tb_atomic_flag_test_and_set(lock))
     {
 #ifdef TB_LOCK_PROFILER_ENABLE
         // occupied
@@ -133,7 +127,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
     tb_size_t tryn = 5;
     
     // lock it
-    while (tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1))
+    while (tb_atomic_flag_test_and_set(lock))
     {
         // yield the processor
         if (!tryn--)
@@ -161,10 +155,10 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_ref_t loc
 
 #ifndef TB_LOCK_PROFILER_ENABLE
     // try locking it
-    return !tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1);
+    return !tb_atomic_flag_test_and_set(lock);
 #else
     // try locking it
-    tb_bool_t ok = !tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1);
+    tb_bool_t ok = !tb_atomic_flag_test_and_set(lock);
 
     // occupied?
     if (!ok) tb_lock_profiler_occupied(tb_lock_profiler(), (tb_pointer_t)lock);
@@ -186,7 +180,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try_without_profiler(tb_s
     tb_assert(lock);
 
     // try locking it
-    return !tb_atomic_fetch_and_cmpset((tb_atomic_t*)lock, 0, 1);
+    return !tb_atomic_flag_test_and_set(lock);
 }
 
 /*! leave spinlock
@@ -199,7 +193,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_leave(tb_spinlock_ref_t lock)
     tb_assert(lock);
 
     // leave
-    *((tb_atomic_t*)lock) = 0;
+    tb_atomic_flag_clear(lock);
 }
 
 #endif

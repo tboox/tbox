@@ -183,7 +183,7 @@ typedef __tb_volatile__ struct __tb_atomic_flag_t
 #endif
 
 /// the spinlock type
-typedef tb_atomic_t                 tb_spinlock_t;
+typedef tb_atomic_flag_t            tb_spinlock_t;
 
 /// the spinlock ref type
 typedef tb_spinlock_t*              tb_spinlock_ref_t;
