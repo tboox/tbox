@@ -24,6 +24,7 @@
  */
 #include "prefix.h"
 #include "../file.h"
+#include "../dynamic.h"
 #include "../../libc/libc.h"
 #include "../../stream/stream.h"
 #include "../../network/network.h"

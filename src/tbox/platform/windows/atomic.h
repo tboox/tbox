@@ -42,6 +42,8 @@
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
 #   define tb_atomic_flag_test_and_set_explicit(a, mo)  tb_atomic_flag_test_and_set_explicit_windows(a, mo)
 #   define tb_atomic_flag_test_and_set(a)               tb_atomic_flag_test_and_set_explicit(a, TB_ATOMIC_SEQ_CST)
+#   define tb_atomic_flag_test_explicit(a, mo)          tb_atomic_flag_test_explicit_windows(a, mo)
+#   define tb_atomic_flag_test(a)                       tb_atomic_flag_test_explicit(a, TB_ATOMIC_SEQ_CST)
 #   define tb_atomic_flag_clear_explicit(a, mo)         tb_atomic_flag_clear_explicit_windows(a, mo)
 #   define tb_atomic_flag_clear(a)                      tb_atomic_flag_clear_explicit(a, TB_ATOMIC_SEQ_CST)
 #endif
@@ -51,7 +53,9 @@
  */
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
 CHAR _InterlockedExchange8(CHAR __tb_volatile__* Destination, CHAR Exchange);
+CHAR _InterlockedOr8(CHAR __tb_volatile__* Destination, CHAR Value);
 #   pragma intrinsic(_InterlockedExchange8)
+#   pragma intrinsic(_InterlockedOr8)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +67,12 @@ static __tb_inline__ tb_bool_t tb_atomic_flag_test_and_set_explicit_windows(tb_a
     tb_assert(a);
     tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_char_t));
     return (tb_bool_t)_InterlockedExchange8((CHAR __tb_volatile__*)a, 1);
+}
+static __tb_inline__ tb_bool_t tb_atomic_flag_test_explicit_windows(tb_atomic_flag_t* a, tb_int_t mo)
+{
+    tb_assert(a);
+    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_char_t));
+    return (tb_bool_t)_InterlockedOr8((CHAR __tb_volatile__*)a, 0);
 }
 static __tb_inline__ tb_void_t tb_atomic_flag_clear_explicit_windows(tb_atomic_flag_t* a, tb_int_t mo)
 {

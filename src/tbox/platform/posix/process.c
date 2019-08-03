@@ -23,6 +23,9 @@
  * includes
  */
 #include "prefix.h"
+#include "../file.h"
+#include "../path.h"
+#include "../time.h"
 #include "../process.h"
 #include "../environment.h"
 #include <fcntl.h>

@@ -43,7 +43,23 @@
 #define TB_ATOMIC_FLAG_INIT                             ATOMIC_FLAG_INIT
 #define tb_atomic_flag_test_and_set_explicit(a, mo)     atomic_flag_test_and_set_explicit(a, mo)
 #define tb_atomic_flag_test_and_set(a)                  atomic_flag_test_and_set(a)
+#ifdef atomic_flag_test_explicit
+#   define tb_atomic_flag_test_explicit(a, mo)          atomic_flag_test_explicit(a, mo)
+#else
+#   define tb_atomic_flag_test_explicit(a, mo)          tb_atomic_flag_test_explicit_libc(a, mo)
+#endif
+#define tb_atomic_flag_test(a)                          tb_atomic_flag_test_explicit(a, memory_order_seq_cst)
 #define tb_atomic_flag_clear_explicit(a, mo)            atomic_flag_clear_explicit(a, mo)
 #define tb_atomic_flag_clear(a)                         atomic_flag_clear(a)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inline implementation
+ */
+static __tb_inline__ tb_bool_t tb_atomic_flag_test_explicit_libc(tb_atomic_flag_t* a, tb_int_t mo)
+{
+    tb_assert(a);
+    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(unsigned char));
+    return (tb_bool_t)atomic_load_explicit((__tb_volatile__ _Atomic unsigned char*)a, mo);
+}
 
 #endif

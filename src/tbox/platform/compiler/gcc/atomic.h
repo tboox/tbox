@@ -43,11 +43,26 @@
 
 #   define tb_atomic_flag_test_and_set_explicit(a, mo)  __atomic_test_and_set(a, mo)
 #   define tb_atomic_flag_test_and_set(a)               __atomic_test_and_set(a, __ATOMIC_SEQ_CST)
+#   define tb_atomic_flag_test_explicit(a, mo)          tb_atomic_flag_test_explicit_gcc(a, mo)
+#   define tb_atomic_flag_test(a)                       tb_atomic_flag_test_explicit(a, __ATOMIC_SEQ_CST)
 #   define tb_atomic_flag_clear_explicit(a, mo)         __atomic_clear(a, mo)
 #   define tb_atomic_flag_clear(a)                      __atomic_clear(a, __ATOMIC_SEQ_CST)
 #else
 #   define tb_memory_barrier()                          __sync_synchronize()
 #endif
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inline implementation
+ */
+#ifdef __ATOMIC_SEQ_CST
+static __tb_inline__ tb_bool_t tb_atomic_flag_test_explicit_gcc(tb_atomic_flag_t* a, tb_int_t mo)
+{
+    tb_assert(a);
+    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(unsigned char));
+    unsigned char t;
+    __atomic_load((__tb_volatile__ unsigned char*)a, &t, mo);
+    return (tb_bool_t)t;
+}
+#endif
 
 #endif

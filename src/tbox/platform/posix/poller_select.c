@@ -22,6 +22,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../time.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
 #ifdef TB_CONFIG_OS_WINDOWS

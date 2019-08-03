@@ -111,11 +111,13 @@ static tb_void_t tb_test_atomic_flag_test_and_set()
 {
     tb_trace_i("atomic_flag_test_and_set(): test ..");
     tb_atomic_flag_t a = TB_ATOMIC_FLAG_INIT;
+    tb_assert_and_check_return(!tb_atomic_flag_test(&a));
     tb_assert_and_check_return(!tb_atomic_flag_test_and_set(&a));
     tb_assert_and_check_return(tb_atomic_flag_test_and_set(&a));
     tb_atomic_flag_clear(&a);
     tb_assert_and_check_return(!tb_atomic_flag_test_and_set(&a));
     tb_assert_and_check_return(tb_atomic_flag_test_and_set(&a));
+    tb_assert_and_check_return(tb_atomic_flag_test(&a));
     tb_trace_i("atomic_flag_test_and_set(): test ok!");
 }
 static tb_void_t tb_test_memory_barrier()

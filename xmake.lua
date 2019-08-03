@@ -11,7 +11,8 @@ set_version("1.6.3", {build = "%Y%m%d%H%M"})
 set_warnings("all", "error")
 
 -- set language: c99, c++11
-set_languages("c99", "cxx11")
+stdc = "c99"
+set_languages(stdc, "cxx11")
 
 -- add defines to config.h
 set_configvar("_GNU_SOURCE", 1)

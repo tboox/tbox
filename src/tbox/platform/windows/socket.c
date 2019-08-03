@@ -23,6 +23,7 @@
  */
 #include "prefix.h"
 #include "../socket.h"
+#include "../file.h"
 #include "interface/interface.h"
 #include "iocp_object.h"
 #include "socket_pool.h"

@@ -68,7 +68,7 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t self, tb_size_t post)
     tb_assert_and_check_return_val(semaphore && post, tb_false);
 
     // post it
-    tb_long_t value = tb_atomic32_fetch_and_add(semaphore, post);
+    tb_int32_t value = tb_atomic32_fetch_and_add(semaphore, (tb_int32_t)post);
 
     // ok
     return value >= 0? tb_true : tb_false;
