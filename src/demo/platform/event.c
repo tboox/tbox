@@ -18,7 +18,7 @@ typedef struct __tb_demo_loop_t
     tb_size_t           index;
 
     // is stoped?
-    tb_atomic_t         bstoped;
+    tb_atomic_flag_t    bstoped;
 
 }tb_demo_loop_t;
 
@@ -69,7 +69,7 @@ static tb_int_t tb_demo_loop(tb_cpointer_t priv)
         tb_trace_i("[thread: %lu]: init", loop->index);
 
         // loop
-        while (!tb_atomic_get(&loop->bstoped))
+        while (!tb_atomic_flag_test(&loop->bstoped))
         {
             // wait
             tb_long_t wait = tb_event_wait(loop->event, -1);
@@ -113,7 +113,7 @@ tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
         loop[i].index = i;
 
         // init stoped
-        loop[i].bstoped = 0;
+        tb_atomic_flag_clear_explicit(&loop[i].bstoped, TB_ATOMIC_RELAXED);
 
         // init loop
         loop[i].loop = tb_thread_init(tb_null, tb_demo_loop, loop + i, 0);
@@ -168,7 +168,7 @@ tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
     for (i = 0; i < n; i++)
     {
         // quit thread
-        tb_atomic_set(&loop[i].bstoped, 1);
+        tb_atomic_flag_test_and_set(&loop[i].bstoped);
 
         // post event
         if (loop[i].event) tb_event_post(loop[i].event);
