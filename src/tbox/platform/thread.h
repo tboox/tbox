@@ -155,7 +155,7 @@ tb_void_t               tb_thread_return(tb_int_t value);
     }
  
     // run the once function
-    static tb_atomic_t once = 0;
+    static tb_atomic32_t once = 0;
     if (tb_thread_once(&once, tb_thread_once_func, "hello"))
     {
         // ok
@@ -170,7 +170,7 @@ tb_void_t               tb_thread_return(tb_int_t value);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv);
+tb_bool_t               tb_thread_once(tb_atomic32_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv);
 
 /*! set cpu affinity for the given thread
  *

@@ -60,7 +60,7 @@ typedef struct __tb_thread_local_t
     tb_bool_t               inited;
 
     // the atomice lock of once function
-    tb_atomic_t             once;
+    tb_atomic32_t           once;
 
     // the free function
     tb_thread_local_free_t  free;

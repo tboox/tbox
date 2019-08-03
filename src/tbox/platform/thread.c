@@ -178,7 +178,7 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
 }
 #endif
 
-tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv)
+tb_bool_t tb_thread_once(tb_atomic32_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb_cpointer_t priv)
 {
     // check
     tb_check_return_val(lock && func, tb_false);
@@ -190,7 +190,7 @@ tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb
      * 2: have been called and ok
      * -2: have been called and failed
      */
-    tb_atomic_t called = tb_atomic_fetch_and_cmpset(lock, 0, 1);
+    tb_atomic32_t called = tb_atomic32_fetch_and_cmpset(lock, 0, 1);
 
     // called?
     if (called && called != 1) return called == 2;
@@ -201,7 +201,7 @@ tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb
         tb_bool_t ok = func(priv);
 
         // call ok
-        tb_atomic_set(lock, ok? 2 : -1);
+        tb_atomic32_set(lock, ok? 2 : -1);
 
         // ok?
         return ok;
@@ -211,7 +211,7 @@ tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb
     {
         // try getting it
         tb_size_t tryn = 50;
-        while ((1 == tb_atomic_get(lock)) && tryn--)
+        while ((1 == tb_atomic32_get(lock)) && tryn--)
         {
             // wait some time
             tb_msleep(100);
@@ -219,5 +219,5 @@ tb_bool_t tb_thread_once(tb_atomic_t* lock, tb_bool_t (*func)(tb_cpointer_t), tb
     }
 
     // ok? 1: timeout, -2: failed, 2: ok
-    return tb_atomic_get(lock) == 2;
+    return tb_atomic32_get(lock) == 2;
 }

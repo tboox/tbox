@@ -166,7 +166,7 @@ tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func
     tb_xxxx_t* tb_xxxx()
     {
         // init
-        static tb_atomic_t      s_binited = 0;
+        static tb_atomic32_t    s_binited = 0;
         static tb_xxxx_t        s_xxxx = {0};
 
         // init the static instance

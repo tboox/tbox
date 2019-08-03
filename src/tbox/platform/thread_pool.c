@@ -85,7 +85,7 @@ typedef struct __tb_thread_pool_job_t
     tb_thread_pool_task_t               task;
 
     // the reference count, must be <= 2
-    tb_atomic_t                         refn;
+    tb_atomic32_t                       refn;
 
     /* the state
      *
@@ -95,7 +95,7 @@ typedef struct __tb_thread_pool_job_t
      * TB_STATE_KILLING
      * TB_STATE_FINISHED
      */
-    tb_atomic_t                         state;
+    tb_atomic32_t                       state;
 
     // the entry
     tb_list_entry_t                     entry;
@@ -146,7 +146,7 @@ typedef struct __tb_thread_pool_worker_t
     tb_hash_map_ref_t                   stats;
 
     // is stoped?
-    tb_atomic_t                         bstoped;
+    tb_atomic32_t                       bstoped;
 
     // the private data 
     tb_thread_pool_worker_priv_t        priv[TB_THREAD_POOL_WORKER_PRIV_MAXN];
@@ -274,7 +274,7 @@ static tb_bool_t tb_thread_pool_worker_walk_pull_and_clean(tb_iterator_ref_t ite
     tb_assert(job);
 
     // the job state
-    tb_size_t state = tb_atomic_get(&job->state);
+    tb_size_t state = tb_atomic32_get(&job->state);
 
     // waiting and non-full? pull it
     tb_bool_t ok = tb_false;
@@ -337,7 +337,7 @@ static tb_bool_t tb_thread_pool_worker_walk_clean(tb_iterator_ref_t iterator, tb
     tb_assert(job);
 
     // the job state
-    tb_size_t state = tb_atomic_get(&job->state);
+    tb_size_t state = tb_atomic32_get(&job->state);
 
     // finished or killed? remove it
     tb_bool_t ok = tb_false;
@@ -462,7 +462,7 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 if (!tb_vector_size(worker->jobs))
                 {
                     // killed?
-                    tb_check_break(!tb_atomic_get(&worker->bstoped));
+                    tb_check_break(!tb_atomic32_get(&worker->bstoped));
 
                     // trace
                     tb_trace_d("worker[%lu]: wait: ..", worker->id);
@@ -502,8 +502,8 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 tb_assert_and_check_continue(job && job->task.done);
 
                 // the job is waiting? work it
-                tb_long_t state = TB_STATE_WAITING;
-                if (tb_atomic_compare_and_swap(&job->state, &state, TB_STATE_WORKING))
+                tb_int32_t state = TB_STATE_WAITING;
+                if (tb_atomic32_compare_and_swap(&job->state, &state, TB_STATE_WORKING))
                 {
                     // trace
                     tb_trace_d("worker[%lu]: done: task[%p:%s]: ..", worker->id, job->task.done, job->task.name);
@@ -561,13 +561,13 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
 #endif
 
                     // update the job state
-                    tb_atomic_set(&job->state, TB_STATE_FINISHED);
+                    tb_atomic32_set(&job->state, TB_STATE_FINISHED);
                 }
                 // the job is killing? work it
                 else if (state == TB_STATE_KILLING)
                 {
                     // update the job state
-                    tb_atomic_set(&job->state, TB_STATE_KILLED);
+                    tb_atomic32_set(&job->state, TB_STATE_KILLED);
                 }
             }
 
@@ -584,7 +584,7 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         tb_trace_d("worker[%lu]: exit", worker->id);
 
         // stoped
-        tb_atomic_set(&worker->bstoped, 1);
+        tb_atomic32_set(&worker->bstoped, 1);
 
         // exit all private data
         tb_size_t i = 0;
@@ -628,7 +628,7 @@ static tb_bool_t tb_thread_pool_jobs_walk_kill_all(tb_pointer_t item, tb_cpointe
     tb_trace_d("task[%p:%s]: kill: ..", job->task.done, job->task.name);
 
     // kill it if be waiting
-    tb_atomic_fetch_and_cmpset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
+    tb_atomic32_fetch_and_cmpset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
 
     // ok
     return tb_true;
@@ -675,8 +675,8 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
         tb_assert_and_check_break(job);
 
         // init job
-        tb_atomic_init(&job->refn, 1);
-        tb_atomic_init(&job->state, TB_STATE_WAITING);
+        tb_atomic32_init(&job->refn, 1);
+        tb_atomic32_init(&job->state, TB_STATE_WAITING);
         job->task   = *task;
 
         // non-urgent job? 
@@ -917,7 +917,7 @@ tb_void_t tb_thread_pool_kill(tb_thread_pool_ref_t pool)
         // kill all workers
         tb_size_t i = 0;
         tb_size_t n = impl->worker_size;
-        for (i = 0; i < n; i++) tb_atomic_set(&impl->worker_list[i].bstoped, 1);
+        for (i = 0; i < n; i++) tb_atomic32_set(&impl->worker_list[i].bstoped, 1);
 
         // kill all jobs
         if (impl->jobs_pool) tb_fixed_pool_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_kill_all, tb_null);
@@ -1123,10 +1123,10 @@ tb_void_t tb_thread_pool_task_kill(tb_thread_pool_ref_t pool, tb_thread_pool_tas
     tb_assert_and_check_return(pool && job);
 
     // trace
-    tb_trace_d("task[%p:%s]: kill: state: %s: ..", job->task.done, job->task.name, tb_state_cstr(tb_atomic_get(&job->state)));
+    tb_trace_d("task[%p:%s]: kill: state: %s: ..", job->task.done, job->task.name, tb_state_cstr(tb_atomic32_get(&job->state)));
 
     // kill it if be waiting
-    tb_atomic_fetch_and_cmpset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
+    tb_atomic32_fetch_and_cmpset(&job->state, TB_STATE_WAITING, TB_STATE_KILLING);
 }
 tb_void_t tb_thread_pool_task_kill_all(tb_thread_pool_ref_t pool)
 {
@@ -1153,7 +1153,7 @@ tb_long_t tb_thread_pool_task_wait(tb_thread_pool_ref_t pool, tb_thread_pool_tas
     // wait it
     tb_hong_t time = tb_cache_time_spak();
     tb_size_t state = TB_STATE_WAITING;
-    while ( ((state = tb_atomic_get(&job->state)) != TB_STATE_FINISHED) 
+    while ( ((state = tb_atomic32_get(&job->state)) != TB_STATE_FINISHED) 
         &&  state != TB_STATE_KILLED
         &&  (timeout < 0 || tb_cache_time_spak() < time + timeout))
     {
@@ -1194,7 +1194,7 @@ tb_long_t tb_thread_pool_task_wait_all(tb_thread_pool_ref_t pool, tb_long_t time
 #if 0
         tb_for_all_if (tb_thread_pool_job_t*, job, tb_list_entry_itor(&impl->jobs_pending), job)
         {
-            tb_trace_d("wait: job: %s from pending", tb_state_cstr(tb_atomic_get(&job->state)));
+            tb_trace_d("wait: job: %s from pending", tb_state_cstr(tb_atomic32_get(&job->state)));
         }
 #endif
 
@@ -1258,7 +1258,7 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
             tb_assert_and_check_break(worker);
 
             // dump worker
-            tb_trace_i("    worker: id: %lu, stoped: %ld", worker->id, (tb_long_t)tb_atomic_get(&worker->bstoped));
+            tb_trace_i("    worker: id: %lu, stoped: %ld", worker->id, (tb_long_t)tb_atomic32_get(&worker->bstoped));
         }
 
         // trace
