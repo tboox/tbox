@@ -59,7 +59,7 @@ typedef struct __tb_stream_t
      * TB_STATE_KILLING
      * </pre>
      */
-    tb_atomic_t         istate;
+    tb_atomic32_t       istate;
 
     // the timeout
     tb_long_t           timeout;
