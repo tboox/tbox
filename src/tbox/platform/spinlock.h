@@ -86,7 +86,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
     {
         /* try non-atomic directly reading to reduce the performance loss of atomic synchronization,
          * this maybe read some dirty data, but only leads to enter wait state fastly, 
-         * but does not affect to require lock.
+         * but does not affect to acquire lock.
          */
         if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock))
             return ;
@@ -116,7 +116,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
                  *    cmp lockvar, 0   ; check if lock is free
                  *    je get_Lock
                  *    pause            ; wait for memory pipeline to become empty
-                 *    jmp Spin_Lock
+                 *    jmp spin_Lock
                  * get_Lock:
                  *
                  * The PAUSE instruction will "de-pipeline" the memory reads, 

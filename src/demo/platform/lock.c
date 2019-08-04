@@ -26,7 +26,7 @@ static __tb_volatile__ tb_atomic32_t g_value = 0;
 static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
 {
     // check
-    tb_uint32_t self = (tb_uint32_t)tb_thread_self();
+    tb_uint32_t self = (tb_uint32_t)tb_thread_self(); tb_used(&self);
 
     // get lock
 #if defined(TB_TEST_LOCK_MUTEX)
@@ -58,7 +58,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
         {
             if (TB_CPUSET_ISSET(i, &cpuset)) 
             {
-                tb_trace_i("thread[%x]: init cpu core(%zu), cpu: %zu", self, i, cpu);
+                tb_trace_d("thread[%x]: init cpu core(%zu), cpu: %zu", self, i, cpu);
                 break;
             }
         }
@@ -101,7 +101,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
 #endif
     }
 
-    tb_trace_i("thread[%x]: exit cpu core(%zu)", self, cpu);
+    tb_trace_d("thread[%x]: exit cpu core(%zu)", self, cpu);
     return 0;
 }
 
