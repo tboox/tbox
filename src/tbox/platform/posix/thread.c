@@ -29,6 +29,21 @@
 #include <errno.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the thread type
+typedef struct __tb_thread_t
+{
+    // the pthread 
+    pthread_t   pthread;
+
+    // is joined?
+    tb_bool_t   is_joined;
+
+}tb_thread_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
 __tb_extern_c_enter__
@@ -40,13 +55,19 @@ __tb_extern_c_leave__
  */
 tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_cpointer_t priv, tb_size_t stack)
 {
-    // done
-    pthread_t       thread;
+    // check
+    tb_assert_and_check_return_val(func, tb_null);
+
     pthread_attr_t  attr;
     tb_bool_t       ok = tb_false;
     tb_value_ref_t  args = tb_null;
+    tb_thread_t*    thread = tb_null;
     do
     {
+        // init thread
+        thread = tb_malloc0_type(tb_thread_t);
+        tb_assert_and_check_break(thread);
+
         // init attr
         if (stack)
         {
@@ -63,7 +84,7 @@ tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_
         args[1].ptr = (tb_pointer_t)priv;
 
         // init thread
-        if (pthread_create(&thread, stack? &attr : tb_null, tb_thread_func, args)) break;
+        if (pthread_create(&thread->pthread, stack? &attr : tb_null, tb_thread_func, args)) break;
 
         // ok
         ok = tb_true;
@@ -73,41 +94,54 @@ tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_
     // exit attr
     if (stack) pthread_attr_destroy(&attr);
 
-    // exit arguments if failed
+    // failed
     if (!ok)
     {
+        // exit arguments
         if (args) tb_free(args);
         args = tb_null;
+
+        // exit thread
+        if (thread) tb_free(thread);
+        thread = tb_null;
     }
 
     // ok?
     return ok? ((tb_thread_ref_t)thread) : tb_null;
 }
-tb_void_t tb_thread_exit(tb_thread_ref_t thread)
-{
-    // check 
-    tb_long_t ok = -1;
-    if ((ok = pthread_kill(((pthread_t)thread), 0)) && ok != ESRCH)
-    {
-        // trace
-        tb_trace_e("thread[%p]: not exited: %ld, errno: %d", thread, ok, errno);
-    }
-}
-tb_long_t tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout, tb_int_t* retval)
+tb_void_t tb_thread_exit(tb_thread_ref_t self)
 {
     // check
+    tb_thread_t* thread = (tb_thread_t*)self;
+    tb_assert_and_check_return(thread);
+
+    // detach thread if not joined
+    if (!thread->is_joined)
+        pthread_detach(thread->pthread);
+    tb_free(thread);
+}
+tb_long_t tb_thread_wait(tb_thread_ref_t self, tb_long_t timeout, tb_int_t* retval)
+{
+    // check
+    tb_thread_t* thread = (tb_thread_t*)self;
     tb_assert_and_check_return_val(thread, -1);
 
-    // wait
+    // wait thread
     tb_long_t       ok = -1;
     tb_pointer_t    ret = tb_null;
-    if ((ok = pthread_join(((pthread_t)thread), &ret)) && ok != ESRCH)
+    if ((ok = pthread_join(thread->pthread, &ret)) && ok != ESRCH)
     {
         // trace
         tb_trace_e("thread[%p]: wait failed: %ld, errno: %d", thread, ok, errno);
+
+        // join failed? detach it
+        pthread_detach(thread->pthread);
         return -1;
     
     }
+
+    // join ok
+    thread->is_joined = tb_true;
 
     // save the return value
     if (retval) *retval = tb_p2s32(ret);
@@ -123,12 +157,12 @@ tb_void_t tb_thread_return(tb_int_t value)
     // exit thread and return value
     pthread_exit((tb_pointer_t)(tb_long_t)value);
 }
-tb_bool_t tb_thread_suspend(tb_thread_ref_t thread)
+tb_bool_t tb_thread_suspend(tb_thread_ref_t self)
 {
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_thread_resume(tb_thread_ref_t thread)
+tb_bool_t tb_thread_resume(tb_thread_ref_t self)
 {
     tb_trace_noimpl();
     return tb_false;
