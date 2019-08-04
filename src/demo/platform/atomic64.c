@@ -16,6 +16,8 @@ static tb_void_t tb_test_atomic64_get()
     tb_assert_and_check_return(tb_atomic64_get(&a) == 1);
     tb_atomic64_init(&a, 1000);
     tb_assert_and_check_return(tb_atomic64_get(&a) == 1000);
+    tb_atomic64_init(&a, 0xFFFFFFFFFFFFFFFFULL);
+    tb_assert_and_check_return(tb_atomic64_get(&a) == 0xFFFFFFFFFFFFFFFFULL);
     tb_trace_i("atomic64_get(): test ok!");
 }
 static tb_void_t tb_test_atomic64_fetch_and_set()
@@ -25,7 +27,8 @@ static tb_void_t tb_test_atomic64_fetch_and_set()
     tb_atomic64_init(&a, 0);
     tb_assert_and_check_return(tb_atomic64_fetch_and_set(&a, 1) == 0);
     tb_assert_and_check_return(tb_atomic64_fetch_and_set(&a, 2) == 1);
-    tb_assert_and_check_return(tb_atomic64_fetch_and_set(&a, 1000) == 2);
+    tb_assert_and_check_return(tb_atomic64_fetch_and_set(&a, 0xFFFFFFFFFFFFFFFFULL) == 2);
+    tb_assert_and_check_return(tb_atomic64_fetch_and_set(&a, 0xFFFFFFFFFFFFFFFFULL) == 0xFFFFFFFFFFFFFFFFULL);
     tb_trace_i("atomic64_fetch_and_set(): test ok!");
 }
 static tb_void_t tb_test_atomic64_fetch_and_cmpset()
@@ -36,7 +39,8 @@ static tb_void_t tb_test_atomic64_fetch_and_cmpset()
     tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 0, 1) == 0);
     tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 1, 2) == 1);
     tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 10, 1000) == 2);
-    tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 10, 1000) == 2);
+    tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 2, 0xFFFFFFFFFFFFFFFFULL) == 2);
+    tb_assert_and_check_return(tb_atomic64_fetch_and_cmpset(&a, 0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL) == 0xFFFFFFFFFFFFFFFFULL);
     tb_trace_i("atomic64_fetch_and_cmpset(): test ok!");
 }
 static tb_void_t tb_test_atomic64_compare_and_swap()
@@ -50,6 +54,10 @@ static tb_void_t tb_test_atomic64_compare_and_swap()
     tb_assert_and_check_return(tb_atomic64_compare_and_swap(&a, &p, 2) && p == 1);
     p = 10;
     tb_assert_and_check_return(!tb_atomic64_compare_and_swap(&a, &p, 1000) && p == 2);
+    p = 2;
+    tb_assert_and_check_return(tb_atomic64_compare_and_swap(&a, &p, 0xFFFFFFFFFFFFFFFFULL) && p == 2);
+    p = 2;
+    tb_assert_and_check_return(!tb_atomic64_compare_and_swap(&a, &p, 0xFFFFFFFFFFFFFFFFULL) && p == 0xFFFFFFFFFFFFFFFFULL);
     tb_trace_i("atomic64_compare_and_swap(): test ok!");
 }
 static tb_void_t tb_test_atomic64_fetch_and_add()
