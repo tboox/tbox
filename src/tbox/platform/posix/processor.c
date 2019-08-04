@@ -31,10 +31,16 @@
  */
 tb_size_t tb_processor_count()
 {
-    tb_size_t count = sysconf(_SC_NPROCESSORS_ONLN);
-    if (!count) count = sysconf(_SC_NPROCESSORS_CONF);
-    if (!count) count = 1;
-    return count;
+    // we will pre-initialize it in tb_platform_init()
+    static tb_size_t ncpu = -1;
+    if (ncpu == -1) 
+    {
+        tb_size_t count = sysconf(_SC_NPROCESSORS_ONLN);
+        if (!count) count = sysconf(_SC_NPROCESSORS_CONF);
+        if (!count) count = 1;
+        ncpu = count;
+    }
+    return ncpu;
 }
 
 

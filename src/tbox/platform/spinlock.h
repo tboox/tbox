@@ -106,7 +106,6 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
         {
             // yield
             tb_sched_yield();
-//          tb_usleep(1);
 
             // reset tryn
             tryn = 5;
@@ -134,7 +133,6 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
         {
             // yield
             tb_sched_yield();
-//          tb_usleep(1);
 
             // reset tryn
             tryn = 5;

@@ -30,15 +30,21 @@
  */
 tb_size_t tb_processor_count()
 {
-    // clear the system info
-    SYSTEM_INFO info;
-    tb_memset(&info, 0, sizeof(SYSTEM_INFO));
+    // we will pre-initialize it in tb_platform_init()
+    static tb_size_t ncpu = -1;
+    if (ncpu == -1) 
+    {
+        // clear the system info
+        SYSTEM_INFO info;
+        tb_memset(&info, 0, sizeof(SYSTEM_INFO));
 
-    // get the system info
-    GetSystemInfo(&info);
-    
-    // the processor count
-    return (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
+        // get the system info
+        GetSystemInfo(&info);
+        
+        // the processor count
+        ncpu = (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
+    }
+    return ncpu;
 }
 
 
