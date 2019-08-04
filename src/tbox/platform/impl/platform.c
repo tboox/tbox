@@ -25,7 +25,7 @@
  */
 #include "platform.h"
 #include "impl.h"
-#include "../processor.h"
+#include "../cpu.h"
 #include "../exception.h"
 #include "../cache_time.h"
 #include "../../network/network.h"
@@ -66,8 +66,8 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
     if (!tb_exception_init_env()) return tb_false;
 #endif
 
-    // init processor count/cache
-    (tb_void_t)tb_processor_count();
+    // init cpu count/cache
+    (tb_void_t)tb_cpu_count();
 
     // ok
     return tb_true;

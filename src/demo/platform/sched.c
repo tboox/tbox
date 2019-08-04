@@ -9,7 +9,7 @@
 tb_int_t tb_demo_platform_sched_main(tb_int_t argc, tb_char_t** argv)
 {
     // get cpu count
-    tb_size_t cpu_count = tb_processor_count();
+    tb_size_t cpu_count = tb_cpu_count();
     tb_trace_i("cpu count: %lu", cpu_count);
 
     // get the previous cpu core

@@ -15,36 +15,26 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        processor.h
+ * @file        cpu.c
  * @ingroup     platform
- *
  */
-#ifndef TB_PLATFORM_PROCESSOR_H
-#define TB_PLATFORM_PROCESSOR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "cpu.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * extern
+ * implementation
  */
-__tb_extern_c_enter__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/*! the processor count
- *
- * @return              the processor count
- */
-tb_size_t               tb_processor_count(tb_noarg_t);
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * extern
- */
-__tb_extern_c_leave__
-
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/cpu.c"
+#elif defined(TB_CONFIG_POSIX_HAVE_SYSCONF)
+#   include "posix/cpu.c"
+#else
+tb_size_t tb_cpu_count()
+{
+    return 1;
+}
 #endif
+

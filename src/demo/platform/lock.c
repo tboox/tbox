@@ -38,7 +38,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
     // get cpu core index
     static tb_size_t cpuidx = 0;
     tb_size_t cpu = cpuidx;
-    cpuidx = (cpuidx + 1) % tb_processor_count();
+    cpuidx = (cpuidx + 1) % tb_cpu_count();
 
     // set thread affinity
     tb_cpuset_t cpuset;

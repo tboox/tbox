@@ -15,36 +15,36 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        processor.c
+ * @file        cpu.h
+ * @ingroup     platform
  *
  */
+#ifndef TB_PLATFORM_CPU_H
+#define TB_PLATFORM_CPU_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * extern
  */
-tb_size_t tb_processor_count()
-{
-    // we will pre-initialize it in tb_platform_init()
-    static tb_size_t ncpu = -1;
-    if (ncpu == -1) 
-    {
-        // clear the system info
-        SYSTEM_INFO info;
-        tb_memset(&info, 0, sizeof(SYSTEM_INFO));
+__tb_extern_c_enter__
 
-        // get the system info
-        GetSystemInfo(&info);
-        
-        // the processor count
-        ncpu = (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
-    }
-    return ncpu;
-}
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
+/*! the cpu count
+ *
+ * @return              the cpu count
+ */
+tb_size_t               tb_cpu_count(tb_noarg_t);
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif

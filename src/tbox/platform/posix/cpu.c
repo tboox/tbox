@@ -15,7 +15,7 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        processor.c
+ * @file        cpu.c
  *
  */
 
@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_processor_count()
+tb_size_t tb_cpu_count()
 {
     // we will pre-initialize it in tb_platform_init()
     static tb_size_t ncpu = -1;

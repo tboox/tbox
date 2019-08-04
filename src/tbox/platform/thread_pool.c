@@ -764,7 +764,7 @@ tb_thread_pool_ref_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
         if (!tb_spinlock_init(&impl->lock)) break;
 
         // computate the default worker maxn if be zero
-        if (!worker_maxn) worker_maxn = tb_processor_count() << 2;
+        if (!worker_maxn) worker_maxn = tb_cpu_count() << 2;
         tb_assert_and_check_break(worker_maxn);
 
         // init thread stack

@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "cpu.h"
 #include "page.h"
 #include "path.h"
 #include "file.h"
@@ -50,7 +51,6 @@
 #include "addrinfo.h"
 #include "spinlock.h"
 #include "hostname.h"
-#include "processor.h"
 #include "semaphore.h"
 #include "backtrace.h"
 #include "directory.h"

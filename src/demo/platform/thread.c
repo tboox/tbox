@@ -31,7 +31,7 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
     }
 
     // reset thread affinity
-    tb_size_t cpu = tb_min(1, tb_processor_count() - 1);
+    tb_size_t cpu = tb_min(1, tb_cpu_count() - 1);
     TB_CPUSET_ZERO(&cpuset); 
     TB_CPUSET_SET(cpu, &cpuset);
     if (!tb_thread_setaffinity(tb_null, &cpuset))
@@ -67,7 +67,7 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
 tb_int_t tb_demo_platform_thread_main(tb_int_t argc, tb_char_t** argv)
 {
     // get cpu count
-    tb_size_t cpu_count = tb_processor_count();
+    tb_size_t cpu_count = tb_cpu_count();
     tb_trace_i("cpu count: %lu", cpu_count);
 
     // init threads

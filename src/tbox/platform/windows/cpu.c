@@ -15,26 +15,36 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        processor.c
- * @ingroup     platform
+ * @file        cpu.c
+ *
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "processor.h"
+#include "prefix.h"
+#include "../platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/processor.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_SYSCONF)
-#   include "posix/processor.c"
-#else
-tb_size_t tb_processor_count()
+tb_size_t tb_cpu_count()
 {
-    return 1;
+    // we will pre-initialize it in tb_platform_init()
+    static tb_size_t ncpu = -1;
+    if (ncpu == -1) 
+    {
+        // clear the system info
+        SYSTEM_INFO info;
+        tb_memset(&info, 0, sizeof(SYSTEM_INFO));
+
+        // get the system info
+        GetSystemInfo(&info);
+        
+        // the cpu count
+        ncpu = (tb_size_t)info.dwNumberOfcpus? info.dwNumberOfcpus : 1;
+    }
+    return ncpu;
 }
-#endif
+
 
