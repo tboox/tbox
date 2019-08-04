@@ -267,6 +267,11 @@
 #   define tb_atomic_flag_clear(a)                      tb_atomic_flag_clear_explicit(a, TB_ATOMIC_SEQ_CST)
 #endif
 
+/// get value of an atomic_flag directly (non-atomic)
+#ifndef tb_atomic_flag_test_noatomic
+#   define tb_atomic_flag_test_noatomic(a)              ((a)->__val)
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */

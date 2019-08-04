@@ -12,8 +12,8 @@
 
 // the lock type
 //#define TB_TEST_LOCK_MUTEX
-//#define TB_TEST_LOCK_SPINLOCK
-#define TB_TEST_LOCK_ATOMIC
+#define TB_TEST_LOCK_SPINLOCK
+//#define TB_TEST_LOCK_ATOMIC
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -74,7 +74,8 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
             tb_mutex_enter(lock);
 
             // value++
-            g_value++;
+            __tb_volatile__ tb_size_t n = 100;
+            while (n--) g_value++;
 
             // leave
             tb_mutex_leave(lock);
@@ -85,7 +86,8 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
             tb_spinlock_enter(lock);
 
             // value++
-            g_value++;
+            __tb_volatile__ tb_size_t n = 100;
+            while (n--) g_value++;
 
             // leave
             tb_spinlock_leave(lock);
@@ -94,7 +96,8 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
         tb_atomic32_fetch_and_add_explicit(&g_value, 1, TB_ATOMIC_RELAXED);
 #else
         // value++
-        g_value++;
+        __tb_volatile__ tb_size_t n = 100;
+        while (n--) g_value++;
 #endif
     }
 

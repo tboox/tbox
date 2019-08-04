@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "cpu.h"
 #include "sched.h"
 #include "atomic.h"
 #include "../utils/lock_profiler.h"
@@ -75,17 +76,21 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
     // check
     tb_assert(lock);
 
-    // init tryn
-    tb_size_t tryn = 5;
-    
     // init occupied
 #ifdef TB_LOCK_PROFILER_ENABLE
     tb_bool_t occupied = tb_false;
 #endif
 
     // lock it
-    while (tb_atomic_flag_test_and_set(lock))
+    while (1)
     {
+        /* try non-atomic directly reading to reduce the performance loss of atomic synchronization,
+         * this maybe read some dirty data, but only leads to enter wait state fastly, 
+         * but does not affect to require lock.
+         */
+        if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock))
+            return ;
+
 #ifdef TB_LOCK_PROFILER_ENABLE
         // occupied
         if (!occupied)
@@ -101,15 +106,34 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
         }
 #endif
 
-        // yield the processor
-        if (!tryn--)
+#ifdef tb_cpu_pause
+        if (tb_cpu_count() > 1)
         {
-            // yield
-            tb_sched_yield();
+            tb_size_t i, n;
+            for (n = 1; n < 2048; n <<= 1)
+            {
+                /* spin_Lock:
+                 *    cmp lockvar, 0   ; check if lock is free
+                 *    je get_Lock
+                 *    pause            ; wait for memory pipeline to become empty
+                 *    jmp Spin_Lock
+                 * get_Lock:
+                 *
+                 * The PAUSE instruction will "de-pipeline" the memory reads, 
+                 * so that the pipeline is not filled with speculative CMP (2) instructions like in the first example. 
+                 * (I.e. it could block the pipeline until all older memory instructions are committed.) 
+                 * Because the CMP instructions (2) execute sequentially it is unlikely (i.e. the time window is much shorter) 
+                 * that an external write occurs after the CMP instruction (2) read lockvar but before the CMP is committed.
+                 */
+                for (i = 0; i < n; i++) 
+                    tb_cpu_pause();
 
-            // reset tryn
-            tryn = 5;
+                if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
+                    return ;
+            }
         }
+#endif
+        tb_sched_yield();
     }
 }
 
@@ -122,21 +146,27 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
     // check
     tb_assert(lock);
 
-    // init tryn
-    tb_size_t tryn = 5;
-    
     // lock it
-    while (tb_atomic_flag_test_and_set(lock))
+    while (1)
     {
-        // yield the processor
-        if (!tryn--)
-        {
-            // yield
-            tb_sched_yield();
+        if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
+            return ;
 
-            // reset tryn
-            tryn = 5;
+#ifdef tb_cpu_pause
+        if (tb_cpu_count() > 1)
+        {
+            tb_size_t i, n;
+            for (n = 1; n < 2048; n <<= 1)
+            {
+                for (i = 0; i < n; i++) 
+                    tb_cpu_pause();
+
+                if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
+                    return ;
+            }
         }
+#endif
+        tb_sched_yield();
     }
 }
 
