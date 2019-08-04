@@ -14,6 +14,8 @@
 * Optimize queue_buffer module
 * Improve stream interfaces
 * Improve charset encoding and add ANSI support
+* Improve atomic and add c11-like atomic apis
+* Improve spinlock
 
 ## v1.6.3
 
@@ -190,6 +192,8 @@
 * 优化queue_buffer模块
 * 改进stream接口实现
 * 改进字符集编码转换，以及增加对ANSI编码的支持
+* 改进原子操作，并增加c11风格原子接口
+* 改进spinlock实现
 
 ## v1.6.3
 
