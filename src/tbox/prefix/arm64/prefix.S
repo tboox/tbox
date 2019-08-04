@@ -26,7 +26,7 @@
 #   define ELF
 #   define EXTERN_ASM
 #else
-#   define ELF          //
+#   define ELF          #
 #   define EXTERN_ASM   _
 #endif
 
