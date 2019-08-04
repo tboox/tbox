@@ -28,6 +28,29 @@
 #include "prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/*! notifies the CPU that this is a spinlock wait loop so memory and cache accesses may be optimized.
+ * pause may actually stop CPU for some time to save power. Older CPUs decode it as REP NOP, so you don't have to check if its supported. Older CPUs will simply do nothing (NOP) as fast as possible.
+ */
+#if defined(TB_CONFIG_OS_WINDOWS) && defined(TB_COMPILER_IS_MSVC)
+#   define tb_cpu_relax()       __tb_asm__ __tb_volatile__ { pause }
+#elif defined(TB_ASSEMBLER_IS_GAS) 
+#   if defined(TB_COMPILER_IS_GCC) && defined(TB_ARCH_x86)
+        // old "as" does not support "pause" opcode
+#       define tb_cpu_relax()       __tb_asm__ __tb_volatile__ (".byte 0xf3, 0x90")
+#   elif (defined(TB_ARCH_x86) || defined(TB_ARCH_x64))
+#       if defined(TB_COMPILER_IS_SUNC)
+            // Sun Studio 12 exits with segmentation fault on '__asm ("pause")'
+#           define tb_cpu_relax()   __tb_asm__ __tb_volatile__ ("rep;nop" ::: "memory")
+#       else
+#           define tb_cpu_relax()   __tb_asm__ __tb_volatile__ ("pause")
+#       endif
+#   endif
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_enter__

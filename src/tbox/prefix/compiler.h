@@ -271,6 +271,17 @@
 #       error Unknown CodePlay VectorC C++ Compiler Version
 #   endif
 
+// sun c/c++
+#elif defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+#   define TB_COMPILER_IS_SUNC
+#   if defined(__SUNPRO_C)
+#       define TB_COMPILER_STRING                       "sun c"
+#       define TB_COMPILER_VERSION_STRING               "sun c"
+#   else
+#       define TB_COMPILER_STRING                       "sun c++"
+#       define TB_COMPILER_VERSION_STRING               "sun c++"
+#   endif
+
 // visual c++
 #elif defined(_MSC_VER)
 #   define TB_COMPILER_IS_MSVC

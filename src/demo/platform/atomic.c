@@ -143,5 +143,6 @@ tb_int_t tb_demo_platform_atomic_main(tb_int_t argc, tb_char_t** argv)
     tb_test_atomic_fetch_and_or();
     tb_test_atomic_flag_test_and_set();
     tb_test_memory_barrier();
+    tb_cpu_relax();
     return 0;
 }
