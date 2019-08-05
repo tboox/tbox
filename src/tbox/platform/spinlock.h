@@ -81,6 +81,11 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
     tb_bool_t occupied = tb_false;
 #endif
 
+    // get cpu count
+#if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
+    tb_size_t ncpu = tb_cpu_count();
+#endif
+
     // lock it
     while (1)
     {
@@ -107,7 +112,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
 #endif
 
 #if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
-        if (tb_cpu_count() > 1)
+        if (ncpu > 1)
         {
             tb_size_t i, n;
             for (n = 1; n < 2048; n <<= 1)
@@ -147,13 +152,16 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
     tb_assert(lock);
 
     // lock it
+#if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
+    tb_size_t ncpu = tb_cpu_count();
+#endif
     while (1)
     {
         if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
             return ;
 
 #if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
-        if (tb_cpu_count() > 1)
+        if (ncpu > 1)
         {
             tb_size_t i, n;
             for (n = 1; n < 2048; n <<= 1)
