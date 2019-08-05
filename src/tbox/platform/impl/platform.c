@@ -67,7 +67,9 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
 #endif
 
     // init cpu count/cache
+#ifndef TB_CONFIG_MICRO_ENABLE
     (tb_void_t)tb_cpu_count();
+#endif
 
     // ok
     return tb_true;

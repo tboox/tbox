@@ -106,7 +106,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
         }
 #endif
 
-#ifdef tb_cpu_pause
+#if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
         if (tb_cpu_count() > 1)
         {
             tb_size_t i, n;
@@ -152,7 +152,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
         if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
             return ;
 
-#ifdef tb_cpu_pause
+#if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
         if (tb_cpu_count() > 1)
         {
             tb_size_t i, n;
