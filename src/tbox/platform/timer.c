@@ -309,7 +309,7 @@ tb_void_t tb_timer_kill(tb_timer_ref_t self)
     tb_assert_and_check_return(timer);
 
     // stop it
-    if (!tb_atomic_flag_test_and_set(&timer->stop))
+    if (!tb_atomic_flag_test_and_set_explicit(&timer->stop, TB_ATOMIC_RELAXED))
     {
         // get event
         tb_spinlock_enter(&timer->lock);
@@ -345,7 +345,7 @@ tb_hize_t tb_timer_top(tb_timer_ref_t self)
     tb_assert_and_check_return_val(timer && timer->heap, -1);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_flag_test(&timer->stop), -1);
+    tb_assert_and_check_return_val(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED), -1);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -372,7 +372,7 @@ tb_size_t tb_timer_delay(tb_timer_ref_t self)
     tb_assert_and_check_return_val(timer && timer->heap, -1);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_flag_test(&timer->stop), -1);
+    tb_assert_and_check_return_val(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED), -1);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -406,7 +406,7 @@ tb_bool_t tb_timer_spak(tb_timer_ref_t self)
     tb_assert_and_check_return_val(timer && timer->pool && timer->heap, tb_false);
 
     // stoped?
-    tb_check_return_val(!tb_atomic_flag_test(&timer->stop), tb_false);
+    tb_check_return_val(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED), tb_false);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -495,7 +495,7 @@ tb_void_t tb_timer_loop(tb_timer_ref_t self)
     tb_spinlock_leave(&timer->lock);
 
     // loop
-    while (!tb_atomic_flag_test(&timer->stop))
+    while (!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED))
     {
         // the delay
         tb_size_t delay = tb_timer_delay(self);
@@ -537,7 +537,7 @@ tb_timer_task_ref_t tb_timer_task_init_at(tb_timer_ref_t self, tb_hize_t when, t
     tb_assert_and_check_return_val(timer && timer->pool && timer->heap && func, tb_null);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_flag_test(&timer->stop), tb_null);
+    tb_assert_and_check_return_val(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED), tb_null);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -605,7 +605,7 @@ tb_void_t tb_timer_task_post_at(tb_timer_ref_t self, tb_hize_t when, tb_size_t p
     tb_assert_and_check_return(timer && timer->pool && timer->heap && func);
 
     // stoped?
-    tb_assert_and_check_return(!tb_atomic_flag_test(&timer->stop));
+    tb_assert_and_check_return(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED));
 
     // enter
     tb_spinlock_enter(&timer->lock);
