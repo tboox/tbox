@@ -270,10 +270,10 @@ tb_void_t tb_timer_exit(tb_timer_ref_t self)
 
     // wait loop exit
     tb_size_t tryn = 10;
-    while (tb_atomic32_get(&timer->work) && tryn--) tb_msleep(500);
+    while (tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED) && tryn--) tb_msleep(500);
 
     // warning
-    if (!tryn && tb_atomic32_get(&timer->work)) 
+    if (!tryn && tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED)) 
     {
         tb_trace_w("[timer]: the loop has been not exited now!");
     }
@@ -487,7 +487,7 @@ tb_void_t tb_timer_loop(tb_timer_ref_t self)
     tb_assert_and_check_return(timer);
 
     // work++
-    tb_atomic32_fetch_and_add(&timer->work, 1);
+    tb_atomic32_fetch_and_add_explicit(&timer->work, 1, TB_ATOMIC_RELAXED);
 
     // init event 
     tb_spinlock_enter(&timer->lock);
@@ -519,7 +519,7 @@ tb_void_t tb_timer_loop(tb_timer_ref_t self)
     }
 
     // work--
-    tb_atomic32_fetch_and_sub(&timer->work, 1);
+    tb_atomic32_fetch_and_sub_explicit(&timer->work, 1, TB_ATOMIC_RELAXED);
 }
 tb_timer_task_ref_t tb_timer_task_init(tb_timer_ref_t self, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_cpointer_t priv)
 {

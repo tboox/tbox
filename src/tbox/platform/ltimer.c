@@ -383,10 +383,10 @@ tb_void_t tb_ltimer_exit(tb_ltimer_ref_t self)
 
     // wait loop exit
     tb_size_t tryn = 10;
-    while (tb_atomic32_get(&timer->work) && tryn--) tb_msleep(500);
+    while (tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED) && tryn--) tb_msleep(500);
 
     // warning
-    if (!tryn && tb_atomic32_get(&timer->work))
+    if (!tryn && tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED))
     {
         tb_trace_w("[ltimer]: the loop has been not exited now!");
     }
@@ -428,7 +428,7 @@ tb_void_t tb_ltimer_kill(tb_ltimer_ref_t self)
     tb_assert_and_check_return(self);
 
     // stop it
-    tb_atomic_flag_test_and_set(&timer->stop);
+    tb_atomic_flag_test_and_set_explicit(&timer->stop, TB_ATOMIC_RELAXED);
 }
 tb_void_t tb_ltimer_clear(tb_ltimer_ref_t self)
 {
@@ -483,7 +483,7 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
     tb_assert_and_check_return_val(timer && timer->pool && timer->tick && timer->expired, tb_false);
 
     // stoped?
-    tb_check_return_val(!tb_atomic_flag_test(&timer->stop), tb_false);
+    tb_check_return_val(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED), tb_false);
 
     // the now time
     tb_hong_t now = tb_ltimer_now(timer);
@@ -582,10 +582,10 @@ tb_void_t tb_ltimer_loop(tb_ltimer_ref_t self)
     tb_assert_and_check_return(timer);
 
     // work++
-    tb_atomic32_fetch_and_add(&timer->work, 1);
+    tb_atomic32_fetch_and_add_explicit(&timer->work, 1, TB_ATOMIC_RELAXED);
 
     // loop
-    while (!tb_atomic_flag_test(&timer->stop))
+    while (!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED))
     {
         // the delay
         tb_size_t delay = tb_ltimer_delay(self);
@@ -602,7 +602,7 @@ tb_void_t tb_ltimer_loop(tb_ltimer_ref_t self)
     }
 
     // work--
-    tb_atomic32_fetch_and_sub(&timer->work, 1);
+    tb_atomic32_fetch_and_sub_explicit(&timer->work, 1, TB_ATOMIC_RELAXED);
 }
 tb_ltimer_task_ref_t tb_ltimer_task_init(tb_ltimer_ref_t self, tb_size_t delay, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_cpointer_t priv)
 {
@@ -620,7 +620,7 @@ tb_ltimer_task_ref_t tb_ltimer_task_init_at(tb_ltimer_ref_t self, tb_hize_t when
     tb_assert_and_check_return_val(timer && timer->pool && func, tb_null);
 
     // stoped?
-    tb_assert_and_check_return_val(!tb_atomic_flag_test(&timer->stop), tb_null);
+    tb_assert_and_check_return_val(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED), tb_null);
 
     // enter
     tb_spinlock_enter(&timer->lock);
@@ -678,7 +678,7 @@ tb_void_t tb_ltimer_task_post_at(tb_ltimer_ref_t self, tb_hize_t when, tb_size_t
     tb_assert_and_check_return(timer && timer->pool && func);
 
     // stoped?
-    tb_assert_and_check_return(!tb_atomic_flag_test(&timer->stop));
+    tb_assert_and_check_return(!tb_atomic_flag_test_explicit(&timer->stop, TB_ATOMIC_RELAXED));
 
     // enter
     tb_spinlock_enter(&timer->lock);
