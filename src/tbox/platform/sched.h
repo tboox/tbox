@@ -27,10 +27,26 @@
  */
 #include "prefix.h"
 #include "../utils/bits.h"
+#if defined(TB_CONFIG_OS_WINDOWS) 
+#   include <windows.h>
+#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
+#   include <sched.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
+
+// sched yield
+#if defined(TB_CONFIG_OS_WINDOWS) 
+#   if defined(YieldProcessor)
+#       define tb_sched_yield()         YieldProcessor()
+#   endif
+#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
+#   define tb_sched_yield()             sched_yield()
+#else
+#   define tb_sched_yield()             tb_usleep(1)
+#endif
 
 // cpu affinity
 #define TB_CPUSET_SIZE                              TB_CPU_BITSIZE
@@ -66,12 +82,6 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-/*! yield the processor
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_sched_yield(tb_noarg_t);
 
 /*! set cpu affinity for the given process id
  *

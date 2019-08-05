@@ -35,18 +35,6 @@
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include "windows/sched_yield.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
-#   include "posix/sched_yield.c"
-#else
-tb_bool_t tb_sched_yield()
-{
-    tb_usleep(1);
-    return tb_true;
-}
-#endif
-
-#if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/sched_affinity.c"
 #elif defined(TB_CONFIG_OS_MACOSX) 
 #   include "mach/sched_affinity.c"
