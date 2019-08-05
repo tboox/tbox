@@ -26,6 +26,10 @@
  * includes
  */
 #include "prefix.h"
+#if defined(TB_CONFIG_OS_WINDOWS) && defined(TB_COMPILER_IS_MSVC)
+#   include "windows/prefix.h"
+#   include <intrin.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -34,13 +38,15 @@
 /*! notifies the CPU that this is a spinlock wait loop so memory and cache accesses may be optimized.
  * pause may actually stop CPU for some time to save power. Older CPUs decode it as REP NOP, so you don't have to check if its supported. Older CPUs will simply do nothing (NOP) as fast as possible.
  */
-#if defined(TB_CONFIG_OS_WINDOWS)
-#   if defined(YieldProcessor)
-#       define tb_cpu_pause()       do { YieldProcessor(); } while (0)
-#   elif defined(TB_ARCH_x86)
+#if defined(TB_CONFIG_OS_WINDOWS) && defined(TB_COMPILER_IS_MSVC)
+#   if defined(_M_AMD64) || defined(_M_IX86)
+#       pragma intrinsic(_mm_pause)
 #       define tb_cpu_pause()       do { _mm_pause(); } while (0)
-#   elif defined(_IA64_)
+#   elif defined(_M_IA64)
+#       pragma intrinsic(__yield)
 #       define tb_cpu_pause()       do { __yield(); } while (0)
+#   else
+#       define tb_cpu_pause()       do { YieldProcessor(); } while (0)
 #   endif
 #elif defined(TB_ASSEMBLER_IS_GAS) 
 #   if defined(TB_COMPILER_IS_GCC) && defined(TB_ARCH_x86)

@@ -28,7 +28,7 @@
 #include "prefix.h"
 #include "../utils/bits.h"
 #if defined(TB_CONFIG_OS_WINDOWS) 
-#   include <windows.h>
+#   include "windows/prefix.h"
 #elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
 #   include <sched.h>
 #endif
@@ -39,9 +39,7 @@
 
 // sched yield
 #if defined(TB_CONFIG_OS_WINDOWS) 
-#   if defined(YieldProcessor)
-#       define tb_sched_yield()         YieldProcessor()
-#   endif
+#   define tb_sched_yield()             YieldProcessor()
 #elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
 #   define tb_sched_yield()             sched_yield()
 #else
