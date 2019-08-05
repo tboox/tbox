@@ -286,18 +286,50 @@ function check_interfaces()
 
     -- add the interfaces for windows
     if is_os("windows") then
-        check_module_csnippet("windows", "windows.h", "_InterlockedExchange8", [[
-            CHAR _InterlockedExchange8(CHAR volatile* Destination, CHAR Exchange);
-            #pragma intrinsic(_InterlockedExchange8)
-            void test() {
-                _InterlockedExchange8(0, 0);
-            }]], {cxflags = "-WX -W3"})
-        check_module_csnippet("windows", "windows.h", "_InterlockedCompareExchange64", [[
-            __int64 _InterlockedCompareExchange64(__int64 volatile* Destination, __int64 Exchange, __int64 Comperand);
-            #pragma intrinsic(_InterlockedCompareExchange64)
-            void test() {
-                _InterlockedCompareExchange64(0, 0, 0);
-            }]], {cxflags = "-WX -W3"})
+        for _, mo in ipairs({"", "_nf", "_acq", "_rel"}) do
+            check_module_csnippet("windows", "windows.h", "_InterlockedExchange" .. mo, format([[
+                LONG _InterlockedExchange%s(LONG volatile* Destination, LONG Value);
+                #pragma intrinsic(_InterlockedExchange%s)
+                void test() {
+                    _InterlockedExchange%s(0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+            check_module_csnippet("windows", "windows.h", "_InterlockedExchange8" .. mo, format([[
+                CHAR _InterlockedExchange8%s(CHAR volatile* Destination, CHAR Value);
+                #pragma intrinsic(_InterlockedExchange8%s)
+                void test() {
+                    _InterlockedExchange8%s(0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+            check_module_csnippet("windows", "windows.h", "_InterlockedOr8" .. mo, format([[
+                CHAR _InterlockedOr8%s(CHAR volatile* Destination, CHAR Value);
+                #pragma intrinsic(_InterlockedOr8%s)
+                void test() {
+                    _InterlockedOr8%s(0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+            check_module_csnippet("windows", "windows.h", "_InterlockedExchangeAdd" .. mo, format([[
+                LONG _InterlockedExchangeAdd%s(LONG volatile* Destination, LONG Value);
+                #pragma intrinsic(_InterlockedExchangeAdd%s)
+                void test() {
+                    _InterlockedExchangeAdd%s(0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+            check_module_csnippet("windows", "windows.h", "_InterlockedExchangeAdd64" .. mo, format([[
+                __int64 _InterlockedExchangeAdd64%s(__int64 volatile* Destination, __int64 Value);
+                #pragma intrinsic(_InterlockedExchangeAdd64%s)
+                void test() {
+                    _InterlockedExchangeAdd64%s(0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+            check_module_csnippet("windows", "windows.h", "_InterlockedCompareExchange" .. mo, format([[
+                LONG _InterlockedCompareExchange%s(LONG volatile* Destination, LONG Exchange, LONG Comperand);
+                #pragma intrinsic(_InterlockedCompareExchange%s)
+                void test() {
+                    _InterlockedCompareExchange%s(0, 0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+            check_module_csnippet("windows", "windows.h", "_InterlockedCompareExchange64" .. mo, format([[
+                __int64 _InterlockedCompareExchange64%s(__int64 volatile* Destination, __int64 Exchange, __int64 Comperand);
+                #pragma intrinsic(_InterlockedCompareExchange64%s)
+                void test() {
+                    _InterlockedCompareExchange64%s(0, 0, 0);
+                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+        end
     end
 
     -- add the interfaces for freebsd

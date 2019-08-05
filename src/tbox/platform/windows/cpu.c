@@ -23,6 +23,7 @@
  * includes
  */
 #include "prefix.h"
+#include <windows.h>
 #include "../platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +43,7 @@ tb_size_t tb_cpu_count()
         GetSystemInfo(&info);
         
         // the cpu count
-        ncpu = (tb_size_t)info.dwNumberOfcpus? info.dwNumberOfcpus : 1;
+        ncpu = (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
     }
     return ncpu;
 }

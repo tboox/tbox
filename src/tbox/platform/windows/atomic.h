@@ -39,7 +39,7 @@
 #   define tb_memory_barrier()                          __mf()
 #endif
 
-#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8) && defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8)
 #   define tb_atomic_flag_test_and_set_explicit(a, mo)  tb_atomic_flag_test_and_set_explicit_windows(a, mo)
 #   define tb_atomic_flag_test_and_set(a)               tb_atomic_flag_test_and_set_explicit(a, TB_ATOMIC_SEQ_CST)
 #   define tb_atomic_flag_test_explicit(a, mo)          tb_atomic_flag_test_explicit_windows(a, mo)
@@ -49,36 +49,115 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * declarations
  */
+
+// _InterlockedExchange8XX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
 CHAR _InterlockedExchange8(CHAR __tb_volatile__* Destination, CHAR Exchange);
-CHAR _InterlockedOr8(CHAR __tb_volatile__* Destination, CHAR Value);
 #   pragma intrinsic(_InterlockedExchange8)
+#endif
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_NF
+CHAR _InterlockedExchange8_nf(CHAR __tb_volatile__* Destination, CHAR Exchange);
+#   pragma intrinsic(_InterlockedExchange8_nf)
+#endif
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_ACQ
+CHAR _InterlockedExchange8_acq(CHAR __tb_volatile__* Destination, CHAR Exchange);
+#   pragma intrinsic(_InterlockedExchange8_acq)
+#endif
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_REL
+CHAR _InterlockedExchange8_rel(CHAR __tb_volatile__* Destination, CHAR Exchange);
+#   pragma intrinsic(_InterlockedExchange8_rel)
+#endif
+
+// _InterlockedOr8XX
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8
+CHAR _InterlockedOr8(CHAR __tb_volatile__* Destination, CHAR Value);
 #   pragma intrinsic(_InterlockedOr8)
 #endif
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_NF
+CHAR _InterlockedOr8_nf(CHAR __tb_volatile__* Destination, CHAR Value);
+#   pragma intrinsic(_InterlockedOr8_nf)
+#endif
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_ACQ
+CHAR _InterlockedOr8_acq(CHAR __tb_volatile__* Destination, CHAR Value);
+#   pragma intrinsic(_InterlockedOr8_acq)
+#endif
+#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_REL
+CHAR _InterlockedOr8_rel(CHAR __tb_volatile__* Destination, CHAR Value);
+#   pragma intrinsic(_InterlockedOr8_rel)
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation
  */
-#ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8) && defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8)
 static __tb_inline__ tb_bool_t tb_atomic_flag_test_and_set_explicit_windows(tb_atomic_flag_t* a, tb_int_t mo)
 {
     tb_assert(a);
     tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_char_t));
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_NF)
+    if (mo == TB_ATOMIC_RELAXED) return (tb_bool_t)_InterlockedExchange8_nf((CHAR __tb_volatile__*)a, 1);
+#endif
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_ACQ)
+    if (mo == TB_ATOMIC_ACQUIRE) return (tb_bool_t)_InterlockedExchange8_acq((CHAR __tb_volatile__*)a, 1);
+#endif
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_REL)
+    if (mo == TB_ATOMIC_RELEASE) return (tb_bool_t)_InterlockedExchange8_rel((CHAR __tb_volatile__*)a, 1);
+#endif
     return (tb_bool_t)_InterlockedExchange8((CHAR __tb_volatile__*)a, 1);
-}
-static __tb_inline__ tb_bool_t tb_atomic_flag_test_explicit_windows(tb_atomic_flag_t* a, tb_int_t mo)
-{
-    tb_assert(a);
-    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_char_t));
-    return (tb_bool_t)_InterlockedOr8((CHAR __tb_volatile__*)a, 0);
 }
 static __tb_inline__ tb_void_t tb_atomic_flag_clear_explicit_windows(tb_atomic_flag_t* a, tb_int_t mo)
 {
     tb_assert(a);
     tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_char_t));
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_NF)
+    if (mo == TB_ATOMIC_RELAXED)
+    {
+        _InterlockedExchange8_nf((CHAR __tb_volatile__*)a, 0);
+        return ;
+    }
+#endif
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_ACQ)
+    if (mo == TB_ATOMIC_ACQUIRE)
+    {
+        _InterlockedExchange8_acq((CHAR __tb_volatile__*)a, 0);
+        return ;
+    }
+#endif
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_REL)
+    if (mo == TB_ATOMIC_RELEASE)
+    {
+        _InterlockedExchange8_rel((CHAR __tb_volatile__*)a, 0);
+        return ;
+    }
+#endif
     _InterlockedExchange8((CHAR __tb_volatile__*)a, 0);
+}
+static __tb_inline__ tb_bool_t tb_atomic_flag_test_explicit_windows(tb_atomic_flag_t* a, tb_int_t mo)
+{
+    tb_assert(a);
+    tb_assert_static(sizeof(tb_atomic_flag_t) == sizeof(tb_char_t));
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_NF)
+    if (mo == TB_ATOMIC_RELAXED) return (tb_bool_t)_InterlockedOr8_nf((CHAR __tb_volatile__*)a, 0);
+#endif
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_ACQ)
+    if (mo == TB_ATOMIC_ACQUIRE) return (tb_bool_t)_InterlockedOr8_acq((CHAR __tb_volatile__*)a, 0);
+#endif
+#if defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_REL)
+    if (mo == TB_ATOMIC_RELEASE) return (tb_bool_t)_InterlockedOr8_rel((CHAR __tb_volatile__*)a, 0);
+#endif
+    return (tb_bool_t)_InterlockedOr8((CHAR __tb_volatile__*)a, 0);
 }
 #endif
 
