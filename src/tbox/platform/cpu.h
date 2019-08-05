@@ -59,6 +59,13 @@
 #       else
 #           define tb_cpu_pause()   do { __tb_asm__ __tb_volatile__ ("pause"); } while (0)
 #       endif
+#   elif defined(TB_ARCH_ARM)
+        // ARM Compiler toolchain Compiler Reference (for __yield() instrinsic) 
+#       ifdef __CC_ARM
+#           define tb_cpu_pause()   __yield()
+#       else
+#           define tb_cpu_pause()   do { __tb_asm__ __volatile__ ("yield"); } while (0)
+#       endif
 #   endif
 #endif
 
