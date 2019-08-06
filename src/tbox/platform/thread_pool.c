@@ -146,7 +146,7 @@ typedef struct __tb_thread_pool_worker_t
     tb_hash_map_ref_t                   stats;
 
     // is stoped?
-    tb_atomic32_t                       bstoped;
+    tb_atomic_flag_t                    bstoped;
 
     // the private data 
     tb_thread_pool_worker_priv_t        priv[TB_THREAD_POOL_WORKER_PRIV_MAXN];
@@ -462,7 +462,7 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
                 if (!tb_vector_size(worker->jobs))
                 {
                     // killed?
-                    tb_check_break(!tb_atomic32_get(&worker->bstoped));
+                    tb_check_break(!tb_atomic_flag_test_explicit(&worker->bstoped, TB_ATOMIC_RELAXED));
 
                     // trace
                     tb_trace_d("worker[%lu]: wait: ..", worker->id);
@@ -583,8 +583,8 @@ static tb_int_t tb_thread_pool_worker_loop(tb_cpointer_t priv)
         // trace
         tb_trace_d("worker[%lu]: exit", worker->id);
 
-        // stoped
-        tb_atomic32_set(&worker->bstoped, 1);
+        // stop it
+        tb_atomic_flag_test_and_set_explicit(&worker->bstoped, TB_ATOMIC_RELAXED);
 
         // exit all private data
         tb_size_t i = 0;
@@ -715,6 +715,7 @@ static tb_thread_pool_job_t* tb_thread_pool_jobs_post_task(tb_thread_pool_impl_t
                 tb_memset(worker, 0, sizeof(tb_thread_pool_worker_t));
 
                 // init worker
+                tb_atomic_flag_clear_explicit(&worker->bstoped, TB_ATOMIC_RELAXED);
                 worker->id          = i;
                 worker->pool        = (tb_thread_pool_ref_t)impl;
                 worker->loop        = tb_thread_init(__tb_lstring__("thread_pool"), tb_thread_pool_worker_loop, worker, impl->stack);
@@ -917,7 +918,7 @@ tb_void_t tb_thread_pool_kill(tb_thread_pool_ref_t pool)
         // kill all workers
         tb_size_t i = 0;
         tb_size_t n = impl->worker_size;
-        for (i = 0; i < n; i++) tb_atomic32_set(&impl->worker_list[i].bstoped, 1);
+        for (i = 0; i < n; i++) tb_atomic_flag_test_and_set_explicit(&impl->worker_list[i].bstoped, TB_ATOMIC_RELAXED);
 
         // kill all jobs
         if (impl->jobs_pool) tb_fixed_pool_walk(impl->jobs_pool, tb_thread_pool_jobs_walk_kill_all, tb_null);
@@ -1258,7 +1259,7 @@ tb_void_t tb_thread_pool_dump(tb_thread_pool_ref_t pool)
             tb_assert_and_check_break(worker);
 
             // dump worker
-            tb_trace_i("    worker: id: %lu, stoped: %ld", worker->id, (tb_long_t)tb_atomic32_get(&worker->bstoped));
+            tb_trace_i("    worker: id: %lu, stoped: %ld", worker->id, (tb_long_t)tb_atomic_flag_test_explicit(&worker->bstoped, TB_ATOMIC_RELAXED));
         }
 
         // trace
