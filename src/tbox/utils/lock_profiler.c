@@ -120,7 +120,7 @@ tb_void_t tb_lock_profiler_dump(tb_lock_profiler_ref_t self)
         if ((lock = (tb_pointer_t)tb_atomic_get(&item->lock)))
         {
             // dump lock
-            tb_trace_i("lock: %p, name: %s, occupied: %ld", lock, (tb_char_t const*)tb_atomic_get(&item->name), tb_atomic32_get(&item->size));
+            tb_trace_i("lock: %p, name: %s, occupied: %d", lock, (tb_char_t const*)tb_atomic_get(&item->name), tb_atomic32_get(&item->size));
         }
     }
 }
@@ -152,6 +152,7 @@ tb_void_t tb_lock_profiler_register(tb_lock_profiler_ref_t self, tb_pointer_t lo
         {
             // init name
             tb_atomic_set(&item->name, (tb_long_t)name);
+            tb_atomic32_init(&item->size, 0);
 
             // trace
             tb_trace_d("register: lock: %p, name: %s, index: %lu: ok", lock, name, addr & (TB_LOCK_PROFILER_MAXN - 1));
