@@ -283,6 +283,7 @@ function check_interfaces()
     check_module_cfuncs("posix", "sys/resource.h",                   "getrlimit")
     check_module_cfuncs("posix", "netdb.h",                          "getaddrinfo", "getnameinfo", "gethostbyname", "gethostbyaddr")
     check_module_cfuncs("posix", "fcntl.h",                          "fcntl")
+    check_module_cfuncs("posix", "unistd.h",                         "pipe", "pipe2")
 
     -- add the interfaces for windows
     if is_os("windows") then
