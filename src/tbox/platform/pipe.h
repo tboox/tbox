@@ -80,8 +80,10 @@ tb_bool_t               tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_si
 /*! exit the pipe file
  * 
  * @param file          the pipe file
+ *
+ * @return              tb_true or tb_false
  */
-tb_void_t               tb_pipe_file_exit(tb_pipe_file_ref_t file);
+tb_bool_t               tb_pipe_file_exit(tb_pipe_file_ref_t file);
 
 /*! read the pipe file data (non-block)
  * 

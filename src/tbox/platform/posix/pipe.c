@@ -27,24 +27,80 @@
 #include <unistd.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// fd to pipe file
+#define tb_fd2pipefile(fd)              ((fd) >= 0? (tb_pipe_file_ref_t)((tb_long_t)(fd) + 1) : tb_null)
+
+// pipe file to fd
+#define tb_pipefile2fd(file)            (tb_int_t)((file)? (((tb_long_t)(file)) - 1) : -1)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    // check
+    tb_assert_and_check_return_val(pair, tb_false);
+
+    tb_int_t  pipefd[2] = {0};
+    tb_bool_t ok = tb_false;
+    do
+    {
+        // create pipe fd pair
+#ifdef TB_CONFIG_POSIX_HAVE_PIPE2
+        if (pipe2(pipefd, O_NONBLOCK) == -1) break;
+#else
+        if (pipe(pipefd) == -1) break;
+
+        // non-block
+        fcntl(pipefd[0], F_SETFL, fcntl(pipefd[0], F_GETFL) | O_NONBLOCK);
+        fcntl(pipefd[1], F_SETFL, fcntl(pipefd[1], F_GETFL) | O_NONBLOCK);
+#endif
+
+        // save to file pair
+        pair[0] = tb_fd2pipefile(pipefd[0]);
+        pair[1] = tb_fd2pipefile(pipefd[1]);
+        
+        // ok
+        ok = tb_true;
+
+    } while (0);
+    return ok;
 }
-tb_void_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
+tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
 {
-    tb_trace_noimpl();
+    // check
+    tb_assert_and_check_return_val(file, tb_false);
+
+    // trace
+    tb_trace_d("close: %p", file);
+
+    // close it
+    tb_bool_t ok = !close(tb_pipefile2fd(file));
+    if (!ok)
+    {
+        // trace
+        tb_trace_e("close: %p failed, errno: %d", file, errno);
+    }
+    return ok;
 }
 tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
-    tb_trace_noimpl();
-    return -1;
+    // check
+    tb_assert_and_check_return_val(file && data, -1);
+    tb_check_return_val(size, 0);
+
+    // read
+    return read(tb_pipefile2fd(file), data, (tb_int_t)size);
 }
 tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
-    tb_trace_noimpl();
-    return -1;
+    // check
+    tb_assert_and_check_return_val(file && data, -1);
+    tb_check_return_val(size, 0);
+
+    // write
+    return write(tb_pipefile2fd(file), data, (tb_int_t)size);
 }

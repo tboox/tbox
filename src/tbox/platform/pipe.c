@@ -37,9 +37,10 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
     tb_trace_noimpl();
     return tb_false;
 }
-tb_void_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
+tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
 {
     tb_trace_noimpl();
+    return tb_false;
 }
 tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
