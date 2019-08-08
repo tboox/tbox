@@ -70,8 +70,8 @@ tb_pipe_file_ref_t      tb_pipe_file_open(tb_pipe_ref_t pipe);
 
 /*! init the file pair of anonymous pipe
  *
- * @param pair          the pipe file pair
- * @param buffer_size   the buffer size of pipe
+ * @param pair          the pipe file pair, read: pair[0], write: pair[1] 
+ * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
  * 
  * @return              tb_true or tb_false
  */
