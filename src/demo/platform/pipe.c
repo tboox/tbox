@@ -4,10 +4,31 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_DEMO_PIPE_NAME   "/tmp/hello"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+static tb_int_t tb_demo_thread_writ(tb_cpointer_t priv)
+{
+    // write data to pipe
+    tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_FILE_MODE_WO, 0);
+    if (pipe)
+    {
+        tb_pipe_file_writ(pipe, (tb_byte_t const*)"hello world!", sizeof("hello world!"));
+        tb_pipe_file_exit(pipe);
+    }
+    return 0;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
 tb_int_t tb_demo_platform_pipe_main(tb_int_t argc, tb_char_t** argv)
 {
+    // test the anonymous pipe
     tb_pipe_file_ref_t file[2] = {};
     if (tb_pipe_file_init_pair(file, 0))
     {
@@ -22,6 +43,29 @@ tb_int_t tb_demo_platform_pipe_main(tb_int_t argc, tb_char_t** argv)
         // exit pipe files
         tb_pipe_file_exit(file[0]);
         tb_pipe_file_exit(file[1]);
+    }
+
+    // test the named pipe
+    tb_thread_ref_t thread = tb_thread_init(tb_null, tb_demo_thread_writ, tb_null, 0);
+    if (thread)
+    {
+        // init file for reading
+        tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_FILE_MODE_RO, 0);
+
+        // read data from pipe
+        if (pipe)
+        {
+            tb_byte_t data[2096] = {0};
+            tb_long_t read = 0;
+            while ((read = tb_pipe_file_read(pipe, data, sizeof(data))) >= 0)
+            {
+            }
+            tb_trace_i("%s, read: %ld", data, read);
+            tb_pipe_file_exit(pipe);
+        }
+
+        tb_thread_wait(thread, -1, tb_null);
+        tb_thread_exit(thread);
     }
     return 0;
 }

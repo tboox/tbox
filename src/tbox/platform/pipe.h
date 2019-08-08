@@ -48,7 +48,7 @@ typedef __tb_typeref__(pipe_file);
  * @note the pipe files will be inherited in child process.
  *
  * @param name          the pipe name
- * @param mode          the file mode, @see TB_FILE_MODE_XX
+ * @param mode          the file mode, only support TB_FILE_MODE_RO/TB_FILE_MODE_WO
  * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
  * 
  * @return              the pipe file

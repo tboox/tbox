@@ -23,8 +23,12 @@
  * includes
  */
 #include "../pipe.h"
+#include "../file.h"
 #include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -42,8 +46,40 @@
 #ifdef TB_CONFIG_POSIX_HAVE_MKFIFO
 tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size)
 {
-    tb_trace_noimpl();
-    return tb_null;
+    // check
+    tb_assert_and_check_return_val(name, tb_null);
+
+    tb_bool_t ok = tb_false;
+    tb_int_t  fd = -1;
+    do
+    {
+        // this pipe is not exists? we create it first
+        if (access(name, F_OK) != 0)
+        {
+            // readonly? We need to wait for other write-client to create a pipe
+            if (mode & TB_FILE_MODE_RO)
+                break;
+
+            // 0644: -rw-r--r-- 
+            if (mkfifo(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0)
+                break;
+        }
+
+        // init flags
+        tb_size_t flags = 0;
+        if (mode & TB_FILE_MODE_RO) flags |= O_NONBLOCK | O_RDONLY;
+        else if (mode & TB_FILE_MODE_WO) flags |= O_WRONLY;
+        tb_assert_and_check_break(flags);
+
+        // open pipe file
+        fd = open(name, flags);
+        tb_assert_and_check_break(fd >= 0);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+    return ok? tb_fd2pipefile(fd) : tb_null;
 }
 #else
 tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size)
