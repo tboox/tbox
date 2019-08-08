@@ -39,6 +39,21 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+#ifdef TB_CONFIG_POSIX_HAVE_MKFIFO
+tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
+#else
+tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
+#endif
+
+#if defined(TB_CONFIG_POSIX_HAVE_PIPE) || defined(TB_CONFIG_POSIX_HAVE_PIPE2)
 tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
 {
     // check
@@ -69,6 +84,13 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
     } while (0);
     return ok;
 }
+#else
+tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+#endif
 tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
 {
     // check

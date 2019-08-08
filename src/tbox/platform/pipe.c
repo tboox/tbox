@@ -29,9 +29,16 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/pipe.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_PIPE) || defined(TB_CONFIG_POSIX_HAVE_PIPE2)
+#elif defined(TB_CONFIG_POSIX_HAVE_PIPE) || \
+        defined(TB_CONFIG_POSIX_HAVE_PIPE2) || \
+            defined(TB_CONFIG_POSIX_HAVE_MKFIFO)
 #   include "posix/pipe.c"
 #else
+tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
 tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
 {
     tb_trace_noimpl();

@@ -36,9 +36,6 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the pipe ref type
-typedef __tb_typeref__(pipe);
-
 /// the pipe file ref type
 typedef __tb_typeref__(pipe_file);
 
@@ -46,29 +43,21 @@ typedef __tb_typeref__(pipe_file);
  * interfaces
  */
 
-/*! init the named pipe
+/*! init the file of named pipe
+ *
+ * @note the pipe files will be inherited in child process.
  *
  * @param name          the pipe name
- * 
- * @return              tb_true or tb_false
- */
-tb_pipe_ref_t           tb_pipe_init(tb_char_t const* name);
-
-/*! exit the named pipe
- *
- * @param pipe          the pipe 
- */
-tb_void_t               tb_pipe_exit(tb_pipe_ref_t pipe);
-
-/*! open the named pipe file
- *
- * @param pipe          the pipe 
+ * @param mode          the file mode, @see TB_FILE_MODE_XX
+ * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
  * 
  * @return              the pipe file
  */
-tb_pipe_file_ref_t      tb_pipe_file_open(tb_pipe_ref_t pipe);
+tb_pipe_file_ref_t      tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size);
 
 /*! init the file pair of anonymous pipe
+ *
+ * @note the pipe files will be inherited in child process.
  *
  * @param pair          the pipe file pair, read: pair[0], write: pair[1] 
  * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
