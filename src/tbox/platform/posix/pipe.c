@@ -42,6 +42,13 @@
 #define tb_pipefile2fd(file)            (tb_int_t)((file)? (((tb_long_t)(file)) - 1) : -1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifdef TB_CONFIG_POSIX_HAVE_MKFIFO
@@ -165,5 +172,6 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_s
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
 {
-    return tb_socket_wait((tb_socket_ref_t)file, events, timeout);
+    // we use poll/select to wait pipe/fd events
+    return tb_socket_wait_impl((tb_socket_ref_t)file, events, timeout);
 }
