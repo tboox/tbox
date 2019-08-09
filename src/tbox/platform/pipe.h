@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "socket.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -38,6 +39,15 @@ __tb_extern_c_enter__
 
 /// the pipe file ref type
 typedef __tb_typeref__(pipe_file);
+
+/// the pipe file event enum
+typedef enum __tb_event_event_e
+{
+    TB_PIPE_EVENT_NONE = TB_SOCKET_EVENT_NONE
+,   TB_PIPE_EVENT_READ = TB_SOCKET_EVENT_RECV
+,   TB_PIPE_EVENT_WRIT = TB_SOCKET_EVENT_SEND
+
+}tb_pipe_event_e;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -93,6 +103,16 @@ tb_long_t               tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* da
  * @return              the real size or -1
  */
 tb_long_t               tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size);
+
+/*! wait the pipe file events
+ *
+ * @param file          the file 
+ * @param events        the pipe file events
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              > 0: the events code, 0: timeout, -1: failed
+ */
+tb_long_t               tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

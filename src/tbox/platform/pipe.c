@@ -59,4 +59,9 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_s
     tb_trace_noimpl();
     return -1;
 }
+tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
+{
+    tb_trace_noimpl();
+    return -1;
+}
 #endif

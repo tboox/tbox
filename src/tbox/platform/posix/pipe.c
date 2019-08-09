@@ -24,6 +24,7 @@
  */
 #include "../pipe.h"
 #include "../file.h"
+#include "../socket.h"
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -161,4 +162,8 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_s
 
     // write
     return write(tb_pipefile2fd(file), data, (tb_int_t)size);
+}
+tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
+{
+    return tb_socket_wait((tb_socket_ref_t)file, events, timeout);
 }

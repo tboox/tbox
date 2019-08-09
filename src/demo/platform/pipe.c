@@ -49,17 +49,16 @@ tb_int_t tb_demo_platform_pipe_main(tb_int_t argc, tb_char_t** argv)
     tb_thread_ref_t thread = tb_thread_init(tb_null, tb_demo_thread_writ, tb_null, 0);
     if (thread)
     {
-        // init file for reading
+        tb_sleep(1);
         tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_FILE_MODE_RO, 0);
-
-        // read data from pipe
         if (pipe)
         {
+            // wait read events
+            tb_pipe_file_wait(pipe, TB_PIPE_EVENT_READ, -1);
+
+            // read data from pipe
             tb_byte_t data[2096] = {0};
-            tb_long_t read = 0;
-            while ((read = tb_pipe_file_read(pipe, data, sizeof(data))) >= 0)
-            {
-            }
+            tb_long_t read = tb_pipe_file_read(pipe, data, sizeof(data));
             tb_trace_i("%s, read: %ld", data, read);
             tb_pipe_file_exit(pipe);
         }
