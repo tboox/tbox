@@ -24,7 +24,10 @@
  */
 #include "../pipe.h"
 #include "../file.h"
+#include "../path.h"
 #include "../socket.h"
+#include "../directory.h"
+#include "../../libc/libc.h"
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -49,6 +52,26 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
 __tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+
+// get pipe file name
+static __tb_inline__ tb_char_t const* tb_pipe_file_name(tb_char_t const* name, tb_char_t* data, tb_size_t maxn)
+{
+    tb_size_t size = tb_directory_temporary(data, maxn);
+    if (size && size < maxn)
+    {
+        if (data[size - 1] != '/') data[size++] = '/';
+        if (size < maxn) 
+        {
+            tb_strlcpy(data + size, name, maxn - size);
+            return data;
+        }
+    }
+    return tb_null;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifdef TB_CONFIG_POSIX_HAVE_MKFIFO
@@ -56,31 +79,37 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
 {
     // check
     tb_assert_and_check_return_val(name, tb_null);
+    tb_assert_and_check_return_val(mode == TB_FILE_MODE_WO || mode == TB_FILE_MODE_RO, tb_null);
 
     tb_bool_t ok = tb_false;
     tb_int_t  fd = -1;
     do
     {
+        // get pipe name
+        tb_char_t buffer[TB_PATH_MAXN];
+        tb_char_t const* pipename = tb_pipe_file_name(name, buffer, tb_arrayn(buffer));
+        tb_assert_and_check_break(pipename);
+
         // this pipe is not exists? we create it first
-        if (access(name, F_OK) != 0)
+        if (access(pipename, F_OK) != 0)
         {
             // readonly? We need to wait for other write-client to create a pipe
             if (mode & TB_FILE_MODE_RO)
                 break;
 
             // 0644: -rw-r--r-- 
-            if (mkfifo(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0)
+            if (mkfifo(pipename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0)
                 break;
         }
 
         // init flags
         tb_size_t flags = 0;
-        if (mode & TB_FILE_MODE_RO) flags |= O_NONBLOCK | O_RDONLY;
-        else if (mode & TB_FILE_MODE_WO) flags |= O_WRONLY;
+        if (mode == TB_FILE_MODE_RO) flags |= O_NONBLOCK | O_RDONLY;
+        else if (mode == TB_FILE_MODE_WO) flags |= O_WRONLY;
         tb_assert_and_check_break(flags);
 
         // open pipe file
-        fd = open(name, flags);
+        fd = open(pipename, flags);
         tb_assert_and_check_break(fd >= 0);
 
         // ok

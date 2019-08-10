@@ -317,6 +317,8 @@ tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr,
 
 /*! wait socket events
  *
+ * @note we can wait for socket events in the coroutine
+ *
  * @param sock      the sock 
  * @param events    the socket events
  * @param timeout   the timeout, infinity: -1
