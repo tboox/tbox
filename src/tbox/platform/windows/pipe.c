@@ -39,6 +39,12 @@ typedef struct __tb_pipe_file_t
     // the pipe name
     tb_char_t const*    name;
 
+    // the data buffer
+    tb_byte_t*          data;
+
+    // the real writed/readed size
+    DWORD               real;
+
     // the overlap
     OVERLAPPED          overlap; 
 
@@ -66,6 +72,8 @@ static tb_pipe_file_t* tb_pipe_file_init_impl(tb_char_t const* name, HANDLE pipe
     tb_pipe_file_t* file = tb_malloc0_type(tb_pipe_file_t);
     tb_assert_and_check_return_val(file, tb_null);
 
+    file->data = tb_null;
+    file->real = 0;
     file->pipe = pipe;
     file->name = name? tb_strdup(name) : tb_null;
     return file;
@@ -103,10 +111,6 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
 
             // connect pipe
             if (!ConnectNamedPipe(pipefd, tb_null)) break;
-
-            // set non-block
-            DWORD mode = PIPE_NOWAIT;
-            if (!SetNamedPipeHandleState(pipefd, &mode, tb_null, tb_null)) break;
         }
         else
         {
@@ -174,6 +178,9 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
     tb_pipe_file_t* file = (tb_pipe_file_t*)self;
     tb_assert_and_check_return_val(file, tb_false);
 
+    // disconnect the named pipe
+    if (file->name && file->pipe) DisconnectNamedPipe(file->pipe);
+
     // close pipe
     if (file->pipe) 
     {
@@ -198,8 +205,40 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
     tb_check_return_val(size, 0);
 
     // read
-    DWORD real_size = 0;
-    return ReadFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    if (file->name)
+    {
+        // has the completed result?
+        tb_check_return_val(!file->real, (tb_long_t)file->real);
+
+        // read data
+        file->data = data;
+        file->real = 0;
+        BOOL ok = ReadFile(file->pipe, data, (DWORD)size, &file->real, &file->overlap);
+        if (ok && file->real == size)
+        {
+            DWORD real_size = file->real;
+            file->data = tb_null;
+            file->real = 0;
+            return (tb_long_t)real_size;
+        }
+        else
+        {
+            // pending?
+            if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+                return 0;
+            else 
+            {
+                file->data = tb_null;
+                file->real = 0;
+                return -1;
+            }
+        }
+    }
+    else 
+    {
+        DWORD real_size = 0;
+        return ReadFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    }
 }
 tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
@@ -209,8 +248,40 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_s
     tb_check_return_val(size, 0);
 
     // write
-    DWORD real_size = 0;
-    return WriteFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    if (file->name)
+    {
+        // has the completed result?
+        tb_check_return_val(!file->real, (tb_long_t)file->real);
+
+        // write data
+        file->data = (tb_byte_t*)data;
+        file->real = 0;
+        BOOL ok = WriteFile(file->pipe, file->data, (DWORD)size, &file->real, &file->overlap);
+        if (ok && file->real == size)
+        {
+            DWORD real_size = file->real;
+            file->data = tb_null;
+            file->real = 0;
+            return (tb_long_t)real_size;
+        }
+        else
+        {
+            // pending?
+            if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+                return 0;
+            else 
+            {
+                file->data = tb_null;
+                file->real = 0;
+                return -1;
+            }
+        }
+    }
+    else 
+    {
+        DWORD real_size = 0;
+        return WriteFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    }
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t timeout)
 {
@@ -224,7 +295,11 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t
     switch (result)
     {
     case WAIT_OBJECT_0: // ok
-        ok = 1;
+        {
+            // pending?
+            if (file->data && GetOverlappedResult(file->pipe, &file->overlap, &file->real, FALSE))
+                ok = 1;
+        }
         break;
     case WAIT_TIMEOUT: // timeout 
         ok = 0;
