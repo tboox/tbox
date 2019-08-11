@@ -65,3 +65,60 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t
     return -1;
 }
 #endif
+
+tb_bool_t tb_pipe_file_bread(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size)
+{
+    // read data
+    tb_size_t read = 0;
+    tb_long_t wait = 0;
+    while (read < size)
+    {
+        // read it
+        tb_long_t real = tb_pipe_file_read(file, data + read, size - read);
+
+        // has data?
+        if (real > 0) 
+        {
+            read += real;
+            wait = 0;
+        }
+        // no data? wait it
+        else if (!real && !wait)
+        {
+            // wait it
+            wait = tb_pipe_file_wait(file, TB_PIPE_EVENT_READ, -1);
+            tb_check_break(wait > 0);
+        }
+        // failed or end?
+        else break;
+    }
+    return read == size;
+}
+tb_bool_t tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+{
+    // writ data
+    tb_size_t writ = 0;
+    tb_long_t wait = 0;
+    while (writ < size)
+    {
+        // writ it
+        tb_long_t real = tb_pipe_file_writ(file, data + writ, size - writ);
+
+        // has data?
+        if (real > 0) 
+        {
+            writ += real;
+            wait = 0;
+        }
+        // no data? wait it
+        else if (!real && !wait)
+        {
+            // wait it
+            wait = tb_pipe_file_wait(file, TB_PIPE_EVENT_WRIT, -1);
+            tb_check_break(wait > 0);
+        }
+        // failed or end?
+        else break;
+    }
+    return writ == size;
+}

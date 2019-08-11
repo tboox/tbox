@@ -53,9 +53,9 @@ typedef enum __tb_event_event_e
  * interfaces
  */
 
-/*! init the file of named pipe
+/*! init the file of named pipe 
  *
- * @note the pipe files will be inherited in child process.
+ * @note the pipe files will be inherited in child process and it will be blocked.
  *
  * @param name          the pipe name
  * @param mode          the file mode, only support TB_FILE_MODE_RO/TB_FILE_MODE_WO
@@ -115,6 +115,26 @@ tb_long_t               tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t con
  * @return              > 0: the events code, 0: timeout, -1: failed
  */
 tb_long_t               tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout);
+
+/*! read the pipe file data for tcp with block mode
+ *
+ * @param file          the pipe file 
+ * @param data          the data
+ * @param size          the size
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_pipe_file_bread(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size);
+
+/*! writ the pipe file data for tcp with block mode
+ *
+ * @param file          the pipe file 
+ * @param data          the data
+ * @param size          the size
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

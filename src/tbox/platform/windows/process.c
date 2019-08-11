@@ -366,7 +366,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
 
     // wait it
     tb_long_t   ok = -1;
-    DWORD       result = tb_kernel32()->WaitForSingleObject(process->pi.hProcess, timeout < 0? INFINITE : (DWORD)timeout);
+    DWORD       result = WaitForSingleObject(process->pi.hProcess, timeout < 0? INFINITE : (DWORD)timeout);
     switch (result)
     {
     case WAIT_OBJECT_0: // ok

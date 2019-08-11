@@ -17,7 +17,10 @@ static tb_int_t tb_demo_thread_writ(tb_cpointer_t priv)
     tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_FILE_MODE_WO, 0);
     if (pipe)
     {
-        tb_pipe_file_writ(pipe, (tb_byte_t const*)"hello world!", sizeof("hello world!"));
+        tb_byte_t const* data = (tb_byte_t const*)"hello world!";
+        tb_size_t        size = sizeof("hello world!");
+        tb_bool_t ok = tb_pipe_file_bwrit(pipe, data, size);
+        tb_trace_i("write: %s, ok: %d", data, ok);
         tb_pipe_file_exit(pipe);
     }
     return 0;
@@ -28,17 +31,21 @@ static tb_int_t tb_demo_thread_writ(tb_cpointer_t priv)
  */ 
 tb_int_t tb_demo_platform_pipe_main(tb_int_t argc, tb_char_t** argv)
 {
+    // data
+    tb_byte_t const* data = (tb_byte_t const*)"hello world!";
+    tb_size_t        size = sizeof("hello world!");
+
     // test the anonymous pipe
     tb_pipe_file_ref_t file[2] = {};
     if (tb_pipe_file_init_pair(file, 0))
     {
         // write data to pipe
-        tb_pipe_file_writ(file[1], (tb_byte_t const*)"hello world!", sizeof("hello world!"));
+        tb_pipe_file_bwrit(file[1], data, size);
 
         // read data from pipe
-        tb_byte_t data[2096] = {0};
-        tb_long_t read = tb_pipe_file_read(file[0], data, sizeof(data));
-        tb_trace_i("%s, read: %ld", data, read);
+        tb_byte_t buffer[2096] = {0};
+        tb_bool_t ok = tb_pipe_file_bread(file[0], buffer, size);
+        tb_trace_i("read: %s, ok: %d", buffer, ok);
 
         // exit pipe files
         tb_pipe_file_exit(file[0]);
@@ -57,9 +64,9 @@ tb_int_t tb_demo_platform_pipe_main(tb_int_t argc, tb_char_t** argv)
             tb_pipe_file_wait(pipe, TB_PIPE_EVENT_READ, -1);
 
             // read data from pipe
-            tb_byte_t data[2096] = {0};
-            tb_long_t read = tb_pipe_file_read(pipe, data, sizeof(data));
-            tb_trace_i("%s, read: %ld", data, read);
+            tb_byte_t buffer[2096] = {0};
+            tb_bool_t ok = tb_pipe_file_bread(pipe, buffer, size);
+            tb_trace_i("read: %s, ok: %d", buffer, ok);
             tb_pipe_file_exit(pipe);
         }
 

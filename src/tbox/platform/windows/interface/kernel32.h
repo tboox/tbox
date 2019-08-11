@@ -73,9 +73,6 @@ typedef BOOL (WINAPI* tb_kernel32_SetEnvironmentVariableW_t)(LPCWSTR lpName, LPC
 // the CreateProcessW func type
 typedef BOOL (WINAPI* tb_kernel32_CreateProcessW_t)(LPCWSTR lpApplicationName, LPCWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFO lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
 
-// the WaitForSingleObject func type
-typedef DWORD (WINAPI* tb_kernel32_WaitForSingleObject_t)(HANDLE hHandle, DWORD dwMilliseconds);
-
 // the WaitForMultipleObjects func type
 typedef DWORD (WINAPI* tb_kernel32_WaitForMultipleObjects_t)(DWORD  nCount, const HANDLE *lpHandles, BOOL bWaitAll, DWORD dwMilliseconds);
 
@@ -126,9 +123,6 @@ typedef struct __tb_kernel32_t
 
     // CreateProcessW
     tb_kernel32_CreateProcessW_t                        CreateProcessW;
-
-    // WaitForSingleObject
-    tb_kernel32_WaitForSingleObject_t                   WaitForSingleObject;
 
     // WaitForMultipleObjects
     tb_kernel32_WaitForMultipleObjects_t                WaitForMultipleObjects;

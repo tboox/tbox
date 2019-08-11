@@ -27,6 +27,24 @@
 #include "../file.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the pipe file type
+typedef struct __tb_pipe_file_t
+{
+    // the pipe handle
+    HANDLE              pipe;
+
+    // the pipe name
+    tb_char_t const*    name;
+
+    // the overlap
+    OVERLAPPED          overlap; 
+
+}tb_pipe_file_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 
@@ -38,6 +56,19 @@ static __tb_inline__ tb_wchar_t const* tb_pipe_file_name(tb_char_t const* name, 
     tb_long_t size = tb_snprintf(pipename, sizeof(pipename) - 1, "\\\\.\\pipe\\%s", name);
     tb_assert_and_check_return_val(size > 0, tb_null);
     return tb_atow(data, pipename, maxn) != -1? data : tb_null;
+}
+static tb_pipe_file_t* tb_pipe_file_init_impl(tb_char_t const* name, HANDLE pipe)
+{
+    // check
+    tb_assert_and_check_return_val(pipe, tb_null);
+
+    // init pipe file
+    tb_pipe_file_t* file = tb_malloc0_type(tb_pipe_file_t);
+    tb_assert_and_check_return_val(file, tb_null);
+
+    file->pipe = pipe;
+    file->name = name? tb_strdup(name) : tb_null;
+    return file;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -67,11 +98,15 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         if (mode == TB_FILE_MODE_WO)
         {
             // create named pipe
-            pipefd = CreateNamedPipeW(pipename, PIPE_ACCESS_INBOUND | PIPE_ACCESS_OUTBOUND, PIPE_NOWAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
+            pipefd = CreateNamedPipeW(pipename, PIPE_ACCESS_INBOUND | PIPE_ACCESS_OUTBOUND, PIPE_WAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
             tb_assert_and_check_break(pipefd && pipefd != INVALID_HANDLE_VALUE);
 
             // connect pipe
             if (!ConnectNamedPipe(pipefd, tb_null)) break;
+
+            // set non-block
+            DWORD mode = PIPE_NOWAIT;
+            if (!SetNamedPipeHandleState(pipefd, &mode, tb_null, tb_null)) break;
         }
         else
         {
@@ -92,7 +127,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
             CloseHandle(pipefd);
         pipefd = tb_null;
     }
-    return (tb_pipe_file_ref_t)pipefd;
+    return pipefd? (tb_pipe_file_ref_t)tb_pipe_file_init_impl(name, pipefd) : tb_null;
 }
 tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
 {
@@ -115,45 +150,88 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
         tb_assert_and_check_break(pipefd[1] != INVALID_HANDLE_VALUE);
 
         // save to file pair
-        pair[0] = (tb_pipe_file_ref_t)pipefd[0];
-        pair[1] = (tb_pipe_file_ref_t)pipefd[1];
+        pair[0] = (tb_pipe_file_ref_t)tb_pipe_file_init_impl(tb_null, pipefd[0]);
+        pair[1] = (tb_pipe_file_ref_t)tb_pipe_file_init_impl(tb_null, pipefd[1]);
+        tb_assert_and_check_break(pair[0] && pair[1]);
         
         // ok
         ok = tb_true;
 
     } while (0);
+
+    if (!ok)
+    {
+        if (pair[0]) tb_pipe_file_exit(pair[0]);
+        if (pair[1]) tb_pipe_file_exit(pair[1]);
+        pair[0] = tb_null;
+        pair[1] = tb_null;
+    }
     return ok;
 }
-tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
+tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
 {
     // check
+    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
     tb_assert_and_check_return_val(file, tb_false);
 
-    // close it
-    return CloseHandle((HANDLE)file)? tb_true : tb_false;
+    // close pipe
+    if (file->pipe) 
+    {
+        if (!CloseHandle(file->pipe))
+            return tb_false;
+        file->pipe = tb_null;
+    }
+
+    // exit name
+    if (file->name) tb_free(file->name);
+    file->name = tb_null;
+
+    // exit the pipe file
+    tb_free(file);
+    return tb_true;
 }
-tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(file && data, -1);
+    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
+    tb_assert_and_check_return_val(file && file->pipe && data, -1);
     tb_check_return_val(size, 0);
 
     // read
     DWORD real_size = 0;
-    return ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    return ReadFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
-tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
-    tb_assert_and_check_return_val(file && data, -1);
+    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
+    tb_assert_and_check_return_val(file && file->pipe && data, -1);
     tb_check_return_val(size, 0);
 
     // write
     DWORD real_size = 0;
-    return WriteFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    return WriteFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
-tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
+tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t timeout)
 {
-    tb_trace_noimpl();
-    return -1;
+    // check
+    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
+    tb_assert_and_check_return_val(file && file->pipe, -1);
+
+    // wait it
+    tb_long_t   ok = -1;
+    DWORD       result = WaitForSingleObject(file->pipe, timeout < 0? INFINITE : (DWORD)timeout);
+    switch (result)
+    {
+    case WAIT_OBJECT_0: // ok
+        ok = 1;
+        break;
+    case WAIT_TIMEOUT: // timeout 
+        ok = 0;
+        break;
+    case WAIT_FAILED: // failed
+    default:
+        break;
+    }
+    return ok;
 }
