@@ -112,6 +112,9 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         fd = open(pipename, flags);
         tb_assert_and_check_break(fd >= 0);
 
+        // non-block
+        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+
         // ok
         ok = tb_true;
 
@@ -188,7 +191,16 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t 
     tb_check_return_val(size, 0);
 
     // read
-    return read(tb_pipefile2fd(file), data, (tb_int_t)size);
+    tb_long_t real = read(tb_pipefile2fd(file), data, (tb_int_t)size);
+
+    // ok?
+    if (real >= 0) return real;
+
+    // continue?
+    if (errno == EINTR || errno == EAGAIN) return 0;
+
+    // error
+    return -1;
 }
 tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
@@ -197,7 +209,16 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_s
     tb_check_return_val(size, 0);
 
     // write
-    return write(tb_pipefile2fd(file), data, (tb_int_t)size);
+    tb_long_t real = write(tb_pipefile2fd(file), data, (tb_int_t)size);
+
+    // ok?
+    if (real >= 0) return real;
+
+    // continue?
+    if (errno == EINTR || errno == EAGAIN) return 0;
+
+    // error
+    return -1;
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
 {

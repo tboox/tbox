@@ -101,7 +101,7 @@ tb_bool_t tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_
     tb_long_t wait = 0;
     while (writ < size)
     {
-        // writ it
+        // write it
         tb_long_t real = tb_pipe_file_writ(file, data + writ, size - writ);
 
         // has data?
