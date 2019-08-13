@@ -41,6 +41,13 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// pipe file to fd
+#define tb_pipefile2fd(file)            (tb_int_t)((file)? (((tb_long_t)(file)) - 1) : -1)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -142,30 +149,48 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         // init spawn action
         posix_spawn_file_actions_init(&process->spawn_action);
 
-        // redirect the stdout
-        if (attr && attr->outfile)
+        // set attributes
+        if (attr)
         {
-            // open stdout
-            tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDOUT_FILENO, attr->outfile, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
-            tb_assertf_pass_and_check_break(!result, "cannot redirect stdout to file: %s, error: %d", attr->outfile, result);
-        }
+            // redirect the stdout
+            if (attr->outfile)
+            {
+                // open stdout
+                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDOUT_FILENO, attr->outfile, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
+                tb_assertf_pass_and_check_break(!result, "cannot redirect stdout to file: %s, error: %d", attr->outfile, result);
+            }
+            else if (attr->outpipe)
+            {
+                // duplicate outpipe fd to stdout in the child process
+                tb_int_t outfd = tb_pipefile2fd(attr->outpipe);
+                posix_spawn_file_actions_adddup2(&process->spawn_action, outfd, STDOUT_FILENO);
+                posix_spawn_file_actions_addclose(&process->spawn_action, outfd);
+            }
 
-        // redirect the stderr
-        if (attr && attr->errfile)
-        {
-            // open stderr
-            tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDERR_FILENO, attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
-            tb_assertf_pass_and_check_break(!result, "cannot redirect stderr to file: %s, error: %d", attr->errfile, result);
-        }
+            // redirect the stderr
+            if (attr->errfile)
+            {
+                // open stderr
+                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDERR_FILENO, attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
+                tb_assertf_pass_and_check_break(!result, "cannot redirect stderr to file: %s, error: %d", attr->errfile, result);
+            }
+            else if (attr->errpipe)
+            {
+                // duplicate errpipe fd to stderr in the child process
+                tb_int_t errfd = tb_pipefile2fd(attr->errpipe);
+                posix_spawn_file_actions_adddup2(&process->spawn_action, errfd, STDERR_FILENO);
+                posix_spawn_file_actions_addclose(&process->spawn_action, errfd);
+            }
 
-        // suspend it first
-        if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND)
-        {
+            // suspend it first
+            if (attr->flags & TB_PROCESS_FLAG_SUSPEND)
+            {
 #ifdef POSIX_SPAWN_START_SUSPENDED
-            posix_spawnattr_setflags(&process->spawn_attr, POSIX_SPAWN_START_SUSPENDED);
+                posix_spawnattr_setflags(&process->spawn_attr, POSIX_SPAWN_START_SUSPENDED);
 #else
-            tb_assertf(0, "suspend process not supported!");
+                tb_assertf(0, "suspend process not supported!");
 #endif
+            }
         }
 
         // no given environment? uses the current user environment
@@ -242,26 +267,44 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             // check
             tb_assertf(!attr || !(attr->flags & TB_PROCESS_FLAG_SUSPEND), "suspend process not supported!");
 
-            // redirect the stdout
-            if (attr && attr->outfile)
+            // set attributes
+            if (attr)
             {
-                // open file
-                process->outfd = open(attr->outfile, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
-                tb_assertf_pass_and_check_break(process->outfd, "cannot redirect stdout to file: %s, error: %d", attr->outfile, errno);
+                // redirect the stdout
+                if (attr->outfile)
+                {
+                    // open file
+                    process->outfd = open(attr->outfile, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
+                    tb_assertf_pass_and_check_break(process->outfd, "cannot redirect stdout to file: %s, error: %d", attr->outfile, errno);
 
-                // redirect it
-                dup2(process->outfd, STDOUT_FILENO);
-            }
+                    // redirect it
+                    dup2(process->outfd, STDOUT_FILENO);
+                }
+                else if (attr->outpipe)
+                {
+                    // duplicate outpipe fd to stdout in the child process
+                    tb_int_t outfd = tb_pipefile2fd(attr->outpipe);
+                    dup2(outfd, STDOUT_FILENO);
+                    close(outfd);
+                }
 
-            // redirect the stderr
-            if (attr && attr->errfile)
-            {
-                // open file
-                process->errfd = open(attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
-                tb_assertf_pass_and_check_break(process->errfd, "cannot redirect stderr to file: %s, error: %d", attr->errfile, errno);
+                // redirect the stderr
+                if (attr->errfile)
+                {
+                    // open file
+                    process->errfd = open(attr->errfile, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
+                    tb_assertf_pass_and_check_break(process->errfd, "cannot redirect stderr to file: %s, error: %d", attr->errfile, errno);
 
-                // redirect it
-                dup2(process->errfd, STDERR_FILENO);
+                    // redirect it
+                    dup2(process->errfd, STDERR_FILENO);
+                }
+                else if (attr->errpipe)
+                {
+                    // duplicate errpipe fd to stderr in the child process
+                    tb_int_t errfd = tb_pipefile2fd(attr->errpipe);
+                    dup2(errfd, STDERR_FILENO);
+                    close(errfd);
+                }
             }
 
             // get environment 

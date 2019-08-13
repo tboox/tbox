@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "pipe.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -50,6 +51,9 @@ typedef struct __tb_process_attr_t
     /// the flags
     tb_size_t           flags;
 
+    /// the stdout pipe
+    tb_pipe_file_ref_t  outpipe;
+
     /// the stdout filename 
     tb_char_t const*    outfile;
 
@@ -66,6 +70,9 @@ typedef struct __tb_process_attr_t
      * - TB_FILE_MODE_TRUNC
      */
     tb_size_t           outmode;
+
+    /// the strerr pipe
+    tb_pipe_file_ref_t  errpipe;
 
     /// the stderr filename
     tb_char_t const*    errfile;
