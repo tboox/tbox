@@ -25,28 +25,14 @@
 #include "prefix.h"
 #include <sys/poll.h>
 #include <sys/socket.h>
-#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-        && !defined(TB_CONFIG_MICRO_ENABLE)
-#   include "../../coroutine/coroutine.h"
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
     // check
     tb_assert_and_check_return_val(sock, -1);
-
-#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-        && !defined(TB_CONFIG_MICRO_ENABLE)
-    // attempt to wait it in coroutine
-    if (tb_coroutine_self())
-    {
-        // wait it
-        return tb_coroutine_waitio(sock, events, timeout);
-    }
-#endif
 
     // init
     struct pollfd pfd = {0};

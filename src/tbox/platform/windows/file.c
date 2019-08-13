@@ -146,8 +146,6 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
-
-    // no size
     tb_check_return_val(size, 0);
 
     // read
@@ -158,11 +156,9 @@ tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
-
-    // no size
     tb_check_return_val(size, 0);
 
-    // writ
+    // write
     DWORD real_size = 0;
     return WriteFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }

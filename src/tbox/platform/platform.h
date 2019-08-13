@@ -31,6 +31,7 @@
 #include "path.h"
 #include "file.h"
 #include "time.h"
+#include "pipe.h"
 #include "mutex.h"
 #include "event.h"
 #include "timer.h"

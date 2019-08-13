@@ -245,8 +245,11 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
-    // the temporary directory
-    return tb_strlcpy(path, "/tmp", maxn);
+    // get the temporary directory
+    tb_size_t size = 0;
+    if (!(size = tb_environment_first("TMPDIR", path, maxn)))
+        size = tb_strlcpy(path, "/tmp", maxn);
+    return size;
 }
 #endif
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)

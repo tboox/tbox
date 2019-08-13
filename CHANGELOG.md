@@ -8,6 +8,7 @@
 * Add stdfile api to read/write stdin, stdout and stderr.
 * [#81](https://github.com/tboox/tbox/issues/81): Add set/get thread/process cpu affinity 
 * Add filelock api
+* Add anonymous and named pipe
 
 ### Changes
 
@@ -186,6 +187,7 @@
 * 添加stdfile接口去读写stdin, stdout和stderr。
 * [#81](https://github.com/tboox/tbox/issues/81): 添加对进程和线程的cpu亲缘性设置和获取
 * 添加filelock文件锁跨平台api接口
+* 添加匿名管道，命名管道支持
 
 ### 改进
 
