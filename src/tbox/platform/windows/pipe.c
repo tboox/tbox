@@ -51,6 +51,13 @@ typedef struct __tb_pipe_file_t
 }tb_pipe_file_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+HANDLE tb_pipe_file_handle(tb_pipe_file_t* file);
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 
@@ -78,6 +85,11 @@ static tb_pipe_file_t* tb_pipe_file_init_impl(tb_char_t const* name, HANDLE pipe
     file->name = name? tb_strdup(name) : tb_null;
     return file;
 }
+HANDLE tb_pipe_file_handle(tb_pipe_file_t* file)
+{
+    tb_assert_and_check_return_val(file, tb_null);
+    return file->pipe;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -97,10 +109,10 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         tb_wchar_t const* pipename = tb_pipe_file_name(name, buffer, tb_arrayn(buffer));
         tb_assert_and_check_break(pipename);
 
-        // set pipe handles are inherited 
+        // set pipe handles are not inherited 
         SECURITY_ATTRIBUTES sattr; 
         sattr.nLength              = sizeof(SECURITY_ATTRIBUTES);
-        sattr.bInheritHandle       = TRUE;
+        sattr.bInheritHandle       = FALSE;
         sattr.lpSecurityDescriptor = tb_null;
 
         if (mode == TB_FILE_MODE_WO)
@@ -142,10 +154,10 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
     tb_bool_t ok = tb_false;
     do
     {
-        // set pipe handles are inherited 
+        // set pipe handles are not inherited 
         SECURITY_ATTRIBUTES sattr; 
         sattr.nLength              = sizeof(SECURITY_ATTRIBUTES);
-        sattr.bInheritHandle       = TRUE;
+        sattr.bInheritHandle       = FALSE;
         sattr.lpSecurityDescriptor = tb_null;
 
         // create pipe fd pair
@@ -184,7 +196,7 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
     // close pipe
     if (file->pipe) 
     {
-        if (!CloseHandle(file->pipe))
+        if (!CloseHandle(file->pipe) && GetLastError() != ERROR_INVALID_HANDLE)
             return tb_false;
         file->pipe = tb_null;
     }
@@ -237,7 +249,10 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
     else 
     {
         DWORD real_size = 0;
-        return ReadFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+        BOOL  ok = PeekNamedPipe(file->pipe, data, 1, &real_size, tb_null, tb_null);
+        if (ok && real_size > 0)
+            return ReadFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+        else return -1;
     }
 }
 tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_size_t size)
