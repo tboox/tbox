@@ -311,9 +311,14 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t
     {
     case WAIT_OBJECT_0: // ok
         {
-            // pending?
-            if (file->data && GetOverlappedResult(file->pipe, &file->overlap, &file->real, FALSE))
-                ok = 1;
+            // wait for named pipe?
+            if (file->name)
+            {
+                // pending?
+                if (file->data && GetOverlappedResult(file->pipe, &file->overlap, &file->real, FALSE))
+                    ok = 1;
+            } 
+            else ok = 1;
         }
         break;
     case WAIT_TIMEOUT: // timeout 
