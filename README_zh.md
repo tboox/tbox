@@ -286,7 +286,7 @@ int main(int argc, char** argv)
     }
 
     // wait 
-    getchar();
+    tb_getchar();
 
     // exit tbox
     tb_exit();

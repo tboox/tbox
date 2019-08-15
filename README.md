@@ -279,7 +279,7 @@ int main(int argc, char** argv)
     }
 
     // wait 
-    getchar();
+    tb_getchar();
 
     // exit tbox
     tb_exit();
@@ -292,4 +292,6 @@ int main(int argc, char** argv)
 * Email：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * Homepage：[tboox.org](https://tboox.org)
 * Community：[/r/tboox on reddit](https://www.reddit.com/r/tboox/)
+* QQ Group: 343118190
+* Wechat Public: tboox-os
 
