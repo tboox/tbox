@@ -23,6 +23,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
         // init process
         tb_process_attr_t attr = {0};
         attr.outpipe = file[1];
+        attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
         tb_process_ref_t process = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
         if (process)
         {

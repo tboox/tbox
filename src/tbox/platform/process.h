@@ -45,19 +45,26 @@ typedef enum __tb_process_flag_e
 
 }tb_process_flag_e;
 
+/// the process redirect type enum
+typedef enum __tb_process_redirect_type_e
+{
+    TB_PROCESS_REDIRECT_TYPE_NONE       = 0
+,   TB_PROCESS_REDIRECT_TYPE_FILEPATH   = 1     //!< redirect to file path
+,   TB_PROCESS_REDIRECT_TYPE_FILE       = 2     //!< redirect to file 
+,   TB_PROCESS_REDIRECT_TYPE_PIPE       = 3     //!< redirect to pipe
+
+}tb_process_redirect_type_e;
+
 /// the process attribute type
 typedef struct __tb_process_attr_t
 {
     /// the flags
-    tb_size_t           flags;
+    tb_uint16_t             flags;
 
-    /// the stdout pipe
-    tb_pipe_file_ref_t  outpipe;
+    /// the stdout redirect type
+    tb_uint16_t             outtype;
 
-    /// the stdout filename 
-    tb_char_t const*    outfile;
-
-    /*! the stdout filemode
+    /*! the stdout file mode
      *
      * default: TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC
      * 
@@ -69,16 +76,37 @@ typedef struct __tb_process_attr_t
      * - TB_FILE_MODE_APPEND 
      * - TB_FILE_MODE_TRUNC
      */
-    tb_size_t           outmode;
+    tb_uint16_t             outmode;
 
-    /// the strerr pipe
-    tb_pipe_file_ref_t  errpipe;
+    /// the stderr redirect type
+    tb_uint16_t             errtype;
 
-    /// the stderr filename
-    tb_char_t const*    errfile;
+    /// the stderr file mode
+    tb_uint16_t             errmode;
 
-    /// the stderr filemode
-    tb_size_t           errmode;
+    union
+    {
+        /// the stdout pipe
+        tb_pipe_file_ref_t  outpipe;
+
+        /// the stdout file 
+        tb_file_ref_t       outfile;
+
+        /// the stdout filepath
+        tb_char_t const*    outpath;
+    };
+
+    union 
+    {
+        /// the strerr pipe
+        tb_pipe_file_ref_t  errpipe;
+
+        /// the stderr file
+        tb_file_ref_t       errfile;
+
+        /// the stderr filepath
+        tb_char_t const*    errpath;
+    };
 
     /*! the environment
      *
@@ -100,7 +128,7 @@ typedef struct __tb_process_attr_t
      * if the value of envp is null, then the child process inherits 
      * the environment of the parent process.
      */
-    tb_char_t const**   envp;
+    tb_char_t const**       envp;
 
 }tb_process_attr_t, *tb_process_attr_ref_t;
 
@@ -111,13 +139,13 @@ typedef __tb_typeref__(process);
 typedef struct __tb_process_waitinfo_t
 {
     // the index of the processes
-    tb_size_t           index;
+    tb_size_t               index;
 
     // the process
-    tb_process_ref_t    process;
+    tb_process_ref_t        process;
 
     // the status
-    tb_long_t           status;
+    tb_long_t               status;
 
 }tb_process_waitinfo_t, *tb_process_waitinfo_ref_t;
 
