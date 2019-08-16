@@ -66,6 +66,10 @@ tb_cpointer_t tb_process_priv(tb_process_ref_t self)
     tb_trace_noimpl();
     return tb_null;
 }
+tb_void_t tb_process_priv_set(tb_process_ref_t process, tb_cpointer_t priv)
+{
+    tb_trace_noimpl();
+}
 tb_void_t tb_process_resume(tb_process_ref_t self)
 {
     tb_trace_noimpl();

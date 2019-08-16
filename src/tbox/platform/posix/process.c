@@ -545,6 +545,14 @@ tb_cpointer_t tb_process_priv(tb_process_ref_t self)
 
     return process->priv;
 }
+tb_void_t tb_process_priv_set(tb_process_ref_t self, tb_cpointer_t priv)
+{
+    // check
+    tb_process_t* process = (tb_process_t*)self;
+    tb_assert_and_check_return(process);
+
+    process->priv = priv;
+}
 tb_void_t tb_process_resume(tb_process_ref_t self)
 {
     // check

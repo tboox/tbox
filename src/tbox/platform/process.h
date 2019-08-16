@@ -286,6 +286,13 @@ tb_void_t               tb_process_kill(tb_process_ref_t process);
  */
 tb_cpointer_t           tb_process_priv(tb_process_ref_t process);
 
+/*! set the user private data
+ *
+ * @param process       the process
+ * @param priv          the user private data
+ */
+tb_void_t               tb_process_priv_set(tb_process_ref_t process, tb_cpointer_t priv);
+
 /*! resume the process
  *
  * @param process       the process
