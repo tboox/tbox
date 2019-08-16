@@ -57,8 +57,8 @@ typedef struct __tb_process_t
     // the pid
     pid_t                       pid;
 
-    // the attributes
-    tb_process_attr_t           attr;
+    // the user private data
+    tb_cpointer_t               priv;
 
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
     // the spawn attributes
@@ -127,15 +127,8 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         process = tb_malloc0_type(tb_process_t);
         tb_assert_and_check_break(process);
 
-        // init attributes
-        if (attr)
-        {
-            // save it
-            process->attr = *attr;
-
-            // do not save envp, maybe stack pointer
-            process->attr.envp = tb_null;
-        }
+        // save the user private data
+        if (attr) process->priv = attr->priv;
 
         // init spawn attributes
         posix_spawnattr_init(&process->spawn_attr);
@@ -231,15 +224,8 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         process = tb_malloc0_type(tb_process_t);
         tb_assert_and_check_break(process);
 
-        // init attributes
-        if (attr)
-        {
-            // save it
-            process->attr = *attr;
-
-            // do not save envp, maybe stack pointer
-            process->attr.envp = tb_null;
-        }
+        // save the user private data
+        if (attr) process->priv = attr->priv;
 
         // fork it
 #if defined(TB_CONFIG_POSIX_HAVE_VFORK) && \
@@ -524,14 +510,6 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
 
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
 
-    // close the stdout
-    if (process->attr.outpath) posix_spawn_file_actions_addclose(&process->spawn_action, STDOUT_FILENO);
-    process->attr.outpath = tb_null;
-
-    // close the stderr
-    if (process->attr.errpath) posix_spawn_file_actions_addclose(&process->spawn_action, STDERR_FILENO);
-    process->attr.errpath = tb_null;
-
     // exit spawn attributes
     posix_spawnattr_destroy(&process->spawn_attr);
 
@@ -558,6 +536,14 @@ tb_void_t tb_process_kill(tb_process_ref_t self)
         tb_trace_noimpl();
 #endif
     }
+}
+tb_cpointer_t tb_process_priv(tb_process_ref_t self)
+{
+    // check
+    tb_process_t* process = (tb_process_t*)self;
+    tb_assert_and_check_return_val(process, tb_null);
+
+    return process->priv;
 }
 tb_void_t tb_process_resume(tb_process_ref_t self)
 {

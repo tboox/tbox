@@ -130,6 +130,9 @@ typedef struct __tb_process_attr_t
      */
     tb_char_t const**       envp;
 
+    /// the user private data
+    tb_cpointer_t           priv;
+
 }tb_process_attr_t, *tb_process_attr_ref_t;
 
 /// the process ref type
@@ -139,13 +142,13 @@ typedef __tb_typeref__(process);
 typedef struct __tb_process_waitinfo_t
 {
     // the index of the processes
-    tb_size_t               index;
+    tb_int_t                index;
+
+    // the status
+    tb_int_t                status;
 
     // the process
     tb_process_ref_t        process;
-
-    // the status
-    tb_long_t               status;
 
 }tb_process_waitinfo_t, *tb_process_waitinfo_ref_t;
 
@@ -274,6 +277,14 @@ tb_void_t               tb_process_exit(tb_process_ref_t process);
  * @param process       the process
  */
 tb_void_t               tb_process_kill(tb_process_ref_t process);
+
+/*! get the user private data
+ *
+ * @param process       the process
+ *
+ * @return              the user private data
+ */
+tb_cpointer_t           tb_process_priv(tb_process_ref_t process);
 
 /*! resume the process
  *

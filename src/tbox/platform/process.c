@@ -61,6 +61,11 @@ tb_void_t tb_process_kill(tb_process_ref_t self)
 {
     tb_trace_noimpl();
 }
+tb_cpointer_t tb_process_priv(tb_process_ref_t self)
+{
+    tb_trace_noimpl();
+    return tb_null;
+}
 tb_void_t tb_process_resume(tb_process_ref_t self)
 {
     tb_trace_noimpl();

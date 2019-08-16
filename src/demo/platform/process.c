@@ -15,7 +15,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
     // trace
     tb_trace_i("run: %s: %ld", argv[1], ok);
 
-#elif 1
+#elif 0
     // init pipe files
     tb_pipe_file_ref_t file[2] = {0};
     if (tb_pipe_file_init_pair(file, 0))
@@ -59,12 +59,14 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
 #else
  
     // init processes
-    tb_size_t        count1 = 0;
-    tb_process_ref_t processes1[5] = {0};
-    tb_process_ref_t processes2[5] = {0};
+    tb_size_t           count1 = 0;
+    tb_process_ref_t    processes1[5] = {0};
+    tb_process_ref_t    processes2[5] = {0};
+    tb_process_attr_t   attr = {0};
     for (; count1 < 4; count1++)
     {
-        processes1[count1] = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), tb_null);
+        attr.priv = tb_u2p(count1);
+        processes1[count1] = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
         tb_assert_and_check_break(processes1[count1]);
     }
 
@@ -83,7 +85,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
             for (i = 0; i < infosize; i++)
             {
                 // trace
-                tb_trace_i("process(%ld:%p) exited: %ld", infolist[i].index, infolist[i].process, infolist[i].status);
+                tb_trace_i("process(%d:%p) exited: %d, priv: %p", infolist[i].index, infolist[i].process, infolist[i].status, tb_process_priv(infolist[i].process));
 
                 // exit process
                 if (infolist[i].process) tb_process_exit(infolist[i].process);

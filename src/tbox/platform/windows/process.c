@@ -43,8 +43,8 @@ typedef struct __tb_process_t
     // the process info
     PROCESS_INFORMATION     pi;
 
-    // the attributes
-    tb_process_attr_t       attr;
+    // the user private data
+    tb_cpointer_t           priv;
 
 }tb_process_t; 
 
@@ -133,15 +133,8 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // init startup info
         process->si.cb = sizeof(process->si);
 
-        // init attributes
-        if (attr)
-        {
-            // save it
-            process->attr = *attr;
-
-            // do not save envp, maybe stack pointer
-            process->attr.envp = tb_null;
-        }
+        // save the user private data
+        if (attr) process->priv = attr->priv;
 
         // init flags
         DWORD flags = 0;
@@ -370,6 +363,14 @@ tb_void_t tb_process_kill(tb_process_ref_t self)
     if (process->pi.hProcess != INVALID_HANDLE_VALUE)
         tb_kernel32()->TerminateProcess(process->pi.hProcess, -1);
 }
+tb_cpointer_t tb_process_priv(tb_process_ref_t self)
+{
+    // check
+    tb_process_t* process = (tb_process_t*)self;
+    tb_assert_and_check_return_val(process, tb_null);
+
+    return process->priv;
+}
 tb_void_t tb_process_resume(tb_process_ref_t self)
 {
     // check
@@ -464,9 +465,9 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
             tb_assert_and_check_return_val(process, -1);
 
             // save process info
-            infolist[infosize].index    = index;
+            infolist[infosize].index    = (tb_int_t)index;
             infolist[infosize].process  = (tb_process_ref_t)process;
-            infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;  
+            infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_int_t)exitcode : -1;  
             infosize++;
 
             // close thread handle
