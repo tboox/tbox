@@ -124,7 +124,6 @@ static tb_long_t tb_stream_file_read(tb_stream_ref_t stream, tb_byte_t* data, tb
 
     // read 
     stream_file->read = tb_file_read(stream_file->file, data, size);
-//    tb_trace_i("stream_file->read: %ld", stream_file->read);
     if (stream_file->read > 0)
         stream_file->offset += stream_file->read;
 
@@ -240,9 +239,19 @@ static tb_bool_t tb_stream_file_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             *pmode = stream_file->mode;
             return tb_true;
         }
-    case TB_STREAM_CTRL_FILE_IS_STREAM:
+    case TB_STREAM_CTRL_FILE_AS_STREAM:
         {
             stream_file->bstream = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+            return tb_true;
+        }
+    case TB_STREAM_CTRL_FILE_GET_FILE:
+        {
+            // the pfile
+            tb_file_ref_t* pfile = (tb_file_ref_t*)tb_va_arg(args, tb_file_ref_t*);
+            tb_assert_and_check_return_val(pfile, tb_false);
+
+            // get file
+            *pfile = stream_file->file;
             return tb_true;
         }
     default:
