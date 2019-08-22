@@ -28,12 +28,12 @@
 #include "prefix.h"
 #include "atomic32.h"
 #if __tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)
-#   include "../libc/atomic64.h"
+#   include "libc/atomic64.h"
 #elif defined(TB_CONFIG_OS_WINDOWS)
-#   include "../windows/atomic64.h"
+#   include "windows/atomic64.h"
 #elif defined(TB_COMPILER_IS_GCC) \
     && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8) && __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
-#   include "../compiler/gcc/atomic64.h"
+#   include "compiler/gcc/atomic64.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ __tb_extern_c_enter__
 #endif
 
 #ifdef TB_CONFIG_API_HAVE_DEPRECATED
-#   include "../deprecated/atomic64.h"
+#   include "deprecated/atomic64.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

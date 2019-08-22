@@ -24,7 +24,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../spinlock.h"
+#include "spinlock.h"
 #include "atomic64.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
