@@ -251,9 +251,6 @@ __tb_extern_c_enter__
 #elif defined(__cpp_static_assert)
 #   define tb_assert_static(x)          static_assert(x, "")
 #   define tb_assert_static_msg(x, m)   static_assert(x, m)
-#elif defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(4, 6)
-#   define tb_assert_static(x)          _Static_assert(x, "")
-#   define tb_assert_static_msg(x, m)   _Static_assert(x, m)
 #else
 #   define tb_assert_static(x)          do { typedef int __tb_static_assert__[(x)? 1 : -1]; __tb_volatile__ __tb_static_assert__ __a; tb_used_ptr((tb_cpointer_t)(tb_size_t)__a); } while(0)
 #   define tb_assert_static_msg(x, m)   tb_assert_static(x)
