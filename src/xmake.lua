@@ -348,7 +348,7 @@ function check_interfaces()
     configvar_check_csnippets("TB_CONFIG_KEYWORD_HAVE_Thread_local", "_Thread_local int a = 0;", {name = "keyword_thread_local", links = "pthread", languages = stdc})
 
     -- check anonymous union feature
-    configvar_check_csnippets("TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION", "struct __st { union {int dummy;};} a;", {name = "feature_anonymous_union", languages = stdc})
+    configvar_check_csnippets("TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION", "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }", {name = "feature_anonymous_union", languages = stdc})
 end
 
 -- include project directories
