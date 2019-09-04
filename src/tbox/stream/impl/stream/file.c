@@ -220,7 +220,20 @@ static tb_bool_t tb_stream_file_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             tb_assert_and_check_return_val(psize, tb_false);
 
             // get size
-            if (!stream_file->bstream) *psize = stream_file->file? tb_file_size(stream_file->file) : 0;
+            if (!stream_file->bstream) 
+            {
+                tb_hize_t filesize = stream_file->file? tb_file_size(stream_file->file) : 0;
+                if (!filesize)
+                {
+                    // we cannot use fstat() to get file size in some case (e.g. docker mount fs)
+                    // so we try to get size from the file path
+                    tb_file_info_t info = {0};
+                    tb_char_t const* url = tb_url_cstr(tb_stream_url(stream));
+                    if (url && tb_file_info(url, &info))
+                        filesize = info.size;
+                }
+                *psize = filesize;
+            }
             else *psize = -1;
             return tb_true;
         }
