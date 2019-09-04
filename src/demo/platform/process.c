@@ -15,7 +15,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
     // trace
     tb_trace_i("run: %s: %ld", argv[1], ok);
 
-#elif 0
+#elif 1
     // init pipe files
     tb_pipe_file_ref_t file[2] = {0};
     if (tb_pipe_file_init_pair(file, 0))

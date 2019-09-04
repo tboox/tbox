@@ -23,6 +23,9 @@ ${define TB_CONFIG_API_HAVE_DEPRECATED}
 ${define TB_CONFIG_KEYWORD_HAVE__thread}
 ${define TB_CONFIG_KEYWORD_HAVE_Thread_local}
 
+// features
+${define TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION}
+
 // modules
 ${define TB_CONFIG_MODULE_HAVE_XML}
 ${define TB_CONFIG_MODULE_HAVE_ZIP}

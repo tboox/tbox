@@ -84,8 +84,10 @@ typedef struct __tb_process_attr_t
     /// the stderr file mode
     tb_uint16_t             errmode;
 
+#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
     union
     {
+#endif
         /// the stdout pipe
         tb_pipe_file_ref_t  outpipe;
 
@@ -94,10 +96,14 @@ typedef struct __tb_process_attr_t
 
         /// the stdout filepath
         tb_char_t const*    outpath;
+#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
     };
+#endif
 
+#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
     union 
     {
+#endif
         /// the strerr pipe
         tb_pipe_file_ref_t  errpipe;
 
@@ -106,7 +112,9 @@ typedef struct __tb_process_attr_t
 
         /// the stderr filepath
         tb_char_t const*    errpath;
+#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
     };
+#endif
 
     /*! the environment
      *
