@@ -299,6 +299,6 @@ int main(int argc, char** argv)
 * 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * 主页：[TBOOX开源工程](https://tboox.org/cn)
 * 社区：[Reddit论坛](https://www.reddit.com/r/tboox/)
-* QQ群：343118190
+* QQ群：343118190(满), 662147501
 * 微信公众号：tboox-os
 

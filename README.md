@@ -292,6 +292,6 @@ int main(int argc, char** argv)
 * Email：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * Homepage：[tboox.org](https://tboox.org)
 * Community：[/r/tboox on reddit](https://www.reddit.com/r/tboox/)
-* QQ Group: 343118190
+* QQ Group: 343118190(full), 662147501
 * Wechat Public: tboox-os
 
