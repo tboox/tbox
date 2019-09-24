@@ -24,7 +24,6 @@
  */
 #include "prefix.h"
 #include "../virtual_memory.h"
-#include <sys/mman.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -46,8 +45,8 @@ tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
     // check
     tb_check_return_val(size, tb_null);
 
-    // allocate an anonymous mmap buffer
-    tb_virtual_memory_header_t* block = mmap(tb_null, sizeof(tb_virtual_memory_header_t) + size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    // allocate a virtual buffer
+    tb_virtual_memory_header_t* block = (tb_virtual_memory_header_t*)VirtualAlloc(tb_null, size, MEM_COMMIT, PAGE_READWRITE);
     if (block)
     {
         block->size = size;
@@ -86,7 +85,7 @@ tb_bool_t tb_virtual_memory_free(tb_pointer_t data)
     if (block) 
     {
         block--;
-        return munmap((tb_pointer_t)block, sizeof(tb_virtual_memory_header_t) + block->size) == 0;
+        return VirtualFree((tb_pointer_t)block, 0, MEM_RELEASE);
     }
     return tb_true;
 }
