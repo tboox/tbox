@@ -15,7 +15,7 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        memory.c
+ * @file        native_memory.c
  *
  */
 
@@ -24,9 +24,9 @@
  */
 #include "prefix.h"
 #include "../sched.h"
-#include "../memory.h"
 #include "../atomic.h"
 #include "../spinlock.h"
+#include "../native_memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals

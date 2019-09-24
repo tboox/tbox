@@ -36,6 +36,7 @@
 #include "small_allocator.h"
 #include "native_allocator.h"
 #include "static_allocator.h"
+#include "virtual_allocator.h"
 #include "default_allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////

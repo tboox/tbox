@@ -15,7 +15,7 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        memory.c
+ * @file        native_memory.c
  *
  */
 
@@ -23,7 +23,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../memory.h"
+#include "../native_memory.h"
 #include <stdlib.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////

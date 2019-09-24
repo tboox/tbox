@@ -31,6 +31,7 @@
  */
 #include "coroutine.h"
 #include "scheduler.h"
+#include "../../memory/memory.h"
 #if defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
 #   include "valgrind/valgrind.h"
 #endif
@@ -116,7 +117,7 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
          * | coroutine | guard | ... stacksize ... | guard |
          *  -----------------------------------------------
          */
-        coroutine = (tb_coroutine_t*)tb_malloc_bytes(sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
+        coroutine = (tb_coroutine_t*)tb_allocator_malloc(tb_virtual_allocator(), sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
         tb_assert_and_check_break(coroutine);
 
         // save scheduler
@@ -189,7 +190,7 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
 
         // remake coroutine
         if (stacksize > coroutine->stacksize)
-            coroutine = (tb_coroutine_t*)tb_ralloc_bytes(coroutine, sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
+            coroutine = (tb_coroutine_t*)tb_allocator_ralloc(tb_virtual_allocator(), coroutine, sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
         else stacksize = coroutine->stacksize;
         tb_assert_and_check_break(coroutine && coroutine->scheduler);
 
@@ -247,7 +248,7 @@ tb_void_t tb_coroutine_exit(tb_coroutine_t* coroutine)
 #endif
 
     // exit it
-    tb_free(coroutine);
+    tb_allocator_free(tb_virtual_allocator(), coroutine);
 }
 #ifdef __tb_debug__
 tb_void_t tb_coroutine_check(tb_coroutine_t* coroutine)

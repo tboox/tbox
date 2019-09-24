@@ -246,6 +246,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #if 0
     if (!tb_init(tb_null, tb_default_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return -1;
 #elif 0
+    if (!tb_init(tb_null, tb_virtual_allocator())) return -1;
+#elif 0
     if (!tb_init(tb_null, tb_static_allocator((tb_byte_t*)malloc(300 * 1024 * 1024), 300 * 1024 * 1024))) return -1;
 #elif (defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)) \
         || defined(__tb_sanitize_address__) || defined(__tb_sanitize_thread__)

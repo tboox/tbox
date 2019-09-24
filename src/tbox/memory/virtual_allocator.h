@@ -15,21 +15,36 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        memory.c
- * @ingroup     platform
+ * @file        virtual_allocator.h
+ * @ingroup     memory
+ *
  */
+#ifndef TB_MEMORY_VIRTUAL_ALLOCATOR_H
+#define TB_MEMORY_VIRTUAL_ALLOCATOR_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "memory.h"
+#include "allocator.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * extern
  */
-#ifdef TB_CONFIG_OS_WINDOWS
-#   include "windows/memory.c"
-#else
-#   include "libc/memory.c"
-#endif
+__tb_extern_c_enter__
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! the global virtual allocator 
+ * 
+ * @return                  the allocator 
+ */
+tb_allocator_ref_t          tb_virtual_allocator(tb_noarg_t);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+#endif

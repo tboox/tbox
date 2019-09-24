@@ -40,7 +40,6 @@
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"
-#include "memory.h"
 #include "poller.h"
 #include "context.h"
 #include "ifaddrs.h"
@@ -60,6 +59,8 @@
 #include "environment.h"
 #include "thread_pool.h"
 #include "thread_local.h"
+#include "native_memory.h"
+#include "virtual_memory.h"
 #ifdef TB_CONFIG_API_HAVE_DEPRECATED
 #   include "deprecated/deprecated.h"
 #endif

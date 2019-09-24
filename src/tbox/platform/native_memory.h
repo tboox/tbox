@@ -15,12 +15,12 @@
  * Copyright (C) 2009 - 2019, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        memory.h
+ * @file        native_memory.h
  * @defgroup    platform
  *
  */
-#ifndef TB_PLATFORM_MEMORY_H
-#define TB_PLATFORM_MEMORY_H
+#ifndef TB_PLATFORM_NATIVE_MEMORY_H
+#define TB_PLATFORM_NATIVE_MEMORY_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes

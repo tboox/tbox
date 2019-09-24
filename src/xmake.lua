@@ -285,6 +285,7 @@ function check_interfaces()
     check_module_cfuncs("posix", "fcntl.h",                          "fcntl")
     check_module_cfuncs("posix", "unistd.h",                         "pipe", "pipe2")
     check_module_cfuncs("posix", "sys/stat.h",                       "mkfifo")
+    check_module_cfuncs("posix", "sys/mman.h",                       "mmap")
 
     -- add the interfaces for windows
     if is_os("windows") then
