@@ -46,7 +46,7 @@ tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
     tb_check_return_val(size, tb_null);
 
     // allocate a virtual buffer
-    tb_virtual_memory_header_t* block = (tb_virtual_memory_header_t*)VirtualAlloc(tb_null, size, MEM_COMMIT, PAGE_READWRITE);
+    tb_virtual_memory_header_t* block = (tb_virtual_memory_header_t*)VirtualAlloc(tb_null, sizeof(tb_virtual_memory_header_t) + size, MEM_COMMIT, PAGE_READWRITE);
     if (block)
     {
         block->size = size;
