@@ -24,6 +24,7 @@
  */
 #include "prefix.h"
 #include "../virtual_memory.h"
+#include "../../memory/impl/prefix.h"
 #include <sys/mman.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -34,18 +35,6 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the virtual memory header type
-typedef struct __tb_virtual_memory_header_t
-{
-    // the block size
-    tb_size_t       size;
-
-}tb_virtual_memory_header_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
@@ -54,8 +43,11 @@ tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
     tb_check_return_val(size, tb_null);
     tb_assert_and_check_return_val(size >= TB_VIRTUAL_MEMORY_DATA_MINN, tb_null);
 
-    // allocate an anonymous mmap buffer
-    tb_virtual_memory_header_t* block = mmap(tb_null, sizeof(tb_virtual_memory_header_t) + size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    /* allocate an anonymous mmap buffer
+     *
+     * @note we use tb_pool_data_head_t to support tb_pool_data_size() when checking memory in debug mode
+     */
+    tb_pool_data_head_t* block = mmap(tb_null, sizeof(tb_pool_data_head_t) + size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (block)
     {
         block->size = size;
@@ -74,7 +66,7 @@ tb_pointer_t tb_virtual_memory_ralloc(tb_pointer_t data, tb_size_t size)
     else 
     {
         // shrink size? return it directly 
-        tb_virtual_memory_header_t* block = &((tb_virtual_memory_header_t*)data)[-1];
+        tb_pool_data_head_t* block = &((tb_pool_data_head_t*)data)[-1];
         if (size <= block->size)
             return data;
 
@@ -87,11 +79,11 @@ tb_pointer_t tb_virtual_memory_ralloc(tb_pointer_t data, tb_size_t size)
 }
 tb_bool_t tb_virtual_memory_free(tb_pointer_t data)
 {
-    tb_virtual_memory_header_t* block = (tb_virtual_memory_header_t*)data;
+    tb_pool_data_head_t* block = (tb_pool_data_head_t*)data;
     if (block) 
     {
         block--;
-        return munmap((tb_pointer_t)block, sizeof(tb_virtual_memory_header_t) + block->size) == 0;
+        return munmap((tb_pointer_t)block, sizeof(tb_pool_data_head_t) + block->size) == 0;
     }
     return tb_true;
 }
