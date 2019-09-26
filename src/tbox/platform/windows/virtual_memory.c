@@ -44,6 +44,7 @@ tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
 {
     // check
     tb_check_return_val(size, tb_null);
+    tb_assert_and_check_return_val(size >= TB_VIRTUAL_MEMORY_DATA_MINN, tb_null);
 
     // allocate a virtual buffer
     tb_virtual_memory_header_t* block = (tb_virtual_memory_header_t*)VirtualAlloc(tb_null, sizeof(tb_virtual_memory_header_t) + size, MEM_COMMIT, PAGE_READWRITE);
@@ -56,14 +57,11 @@ tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
 }
 tb_pointer_t tb_virtual_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
-    // no size? free it
-    if (!size) 
-    {
-        tb_virtual_memory_free(data);
-        return tb_null;
-    }
+    // check
+    tb_assert_and_check_return_val(size >= TB_VIRTUAL_MEMORY_DATA_MINN, tb_null);
+
     // no data? malloc it
-    else if (!data) return tb_virtual_memory_malloc(size);
+    if (!data) return tb_virtual_memory_malloc(size);
     // realloc it
     else 
     {

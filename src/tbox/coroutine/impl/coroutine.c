@@ -43,8 +43,8 @@
 // the stack guard magic
 #define TB_COROUTINE_STACK_GUARD            (0xbeef)
 
-// the default stack size
-#define TB_COROUTINE_STACK_DEFSIZE          (8192 << 1)
+// the default stack size, @note we will allocate it from large/virtual allocator if size >= TB_VIRTUAL_MEMORY_DATA_MINN
+#define TB_COROUTINE_STACK_DEFSIZE          TB_VIRTUAL_MEMORY_DATA_MINN
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -117,7 +117,7 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
          * | coroutine | guard | ... stacksize ... | guard |
          *  -----------------------------------------------
          */
-        coroutine = (tb_coroutine_t*)tb_allocator_malloc(tb_virtual_allocator(), sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
+        coroutine = (tb_coroutine_t*)tb_malloc_bytes(sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
         tb_assert_and_check_break(coroutine);
 
         // save scheduler
@@ -190,7 +190,7 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
 
         // remake coroutine
         if (stacksize > coroutine->stacksize)
-            coroutine = (tb_coroutine_t*)tb_allocator_ralloc(tb_virtual_allocator(), coroutine, sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
+            coroutine = (tb_coroutine_t*)tb_ralloc_bytes(coroutine, sizeof(tb_coroutine_t) + stacksize + sizeof(tb_uint16_t));
         else stacksize = coroutine->stacksize;
         tb_assert_and_check_break(coroutine && coroutine->scheduler);
 
@@ -248,7 +248,7 @@ tb_void_t tb_coroutine_exit(tb_coroutine_t* coroutine)
 #endif
 
     // exit it
-    tb_allocator_free(tb_virtual_allocator(), coroutine);
+    tb_free(coroutine);
 }
 #ifdef __tb_debug__
 tb_void_t tb_coroutine_check(tb_coroutine_t* coroutine)
