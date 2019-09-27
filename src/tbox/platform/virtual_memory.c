@@ -23,6 +23,7 @@
  * includes
  */
 #include "virtual_memory.h"
+#include "native_memory.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -34,18 +35,15 @@
 #else
 tb_pointer_t tb_virtual_memory_malloc(tb_size_t size)
 {
-    tb_trace_noimpl();
-    return tb_null;
+    return tb_native_memory_malloc(size);
 }
 tb_pointer_t tb_virtual_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
-    tb_trace_noimpl();
-    return tb_null;
+    return tb_native_memory_ralloc(data, size);
 }
 tb_bool_t tb_virtual_memory_free(tb_pointer_t data)
 {
-    tb_trace_noimpl();
-    return tb_false;
+    return tb_native_memory_free(data);
 }
 #endif
 
