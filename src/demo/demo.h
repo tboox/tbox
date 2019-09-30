@@ -174,10 +174,11 @@ TB_DEMO_MAIN_DECL(platform_exception);
 TB_DEMO_MAIN_DECL(platform_semaphore);
 TB_DEMO_MAIN_DECL(platform_cache_time);
 TB_DEMO_MAIN_DECL(platform_environment);
-TB_DEMO_MAIN_DECL(platform_poller);
 TB_DEMO_MAIN_DECL(platform_thread);
 TB_DEMO_MAIN_DECL(platform_thread_pool);
 TB_DEMO_MAIN_DECL(platform_thread_local);
+TB_DEMO_MAIN_DECL(platform_poller_client);
+TB_DEMO_MAIN_DECL(platform_poller_server);
 TB_DEMO_MAIN_DECL(platform_context);
 
 // container

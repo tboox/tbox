@@ -106,7 +106,12 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_socket_ref_t s
 
         // send file data to client
         if (!tb_demo_session_send(client))
-            tb_poller_insert(poller, sock, TB_SOCKET_EVENT_SEND, client);
+        {
+            tb_size_t events = TB_POLLER_EVENT_SEND;
+            if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
+                events |= TB_POLLER_EVENT_CLEAR;
+            tb_poller_insert(poller, sock, events, client);
+        }
         else tb_demo_session_exit(client);
     }
 }
@@ -120,10 +125,10 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t so
 {
     switch (events)
     {
-    case TB_SOCKET_EVENT_ACPT:
+    case TB_POLLER_EVENT_ACPT:
         tb_demo_poller_accept(poller, sock);
         break;
-    case TB_SOCKET_EVENT_SEND:
+    case TB_POLLER_EVENT_SEND:
         {
             tb_demo_client_ref_t client = (tb_demo_client_ref_t)priv;
             if (tb_demo_session_send(client))
@@ -138,7 +143,7 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t so
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_platform_poller_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_platform_poller_server_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
     tb_assert_and_check_return_val(argc == 2 && argv[1], -1);
@@ -178,7 +183,10 @@ tb_int_t tb_demo_platform_poller_main(tb_int_t argc, tb_char_t** argv)
         tb_demo_poller_accept(poller, sock);
 
         // start to wait accept events
-        tb_poller_insert(poller, sock, TB_SOCKET_EVENT_ACPT, tb_null);
+        tb_size_t events = TB_POLLER_EVENT_ACPT;
+        if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
+            events |= TB_POLLER_EVENT_CLEAR;
+        tb_poller_insert(poller, sock, events, tb_null);
 
         // wait events
         while (tb_poller_wait(poller, tb_demo_poller_event, -1) > 0) ;
