@@ -31,12 +31,15 @@ typedef struct __tb_demo_client_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client)
+static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref_t poller)
 {
     if (client)
     {
         // trace
         tb_trace_d("[%p]: recv %llu", client->sock, client->size);
+
+        // remove socket from poller
+        tb_poller_remove(poller, client->sock);
 
         // exit socket
         if (client->sock) tb_socket_exit(client->sock);
@@ -84,7 +87,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_socket_ref_t s
                 events |= TB_POLLER_EVENT_CLEAR;
             tb_poller_insert(poller, sock, events, client);
         }
-        else tb_demo_session_exit(client);
+        else tb_demo_session_exit(client, poller);
     }
 }
 static tb_void_t tb_demo_poller_connect(tb_poller_ref_t poller, tb_ipaddr_ref_t addr)
@@ -110,7 +113,7 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t so
         {
             tb_demo_client_ref_t client = (tb_demo_client_ref_t)priv;
             if (tb_demo_session_recv(client) || (events & TB_POLLER_EVENT_EOF))
-                tb_demo_session_exit(client);
+                tb_demo_session_exit(client, poller);
         }
         break;
     default:

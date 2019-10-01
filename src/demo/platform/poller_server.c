@@ -44,12 +44,15 @@ static tb_char_t    g_filepath[TB_PATH_MAXN];
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client)
+static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref_t poller)
 {
     if (client)
     {
         // trace
         tb_trace_d("[%p]: send %llu", client->sock, client->offset);
+
+        // remove socket from poller
+        tb_poller_remove(poller, client->sock);
 
         // exit file
         if (client->file) tb_file_exit(client->file);
@@ -69,7 +72,7 @@ static tb_long_t tb_demo_session_send(tb_demo_client_ref_t client)
     tb_hize_t size   = client->size;
     while (offset < size)
     {
-        tb_long_t real = tb_socket_sendf(client->sock, client->file, offset, size - offset);
+        tb_hong_t real = tb_socket_sendf(client->sock, client->file, offset, size - offset);
         if (real > 0) 
         {
             offset += real;
@@ -112,7 +115,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_socket_ref_t s
                 events |= TB_POLLER_EVENT_CLEAR;
             tb_poller_insert(poller, sock, events, client);
         }
-        else tb_demo_session_exit(client);
+        else tb_demo_session_exit(client, poller);
     }
 }
 static tb_void_t tb_demo_poller_accept(tb_poller_ref_t poller, tb_socket_ref_t sock)
@@ -132,7 +135,7 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t so
         {
             tb_demo_client_ref_t client = (tb_demo_client_ref_t)priv;
             if (tb_demo_session_send(client))
-                tb_demo_session_exit(client);
+                tb_demo_session_exit(client, poller);
         }
         break;
     default:

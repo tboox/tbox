@@ -718,16 +718,7 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
     tb_check_return_val(read > 0, read);
 
     // send data
-    tb_size_t writ = 0;
-    while (writ < read)
-    {
-        tb_long_t real = tb_socket_send(sock, data + writ, read - writ);
-        if (real > 0) writ += real;
-        else break;
-    }
-
-    // ok?
-    return writ == read? writ : -1;
+    return tb_socket_send(sock, data, read);
 }
 tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size)
 {
@@ -751,10 +742,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
     // ok?
     if (r >= 0) 
     {
-        // save address
         if (addr) tb_sockaddr_save(addr, &d);
-        
-        // ok
         return r;
     }
 
