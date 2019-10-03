@@ -213,6 +213,9 @@ tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler)
         scheduler_io->poller = tb_poller_init(tb_null);
         tb_assert_and_check_break(scheduler_io->poller);
 
+        // attach poller
+        tb_poller_attach(scheduler_io->poller);
+
 #ifndef TB_CONFIG_MICRO_ENABLE
         // init timer and using cache time
         scheduler_io->timer = tb_timer_init(TB_SCHEDULER_IO_TIMER_GROW, tb_true);

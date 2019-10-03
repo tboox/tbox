@@ -216,6 +216,9 @@ tb_co_scheduler_io_ref_t tb_co_scheduler_io_init(tb_co_scheduler_t* scheduler)
         scheduler_io->poller = tb_poller_init(tb_null);
         tb_assert_and_check_break(scheduler_io->poller);
 
+        // attach poller
+        tb_poller_attach(scheduler_io->poller);
+
         // start the io loop coroutine
         if (!tb_co_scheduler_start(scheduler_io->scheduler, tb_co_scheduler_io_loop, scheduler_io, 0)) break;
 

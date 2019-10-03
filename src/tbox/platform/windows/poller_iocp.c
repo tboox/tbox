@@ -24,6 +24,7 @@
  */
 #include "prefix.h"
 #include "iocp_object.h"
+#include "../thread_local.h"
 #include "../posix/sockaddr.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
@@ -83,10 +84,15 @@ typedef struct __tb_poller_iocp_t
  */
 __tb_extern_c_enter__
 
-// bind iocp port for object
-tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object);
+tb_poller_ref_t tb_poller_self();
+tb_bool_t       tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object);
 
 __tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+static tb_thread_local_t g_poller_self = TB_THREAD_LOCAL_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -503,17 +509,12 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     // bind this socket and object to port
     if (!object->port) 
     {
-        // get the poller of the current coroutin scheduler
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
         if (!poller) 
         {
-            tb_co_scheduler_io_ref_t co_scheduler_io = tb_co_scheduler_io_need(tb_null);
-            if (co_scheduler_io) poller = (tb_poller_iocp_ref_t)co_scheduler_io->poller;
-            else
-            {
-                tb_lo_scheduler_io_ref_t lo_scheduler_io = tb_lo_scheduler_io_need(tb_null);
-                if (lo_scheduler_io) poller = (tb_poller_iocp_ref_t)lo_scheduler_io->poller;
-            }
+            if (tb_co_scheduler_io_need(tb_null)) poller = (tb_poller_iocp_ref_t)tb_poller_self();
+            else if (tb_lo_scheduler_io_need(tb_null))
+                poller = (tb_poller_iocp_ref_t)tb_poller_self();
         }   
 #endif
         tb_assert_and_check_return_val(poller, tb_false);
@@ -530,8 +531,6 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
         // bind ok
         object->port = port;
     }
-
-    // ok
     return tb_true;
 }
 
@@ -591,6 +590,10 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
+
+    // detach poller 
+    if (tb_poller_self() == self)
+        tb_thread_local_set(&g_poller_self, tb_null);
 
     // exit port
     if (poller->port) CloseHandle(poller->port);
@@ -670,6 +673,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return_val(poller && func, -1);
+    tb_assert(self == tb_poller_self());
 
     // trace
     tb_trace_d("waiting with timeout(%ld) ..", timeout);
@@ -688,4 +692,15 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // wait ok
     return wait;
 }
-
+tb_poller_ref_t tb_poller_self()
+{
+    return (tb_poller_ref_t)tb_thread_local_get(&g_poller_self);
+}
+tb_void_t tb_poller_attach(tb_poller_ref_t self)
+{
+    // init self poller local
+    if (!tb_thread_local_init(&g_poller_self, tb_null)) return ;
+ 
+    // update and overide the current scheduler
+    tb_thread_local_set(&g_poller_self, self);
+}

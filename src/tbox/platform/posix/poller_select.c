@@ -260,7 +260,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 {
     // all supported events 
-    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL;
+    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_ONESHOT;
 
     // is supported?
     return (events_supported & events) == events;
@@ -459,4 +459,6 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // ok
     return wait;
 }
-
+tb_void_t tb_poller_attach(tb_poller_ref_t self)
+{
+}

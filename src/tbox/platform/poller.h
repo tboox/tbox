@@ -182,6 +182,12 @@ tb_bool_t           tb_poller_modify(tb_poller_ref_t poller, tb_socket_ref_t soc
  */
 tb_long_t           tb_poller_wait(tb_poller_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout);
 
+/*! attach the poller to the current thread (only for windows/iocp now)
+ *
+ * @param poller    the poller
+ */
+tb_void_t           tb_poller_attach(tb_poller_ref_t poller);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

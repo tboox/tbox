@@ -449,4 +449,6 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // ok
     return wait;
 }
-
+tb_void_t tb_poller_attach(tb_poller_ref_t self)
+{
+}

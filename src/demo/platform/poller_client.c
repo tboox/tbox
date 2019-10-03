@@ -23,6 +23,9 @@ typedef struct __tb_demo_client_t
     // the recv size
     tb_hize_t           size;
 
+    // the recv data
+    tb_byte_t           data[8192];
+
     // wait event
     tb_bool_t           wait;
 
@@ -51,10 +54,9 @@ static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref
 }
 static tb_long_t tb_demo_session_recv(tb_demo_client_ref_t client)
 {
-    tb_byte_t data[8192];
     while (1)
     {
-        tb_long_t real = tb_socket_recv(client->sock, data, sizeof(data));
+        tb_long_t real = tb_socket_recv(client->sock, client->data, sizeof(client->data));
         if (real > 0) 
         {
             client->size += real;
@@ -139,6 +141,9 @@ tb_int_t tb_demo_platform_poller_client_main(tb_int_t argc, tb_char_t** argv)
         // init poller
         poller = tb_poller_init(tb_null);
         tb_assert_and_check_break(poller);
+
+        // attach poller to the current thread
+        tb_poller_attach(poller);
 
         // init address
         tb_ipaddr_t addr;
