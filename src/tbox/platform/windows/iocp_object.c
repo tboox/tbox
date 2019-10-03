@@ -187,7 +187,7 @@ static tb_iocp_object_ref_t tb_iocp_object_cache_alloc()
 }
 static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
 {
-    return tb_sockdata();
+    return tb_poller_self()? tb_sockdata() : tb_null;
 }
 static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object)
 {

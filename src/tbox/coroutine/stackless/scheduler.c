@@ -373,6 +373,11 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
 #   endif
 #endif
 
+#ifdef TB_CONFIG_OS_WINDOWS
+    // we need attach poller in the current thread first for iocp/windows
+    tb_lo_scheduler_io_need(scheduler);
+#endif
+
     // schedule all ready coroutines
     while (tb_list_entry_size(&scheduler->coroutines_ready) && !scheduler->stopped) 
     {

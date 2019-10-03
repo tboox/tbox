@@ -30,10 +30,6 @@
 #include "../../algorithm/algorithm.h"
 #include "interface/interface.h"
 #include "ntstatus.h"
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
-#   include "../../coroutine/coroutine.h"
-#   include "../../coroutine/impl/impl.h"
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -505,20 +501,11 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
 {
     // check
     tb_assert(object);
+    tb_assert_and_check_return_val(poller, tb_false);
 
     // bind this socket and object to port
     if (!object->port) 
     {
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
-        if (!poller) 
-        {
-            if (tb_co_scheduler_io_need(tb_null)) poller = (tb_poller_iocp_ref_t)tb_poller_self();
-            else if (tb_lo_scheduler_io_need(tb_null))
-                poller = (tb_poller_iocp_ref_t)tb_poller_self();
-        }   
-#endif
-        tb_assert_and_check_return_val(poller, tb_false);
-
         // bind iocp port
         HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(object->sock), poller->port, tb_null, 0);
         if (port != poller->port)
