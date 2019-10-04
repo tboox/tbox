@@ -16,5 +16,17 @@ jobs:
       with:
         xmake-version: v2.2.8
     - name: make
+      env:
+        CI:true
       run: |
         xmake 
+        xmake run demo
+        xmake f -m debug
+        xmake -r
+        xmake run demo
+        xmake f --micro=y
+        xmake -r
+        xmake run demo
+        xmake f --small=y -m debug
+        xmake -r
+        xmake run demo
