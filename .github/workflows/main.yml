@@ -17,7 +17,7 @@ jobs:
         xmake-version: v2.2.8
     - name: make
       env:
-        CI:true
+        CI: true
       run: |
         xmake 
         xmake run demo
