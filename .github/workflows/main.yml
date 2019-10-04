@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: build
 
 on: [push]
 
@@ -15,7 +15,7 @@ jobs:
     - uses: xmake-io/github-action-setup-xmake@v1
       with:
         xmake-version: v2.2.8
-    - name: make
+    - name: build
       env:
         CI: true
       run: |
