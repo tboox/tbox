@@ -11,9 +11,6 @@
     <a href="https://ci.appveyor.com/project/waruqi/tbox/branch/master">
       <img src="https://img.shields.io/appveyor/ci/waruqi/tbox/master.svg?style=flat-square" alt="appveyor-ci" />
     </a>
-    <a href="https://github.com/tboox/tbox/actions">
-      <img src="https://github.com/tboox/tbox/workflows/build/badge.svg" alt="github-ci" />
-    </a>
     <a href="https://github.com/tboox/tbox/releases">
       <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
     </a>
