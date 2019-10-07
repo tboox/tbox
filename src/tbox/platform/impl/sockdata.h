@@ -75,20 +75,20 @@ tb_void_t           tb_sockdata_exit(tb_sockdata_ref_t sockdata);
  */
 tb_void_t           tb_sockdata_clear(tb_sockdata_ref_t sockdata);
 
-/* insert socket data 
+/* set socket data 
  *
  * @param sockdata  the sockdata
  * @param sock      the socket
  * @param priv      the socket private data
  */
-tb_void_t           tb_sockdata_insert(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, tb_cpointer_t priv);
+tb_void_t           tb_sockdata_set(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, tb_cpointer_t priv);
 
-/* remove socket data 
+/* reset socket data 
  *
  * @param sockdata  the sockdata
  * @param sock      the socket
  */
-tb_void_t           tb_sockdata_remove(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock);
+tb_void_t           tb_sockdata_reset(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * inline implementation

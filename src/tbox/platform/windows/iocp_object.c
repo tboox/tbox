@@ -218,7 +218,7 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object)
     tb_list_entry_insert_tail(cache, &object->entry);
 
     // remove this object from the local socket data
-    tb_sockdata_remove(sockdata, object->sock);
+    tb_sockdata_reset(sockdata, object->sock);
 
     // trace
     tb_trace_d("insert to the iocp object cache(%lu)", tb_list_entry_size(cache));
@@ -261,7 +261,7 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
             tb_iocp_object_clear(object);
 
             // save object
-            tb_sockdata_insert(sockdata, sock, (tb_cpointer_t)object);
+            tb_sockdata_set(sockdata, sock, (tb_cpointer_t)object);
         }
 
     } while (0);
@@ -301,7 +301,7 @@ tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
             tb_trace_d("sock(%p): removed directly, state: %s", sock, tb_state_cstr(object->state));
 
             // remove this object from the local socket data
-            tb_sockdata_remove(sockdata, sock);
+            tb_sockdata_reset(sockdata, sock);
 
             // clear and free the object data
             tb_iocp_object_clear(object);

@@ -261,7 +261,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
     
     // save events to socket
-    if (ok) tb_sockdata_insert(&poller->sockdata, sock, (tb_cpointer_t)events);
+    if (ok) tb_sockdata_set(&poller->sockdata, sock, (tb_cpointer_t)events);
 
     // ok?
     return ok;
@@ -294,7 +294,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
 
     // remove events from socket
-    if (ok) tb_sockdata_remove(&poller->sockdata, sock);
+    if (ok) tb_sockdata_reset(&poller->sockdata, sock);
 
     // ok?
     return ok;
@@ -346,7 +346,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_bool_t ok = n? tb_poller_change(poller, e, n) : tb_true;
 
     // save events to socket
-    if (ok) tb_sockdata_insert(&poller->sockdata, sock, (tb_cpointer_t)events);
+    if (ok) tb_sockdata_set(&poller->sockdata, sock, (tb_cpointer_t)events);
 
     // ok?
     return ok;

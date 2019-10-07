@@ -117,46 +117,42 @@ tb_void_t tb_sockdata_clear(tb_sockdata_ref_t sockdata)
     // clear data
     if (sockdata->data) tb_memset(sockdata->data, 0, sockdata->maxn * sizeof(tb_cpointer_t));
 }
-tb_void_t tb_sockdata_insert(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, tb_cpointer_t priv)
+tb_void_t tb_sockdata_set(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock, tb_cpointer_t priv)
 {
     // check
     tb_long_t fd = tb_sock2fd(sock);
     tb_assert(sockdata && fd > 0 && fd < TB_MAXS32);
 
-    // not null?
-    if (priv)
+    // no data? init it first
+    tb_size_t need = fd + 1;
+    if (!sockdata->data)
     {
-        // no data? init it first
-        tb_size_t need = fd + 1;
-        if (!sockdata->data)
-        {
-            // init data
-            need += TB_SOCKDATA_GROW;
-            sockdata->data = tb_nalloc0_type(need, tb_cpointer_t);
-            tb_assert_and_check_return(sockdata->data);
+        // init data
+        need += TB_SOCKDATA_GROW;
+        sockdata->data = tb_nalloc0_type(need, tb_cpointer_t);
+        tb_assert_and_check_return(sockdata->data);
 
-            // init data size
-            sockdata->maxn = need;
-        }
-        else if (need > sockdata->maxn)
-        {
-            // grow data
-            need += TB_SOCKDATA_GROW;
-            sockdata->data = (tb_cpointer_t*)tb_ralloc(sockdata->data, need * sizeof(tb_cpointer_t));
-            tb_assert_and_check_return(sockdata->data);
-
-            // init growed space
-            tb_memset(sockdata->data + sockdata->maxn, 0, (need - sockdata->maxn) * sizeof(tb_cpointer_t));
-
-            // grow data size
-            sockdata->maxn = need;
-        }
-
-        // save the socket private data
-        sockdata->data[fd] = priv;
+        // init data size
+        sockdata->maxn = need;
     }
+    else if (need > sockdata->maxn)
+    {
+        // grow data
+        need += TB_SOCKDATA_GROW;
+        sockdata->data = (tb_cpointer_t*)tb_ralloc(sockdata->data, need * sizeof(tb_cpointer_t));
+        tb_assert_and_check_return(sockdata->data);
+
+        // init growed space
+        tb_memset(sockdata->data + sockdata->maxn, 0, (need - sockdata->maxn) * sizeof(tb_cpointer_t));
+
+        // grow data size
+        sockdata->maxn = need;
+    }
+
+    // save the socket private data
+    sockdata->data[fd] = priv;
 }
-tb_void_t tb_sockdata_remove(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock)
+tb_void_t tb_sockdata_reset(tb_sockdata_ref_t sockdata, tb_socket_ref_t sock)
 {
     // check
     tb_long_t fd = tb_sock2fd(sock);

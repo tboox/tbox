@@ -233,7 +233,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // bind user private data to socket
-    tb_sockdata_insert(&poller->sockdata, sock, priv);
+    tb_sockdata_set(&poller->sockdata, sock, priv);
 
     // add socket and events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_ADD, e.data.fd, &e) < 0)
@@ -267,7 +267,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     }
 
     // remove user private data from this socket
-    tb_sockdata_remove(&poller->sockdata, sock);
+    tb_sockdata_reset(&poller->sockdata, sock);
     
     // ok
     return tb_true;
@@ -300,7 +300,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // modify user private data to socket
-    tb_sockdata_insert(&poller->sockdata, sock, priv);
+    tb_sockdata_set(&poller->sockdata, sock, priv);
 
     // modify events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_MOD, e.data.fd, &e) < 0) 

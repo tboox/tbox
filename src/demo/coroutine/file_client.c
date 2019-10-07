@@ -19,9 +19,99 @@
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
 
+// eanble conn/recv coroutine
+#define TB_DEMO_CONN_RECV   (0)
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
+#if TB_DEMO_CONN_RECV
+static tb_void_t tb_demo_coroutine_recv(tb_cpointer_t priv)
+{
+    // check
+    tb_socket_ref_t sock = (tb_socket_ref_t)priv;
+    tb_assert_and_check_return(sock);
+
+    // trace
+    tb_trace_d("[%p]: recving ..", sock);
+
+    // recv data
+    tb_byte_t data[8192];
+    tb_hize_t recv = 0;
+    tb_long_t wait = 0;
+    tb_hong_t time = tb_mclock();
+    while (1)
+    {
+        // read it
+        tb_long_t real = tb_socket_recv(sock, data, sizeof(data));
+
+        // trace
+        tb_trace_d("[%p]: recv: %ld, total: %lu", sock, real, recv + (real > 0? real : 0));
+
+        // has data?
+        if (real > 0)
+        {
+            recv += real;
+            wait = 0;
+        }
+        // no data? wait it
+        else if (!real && !wait)
+        {
+            // wait it
+            wait = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+            tb_assert_and_check_break(wait >= 0);
+        }
+        // failed or end?
+        else break;
+    }
+
+    // trace
+    tb_trace_i("[%p]: recv %llu bytes %lld ms", sock, recv, tb_mclock() - time);
+
+    // exit socket
+    if (sock) tb_socket_exit(sock);
+    sock = tb_null;
+}
+static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
+{
+    tb_long_t ok = -1;
+    tb_socket_ref_t sock = tb_null;
+    do
+    {
+        // init socket
+        sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_IPV4);
+        tb_assert_and_check_break(sock);
+
+        // init address
+        tb_ipaddr_t addr;
+        tb_ipaddr_set(&addr, "127.0.0.1", TB_DEMO_PORT, TB_IPADDR_FAMILY_IPV4);
+
+        // trace
+        tb_trace_d("[%p]: connecting %{ipaddr} ..", sock, &addr);
+
+        // connect socket
+        while (!(ok = tb_socket_connect(sock, &addr))) 
+        {
+            // wait it
+            if (tb_socket_wait(sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT) <= 0) break;
+        }
+
+        // connect ok?
+        tb_check_break(ok > 0);
+
+        // start recv coroutine
+        tb_coroutine_start(tb_co_scheduler_self(), tb_demo_coroutine_recv, sock, 0);
+
+    } while (0);
+
+    // failed?
+    if (ok <= 0)
+    {
+        if (sock) tb_socket_exit(sock);
+        sock = tb_null;
+    }
+}
+#else
 static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
 {
     // done
@@ -92,6 +182,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
     if (sock) tb_socket_exit(sock);
     sock = tb_null;
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main

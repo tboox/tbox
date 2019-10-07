@@ -26,6 +26,7 @@
  * includes
  */
 #include "scheduler.h"
+#include "../../platform/impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -53,6 +54,9 @@ typedef struct __tb_co_scheduler_io_t
 
     // the low-precision timer (faster)
     tb_ltimer_ref_t     ltimer;
+
+    // the socket events
+    tb_sockdata_t       sockevents;
 
 }tb_co_scheduler_io_t, *tb_co_scheduler_io_ref_t;
 
