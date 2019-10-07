@@ -126,16 +126,18 @@ static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
             // cache this eof as next recv/send event
             events &= ~TB_POLLER_EVENT_EOF;
             events_cache |= events_wait;
+            tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_cache << 16) | events_wait));
         }
 
         // resume the coroutine and pass the events to suspend()
         tb_lo_scheduler_io_resume(scheduler, coroutine, ((events & TB_POLLER_EVENT_ERROR)? -1 : events));
     }
     // cache this events
-    else events_cache = events;
-
-    // update socket events
-    tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_cache << 16) | events_wait));
+    else 
+    {
+        events_cache = events;
+        tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_cache << 16) | events_wait));
+    }
 }
 #ifndef TB_CONFIG_MICRO_ENABLE
 static tb_bool_t tb_lo_scheduler_io_timer_spak(tb_lo_scheduler_io_ref_t scheduler_io)
@@ -398,10 +400,7 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             // check error?
             if (events_cache & TB_POLLER_EVENT_ERROR)
             {
-                events_cache = 0;
-                tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_cache << 16) | events_prev));
-
-                // failed
+                tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p(events_prev));
                 coroutine->rs.wait.events_result = -1;
                 return tb_false;
             }
@@ -410,8 +409,7 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_sock
             coroutine->rs.wait.events_result = events_cache & events;
 
             // clear cache events
-            events_cache &= ~events;
-            tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_cache << 16) | events_prev));
+            tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p(((events_cache & ~events) << 16) | events_prev));
             return tb_false;
         }
 
@@ -507,8 +505,9 @@ tb_bool_t tb_lo_scheduler_io_cancel(tb_lo_scheduler_io_ref_t scheduler_io, tb_so
             return tb_false;
         }
 
-        // remove ok
+        // remove the socket events
         coroutine->rs.wait.events_result = 0;
+        tb_sockdata_reset(&scheduler_io->sockevents, sock);
         return tb_true;
     }
 
