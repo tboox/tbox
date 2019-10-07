@@ -39,28 +39,18 @@ __tb_extern_c_enter__
 typedef struct __tb_lo_coroutine_rs_wait_t
 {
 #ifndef TB_CONFIG_MICRO_ENABLE
-    /* the timer task pointer for ltimer or timer
-     *
-     * for ltimer:  task
-     * for timer:   task & 0x1
-     */
+    // the timer task pointer for ltimer or timer
     tb_cpointer_t               task;
 #endif
 
-    // the socket
-    tb_socket_ref_t             sock;
-
-    // the waiting events
-    tb_sint32_t                 events          : 6;
-
-    // the cached events
-    tb_sint32_t                 events_cache    : 6;
-
-    // the events result (may be -1)
-    tb_sint32_t                 events_result   : 6;
-
     // is waiting?
-    tb_sint32_t                 waiting         : 1;
+    tb_sint32_t                 is_waiting    : 1;
+
+    // is ltimer?
+    tb_sint32_t                 is_ltimer     : 1;
+
+    // events result
+    tb_sint32_t                 events_result : 16;
 
 }tb_lo_coroutine_rs_wait_t;
 

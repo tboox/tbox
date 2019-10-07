@@ -66,7 +66,7 @@ static tb_void_t tb_co_scheduler_io_resume(tb_co_scheduler_t* scheduler, tb_coro
     }
 
     // clear waiting state
-    coroutine->rs.wait.waiting = 0;
+    coroutine->rs.wait.is_waiting = 0;
 
     // resume the coroutine
     tb_co_scheduler_resume(scheduler, coroutine, priv);
@@ -110,14 +110,14 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     tb_size_t   events_cache  = sockevents >> 16;
 
     // waiting now?
-    if (coroutine->rs.wait.waiting)
+    if (coroutine->rs.wait.is_waiting)
     {
         // eof for edge trigger?
         if (events & TB_POLLER_EVENT_EOF)
         {
             // cache this eof as next recv/send event
             events &= ~TB_POLLER_EVENT_EOF;
-            events_cache |= events;
+            events_cache |= events_wait;
         }
 
         // resume the coroutine and pass the events to suspend()
@@ -435,18 +435,15 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
         }
     }
 
-    // check
-    tb_assert(!((tb_size_t)(task) & 0x1));
-
     // save the timer task to coroutine
     coroutine->rs.wait.task = task;
     coroutine->rs.wait.is_ltimer = is_ltimer;
 
+    // mark as waiting state
+    coroutine->rs.wait.is_waiting = 1;
+
     // save waiting events to coroutine
     tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p(events));
-
-    // mark as waiting state
-    coroutine->rs.wait.waiting = 1;
 
     // suspend the current coroutine and return the waited result
     return (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);

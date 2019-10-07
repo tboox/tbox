@@ -26,7 +26,7 @@
  * includes
  */
 #include "scheduler.h"
-#include "../../platform/impl/sockdata.h"
+#include "../../../platform/impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

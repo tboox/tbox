@@ -64,7 +64,7 @@ typedef struct __tb_coroutine_rs_wait_t
     tb_cpointer_t                   task;
 
     // is waiting?
-    tb_uint16_t                     waiting      : 1;
+    tb_uint16_t                     is_waiting   : 1;
 
     // is ltimer?
     tb_uint16_t                     is_ltimer    : 1;
