@@ -423,7 +423,7 @@ tb_void_t tb_ssl_exit(tb_ssl_ref_t self)
     tb_assert_and_check_return(ssl);
 
     // close it first
-    tb_ssl_clos(self);
+    tb_ssl_close(self);
 
     // exit ssl
     if (ssl->ssl) SSL_free(ssl->ssl);
@@ -564,7 +564,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
     // ok?
     return ok;
 }
-tb_bool_t tb_ssl_clos(tb_ssl_ref_t self)
+tb_bool_t tb_ssl_close(tb_ssl_ref_t self)
 {
     // the ssl
     tb_ssl_t* ssl = (tb_ssl_t*)self;
@@ -572,7 +572,7 @@ tb_bool_t tb_ssl_clos(tb_ssl_ref_t self)
 
     // open it
     tb_long_t ok = -1;
-    while (!(ok = tb_ssl_clos_try(self)))
+    while (!(ok = tb_ssl_close_try(self)))
     {
         // wait it
         ok = tb_ssl_wait(self, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, ssl->timeout);
@@ -582,7 +582,7 @@ tb_bool_t tb_ssl_clos(tb_ssl_ref_t self)
     // ok?
     return ok > 0? tb_true : tb_false;
 }
-tb_long_t tb_ssl_clos_try(tb_ssl_ref_t self)
+tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
 {
     // the ssl
     tb_ssl_t* ssl = (tb_ssl_t*)self;
@@ -606,7 +606,7 @@ tb_long_t tb_ssl_clos_try(tb_ssl_ref_t self)
         tb_long_t r = SSL_shutdown(ssl->ssl);
     
         // trace
-        tb_trace_d("clos: shutdown: %ld", r);
+        tb_trace_d("close: shutdown: %ld", r);
 
         // ok?
         if (r == 1) ok = 1;
@@ -621,7 +621,7 @@ tb_long_t tb_ssl_clos_try(tb_ssl_ref_t self)
             if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
             {
                 // trace
-                tb_trace_d("clos: shutdown: wait: %s: ..", error == SSL_ERROR_WANT_READ? "read" : "writ");
+                tb_trace_d("close: shutdown: wait: %s: ..", error == SSL_ERROR_WANT_READ? "read" : "writ");
 
                 // continue it
                 ok = 0;
@@ -633,7 +633,7 @@ tb_long_t tb_ssl_clos_try(tb_ssl_ref_t self)
             else
             {
                 // trace
-                tb_trace_d("clos: shutdown: failed: %s", tb_ssl_error(error));
+                tb_trace_d("close: shutdown: failed: %s", tb_ssl_error(error));
     
                 // save state
                 ssl->state = TB_STATE_SOCK_SSL_FAILED;
@@ -660,7 +660,7 @@ tb_long_t tb_ssl_clos_try(tb_ssl_ref_t self)
     }
 
     // trace
-    tb_trace_d("clos: shutdown: %s", ok > 0? "ok" : (!ok? ".." : "no"));
+    tb_trace_d("close: shutdown: %s", ok > 0? "ok" : (!ok? ".." : "no"));
 
     // ok?
     return ok;
@@ -724,8 +724,6 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
         ssl->state = TB_STATE_CLOSED;
         return -1;
     }
-
-    // ok
     return real;
 }
 tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)

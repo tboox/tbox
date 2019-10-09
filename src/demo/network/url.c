@@ -53,6 +53,8 @@ tb_int_t tb_demo_network_url_main(tb_int_t argc, tb_char_t** argv)
     tb_url_test_set("https://localhost/ruki/file.txt");
     tb_url_test_set("https://localhost:443/ruki/file.txt");
     tb_url_test_set("https://localhost:8080/ruki/file.txt");
+    tb_url_test_set("https://localhost:8080/ruki/file.txt/#/hello");
+    tb_url_test_set("https://github.githubassets.com/#start-of-content");
 
     tb_url_test_set("file:///home/ruki/file.txt?");
     tb_url_test_set("sock://localhost:8080?udp=");

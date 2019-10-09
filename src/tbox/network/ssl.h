@@ -160,7 +160,7 @@ tb_long_t           tb_ssl_open_try(tb_ssl_ref_t ssl);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ssl_clos(tb_ssl_ref_t ssl);
+tb_bool_t           tb_ssl_close(tb_ssl_ref_t ssl);
 
 /*! try closing ssl  using non-blocking mode
  *
@@ -168,7 +168,7 @@ tb_bool_t           tb_ssl_clos(tb_ssl_ref_t ssl);
  *
     // open it
     tb_long_t ok = -1;
-    while (!(ok = tb_ssl_clos_try(handle)))
+    while (!(ok = tb_ssl_close_try(handle)))
     {
         // wait it
         ok = tb_ssl_wait(handle, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, timeout);
@@ -181,7 +181,7 @@ tb_bool_t           tb_ssl_clos(tb_ssl_ref_t ssl);
  *
  * @return          ok: 1, continue: 0, failed: -1
  */
-tb_long_t           tb_ssl_clos_try(tb_ssl_ref_t ssl);
+tb_long_t           tb_ssl_close_try(tb_ssl_ref_t ssl);
 
 /*! read ssl data
  *

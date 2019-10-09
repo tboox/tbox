@@ -55,16 +55,16 @@ typedef enum __tb_url_protocol_t
 typedef struct __tb_url_t
 {
     // the protocol 
-    tb_uint16_t         poto:   6;
+    tb_uint16_t         protocol: 6;
 
     // is ssl?
-    tb_uint16_t         bssl:   1;
+    tb_uint16_t         is_ssl:   1;
 
     // is win?
-    tb_uint16_t         bwin:   1;
+    tb_uint16_t         is_win:   1;
 
     // the windows prefix 
-    tb_uint16_t         pwin:   8;
+    tb_uint16_t         pwin:     8;
 
     // the addr
     tb_ipaddr_t         addr;
@@ -151,9 +151,9 @@ tb_bool_t           tb_url_ssl(tb_url_ref_t url);
 /*! set ssl
  *
  * @param url       the url
- * @param bssl      is ssl?
+ * @param is_ssl    is ssl?
  */
-tb_void_t           tb_url_ssl_set(tb_url_ref_t url, tb_bool_t bssl);
+tb_void_t           tb_url_ssl_set(tb_url_ref_t url, tb_bool_t is_ssl);
 
 /*! get the protocol from the url
  *

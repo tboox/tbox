@@ -399,7 +399,7 @@ static tb_bool_t tb_stream_sock_clos(tb_stream_ref_t stream)
 #ifdef TB_SSL_ENABLE
     // close ssl
     if (tb_url_ssl(tb_stream_url(stream)) && stream_sock->hssl)
-        tb_ssl_clos(stream_sock->hssl);
+        tb_ssl_close(stream_sock->hssl);
 #endif
 
     // keep alive? not close it

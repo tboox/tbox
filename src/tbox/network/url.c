@@ -57,7 +57,7 @@ static tb_char_t const* tb_url_parse_args(tb_string_ref_t args, tb_char_t const*
     // end
     return p;
 }
-static tb_char_t const* tb_url_parse_path(tb_string_ref_t path, tb_char_t const* p)
+static tb_char_t const* tb_url_parse_path(tb_string_ref_t path, tb_char_t const* p, tb_size_t protocol)
 {
     // check
     tb_assert_and_check_return_val(path && p, tb_null);
@@ -73,7 +73,7 @@ static tb_char_t const* tb_url_parse_path(tb_string_ref_t path, tb_char_t const*
 
     // done
     tb_char_t ch;
-    while ((ch = *p) && ch != '?')
+    while ((ch = *p) && ((ch != '?' && ch != '#') || protocol == TB_URL_PROTOCOL_FILE))
     {
         // replace '\\' => '/'
         if (ch == '\\') tb_string_chrcat(path, '/');
@@ -185,9 +185,9 @@ tb_bool_t tb_url_init(tb_url_ref_t url)
     do
     {
         // init url
-        url->poto = TB_URL_PROTOCOL_NONE;
-        url->bssl = 0;
-        url->bwin = 0;
+        url->protocol = TB_URL_PROTOCOL_NONE;
+        url->is_ssl = 0;
+        url->is_win = 0;
         url->pwin = 0;
         tb_ipaddr_clear(&url->addr);
         if (!tb_string_init(&url->host)) break;
@@ -226,9 +226,9 @@ tb_void_t tb_url_clear(tb_url_ref_t url)
     tb_assert_and_check_return(url);
 
     // clear
-    url->poto = TB_URL_PROTOCOL_NONE;
-    url->bssl = 0;
-    url->bwin = 0;
+    url->protocol = TB_URL_PROTOCOL_NONE;
+    url->is_ssl = 0;
+    url->is_win = 0;
     url->pwin = 0;
     tb_ipaddr_clear(&url->addr);
     tb_string_clear(&url->host);
@@ -245,7 +245,7 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
     if (tb_string_size(&url->cache)) return tb_string_cstr(&url->cache);
 
     // make
-    switch (url->poto)
+    switch (url->protocol)
     {
     case TB_URL_PROTOCOL_FILE:
         {
@@ -253,9 +253,9 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             tb_check_return_val(tb_string_size(&url->path), tb_null);
 
             // add protocol
-            if (!url->bwin)
+            if (!url->is_win)
             {
-                if (url->bssl) tb_string_cstrncpy(&url->cache, "files://", 8);
+                if (url->is_ssl) tb_string_cstrncpy(&url->cache, "files://", 8);
                 else tb_string_cstrncpy(&url->cache, "file://", 7);
             }
             else
@@ -279,13 +279,13 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             tb_check_return_val(port && tb_string_size(&url->host), tb_null);
 
             // add protocol
-            if (url->poto == TB_URL_PROTOCOL_HTTP) tb_string_cstrcpy(&url->cache, "http");
-            else if (url->poto == TB_URL_PROTOCOL_SOCK) tb_string_cstrcpy(&url->cache, "sock");
-            else if (url->poto == TB_URL_PROTOCOL_RTSP) tb_string_cstrcpy(&url->cache, "rtsp");
+            if (url->protocol == TB_URL_PROTOCOL_HTTP) tb_string_cstrcpy(&url->cache, "http");
+            else if (url->protocol == TB_URL_PROTOCOL_SOCK) tb_string_cstrcpy(&url->cache, "sock");
+            else if (url->protocol == TB_URL_PROTOCOL_RTSP) tb_string_cstrcpy(&url->cache, "rtsp");
             else tb_assert_and_check_break(0);
 
             // add ssl
-            if (url->bssl) tb_string_chrcat(&url->cache, 's');
+            if (url->is_ssl) tb_string_chrcat(&url->cache, 's');
 
             // add ://
             tb_string_cstrncat(&url->cache, "://", 3);
@@ -301,9 +301,9 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             else tb_string_cstrncat(&url->cache, tb_string_cstr(&url->host), tb_string_size(&url->host));
 
             // add port
-            if (    (url->poto != TB_URL_PROTOCOL_HTTP)
-                ||  (url->bssl && port != TB_HTTP_DEFAULT_PORT_SSL) 
-                ||  (!url->bssl && port != TB_HTTP_DEFAULT_PORT))
+            if (    (url->protocol != TB_URL_PROTOCOL_HTTP)
+                ||  (url->is_ssl && port != TB_HTTP_DEFAULT_PORT_SSL) 
+                ||  (!url->is_ssl && port != TB_HTTP_DEFAULT_PORT))
             {
                 tb_string_cstrfcat(&url->cache, ":%u", port);
             }
@@ -376,50 +376,50 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
         tb_char_t           full[TB_PATH_MAXN];
         if (!tb_strnicmp(p, "http://", 7)) 
         {
-            url->poto = TB_URL_PROTOCOL_HTTP;
-            url->bssl = 0;
+            url->protocol = TB_URL_PROTOCOL_HTTP;
+            url->is_ssl = 0;
             p += 7;
         }
         else if (!tb_strnicmp(p, "sock://", 7))
         {
-            url->poto = TB_URL_PROTOCOL_SOCK;
-            url->bssl = 0;
+            url->protocol = TB_URL_PROTOCOL_SOCK;
+            url->is_ssl = 0;
             p += 7;
         }
         else if (!tb_strnicmp(p, "file://", 7))
         {
-            url->poto = TB_URL_PROTOCOL_FILE;
-            url->bssl = 0;
+            url->protocol = TB_URL_PROTOCOL_FILE;
+            url->is_ssl = 0;
             p += 7;
         }
         else if (!tb_strnicmp(p, "rtsp://", 7))
         {
-            url->poto = TB_URL_PROTOCOL_RTSP;
-            url->bssl = 0;
+            url->protocol = TB_URL_PROTOCOL_RTSP;
+            url->is_ssl = 0;
             p += 7;
         }
         else if (!tb_strnicmp(p, "data://", 7))
         {
-            url->poto = TB_URL_PROTOCOL_DATA;
-            url->bssl = 0;
+            url->protocol = TB_URL_PROTOCOL_DATA;
+            url->is_ssl = 0;
             p += 7;
         }
         else if (!tb_strnicmp(p, "https://", 8))
         {
-            url->poto = TB_URL_PROTOCOL_HTTP;
-            url->bssl = 1;
+            url->protocol = TB_URL_PROTOCOL_HTTP;
+            url->is_ssl = 1;
             p += 8;
         }
         else if (!tb_strnicmp(p, "socks://", 8))
         {
-            url->poto = TB_URL_PROTOCOL_SOCK;
-            url->bssl = 1;
+            url->protocol = TB_URL_PROTOCOL_SOCK;
+            url->is_ssl = 1;
             p += 8;
         }
         else if (!tb_strnicmp(p, "sql://", 6))
         {
-            url->poto = TB_URL_PROTOCOL_SQL;
-            url->bssl = 0;
+            url->protocol = TB_URL_PROTOCOL_SQL;
+            url->is_ssl = 0;
             p += 6;
         }
         // ./file or /home/file or c:/file or c:\\file ...
@@ -428,16 +428,16 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             // for unix style path
             if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
             {
-                url->poto = TB_URL_PROTOCOL_FILE;
-                url->bssl = 0;
+                url->protocol = TB_URL_PROTOCOL_FILE;
+                url->is_ssl = 0;
                 if (*p != '/') p += 7;
             }
             // for windows style path
             else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
             {
-                url->poto = TB_URL_PROTOCOL_FILE;
-                url->bssl = 0;
-                url->bwin = 1;
+                url->protocol = TB_URL_PROTOCOL_FILE;
+                url->is_ssl = 0;
+                url->is_win = 1;
                 url->pwin = *p;
 
                 // skip the drive prefix
@@ -456,10 +456,10 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
         tb_assert_and_check_break(*p);
 
         // parse host and port for http or sock or rtsp
-        if (    url->poto == TB_URL_PROTOCOL_HTTP
-            ||  url->poto == TB_URL_PROTOCOL_SOCK
-            ||  url->poto == TB_URL_PROTOCOL_RTSP
-            ||  url->poto == TB_URL_PROTOCOL_SQL)
+        if (    url->protocol == TB_URL_PROTOCOL_HTTP
+            ||  url->protocol == TB_URL_PROTOCOL_SOCK
+            ||  url->protocol == TB_URL_PROTOCOL_RTSP
+            ||  url->protocol == TB_URL_PROTOCOL_SQL)
         {
             // parse host
             p = tb_url_parse_host(&url->host, p);
@@ -477,20 +477,20 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
                 tb_assert_and_check_break(p);
 
                 // no port? using the default port
-                if (!port) port = url->bssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
+                if (!port) port = url->is_ssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
             }
-            else if (url->poto == TB_URL_PROTOCOL_HTTP) port = url->bssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
-            else if (url->poto != TB_URL_PROTOCOL_SQL) break;
+            else if (url->protocol == TB_URL_PROTOCOL_HTTP) port = url->is_ssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
+            else if (url->protocol != TB_URL_PROTOCOL_SQL) break;
 
             // save port
             tb_ipaddr_port_set(&url->addr, port);
         }
 
         // parse path and args 
-        if (url->poto != TB_URL_PROTOCOL_DATA)
+        if (url->protocol != TB_URL_PROTOCOL_DATA)
         {
             // parse path
-            p = tb_url_parse_path(&url->path, p);
+            p = tb_url_parse_path(&url->path, p, url->protocol);
             tb_assert_and_check_break(p);
 
             // find args
@@ -519,10 +519,10 @@ tb_void_t tb_url_copy(tb_url_ref_t url, tb_url_ref_t copy)
     tb_assert_and_check_return(url && copy);
 
     // copy it
-    url->poto = copy->poto;
+    url->protocol = copy->protocol;
     url->addr = copy->addr;
-    url->bssl = copy->bssl;
-    url->bwin = copy->bwin;
+    url->is_ssl = copy->is_ssl;
+    url->is_win = copy->is_win;
     url->pwin = copy->pwin;
     tb_string_strcpy(&url->host, &copy->host);
     tb_string_strcpy(&url->path, &copy->path);
@@ -535,15 +535,15 @@ tb_bool_t tb_url_ssl(tb_url_ref_t url)
     tb_assert_and_check_return_val(url, tb_false);
 
     // get ssl
-    return url->bssl? tb_true : tb_false;
+    return url->is_ssl? tb_true : tb_false;
 }
-tb_void_t tb_url_ssl_set(tb_url_ref_t url, tb_bool_t bssl)
+tb_void_t tb_url_ssl_set(tb_url_ref_t url, tb_bool_t is_ssl)
 {
     // check
     tb_assert_and_check_return(url);
 
     // set ssl
-    url->bssl = bssl? 1 : 0;
+    url->is_ssl = is_ssl? 1 : 0;
 }
 tb_size_t tb_url_protocol(tb_url_ref_t url)
 {
@@ -551,15 +551,15 @@ tb_size_t tb_url_protocol(tb_url_ref_t url)
     tb_assert_and_check_return_val(url, TB_URL_PROTOCOL_NONE);
 
     // get protocol
-    return url->poto;
+    return url->protocol;
 }
-tb_void_t tb_url_protocol_set(tb_url_ref_t url, tb_size_t poto)
+tb_void_t tb_url_protocol_set(tb_url_ref_t url, tb_size_t protocol)
 {
     // check
     tb_assert_and_check_return(url);
 
     // set protocol
-    url->poto = poto;
+    url->protocol = protocol;
 }
 tb_char_t const* tb_url_protocol_cstr(tb_url_ref_t url)
 {
@@ -577,10 +577,10 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_ref_t url)
     ,   "rtsp"
     ,   "sql"
     };
-    tb_assert_and_check_return_val(url->poto < tb_arrayn(s_protocols), tb_null);
+    tb_assert_and_check_return_val(url->protocol < tb_arrayn(s_protocols), tb_null);
 
     // ok
-    return s_protocols[url->poto];
+    return s_protocols[url->protocol];
 }
 tb_size_t tb_url_protocol_probe(tb_char_t const* url)
 {
@@ -700,7 +700,7 @@ tb_void_t tb_url_path_set(tb_url_ref_t url, tb_char_t const* path)
     tb_string_clear(&url->cache);
 
     // parse path
-    tb_url_parse_path(&url->path, path);
+    tb_url_parse_path(&url->path, path, url->protocol);
 }
 tb_char_t const* tb_url_args(tb_url_ref_t url)
 {
