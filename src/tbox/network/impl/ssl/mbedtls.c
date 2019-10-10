@@ -518,23 +518,16 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
             ssl->state = TB_STATE_SOCK_SSL_FAILED;
         }
 
-        // clear ssl
-        if (ok > 0) mbedtls_ssl_session_reset(&ssl->ssl);
-
     } while (0);
 
-    // ok?
+    // ok or failed?
     if (ok > 0)
     {
         // closed
         ssl->bopened = tb_false;
-    }
-    // failed?
-    else if (ok < 0)
-    {
-        // save state
-        if (ssl->state == TB_STATE_OK)
-            ssl->state = TB_STATE_SOCK_SSL_FAILED;
+
+        // clear ssl
+        mbedtls_ssl_session_reset(&ssl->ssl);
     }
 
     // trace
