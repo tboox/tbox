@@ -355,7 +355,7 @@ tb_bool_t               tb_http_open(tb_http_ref_t http);
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_http_clos(tb_http_ref_t http);
+tb_bool_t               tb_http_close(tb_http_ref_t http);
 
 /*! seek http
  *

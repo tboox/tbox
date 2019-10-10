@@ -795,7 +795,7 @@ tb_void_t tb_http_exit(tb_http_ref_t self)
     tb_assert_and_check_return(http);
 
     // close it
-    tb_http_clos(self);
+    tb_http_close(self);
 
     // exit zstream
     if (http->zstream) tb_stream_exit(http->zstream);
@@ -895,7 +895,7 @@ tb_bool_t tb_http_open(tb_http_ref_t self)
     // ok?
     return ok;
 }
-tb_bool_t tb_http_clos(tb_http_ref_t self)
+tb_bool_t tb_http_close(tb_http_ref_t self)
 {
     // check
     tb_http_t* http = (tb_http_t*)self;

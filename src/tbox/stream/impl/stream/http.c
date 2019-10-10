@@ -73,7 +73,7 @@ static tb_bool_t tb_stream_http_clos(tb_stream_ref_t stream)
     tb_assert_and_check_return_val(stream_http && stream_http->http, tb_false);
 
     // close it
-    return tb_http_clos(stream_http->http);
+    return tb_http_close(stream_http->http);
 }
 static tb_void_t tb_stream_http_exit(tb_stream_ref_t stream)
 {
