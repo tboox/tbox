@@ -38,6 +38,7 @@ __tb_extern_c_enter__
 
 // enable ssl?
 #if defined(TB_CONFIG_PACKAGE_HAVE_OPENSSL) \
+    || defined(TB_CONFIG_PACKAGE_HAVE_MBEDTLS) \
     || defined(TB_CONFIG_PACKAGE_HAVE_POLARSSL)
 #   define TB_SSL_ENABLE
 #else
