@@ -642,21 +642,14 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
 
     } while (0);
 
-    // ok?
-    if (ok > 0)
+    // ok or failed?
+    if (!ok)
     {
         // closed
         ssl->bopened = tb_false;
 
         // clear ssl
         if (ssl->ssl) SSL_clear(ssl->ssl);
-    }
-    // failed?
-    else if (ok < 0)
-    {
-        // save state
-        if (ssl->state == TB_STATE_OK)
-            ssl->state = TB_STATE_SOCK_SSL_FAILED;
     }
 
     // trace
