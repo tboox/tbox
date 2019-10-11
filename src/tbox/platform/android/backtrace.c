@@ -27,6 +27,7 @@
 #include "../atomic.h"
 #include "../memory.h"
 #include "../dynamic.h"
+#include "../native_memory.h"
 #if 0
 #   include <unwind.h>
 #   include <dlfcn.h>

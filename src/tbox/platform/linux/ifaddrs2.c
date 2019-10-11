@@ -561,7 +561,7 @@ static tb_bool_t tb_ifaddrs_interface_load(tb_list_ref_t interfaces, tb_long_t s
 
     // done
     tb_long_t ok = -1;
-    while (!(ok = tb_ifaddrs_interface_done(interfaces, names, sock, request))) ;
+    while (!(ok = tb_ifaddrs_interface_done(interfaces, names, sock, request))) {};
 
     // trace
     tb_trace_d("netlink: load: %s", ok > 0? "ok" : "no");

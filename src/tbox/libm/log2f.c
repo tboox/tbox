@@ -32,7 +32,11 @@
 tb_float_t tb_log2f(tb_float_t x)
 {
 #ifdef TB_CONFIG_LIBM_HAVE_LOG2F
+#   if defined(TB_CONFIG_OS_ANDROID) && defined(__ANDROID_API__) && (__ANDROID_API__ < 18)
+    return log(x) * 1.44269504088896340736f;
+#   else
     return log2f(x);
+#   endif
 #else
     return log(x) * 1.44269504088896340736f;
 #endif
