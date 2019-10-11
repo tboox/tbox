@@ -19,6 +19,7 @@
 * Improve spinlock
 * Support to redirect process output to pipe 
 * Uses virtual memory for coroutine stack
+* Improve openssl/mbedtls for https
 
 ## v1.6.3
 
@@ -200,6 +201,7 @@
 * 改进spinlock实现
 * 新增进程输出重定向到管道
 * 针对协程栈使用虚拟内存
+* 改进基于openssl/mbedtls的https访问
 
 ## v1.6.3
 
