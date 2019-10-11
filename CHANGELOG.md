@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.6.4
+
 ### New features
 
 * [#70](https://github.com/tboox/tbox/issues/70): Add `tb_stream_init_from_sock_ref()` to open a given socket as stream
@@ -183,6 +185,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.6.4
 
 ### 新特性
 
