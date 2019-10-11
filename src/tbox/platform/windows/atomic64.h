@@ -52,37 +52,37 @@ __tb_extern_c_enter__
 tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail);
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64
 __int64 _InterlockedCompareExchange64(__int64 __tb_volatile__* Destination, __int64 Exchange, __int64 Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange64)
+#    pragma intrinsic(_InterlockedCompareExchange64)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64_NF
 __int64 _InterlockedCompareExchange64_nf(__int64 __tb_volatile__* Destination, __int64 Exchange, __int64 Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange64_nf)
+#    pragma intrinsic(_InterlockedCompareExchange64_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64_ACQ
 __int64 _InterlockedCompareExchange64_acq(__int64 __tb_volatile__* Destination, __int64 Exchange, __int64 Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange64_acq)
+#    pragma intrinsic(_InterlockedCompareExchange64_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE64_REL
 __int64 _InterlockedCompareExchange64_rel(__int64 __tb_volatile__* Destination, __int64 Exchange, __int64 Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange64_rel)
+#    pragma intrinsic(_InterlockedCompareExchange64_rel)
 #endif
 
 // _InterlockedExchangeAdd64XX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD64
 __int64 _InterlockedExchangeAdd64(__int64 volatile* Destination, __int64 Value);
-#   pragma intrinsic(_InterlockedExchangeAdd64)
+#    pragma intrinsic(_InterlockedExchangeAdd64)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD64_NF
 __int64 _InterlockedExchangeAdd64_nf(__int64 volatile* Destination, __int64 Value);
-#   pragma intrinsic(_InterlockedExchangeAdd64_nf)
+#    pragma intrinsic(_InterlockedExchangeAdd64_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD64_ACQ
 __int64 _InterlockedExchangeAdd64_acq(__int64 volatile* Destination, __int64 Value);
-#   pragma intrinsic(_InterlockedExchangeAdd64_acq)
+#    pragma intrinsic(_InterlockedExchangeAdd64_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD64_REL
 __int64 _InterlockedExchangeAdd64_rel(__int64 volatile* Destination, __int64 Value);
-#   pragma intrinsic(_InterlockedExchangeAdd64_rel)
+#    pragma intrinsic(_InterlockedExchangeAdd64_rel)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

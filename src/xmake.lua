@@ -287,8 +287,8 @@ function check_interfaces()
     check_module_cfuncs("posix", "sys/stat.h",                       "mkfifo")
     check_module_cfuncs("posix", "sys/mman.h",                       "mmap")
 
-    -- add the interfaces for windows
-    if is_os("windows") then
+    -- add the interfaces for windows/msvc
+    if is_plat("windows") then
         for _, mo in ipairs({"", "_nf", "_acq", "_rel"}) do
             check_module_csnippet("windows", "windows.h", "_InterlockedExchange" .. mo, format([[
                 LONG _InterlockedExchange%s(LONG volatile* Destination, LONG Value);

@@ -507,7 +507,7 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     if (!object->port) 
     {
         // bind iocp port
-        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(object->sock), poller->port, tb_null, 0);
+        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(object->sock), poller->port, (ULONG_PTR)tb_null, 0);
         if (port != poller->port)
         {
             // trace
@@ -614,7 +614,7 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     tb_assert_and_check_return(poller);
 
     // post kill notification to iocp port
-    PostQueuedCompletionStatus(poller->port, 0, tb_null, tb_null);
+    PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_null, tb_null);
 }
 tb_void_t tb_poller_spak(tb_poller_ref_t self)
 {

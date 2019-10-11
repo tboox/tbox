@@ -57,7 +57,7 @@ static __tb_inline__ tb_wchar_t const* tb_path_absolute_w(tb_char_t const* path,
     tb_check_return_val(path, tb_null);
 
     // atow
-    return tb_atow(full, path, maxn) != -1? full : tb_null;
+    return tb_atow(full, path, maxn) != (tb_size_t)-1? full : tb_null;
 }
 
 #endif

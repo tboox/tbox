@@ -82,3 +82,8 @@ target("demo")
             add_ldflags("/subsystem:console,5.02")
         end
     end
+
+    -- link mingw/libgcc
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", {force = true})
+    end

@@ -382,7 +382,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
         }
         break;
     case TB_SOCKET_CTRL_SET_NOSIGPIPE:
-        ok = true;
+        ok = tb_true;
         break;
 #ifdef SO_KEEPALIVE
     case TB_SOCKET_CTRL_SET_KEEPALIVE:

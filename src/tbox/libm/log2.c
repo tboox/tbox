@@ -27,16 +27,20 @@
 #include <math.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#if defined(TB_CONFIG_LIBM_HAVE_LOG2) && \
+    defined(TB_CONFIG_OS_ANDROID) && defined(__ANDROID_API__) && (__ANDROID_API__ < 18)
+#   undef TB_CONFIG_LIBM_HAVE_LOG2
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_double_t tb_log2(tb_double_t x)
 {
 #ifdef TB_CONFIG_LIBM_HAVE_LOG2
-#   if defined(TB_CONFIG_OS_ANDROID) && defined(__ANDROID_API__) && (__ANDROID_API__ < 18)
-    return log(x) * 1.44269504088896340736;
-#   else
     return log2(x);
-#   endif
 #else
     return log(x) * 1.44269504088896340736;
 #endif

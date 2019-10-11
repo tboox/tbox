@@ -47,55 +47,55 @@ __tb_extern_c_enter__
 // _InterlockedExchangeXX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE
 LONG _InterlockedExchange(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchange)
+#    pragma intrinsic(_InterlockedExchange)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE_NF
 LONG _InterlockedExchange_nf(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchange_nf)
+#    pragma intrinsic(_InterlockedExchange_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE_ACQ
 LONG _InterlockedExchange_acq(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchange_acq)
+#    pragma intrinsic(_InterlockedExchange_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE_REL
 LONG _InterlockedExchange_rel(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchange_rel)
+#    pragma intrinsic(_InterlockedExchange_rel)
 #endif
 
 // _InterlockedCompareExchangeXX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE
 LONG _InterlockedCompareExchange(LONG volatile* Destination, LONG Exchange, LONG Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange)
+#    pragma intrinsic(_InterlockedCompareExchange)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE_nf
 LONG _InterlockedCompareExchange_nf(LONG volatile* Destination, LONG Exchange, LONG Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange_nf)
+#    pragma intrinsic(_InterlockedCompareExchange_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE_acq
 LONG _InterlockedCompareExchange_acq(LONG volatile* Destination, LONG Exchange, LONG Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange_acq)
+#    pragma intrinsic(_InterlockedCompareExchange_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDCOMPAREEXCHANGE_rel
 LONG _InterlockedCompareExchange_rel(LONG volatile* Destination, LONG Exchange, LONG Comperand);
-#   pragma intrinsic(_InterlockedCompareExchange_rel)
+#    pragma intrinsic(_InterlockedCompareExchange_rel)
 #endif
 
 // _InterlockedExchangeAddXX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD
 LONG _InterlockedExchangeAdd(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchangeAdd)
+#    pragma intrinsic(_InterlockedExchangeAdd)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD_NF
 LONG _InterlockedExchangeAdd_nf(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchangeAdd_nf)
+#    pragma intrinsic(_InterlockedExchangeAdd_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD_ACQ
 LONG _InterlockedExchangeAdd_acq(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchangeAdd_acq)
+#    pragma intrinsic(_InterlockedExchangeAdd_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGEADD_REL
 LONG _InterlockedExchangeAdd_rel(LONG volatile* Destination, LONG Value);
-#   pragma intrinsic(_InterlockedExchangeAdd_rel)
+#    pragma intrinsic(_InterlockedExchangeAdd_rel)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

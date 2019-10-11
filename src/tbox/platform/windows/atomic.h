@@ -30,6 +30,25 @@
  * macros
  */
 
+// no barriers or synchronization. 
+#define TB_ATOMIC_RELAXED        (1)
+
+// data dependency only for both barrier and synchronization with another thread. 
+#define TB_ATOMIC_CONSUME        (2)
+
+// barrier to hoisting of code and synchronizes with release (or stronger) semantic stores from another thread. 
+#define TB_ATOMIC_ACQUIRE        (3)
+
+// barrier to sinking of code and synchronizes with acquire (or stronger) semantic loads from another thread. 
+#define TB_ATOMIC_RELEASE        (4)
+
+// full barrier in both directions and synchronizes with acquire loads and release stores in another thread. 
+#define TB_ATOMIC_ACQ_REL        (5)
+
+/// full barrier in both directions and synchronizes with acquire loads and release stores in all threads.
+#define TB_ATOMIC_SEQ_CST        (6)
+
+// memory barrier
 #if defined(MemoryBarrier)
 #   define tb_memory_barrier()                          MemoryBarrier()
 #elif defined(_AMD64_)
@@ -59,37 +78,37 @@ __tb_extern_c_enter__
 // _InterlockedExchange8XX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8
 CHAR _InterlockedExchange8(CHAR __tb_volatile__* Destination, CHAR Exchange);
-#   pragma intrinsic(_InterlockedExchange8)
+#    pragma intrinsic(_InterlockedExchange8)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_NF
 CHAR _InterlockedExchange8_nf(CHAR __tb_volatile__* Destination, CHAR Exchange);
-#   pragma intrinsic(_InterlockedExchange8_nf)
+#    pragma intrinsic(_InterlockedExchange8_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_ACQ
 CHAR _InterlockedExchange8_acq(CHAR __tb_volatile__* Destination, CHAR Exchange);
-#   pragma intrinsic(_InterlockedExchange8_acq)
+#    pragma intrinsic(_InterlockedExchange8_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8_REL
 CHAR _InterlockedExchange8_rel(CHAR __tb_volatile__* Destination, CHAR Exchange);
-#   pragma intrinsic(_InterlockedExchange8_rel)
+#    pragma intrinsic(_InterlockedExchange8_rel)
 #endif
 
 // _InterlockedOr8XX
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8
 CHAR _InterlockedOr8(CHAR __tb_volatile__* Destination, CHAR Value);
-#   pragma intrinsic(_InterlockedOr8)
+#    pragma intrinsic(_InterlockedOr8)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_NF
 CHAR _InterlockedOr8_nf(CHAR __tb_volatile__* Destination, CHAR Value);
-#   pragma intrinsic(_InterlockedOr8_nf)
+#    pragma intrinsic(_InterlockedOr8_nf)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_ACQ
 CHAR _InterlockedOr8_acq(CHAR __tb_volatile__* Destination, CHAR Value);
-#   pragma intrinsic(_InterlockedOr8_acq)
+#    pragma intrinsic(_InterlockedOr8_acq)
 #endif
 #ifdef TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8_REL
 CHAR _InterlockedOr8_rel(CHAR __tb_volatile__* Destination, CHAR Value);
-#   pragma intrinsic(_InterlockedOr8_rel)
+#    pragma intrinsic(_InterlockedOr8_rel)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
