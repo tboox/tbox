@@ -136,8 +136,8 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
     // the instance
     tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_cmpset(&g_singletons[type].instance, 0, 1);
 
-    // ok?
-    if (instance && instance != (tb_handle_t)1) return instance;
+    // ok or failed?
+    if (instance && instance != (tb_handle_t)1) return (instance != (tb_handle_t)-1)? instance : tb_null;
     // null? init it
     else if (!instance)
     {
@@ -149,14 +149,13 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
 
         // init it
         instance = init(&g_singletons[type].priv);
-        tb_check_return_val(instance, tb_null);
 
         // init func
         g_singletons[type].exit = exit;
         g_singletons[type].kill = kill;
 
         // register instance 
-        tb_atomic_set(&g_singletons[type].instance, (tb_long_t)instance);
+        tb_atomic_set(&g_singletons[type].instance, instance? (tb_long_t)instance : (tb_long_t)-1);
     }
     // initing? wait it
     else
@@ -170,7 +169,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
         }
 
         // failed?
-        if (instance == (tb_handle_t)1 || !instance)
+        if (instance == (tb_handle_t)1 || instance == (tb_handle_t)-1)
             return tb_null;
     }
 
@@ -185,8 +184,8 @@ tb_bool_t tb_singleton_static_init(tb_atomic32_t* binited, tb_handle_t instance,
     // inited?
     tb_atomic32_t inited = tb_atomic32_fetch_and_cmpset(binited, 0, 1);
 
-    // ok?
-    if (inited && inited != 1) return tb_true;
+    // ok or failed?
+    if (inited && inited != 1) return inited != -1;
     // null? init it
     else if (!inited)
     {
@@ -194,7 +193,12 @@ tb_bool_t tb_singleton_static_init(tb_atomic32_t* binited, tb_handle_t instance,
         tb_check_return_val(init, tb_false);
 
         // init it
-        if (!init(instance, priv)) return tb_false;
+        if (!init(instance, priv)) 
+        {
+            // failed
+            tb_atomic32_set(binited, -1);
+            return tb_false;
+        }
 
         // init ok
         tb_atomic32_set(binited, 2);
@@ -211,7 +215,7 @@ tb_bool_t tb_singleton_static_init(tb_atomic32_t* binited, tb_handle_t instance,
         }
 
         // failed?
-        if (tb_atomic32_get(binited) == 1 || !instance)
+        if (tb_atomic32_get(binited) != 2)
             return tb_false;
     }
 

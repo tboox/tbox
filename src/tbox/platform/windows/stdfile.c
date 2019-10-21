@@ -214,7 +214,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
     case TB_STDFILE_TYPE_STDOUT: fp = GetStdHandle(STD_OUTPUT_HANDLE); break;
     case TB_STDFILE_TYPE_STDERR: fp = GetStdHandle(STD_ERROR_HANDLE); break;
     }
-    tb_assert_and_check_return_val(fp, tb_null);
+    tb_check_return_val(fp, tb_null);
 
     // create standard device file
     tb_bool_t ok = tb_false;
