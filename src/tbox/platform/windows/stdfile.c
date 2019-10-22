@@ -310,7 +310,8 @@ tb_void_t tb_stdfile_exit(tb_stdfile_ref_t self)
     tb_assert_and_check_return(stdfile);
 
     // flush the left data first
-    tb_stdfile_flush(self);
+    if (stdfile->type != TB_STDFILE_TYPE_STDIN)
+        tb_stdfile_flush(self);
 
     // enter mutex
     if (stdfile->mutex) tb_mutex_enter(stdfile->mutex);
