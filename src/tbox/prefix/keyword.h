@@ -45,6 +45,8 @@
 #   define __tb_func__                          __FUNCTION__
 #   define __tb_file__                          __FILE__
 #   define __tb_line__                          __LINE__
+#   define __tb_date__                          __DATE__
+#   define __tb_time__                          __TIME__
 #   define __tb_asm__                           __asm
 #   define __tb_inline__                        __inline
 #   define __tb_inline_force__                  __forceinline
@@ -60,6 +62,8 @@
 #   define __tb_func__                          __FUNCTION__
 #   define __tb_file__                          __FILE__
 #   define __tb_line__                          __LINE__
+#   define __tb_date__                          __DATE__
+#   define __tb_time__                          __TIME__
 #   define __tb_asm__                           __asm__
 #   define __tb_inline__                        __inline__
 #   define __tb_inline_force__                  __inline__ __attribute__((always_inline))
@@ -87,6 +91,8 @@
 #   define __tb_func__                          __func__
 #   define __tb_file__                          __FILE__
 #   define __tb_line__                          __LINE__
+#   define __tb_date__                          __DATE__
+#   define __tb_time__                          __TIME__
 #   define __tb_asm__                           __asm__
 #   define __tb_inline__                        __inline__
 #   define __tb_inline_force__                  __inline__ __attribute__((always_inline))
@@ -102,8 +108,10 @@
 #   define __tb_asm__
 #   define __tb_inline__                        inline
 #   define __tb_inline_force__                  inline
-#   define __tb_func__
+#   define __tb_func__                          ""
 #   define __tb_file__                          ""
+#   define __tb_date__                          ""
+#   define __tb_time__                          ""
 #   define __tb_line__                          (0)
 
 #   define __tb_cdecl__
