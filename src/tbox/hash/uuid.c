@@ -24,7 +24,7 @@
  * includes
  */
 #include "uuid.h"
-#include "bkdr.h"
+#include "md5.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -33,78 +33,100 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
-#   include "../platform/windows/uuid.c"
-#else
-/* we make a fake uuid using random values here.
- *
- * TODO we need a full RFC 4122 4.3 implementation later
- */
-static tb_bool_t tb_uuid_generate(tb_byte_t uuid[16])
+
+// http://xorshift.di.unimi.it/xorshift128plus.c 
+static tb_uint64_t tb_uuid4_xorshift128plus(tb_uint64_t* s) 
 {
-    // disable pseudo random
-    tb_random_reset(tb_false);
+    tb_uint64_t s1       = s[0];
+    tb_uint64_t const s0 = s[1];
+    s[0] = s0;
+    s1 ^= s1 << 23;
+    s[1] = s1 ^ s0 ^ (s1 >> 18) ^ (s0 >> 5);
+    return s[1] + s0;
+}
+static tb_bool_t tb_uuid4_generate(tb_byte_t uuid[16], tb_uint64_t seed[2])
+{
+    // init seed data
+    union { tb_byte_t b[16]; tb_uint64_t word[2]; } s;
+    s.word[0] = tb_uuid4_xorshift128plus(seed);
+    s.word[1] = tb_uuid4_xorshift128plus(seed);
 
-    // generate random values
-    tb_uint32_t r0 = (tb_uint32_t)tb_random();
-    tb_uint32_t r1 = (tb_uint32_t)tb_random();
-    tb_uint32_t r2 = (tb_uint32_t)tb_random();
-    tb_uint32_t r3 = (tb_uint32_t)tb_random();
-
-    // fill uuid
-    tb_bits_set_u32_be(uuid + 0,    r0);
-    tb_bits_set_u32_be(uuid + 4,    r1);
-    tb_bits_set_u32_be(uuid + 8,    r2);
-    tb_bits_set_u32_be(uuid + 12,   r3);
-
-    // ok
+    /* generate uuid
+     * 
+     * t: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+     *    xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx
+     */
+    tb_int_t i = 0;
+    tb_int_t n = 0;
+    tb_int_t t = 0;
+    tb_int_t c1 = 0;
+    tb_int_t c2 = 0;
+    for (t = 0; t < 32; t++) 
+    {
+        n = s.b[i >> 1];
+        n = (i & 1) ? (n >> 4) : (n & 0xf);
+        if (t == 16) // y
+        {
+            c2 = (n & 0x3) + 8;
+            i++;
+        }
+        else if (t == 12) c2 = 4; // 4
+        else // x
+        {
+            c2 = n;
+            i++;
+        }
+        if (t & 1) uuid[t >> 1] = (tb_byte_t)(c1 * 16 + c2);
+        c1 = c2;
+    }
     return tb_true;
 }
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_uuid_make(tb_byte_t uuid[16], tb_char_t const* name)
 {
+    return tb_uuid4_make(uuid, name);
+}
+tb_char_t const* tb_uuid_make_cstr(tb_char_t uuid_cstr[37], tb_char_t const* name)
+{
+    return tb_uuid4_make_cstr(uuid_cstr, name);
+}
+tb_bool_t tb_uuid4_make(tb_byte_t uuid[16], tb_char_t const* name)
+{
     // check
     tb_assert_and_check_return_val(uuid, tb_false);
 
-    // we only generate it using a simple hashing function for speed if name is supplied 
-    tb_bool_t ok = tb_false;
-    if (name)
+    // init seed
+    tb_uint64_t seed[2];
+    if (name) 
     {
-        // generate hash values
-        tb_uint32_t h0 = (tb_uint32_t)tb_bkdr_make_from_cstr(name, 'g');
-        tb_uint32_t h1 = (tb_uint32_t)tb_bkdr_make_from_cstr(name, 'u');
-        tb_uint32_t h2 = (tb_uint32_t)tb_bkdr_make_from_cstr(name, 'i');
-        tb_uint32_t h3 = (tb_uint32_t)tb_bkdr_make_from_cstr(name, 'd');
-
-        // fill uuid
-        tb_bits_set_u32_be(uuid + 0,    h0);
-        tb_bits_set_u32_be(uuid + 4,    h1);
-        tb_bits_set_u32_be(uuid + 8,    h2);
-        tb_bits_set_u32_be(uuid + 12,   h3);
-
-        // ok
-        ok = tb_true;
+        tb_assert_static(sizeof(seed) == 16);
+        tb_md5_make((tb_byte_t const*)name, tb_strlen(name), (tb_byte_t*)seed, 16);
     }
-    else ok = tb_uuid_generate(uuid);
+    else
+    {
+        // disable pseudo random
+        tb_random_reset(tb_false);
+        seed[0] = (tb_uint64_t)tb_random();
+        seed[1] = (tb_uint64_t)tb_random();
+    }
 
-    // ok?
-    return ok;
+    // generate uuid v4
+    return tb_uuid4_generate(uuid, seed);
 }
-tb_char_t const* tb_uuid_make_cstr(tb_char_t uuid_cstr[37], tb_char_t const* name)
+tb_char_t const* tb_uuid4_make_cstr(tb_char_t uuid_cstr[37], tb_char_t const* name)
 {
     // check
     tb_assert_and_check_return_val(uuid_cstr, tb_null);
 
     // make uuid bytes
     tb_byte_t uuid[16];
-    if (!tb_uuid_make(uuid, name)) return tb_null;
+    if (!tb_uuid4_make(uuid, name)) return tb_null;
 
     // make uuid string
-	tb_long_t size = tb_snprintf(   uuid_cstr
+    tb_long_t size = tb_snprintf(   uuid_cstr
                                 ,   37
                                 ,   "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X"
                                 ,   uuid[0], uuid[1], uuid[2], uuid[3]
