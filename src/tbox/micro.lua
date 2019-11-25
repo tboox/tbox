@@ -96,6 +96,8 @@ target("tbox")
     if is_os("windows") then
         add_files("libc/stdlib/mbstowcs.c")
         add_files("platform/dynamic.c")
+        add_files("platform/atomic64.c")
+        add_files("platform/windows/windows.c")
         add_files("platform/windows/interface/ws2_32.c")
         add_files("platform/windows/interface/mswsock.c")
         add_files("platform/windows/interface/kernel32.c")
