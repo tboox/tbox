@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* improve uuid and improve uuid v4
+
 ## v1.6.4
 
 ### New features
@@ -185,6 +189,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 改进uuid生成，实现uuid v4
 
 ## v1.6.4
 
