@@ -19,8 +19,8 @@ set_configvar("_GNU_SOURCE", 1)
 set_configvar("_REENTRANT", 1)
 
 -- disable some compiler errors
-add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
-add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
+add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined", "-Wno-error=address-of-packed-member")
+add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined", "-Wno-error=address-of-packed-member")
 
 -- the debug, coverage, valgrind or sanitize-address/thread mode
 if is_mode("debug", "coverage", "valgrind", "asan", "tsan") then
