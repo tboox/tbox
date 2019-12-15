@@ -72,7 +72,7 @@ tb_void_t tb_ipaddr_clear(tb_ipaddr_ref_t ipaddr)
     tb_assert_and_check_return(ipaddr);
 
     // clear it
-    ipaddr->family  = TB_IPADDR_FAMILY_IPV4;
+    ipaddr->family  = TB_IPADDR_FAMILY_NONE;
     ipaddr->have_ip = 0;
     ipaddr->port    = 0;
 }
