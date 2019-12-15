@@ -79,7 +79,7 @@ typedef struct __tb_icmp_echo_request_t
     tb_icmp_header_t        icmp;
 
     // the request time
-    tb_hong_t               time;
+    tb_uint64_t             time;
 
 } __tb_packed__ tb_icmp_echo_request_t;
 
@@ -99,23 +99,24 @@ typedef struct __tb_icmp_echo_reply_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_uint16_t tb_calculate_checksum(tb_uint16_t* data, tb_long_t size)
+static tb_uint16_t tb_calculate_checksum(tb_byte_t const* data, tb_long_t size)
 {
     // calculate sum
-    tb_uint32_t     sum = 0;
-    tb_long_t       nleft = size;
-    tb_uint16_t*    p = data;
+    tb_uint32_t         sum = 0;
+    tb_long_t           nleft = size;
+    tb_byte_t const*    p = data;
     while (nleft > 1) 
     {
-        sum += *p++;
+        sum += tb_bits_get_u16_le(p);
         nleft -= 2;
+        p += 2;
     }
 
     // calculate answer
     tb_uint16_t answer = 0;
     if (nleft == 1) 
     {
-        *(tb_byte_t *)(&answer) = *(tb_byte_t *)p;
+        *(tb_byte_t *)(&answer) = *p;
         sum += answer;
     }
     sum = (sum >> 16) + (sum & 0xffff);
@@ -127,13 +128,15 @@ static tb_bool_t tb_ping_send(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_uin
 {
     // init echo 
     tb_icmp_echo_request_t echo;
+    tb_uint64_t time            = tb_mclock();
     echo.icmp.type              = TB_ICMP_ECHOREQ;
     echo.icmp.code              = 0;
-    echo.icmp.checksum          = 0;
-    echo.icmp.id                = 0xbeaf;
-    echo.icmp.seq               = seq;
-    echo.time                   = tb_mclock();
-    echo.icmp.checksum          = tb_calculate_checksum((tb_uint16_t *)&echo, sizeof(echo));
+    tb_bits_set_u16_le((tb_byte_t*)&echo.icmp.checksum, 0);
+    tb_bits_set_u16_le((tb_byte_t*)&echo.icmp.id, 0xbeaf);
+    tb_bits_set_u16_le((tb_byte_t*)&echo.icmp.seq, seq);
+    tb_bits_set_u64_le((tb_byte_t*)&echo.time, time);
+    tb_uint16_t checksum        = tb_calculate_checksum((tb_byte_t const*)&echo, sizeof(echo));
+    tb_bits_set_u16_le((tb_byte_t*)&echo.icmp.checksum, checksum);
 
     // send echo
     tb_long_t send = 0;
@@ -193,14 +196,15 @@ static tb_bool_t tb_ping_recv(tb_socket_ref_t sock, tb_uint16_t seq)
     tb_assert_and_check_return_val(echo.request.icmp.type == TB_ICMP_ECHOREPLY, tb_false);
 
     // check id
-    tb_assert_and_check_return_val(echo.request.icmp.id == 0xbeaf, tb_false);
+    tb_assert_and_check_return_val(tb_bits_get_u16_le((tb_byte_t const*)&echo.request.icmp.id) == 0xbeaf, tb_false);
 
     // get source ip address
     tb_ipv4_t source_ip;
-    source_ip.u32 = echo.ip.source_ip;
+    source_ip.u32 = tb_bits_get_u32_le((tb_byte_t const*)&echo.ip.source_ip);
 
     // trace
-    tb_trace_i("%ld bytes from %{ipv4}: icmp_seq=%d ttl=%d time=%ld ms", size, &source_ip, seq, echo.ip.ttl, tb_mclock() - echo.request.time);
+    tb_uint64_t time = tb_bits_get_u64_le((tb_byte_t const*)&echo.request.time);
+    tb_trace_i("%ld bytes from %{ipv4}: icmp_seq=%d ttl=%d time=%ld ms", size, &source_ip, seq, echo.ip.ttl, tb_mclock() - (tb_hong_t)time);
 
     // ok
     return tb_true;
