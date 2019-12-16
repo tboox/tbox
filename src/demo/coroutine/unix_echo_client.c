@@ -4,11 +4,16 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */ 
+typedef struct __tb_demo_args_t {
+    tb_size_t count;
+    tb_char_t *path;
+}tb_demo_args_t, *tb_demo_args_ref_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */ 
-
-// path
-#define TB_DEMO_PATH        "unix.socket"
 
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
@@ -18,6 +23,13 @@
  */ 
 static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 {
+    // get args
+    tb_demo_args_ref_t pargs = (tb_demo_args_ref_t)priv;
+
+    // get path
+    tb_bool_t is_abstract = pargs->path[0] == '@';
+    tb_char_t* path = is_abstract? pargs->path + 1 : pargs->path;
+
     // done
     tb_socket_ref_t sock = tb_null;
     do
@@ -28,10 +40,10 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 
         // init address
         tb_ipaddr_t addr;
-        tb_ipaddr_set(&addr, TB_DEMO_PATH, 0, TB_IPADDR_FAMILY_UNIX);
+        tb_ipaddr_unix_set_cstr(&addr, path, is_abstract);
 
         // trace
-        tb_trace_i("connecting(%p): %{ipaddr} ..", sock, &addr);
+        tb_trace_i("connecting(%p): %{ipaddr} %s..", sock, &addr, is_abstract? "(abstract)" : "");
 
         // connect socket
         tb_long_t ok;
@@ -46,7 +58,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 
         // loop
         tb_byte_t data[8192] = {0};
-        tb_long_t count = (tb_long_t)priv;
+        tb_long_t count = pargs->count;
         while (count--)
         {
             // send data
@@ -79,13 +91,18 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 tb_int_t tb_demo_coroutine_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
-    tb_assert_and_check_return_val(argc >= 1, -1);
+    tb_assert_and_check_return_val(argc >= 2, -1);
 
     // the coroutines count
-    tb_size_t count = argc > 1? tb_atoi(argv[1]) : 100;
+    tb_size_t count = argc > 2? tb_atoi(argv[2]) : 100;
 
     // the request count
-    tb_size_t reqt_count = argc > 2? tb_atoi(argv[2]) : 10000;
+    tb_size_t reqt_count = argc > 3? tb_atoi(argv[3]) : 10000;
+
+    // the args pack
+    tb_demo_args_t args;
+    args.count = reqt_count;
+    args.path = argv[1];
 
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
@@ -94,7 +111,7 @@ tb_int_t tb_demo_coroutine_unix_echo_client_main(tb_int_t argc, tb_char_t** argv
         // start echo
         tb_size_t i = 0;
         for (i = 0; i < count; i++)
-            tb_coroutine_start(scheduler, tb_demo_coroutine_echo, (tb_cpointer_t)reqt_count, 0);
+            tb_coroutine_start(scheduler, tb_demo_coroutine_echo, &args, 0);
 
         // start time
         tb_hong_t startime = tb_mclock();

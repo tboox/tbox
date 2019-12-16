@@ -7,9 +7,6 @@
  * macros
  */ 
 
-// path
-#define TB_DEMO_PATH        "unix.socket"
-
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
 
@@ -49,6 +46,11 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
 }
 static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 {
+    // get path
+    tb_char_t* raw = (tb_char_t*)priv;
+    tb_bool_t is_abstract = raw[0] == '@';
+    tb_char_t* path = is_abstract? raw + 1 : raw;
+
     // done
     tb_socket_ref_t sock = tb_null;
     do
@@ -56,18 +58,23 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
         // init socket
         sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_UNIX);
         tb_assert_and_check_break(sock);
+        
+        if (!is_abstract)
+        {
+            // clear old socket
+            tb_file_remove(path);
+        }
 
         // bind socket
-        tb_file_remove(TB_DEMO_PATH);
         tb_ipaddr_t addr;
-        tb_ipaddr_set(&addr, TB_DEMO_PATH, 0, TB_IPADDR_FAMILY_UNIX);
+        tb_ipaddr_unix_set_cstr(&addr, path, is_abstract);
         if (!tb_socket_bind(sock, &addr)) break;
 
         // listen socket
         if (!tb_socket_listen(sock, 1000)) break;
 
         // trace
-        tb_trace_i("listening ..");
+        tb_trace_i("listening %{ipaddr} %s..", &addr, is_abstract? "(abstract)" : "");
 
         // accept client sockets
         tb_socket_ref_t client = tb_null;
@@ -93,12 +100,14 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
  */ 
 tb_int_t tb_demo_coroutine_unix_echo_server_main(tb_int_t argc, tb_char_t** argv)
 {
+    // check
+    tb_assert_and_check_return_val(argc >= 2, -1);
     // init scheduler
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
     if (scheduler)
     {
         // start listening
-        tb_coroutine_start(scheduler, tb_demo_coroutine_listen, tb_null, 0);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_listen, argv[1], 0);
 
         // run scheduler
         tb_co_scheduler_loop(scheduler, tb_true);

@@ -7,9 +7,6 @@
  * macros
  */ 
 
-// path
-#define TB_DEMO_PATH        "unix.socket"
-
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
 
@@ -18,6 +15,8 @@
  */ 
 tb_int_t tb_demo_network_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
 {
+    // check
+    tb_assert_and_check_return_val(argc == 2, -1);
     // done
     tb_socket_ref_t sock = tb_null;
     do
@@ -26,12 +25,15 @@ tb_int_t tb_demo_network_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
         sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_UNIX);
         tb_assert_and_check_break(sock);
 
+        tb_bool_t is_abstract = argv[1][0] == '@';
+        tb_char_t* path = is_abstract? argv[1] + 1 : argv[1];
+
         // init address
         tb_ipaddr_t addr;
-        tb_ipaddr_unix_set_cstr(&addr, TB_DEMO_PATH, tb_true);
+        tb_ipaddr_unix_set_cstr(&addr, path, is_abstract);
 
         // trace
-        tb_trace_i("connecting(%p): %{ipaddr} ..", sock, &addr);
+        tb_trace_i("connecting(%p): %{ipaddr} %s..", sock, &addr, is_abstract? "(abstract)" : "");
 
         // connect socket
         tb_long_t ok;
