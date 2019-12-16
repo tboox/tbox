@@ -136,6 +136,14 @@ tb_char_t const* tb_ipaddr_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size
         tb_long_t size = tb_snprintf(data, maxn - 1, "0.0.0.0:%u", ipaddr->port);
         if (size >= 0) data[size] = '\0';
     }
+    else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX)
+    {
+        // check (again)
+        tb_assert_and_check_return_val(maxn >= TB_UNIX_CSTR_MAXN, tb_null);
+
+        // make it
+        tb_unix_cstr(&ipaddr->u.unix, data, maxn);
+    }
     else
     {
         // make it
@@ -193,6 +201,9 @@ tb_bool_t tb_ipaddr_ip_is_any(tb_ipaddr_ref_t ipaddr)
     case TB_IPADDR_FAMILY_IPV6:
         is_any = tb_ipv6_is_any(&ipaddr->u.ipv6);
         break;
+    case TB_IPADDR_FAMILY_UNIX:
+        is_any = tb_false;
+        break;
     default:
         break;
     }
@@ -214,6 +225,9 @@ tb_bool_t tb_ipaddr_ip_is_loopback(tb_ipaddr_ref_t ipaddr)
         break;
     case TB_IPADDR_FAMILY_IPV6:
         is_loopback = tb_ipv6_is_loopback(&ipaddr->u.ipv6);
+        break;
+    case TB_IPADDR_FAMILY_UNIX:
+        is_loopback = tb_false;
         break;
     default:
         break;
@@ -243,6 +257,14 @@ tb_bool_t tb_ipaddr_ip_is_equal(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
         // is equal?
         return tb_ipv6_is_equal(&ipaddr->u.ipv6, &other->u.ipv6);
     }
+    // both unix?
+    else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX && other->family == TB_IPADDR_FAMILY_UNIX)
+    {
+        // is equal?
+        return tb_unix_is_equal(&ipaddr->u.unix, &other->u.unix);
+    }
+    // only one is unix?
+    else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX || other->family == TB_IPADDR_FAMILY_UNIX) return tb_false;
     // ipaddr is ipv6?
     else if (ipaddr->family == TB_IPADDR_FAMILY_IPV6)
     {
@@ -307,6 +329,23 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
             }
         }
         break;
+    case TB_IPADDR_FAMILY_UNIX:
+        {
+            // make unix cstr
+            if (ipaddr->have_ip) cstr = tb_unix_cstr(&ipaddr->u.unix, data, maxn);
+            else
+            {
+                // check
+                tb_assert(maxn >= TB_UNIX_CSTR_MAXN);
+
+                // make empty cstr
+                tb_memset(data, 0, maxn);
+
+                // ok
+                cstr = data;
+            }
+        }
+        break;
     default:
         tb_assert(0);
         break;
@@ -352,6 +391,14 @@ tb_bool_t tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, t
             if (ok) temp.family = family;
         }
         break;
+    case TB_IPADDR_FAMILY_UNIX:
+        {
+            // make unix
+            ok = tb_unix_cstr_set(&temp.u.unix, cstr);
+
+            // make family
+            if (ok) temp.family = family;
+        }
     default:
         {
             // attempt to make ipv4
@@ -411,6 +458,14 @@ tb_void_t tb_ipaddr_ip_set(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
             ipaddr->have_ip = 1;
         }
         break;
+    case TB_IPADDR_FAMILY_UNIX:
+        {
+            // save unix
+            tb_ipaddr_unix_set(ipaddr, &other->u.unix);
+
+            // save state
+            ipaddr->have_ip = 1;
+        }
     default:
         tb_assert(0);
         break;
@@ -441,6 +496,8 @@ tb_ipv4_ref_t tb_ipaddr_ipv4(tb_ipaddr_ref_t ipaddr)
                 ipv4 = &ipaddr->u.ipv4;
             }
         }
+        break;
+    case TB_IPADDR_FAMILY_UNIX:
         break;
     default:
         tb_assert(0);
@@ -493,6 +550,8 @@ tb_ipv6_ref_t tb_ipaddr_ipv6(tb_ipaddr_ref_t ipaddr)
     case TB_IPADDR_FAMILY_IPV6:
         ipv6 = &ipaddr->u.ipv6;
         break;
+    case TB_IPADDR_FAMILY_UNIX:
+        break;
     default:
         tb_assert(0);
         break;
@@ -516,6 +575,36 @@ tb_void_t tb_ipaddr_ipv6_set(tb_ipaddr_ref_t ipaddr, tb_ipv6_ref_t ipv6)
     // save it
     ipaddr->family    = TB_IPADDR_FAMILY_IPV6;
     ipaddr->u.ipv6    = *ipv6;
+    ipaddr->have_ip   = 1;
+}
+tb_unix_ref_t tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr)
+{
+    // check
+    tb_assert_and_check_return_val(ipaddr, tb_null);
+
+    // no ip?
+    tb_check_return_val(ipaddr->have_ip, tb_null);
+
+    // done
+    if (ipaddr->family == TB_IPADDR_FAMILY_UNIX) return &ipaddr->u.unix;
+
+    return tb_null;
+}
+tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unix_ref_t unix)
+{
+    // check
+    tb_assert_and_check_return(ipaddr && unix);
+
+    // no ipv6? clear it
+    if (!unix)
+    {
+        ipaddr->have_ip = 0;
+        return ;
+    }
+
+    // save it
+    ipaddr->family    = TB_IPADDR_FAMILY_UNIX;
+    ipaddr->u.unix    = *unix;
     ipaddr->have_ip   = 1;
 }
 tb_size_t tb_ipaddr_family(tb_ipaddr_ref_t ipaddr)
@@ -561,6 +650,12 @@ tb_void_t tb_ipaddr_family_set(tb_ipaddr_ref_t ipaddr, tb_size_t family)
             tb_assert(0);
         }
     }
+    // unix address cannot be converted
+    else if ((ipaddr->family == TB_IPADDR_FAMILY_UNIX) != (family == TB_IPADDR_FAMILY_UNIX) && family != TB_IPADDR_FAMILY_NONE)
+    {
+        // check
+        tb_assert(0);
+    }
     else ipaddr->family = family;
 
     // no family? clear ip
@@ -572,12 +667,12 @@ tb_uint16_t tb_ipaddr_port(tb_ipaddr_ref_t ipaddr)
     tb_assert_and_check_return_val(ipaddr, 0);
 
     // the port
-    return ipaddr->port;
+    return ipaddr->family == TB_IPADDR_FAMILY_UNIX ? 0 : ipaddr->port;
 }
 tb_void_t tb_ipaddr_port_set(tb_ipaddr_ref_t ipaddr, tb_uint16_t port)
 {
     // check
-    tb_assert_and_check_return(ipaddr);
+    tb_assert_and_check_return(ipaddr && ipaddr->family != TB_IPADDR_FAMILY_UNIX);
 
     // set port
     ipaddr->port = port;
