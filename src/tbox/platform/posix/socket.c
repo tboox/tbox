@@ -76,6 +76,7 @@ static tb_int_t tb_socket_type(tb_size_t type)
 }
 static tb_int_t tb_socket_proto(tb_size_t type, tb_size_t family)
 {
+    if (family == TB_IPADDR_FAMILY_UNIX) return 0;
     // get protocal type
     switch (type & 0xff)
     {

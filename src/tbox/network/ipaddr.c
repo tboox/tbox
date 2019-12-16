@@ -399,6 +399,7 @@ tb_bool_t tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, t
             // make family
             if (ok) temp.family = family;
         }
+        break;
     default:
         {
             // attempt to make ipv4
@@ -672,7 +673,9 @@ tb_uint16_t tb_ipaddr_port(tb_ipaddr_ref_t ipaddr)
 tb_void_t tb_ipaddr_port_set(tb_ipaddr_ref_t ipaddr, tb_uint16_t port)
 {
     // check
-    tb_assert_and_check_return(ipaddr && ipaddr->family != TB_IPADDR_FAMILY_UNIX);
+    tb_assert_and_check_return(ipaddr);
+
+    if (ipaddr->family == TB_IPADDR_FAMILY_UNIX) return;
 
     // set port
     ipaddr->port = port;

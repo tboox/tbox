@@ -223,6 +223,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
             // save size
             size = sizeof(struct sockaddr_un);
         }
+        break;
     default:
         tb_assert(0);
         break;
