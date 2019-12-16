@@ -122,12 +122,12 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
             tb_assert_static(sizeof(ipaddr->u.unixaddr.str) == sizeof(addru->sun_path));
             tb_assert_static(tb_arrayn(ipaddr->u.unixaddr.str) == tb_arrayn(addru->sun_path));
 
-            // make unix
-            tb_unixaddr_t unix;
-            tb_memcpy(unix.str, addru->sun_path, sizeof(addru->sun_path));
+            // make unixaddr
+            tb_unixaddr_t unixaddr;
+            tb_memcpy(unixaddr.str, addru->sun_path, sizeof(addru->sun_path));
 
-            // save unix
-            tb_ipaddr_unix_set(ipaddr, &unix);
+            // save unixaddr
+            tb_ipaddr_unix_set(ipaddr, &unixaddr);
 
             // save size
             size = sizeof(struct sockaddr_un);

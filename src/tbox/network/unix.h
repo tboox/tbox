@@ -58,39 +58,39 @@ typedef struct __tb_unixaddr_t
  * interfaces
  */
 
-/*! clear the unix
+/*! clear the unixaddr
  *
- * @param unix      the unix
+ * @param unixaddr  the unixaddr
  */
-tb_void_t           tb_unixaddr_clear(tb_unixaddr_ref_t _unix);
+tb_void_t           tb_unixaddr_clear(tb_unixaddr_ref_t unixaddr);
 
 /*! is equal?
  *
- * @param unix      the unix
- * @param other     the other unix
+ * @param unixaddr  the unixaddr
+ * @param other     the other unixaddr
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unixaddr_is_equal(tb_unixaddr_ref_t _unix, tb_unixaddr_ref_t other);
+tb_bool_t           tb_unixaddr_is_equal(tb_unixaddr_ref_t unixaddr, tb_unixaddr_ref_t other);
 
-/*! get the unix string
+/*! get the unixaddr string
  *
- * @param unix      the unix
- * @param data      the unix data
+ * @param unixaddr  the unixaddr
+ * @param data      the unixaddr data
  * @param maxn      the data maxn
  *
- * @return          the unix address
+ * @return          the unixaddr path
  */
-tb_char_t const*    tb_unixaddr_cstr(tb_unixaddr_ref_t _unix, tb_char_t* data, tb_size_t maxn);
+tb_char_t const*    tb_unixaddr_cstr(tb_unixaddr_ref_t unixaddr, tb_char_t* data, tb_size_t maxn);
 
-/*! set the unix from string
+/*! set the unixaddr from string
  *
- * @param unix      the unix
- * @param cstr      the unix string 
+ * @param unixaddr  the unixaddr
+ * @param cstr      the unixaddr path
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unixaddr_cstr_set(tb_unixaddr_ref_t _unix, tb_char_t const* cstr);
+tb_bool_t           tb_unixaddr_cstr_set(tb_unixaddr_ref_t unixaddr, tb_char_t const* cstr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

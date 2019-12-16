@@ -257,13 +257,13 @@ tb_bool_t tb_ipaddr_ip_is_equal(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
         // is equal?
         return tb_ipv6_is_equal(&ipaddr->u.ipv6, &other->u.ipv6);
     }
-    // both unix?
+    // both unixaddr?
     else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX && other->family == TB_IPADDR_FAMILY_UNIX)
     {
         // is equal?
         return tb_unixaddr_is_equal(&ipaddr->u.unixaddr, &other->u.unixaddr);
     }
-    // only one is unix?
+    // only one is unixaddr?
     else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX || other->family == TB_IPADDR_FAMILY_UNIX) return tb_false;
     // ipaddr is ipv6?
     else if (ipaddr->family == TB_IPADDR_FAMILY_IPV6)
@@ -331,7 +331,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
         break;
     case TB_IPADDR_FAMILY_UNIX:
         {
-            // make unix cstr
+            // make unixaddr cstr
             if (ipaddr->have_ip) cstr = tb_unixaddr_cstr(&ipaddr->u.unixaddr, data, maxn);
             else
             {
@@ -393,7 +393,7 @@ tb_bool_t tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, t
         break;
     case TB_IPADDR_FAMILY_UNIX:
         {
-            // make unix
+            // make unixaddr
             ok = tb_unixaddr_cstr_set(&temp.u.unixaddr, cstr);
 
             // make family
@@ -461,7 +461,7 @@ tb_void_t tb_ipaddr_ip_set(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
         break;
     case TB_IPADDR_FAMILY_UNIX:
         {
-            // save unix
+            // save unixaddr
             tb_ipaddr_unix_set(ipaddr, &other->u.unixaddr);
 
             // save state
@@ -591,13 +591,13 @@ tb_unixaddr_ref_t tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr)
 
     return tb_null;
 }
-tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unix)
+tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unixaddr)
 {
     // check
-    tb_assert_and_check_return(ipaddr && unix);
+    tb_assert_and_check_return(ipaddr && unixaddr);
 
     // no ipv6? clear it
-    if (!unix)
+    if (!unixaddr)
     {
         ipaddr->have_ip = 0;
         return ;
@@ -605,7 +605,7 @@ tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unix)
 
     // save it
     ipaddr->family     = TB_IPADDR_FAMILY_UNIX;
-    ipaddr->u.unixaddr = *unix;
+    ipaddr->u.unixaddr = *unixaddr;
     ipaddr->have_ip    = 1;
 }
 tb_size_t tb_ipaddr_family(tb_ipaddr_ref_t ipaddr)
@@ -651,7 +651,7 @@ tb_void_t tb_ipaddr_family_set(tb_ipaddr_ref_t ipaddr, tb_size_t family)
             tb_assert(0);
         }
     }
-    // unix address cannot be converted
+    // unixaddr cannot be converted
     else if ((ipaddr->family == TB_IPADDR_FAMILY_UNIX) != (family == TB_IPADDR_FAMILY_UNIX) && family != TB_IPADDR_FAMILY_NONE)
     {
         // check
