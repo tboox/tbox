@@ -604,9 +604,9 @@ tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unix)
     }
 
     // save it
-    ipaddr->family    = TB_IPADDR_FAMILY_UNIX;
-    ipaddr->u.unixaddr   = *unix;
-    ipaddr->have_ip   = 1;
+    ipaddr->family     = TB_IPADDR_FAMILY_UNIX;
+    ipaddr->u.unixaddr = *unix;
+    ipaddr->have_ip    = 1;
 }
 tb_size_t tb_ipaddr_family(tb_ipaddr_ref_t ipaddr)
 {

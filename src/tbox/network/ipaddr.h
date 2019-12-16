@@ -240,7 +240,7 @@ tb_void_t           tb_ipaddr_ipv6_set(tb_ipaddr_ref_t ipaddr, tb_ipv6_ref_t ipv
  *
  * @return          the unix
  */
-tb_unixaddr_ref_t       tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr);
+tb_unixaddr_ref_t   tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr);
 
 /*! set the address from unix
  *
