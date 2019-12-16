@@ -27,7 +27,16 @@
 #include "../../network/network.h"
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "ws2tcpip.h"
-#   include "afunix.h"
+
+// hack for afunix.h
+struct tb_sockaddr_un
+{
+    ADDRESS_FAMILY sun_family;
+    tb_char_t      sun_path[108];
+};
+
+#  define sockaddr_un tb_sockaddr_un
+
 #else
 #   include <netinet/in.h>
 #   include <sys/un.h>
@@ -257,5 +266,10 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
  * extern
  */
 __tb_extern_c_leave__
+
+#ifdef TB_CONFIG_OS_WINDOWS
+// hack for afunix.h, see above
+#  undef sockaddr_un
+#endif
 
 #endif
