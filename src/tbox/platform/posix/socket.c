@@ -84,7 +84,15 @@ static tb_int_t tb_socket_proto(tb_size_t type, tb_size_t family)
     case TB_SOCKET_TYPE_IPPROTO_UDP: 
         return IPPROTO_UDP;
     case TB_SOCKET_TYPE_IPPROTO_ICMP: 
-        return family == TB_IPADDR_FAMILY_IPV6? IPPROTO_ICMPV6 : IPPROTO_ICMP;
+        switch (family)
+        {
+        case TB_IPADDR_FAMILY_IPV4:
+            return IPPROTO_ICMP;
+        case TB_IPADDR_FAMILY_IPV6:
+            return IPPROTO_ICMPV6;
+        default:
+            tb_assert(0);
+        }
     }
 
     // failed
@@ -123,7 +131,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
         tb_assert_and_check_break(t >= 0 && p >= 0);
 
         // init socket family
-        tb_int_t f = (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
+        tb_int_t f = (family == TB_IPADDR_FAMILY_UNIX)? AF_UNIX : (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
 
         // sock
         tb_int_t fd = socket(f, t, p);
