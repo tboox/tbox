@@ -54,6 +54,7 @@ static tb_int_t tb_socket_type(tb_size_t type)
 }
 static tb_int_t tb_socket_proto(tb_size_t type, tb_size_t family)
 {
+    if (family == TB_IPADDR_FAMILY_UNIX) return 0;
     // get protocal type
     switch (type & 0xff)
     {
@@ -147,7 +148,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
         tb_assert_and_check_break(t >= 0 && p >= 0);
 
         // init socket family
-        tb_int_t f = (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
+        tb_int_t f = (family == TB_IPADDR_FAMILY_UNIX)? AF_UNIX : (family == TB_IPADDR_FAMILY_IPV6)? AF_INET6 : AF_INET;
 
         // sock
         SOCKET fd = tb_ws2_32()->WSASocketA(f, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
@@ -464,6 +465,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
     // reuse addr
 #ifdef SO_REUSEADDR
+    if (tb_ipaddr_family(addr) != TB_IPADDR_FAMILY_UNIX)
     {
         tb_int_t reuseaddr = 1;
         if (tb_ws2_32()->setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0) 
