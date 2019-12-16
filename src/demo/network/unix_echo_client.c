@@ -28,7 +28,7 @@ tb_int_t tb_demo_network_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
 
         // init address
         tb_ipaddr_t addr;
-        tb_ipaddr_set(&addr, TB_DEMO_PATH, 0, TB_IPADDR_FAMILY_UNIX);
+        tb_ipaddr_set_unix(&addr, TB_DEMO_PATH, tb_true);
 
         // trace
         tb_trace_i("connecting(%p): %{ipaddr} ..", sock, &addr);

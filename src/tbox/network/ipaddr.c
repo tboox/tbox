@@ -167,16 +167,14 @@ tb_bool_t tb_ipaddr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_uint16
     // save ip address and family
     return tb_ipaddr_ip_cstr_set(ipaddr, cstr, family);
 }
-tb_bool_t tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abs)
+tb_bool_t tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract)
 {
     // check
     tb_assert_and_check_return_val(ipaddr, tb_false);
 
-    // done
-    tb_ipaddr_t temp;
-
     // make unixaddr
-    if (!tb_unixaddr_cstr_set(&temp.u.unixaddr, cstr, tb_false))
+    tb_ipaddr_t temp;
+    if (!tb_unixaddr_cstr_set(&temp.u.unixaddr, cstr, is_abstract))
         return tb_false;
 
     // make family
@@ -187,7 +185,6 @@ tb_bool_t tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_b
 
     // save ipaddr
     tb_ipaddr_copy(ipaddr, &temp);
-
     return tb_true;
 }
 tb_void_t tb_ipaddr_ip_clear(tb_ipaddr_ref_t ipaddr)

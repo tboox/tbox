@@ -142,11 +142,11 @@ tb_bool_t           tb_ipaddr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr,
  *
  * @param ipaddr    the address
  * @param cstr      the address string
- * @param is_abs    true if the address is abstract address
+ * @param is_abstract true if the address is abstract address
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abs);
+tb_bool_t           tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract);
 
 /*! clear ip
  *
