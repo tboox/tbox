@@ -213,6 +213,8 @@ TB_DEMO_MAIN_DECL(coroutine_channel);
 TB_DEMO_MAIN_DECL(coroutine_semaphore);
 TB_DEMO_MAIN_DECL(coroutine_echo_client);
 TB_DEMO_MAIN_DECL(coroutine_echo_server);
+TB_DEMO_MAIN_DECL(coroutine_unix_echo_client);
+TB_DEMO_MAIN_DECL(coroutine_unix_echo_server);
 TB_DEMO_MAIN_DECL(coroutine_file_client);
 TB_DEMO_MAIN_DECL(coroutine_file_server);
 TB_DEMO_MAIN_DECL(coroutine_http_server);
