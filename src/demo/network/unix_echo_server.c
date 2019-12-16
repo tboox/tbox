@@ -29,7 +29,7 @@ tb_int_t tb_demo_network_unix_echo_server_main(tb_int_t argc, tb_char_t** argv)
         // bind socket
         tb_file_remove(TB_DEMO_PATH);
         tb_ipaddr_t addr;
-        tb_ipaddr_set_unix(&addr, TB_DEMO_PATH, tb_true);
+        tb_ipaddr_unix_set_cstr(&addr, TB_DEMO_PATH, tb_true);
         if (!tb_socket_bind(sock, &addr)) break;
 
         // listen socket

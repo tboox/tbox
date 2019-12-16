@@ -167,26 +167,6 @@ tb_bool_t tb_ipaddr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_uint16
     // save ip address and family
     return tb_ipaddr_ip_cstr_set(ipaddr, cstr, family);
 }
-tb_bool_t tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract)
-{
-    // check
-    tb_assert_and_check_return_val(ipaddr, tb_false);
-
-    // make unixaddr
-    tb_ipaddr_t temp;
-    if (!tb_unixaddr_cstr_set(&temp.u.unixaddr, cstr, is_abstract))
-        return tb_false;
-
-    // make family
-    temp.family = TB_IPADDR_FAMILY_UNIX;
-
-    // have ip?
-    temp.have_ip = 1;
-
-    // save ipaddr
-    tb_ipaddr_copy(ipaddr, &temp);
-    return tb_true;
-}
 tb_void_t tb_ipaddr_ip_clear(tb_ipaddr_ref_t ipaddr)
 {
     // check
@@ -627,6 +607,26 @@ tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unixaddr)
     ipaddr->family     = TB_IPADDR_FAMILY_UNIX;
     ipaddr->u.unixaddr = *unixaddr;
     ipaddr->have_ip    = 1;
+}
+tb_bool_t tb_ipaddr_unix_set_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract)
+{
+    // check
+    tb_assert_and_check_return_val(ipaddr, tb_false);
+
+    // make unixaddr
+    tb_ipaddr_t temp;
+    if (!tb_unixaddr_cstr_set(&temp.u.unixaddr, cstr, is_abstract))
+        return tb_false;
+
+    // make family
+    temp.family = TB_IPADDR_FAMILY_UNIX;
+
+    // have ip?
+    temp.have_ip = 1;
+
+    // save ipaddr
+    tb_ipaddr_copy(ipaddr, &temp);
+    return tb_true;
 }
 tb_size_t tb_ipaddr_family(tb_ipaddr_ref_t ipaddr)
 {

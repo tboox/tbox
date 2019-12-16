@@ -138,16 +138,6 @@ tb_char_t const*    tb_ipaddr_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
  */
 tb_bool_t           tb_ipaddr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_uint16_t port, tb_uint8_t family);
 
-/*! set the unix socket address from string
- *
- * @param ipaddr    the address
- * @param cstr      the address string
- * @param is_abstract true if the address is abstract address
- *
- * @return          tb_true or tb_false
- */
-tb_bool_t           tb_ipaddr_set_unix(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract);
-
 /*! clear ip
  *
  * @param ipaddr    the address
@@ -258,6 +248,16 @@ tb_unixaddr_ref_t   tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr);
  * @param unixaddr  the unixaddr, clear it if be null
  */
 tb_void_t           tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unixaddr);
+
+/*! set the unix socket address from string
+ *
+ * @param ipaddr    the address
+ * @param cstr      the address string
+ * @param is_abstract true if the address is abstract address
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipaddr_unix_set_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract);
 
 /*! get the address family
  *
