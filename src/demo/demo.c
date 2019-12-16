@@ -145,6 +145,8 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(network_ipv4)
 ,   TB_DEMO_MAIN_ITEM(network_ipv6)
 ,   TB_DEMO_MAIN_ITEM(network_unix)
+,   TB_DEMO_MAIN_ITEM(network_unix_echo_server)
+,   TB_DEMO_MAIN_ITEM(network_unix_echo_client)
 ,   TB_DEMO_MAIN_ITEM(network_ping)
 ,   TB_DEMO_MAIN_ITEM(network_ipaddr)
 ,   TB_DEMO_MAIN_ITEM(network_hwaddr)
