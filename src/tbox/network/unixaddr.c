@@ -45,7 +45,15 @@ tb_void_t tb_unixaddr_clear(tb_unixaddr_ref_t unixaddr)
     tb_assert_and_check_return(unixaddr);
 
     // clear it
-    tb_memset(unixaddr->str, 0, sizeof(unixaddr->str));
+    tb_memset(unixaddr->path, 0, sizeof(unixaddr->path));
+}
+tb_bool_t tb_unixaddr_is_abstract(tb_unixaddr_ref_t unixaddr)
+{
+    // check
+    tb_assert_and_check_return_val(unixaddr, tb_false);
+
+    // is abstract?
+    return unixaddr->is_abstract;
 }
 tb_bool_t tb_unixaddr_is_equal(tb_unixaddr_ref_t unixaddr, tb_unixaddr_ref_t other)
 {
@@ -53,7 +61,7 @@ tb_bool_t tb_unixaddr_is_equal(tb_unixaddr_ref_t unixaddr, tb_unixaddr_ref_t oth
     tb_assert_and_check_return_val(unixaddr && other, tb_false);
 
     // is equal?
-    return tb_strcmp(unixaddr->str, other->str) == 0;
+    return tb_strcmp(unixaddr->path, other->path) == 0;
 }
 tb_char_t const* tb_unixaddr_cstr(tb_unixaddr_ref_t unixaddr, tb_char_t* data, tb_size_t maxn)
 {
@@ -61,17 +69,20 @@ tb_char_t const* tb_unixaddr_cstr(tb_unixaddr_ref_t unixaddr, tb_char_t* data, t
     tb_assert_and_check_return_val(unixaddr && data && maxn >= TB_UNIXADDR_CSTR_MAXN, tb_null);
 
     // make it
-    tb_long_t size = tb_snprintf(data, maxn - 1, "%s", unixaddr->str);
+    tb_long_t size = tb_snprintf(data, maxn - 1, "%s", unixaddr->path);
     if (size >= 0) data[size] = '\0';
 
     // ok
     return data;
 }
-tb_bool_t tb_unixaddr_cstr_set(tb_unixaddr_ref_t unixaddr, tb_char_t const* cstr)
+tb_bool_t tb_unixaddr_cstr_set(tb_unixaddr_ref_t unixaddr, tb_char_t const* cstr, tb_bool_t is_abstract)
 {
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
 
+    // set is_abstract
+    unixaddr->is_abstract = is_abstract;
+
     // copy and report
-    return tb_strlcpy(unixaddr->str, cstr, TB_UNIXADDR_CSTR_MAXN) < TB_UNIXADDR_CSTR_MAXN;
+    return tb_strlcpy(unixaddr->path, cstr, TB_UNIXADDR_CSTR_MAXN) < TB_UNIXADDR_CSTR_MAXN;
 }

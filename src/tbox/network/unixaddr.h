@@ -49,8 +49,10 @@ __tb_extern_c_enter__
  */
 typedef struct __tb_unixaddr_t
 {
-    /// str
-    tb_char_t      str[TB_UNIXADDR_CSTR_MAXN];
+    /// is abstract
+    tb_bool_t      is_abstract;
+    /// path
+    tb_char_t      path[TB_UNIXADDR_CSTR_MAXN];
 
 }tb_unixaddr_t, *tb_unixaddr_ref_t;
 
@@ -63,6 +65,14 @@ typedef struct __tb_unixaddr_t
  * @param unixaddr  the unixaddr
  */
 tb_void_t           tb_unixaddr_clear(tb_unixaddr_ref_t unixaddr);
+
+/*! is abstract?
+ *
+ * @param unixaddr  the unixaddr
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_unixaddr_is_abstract(tb_unixaddr_ref_t unixaddr);
 
 /*! is equal?
  *
@@ -90,7 +100,7 @@ tb_char_t const*    tb_unixaddr_cstr(tb_unixaddr_ref_t unixaddr, tb_char_t* data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unixaddr_cstr_set(tb_unixaddr_ref_t unixaddr, tb_char_t const* cstr);
+tb_bool_t           tb_unixaddr_cstr_set(tb_unixaddr_ref_t unixaddr, tb_char_t const* cstr, tb_bool_t is_abstract);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

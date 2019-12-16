@@ -118,13 +118,24 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
         {
             struct sockaddr_un* addru = (struct sockaddr_un*)saddr;
 
-            // check
-            tb_assert_static(sizeof(ipaddr->u.unixaddr.str) == sizeof(addru->sun_path));
-            tb_assert_static(tb_arrayn(ipaddr->u.unixaddr.str) == tb_arrayn(addru->sun_path));
+            // save family
+            tb_ipaddr_family_set(ipaddr, TB_IPADDR_FAMILY_UNIX);
 
             // make unixaddr
             tb_unixaddr_t unixaddr;
-            tb_memcpy(unixaddr.str, addru->sun_path, sizeof(addru->sun_path));
+            if (addru->sun_path[0])
+            {
+                // normal unixaddr
+                tb_size_t n = tb_strlcpy(unixaddr.path, addru->sun_path, sizeof(addru->sun_path));
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path), 0);
+            }
+            else
+            {
+                // abstract unixaddr
+                tb_size_t n = tb_strlcpy(unixaddr.path, addru->sun_path + 1, sizeof(addru->sun_path) - 1);
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path) - 1, 0);
+                unixaddr.is_abstract = tb_true;
+            }
 
             // save unixaddr
             tb_ipaddr_unix_set(ipaddr, &unixaddr);
@@ -210,15 +221,23 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
             // the unix ipaddr
             struct sockaddr_un* addru = (struct sockaddr_un*)saddr;
 
-            // check
-            tb_assert_static(sizeof(ipaddr->u.unixaddr.str) == sizeof(addru->sun_path));
-            tb_assert_static(tb_arrayn(ipaddr->u.unixaddr.str) == tb_arrayn(addru->sun_path));
-
             // save family
             addru->sun_family = AF_UNIX;
 
             // save unix
-            tb_memcpy(addru->sun_path, ipaddr->u.unixaddr.str, sizeof(addru->sun_path));
+            if (!ipaddr->u.unixaddr.is_abstract)
+            {
+                // normal unixaddr
+                tb_size_t n = tb_strlcpy(addru->sun_path, ipaddr->u.unixaddr.path, sizeof(addru->sun_path));
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path), 0);
+            }
+            else
+            {
+                // abstract unixaddr
+                addru->sun_path[0] = '\0';
+                tb_size_t n = tb_strlcpy(addru->sun_path + 1, ipaddr->u.unixaddr.path, sizeof(addru->sun_path));
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path) - 1, 0);
+            }
 
             // save size
             size = sizeof(struct sockaddr_un);
