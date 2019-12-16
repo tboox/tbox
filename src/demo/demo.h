@@ -140,7 +140,7 @@ TB_DEMO_MAIN_DECL(network_dns);
 TB_DEMO_MAIN_DECL(network_url);
 TB_DEMO_MAIN_DECL(network_ipv4);
 TB_DEMO_MAIN_DECL(network_ipv6);
-TB_DEMO_MAIN_DECL(network_unix);
+TB_DEMO_MAIN_DECL(network_unixaddr);
 TB_DEMO_MAIN_DECL(network_unix_echo_server);
 TB_DEMO_MAIN_DECL(network_unix_echo_client);
 TB_DEMO_MAIN_DECL(network_ping);

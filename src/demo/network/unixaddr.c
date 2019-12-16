@@ -6,7 +6,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_network_unix_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_network_unixaddr_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
     tb_unixaddr_t unixaddr;
