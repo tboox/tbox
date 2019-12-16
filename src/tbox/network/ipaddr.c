@@ -142,7 +142,7 @@ tb_char_t const* tb_ipaddr_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size
         tb_assert_and_check_return_val(maxn >= TB_UNIX_CSTR_MAXN, tb_null);
 
         // make it
-        tb_unix_cstr(&ipaddr->u.unix, data, maxn);
+        tb_unix_cstr(&ipaddr->u.local, data, maxn);
     }
     else
     {
@@ -261,7 +261,7 @@ tb_bool_t tb_ipaddr_ip_is_equal(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
     else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX && other->family == TB_IPADDR_FAMILY_UNIX)
     {
         // is equal?
-        return tb_unix_is_equal(&ipaddr->u.unix, &other->u.unix);
+        return tb_unix_is_equal(&ipaddr->u.local, &other->u.local);
     }
     // only one is unix?
     else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX || other->family == TB_IPADDR_FAMILY_UNIX) return tb_false;
@@ -332,7 +332,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
     case TB_IPADDR_FAMILY_UNIX:
         {
             // make unix cstr
-            if (ipaddr->have_ip) cstr = tb_unix_cstr(&ipaddr->u.unix, data, maxn);
+            if (ipaddr->have_ip) cstr = tb_unix_cstr(&ipaddr->u.local, data, maxn);
             else
             {
                 // check
@@ -394,7 +394,7 @@ tb_bool_t tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, t
     case TB_IPADDR_FAMILY_UNIX:
         {
             // make unix
-            ok = tb_unix_cstr_set(&temp.u.unix, cstr);
+            ok = tb_unix_cstr_set(&temp.u.local, cstr);
 
             // make family
             if (ok) temp.family = family;
@@ -461,7 +461,7 @@ tb_void_t tb_ipaddr_ip_set(tb_ipaddr_ref_t ipaddr, tb_ipaddr_ref_t other)
     case TB_IPADDR_FAMILY_UNIX:
         {
             // save unix
-            tb_ipaddr_unix_set(ipaddr, &other->u.unix);
+            tb_ipaddr_unix_set(ipaddr, &other->u.local);
 
             // save state
             ipaddr->have_ip = 1;
@@ -586,7 +586,7 @@ tb_unix_ref_t tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr)
     tb_check_return_val(ipaddr->have_ip, tb_null);
 
     // done
-    if (ipaddr->family == TB_IPADDR_FAMILY_UNIX) return &ipaddr->u.unix;
+    if (ipaddr->family == TB_IPADDR_FAMILY_UNIX) return &ipaddr->u.local;
 
     return tb_null;
 }
@@ -604,7 +604,7 @@ tb_void_t tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unix_ref_t unix)
 
     // save it
     ipaddr->family    = TB_IPADDR_FAMILY_UNIX;
-    ipaddr->u.unix    = *unix;
+    ipaddr->u.local   = *unix;
     ipaddr->have_ip   = 1;
 }
 tb_size_t tb_ipaddr_family(tb_ipaddr_ref_t ipaddr)

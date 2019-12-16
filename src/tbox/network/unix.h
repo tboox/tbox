@@ -47,7 +47,7 @@ __tb_extern_c_enter__
  *
  * xxx.xxx.xxx.xxx
  */
-typedef union __tb_unix_t
+typedef struct __tb_unix_t
 {
     /// str
     tb_char_t      str[TB_UNIX_CSTR_MAXN];
@@ -62,7 +62,7 @@ typedef union __tb_unix_t
  *
  * @param unix      the unix
  */
-tb_void_t           tb_unix_clear(tb_unix_ref_t unix);
+tb_void_t           tb_unix_clear(tb_unix_ref_t _unix);
 
 /*! is equal?
  *
@@ -71,7 +71,7 @@ tb_void_t           tb_unix_clear(tb_unix_ref_t unix);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unix_is_equal(tb_unix_ref_t unix, tb_unix_ref_t other);
+tb_bool_t           tb_unix_is_equal(tb_unix_ref_t _unix, tb_unix_ref_t other);
 
 /*! get the unix string
  *
@@ -81,7 +81,7 @@ tb_bool_t           tb_unix_is_equal(tb_unix_ref_t unix, tb_unix_ref_t other);
  *
  * @return          the unix address
  */
-tb_char_t const*    tb_unix_cstr(tb_unix_ref_t unix, tb_char_t* data, tb_size_t maxn);
+tb_char_t const*    tb_unix_cstr(tb_unix_ref_t _unix, tb_char_t* data, tb_size_t maxn);
 
 /*! set the unix from string
  *
@@ -90,7 +90,7 @@ tb_char_t const*    tb_unix_cstr(tb_unix_ref_t unix, tb_char_t* data, tb_size_t 
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unix_cstr_set(tb_unix_ref_t unix, tb_char_t const* cstr);
+tb_bool_t           tb_unix_cstr_set(tb_unix_ref_t _unix, tb_char_t const* cstr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -119,8 +119,8 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
             struct sockaddr_un* addru = (struct sockaddr_un*)saddr;
 
             // check
-            tb_assert_static(sizeof(ipaddr->u.unix.str) == sizeof(addru->sun_path));
-            tb_assert_static(tb_arrayn(ipaddr->u.unix.str) == tb_arrayn(addru->sun_path));
+            tb_assert_static(sizeof(ipaddr->u.local.str) == sizeof(addru->sun_path));
+            tb_assert_static(tb_arrayn(ipaddr->u.local.str) == tb_arrayn(addru->sun_path));
 
             // make unix
             tb_unix_t unix;
@@ -211,14 +211,14 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
             struct sockaddr_un* addru = (struct sockaddr_un*)saddr;
 
             // check
-            tb_assert_static(sizeof(ipaddr->u.unix.str) == sizeof(addru->sun_path));
-            tb_assert_static(tb_arrayn(ipaddr->u.unix.str) == tb_arrayn(addru->sun_path));
+            tb_assert_static(sizeof(ipaddr->u.local.str) == sizeof(addru->sun_path));
+            tb_assert_static(tb_arrayn(ipaddr->u.local.str) == tb_arrayn(addru->sun_path));
 
             // save family
             addru->sun_family = AF_UNIX;
 
             // save unix
-            tb_memcpy(addru->sun_path, ipaddr->u.unix.str, sizeof(addru->sun_path));
+            tb_memcpy(addru->sun_path, ipaddr->u.local.str, sizeof(addru->sun_path));
 
             // save size
             size = sizeof(struct sockaddr_un);
