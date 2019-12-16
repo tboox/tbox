@@ -139,7 +139,7 @@ tb_char_t const* tb_ipaddr_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_size
     else if (ipaddr->family == TB_IPADDR_FAMILY_UNIX)
     {
         // check (again)
-        tb_assert_and_check_return_val(maxn >= tb_unixaddr_CSTR_MAXN, tb_null);
+        tb_assert_and_check_return_val(maxn >= TB_UNIXADDR_CSTR_MAXN, tb_null);
 
         // make it
         tb_unixaddr_cstr(&ipaddr->u.unixaddr, data, maxn);
@@ -336,7 +336,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
             else
             {
                 // check
-                tb_assert(maxn >= tb_unixaddr_CSTR_MAXN);
+                tb_assert(maxn >= TB_UNIXADDR_CSTR_MAXN);
 
                 // make empty cstr
                 tb_memset(data, 0, maxn);

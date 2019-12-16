@@ -58,7 +58,7 @@ tb_bool_t tb_unixaddr_is_equal(tb_unixaddr_ref_t unix, tb_unixaddr_ref_t other)
 tb_char_t const* tb_unixaddr_cstr(tb_unixaddr_ref_t unix, tb_char_t* data, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(unix && data && maxn >= tb_unixaddr_CSTR_MAXN, tb_null);
+    tb_assert_and_check_return_val(unix && data && maxn >=TB_UNIXADDR_CSTR_MAXN, tb_null);
 
     // make it
     tb_long_t size = tb_snprintf(data, maxn - 1, "%s", unix->str);
@@ -72,7 +72,7 @@ tb_bool_t tb_unixaddr_cstr_set(tb_unixaddr_ref_t unix, tb_char_t const* cstr)
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
     tb_size_t len = tb_strlen(cstr);
-    tb_assert_and_check_return_val(len < tb_unixaddr_CSTR_MAXN, tb_false);
+    tb_assert_and_check_return_val(len <TB_UNIXADDR_CSTR_MAXN, tb_false);
 
     // copy
     tb_memcpy(unix->str, cstr, len + 1);

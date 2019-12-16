@@ -36,21 +36,21 @@ __tb_extern_c_enter__
  * macros
  */
 
-/// the ipv4 string data maxn
-#define tb_unixaddr_CSTR_MAXN           (108)
+/// the unixaddr string data maxn
+#define TB_UNIXADDR_CSTR_MAXN           (108)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
-/*! the ipv4 type
+/*! the unix type
  *
- * xxx.xxx.xxx.xxx
+ * /path/to.sock
  */
 typedef struct __tb_unixaddr_t
 {
     /// str
-    tb_char_t      str[tb_unixaddr_CSTR_MAXN];
+    tb_char_t      str[TB_UNIXADDR_CSTR_MAXN];
 
 }tb_unixaddr_t, *tb_unixaddr_ref_t;
 
