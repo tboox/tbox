@@ -65,10 +65,10 @@ static tb_long_t tb_network_printf_format_unix(tb_cpointer_t object, tb_char_t* 
     tb_assert_and_check_return_val(object && cstr && maxn, -1);
 
     // the unix
-    tb_unix_ref_t unix = (tb_unix_ref_t)object;
+    tb_unixaddr_ref_t unix = (tb_unixaddr_ref_t)object;
 
     // make it
-    cstr = (tb_char_t*)tb_unix_cstr(unix, cstr, maxn);
+    cstr = (tb_char_t*)tb_unixaddr_cstr(unix, cstr, maxn);
 
     // ok?
     return cstr? tb_strlen(cstr) : -1;

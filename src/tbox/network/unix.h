@@ -37,7 +37,7 @@ __tb_extern_c_enter__
  */
 
 /// the ipv4 string data maxn
-#define TB_UNIX_CSTR_MAXN           (108)
+#define tb_unixaddr_CSTR_MAXN           (108)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -47,12 +47,12 @@ __tb_extern_c_enter__
  *
  * xxx.xxx.xxx.xxx
  */
-typedef struct __tb_unix_t
+typedef struct __tb_unixaddr_t
 {
     /// str
-    tb_char_t      str[TB_UNIX_CSTR_MAXN];
+    tb_char_t      str[tb_unixaddr_CSTR_MAXN];
 
-}tb_unix_t, *tb_unix_ref_t;
+}tb_unixaddr_t, *tb_unixaddr_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -62,7 +62,7 @@ typedef struct __tb_unix_t
  *
  * @param unix      the unix
  */
-tb_void_t           tb_unix_clear(tb_unix_ref_t _unix);
+tb_void_t           tb_unixaddr_clear(tb_unixaddr_ref_t _unix);
 
 /*! is equal?
  *
@@ -71,7 +71,7 @@ tb_void_t           tb_unix_clear(tb_unix_ref_t _unix);
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unix_is_equal(tb_unix_ref_t _unix, tb_unix_ref_t other);
+tb_bool_t           tb_unixaddr_is_equal(tb_unixaddr_ref_t _unix, tb_unixaddr_ref_t other);
 
 /*! get the unix string
  *
@@ -81,7 +81,7 @@ tb_bool_t           tb_unix_is_equal(tb_unix_ref_t _unix, tb_unix_ref_t other);
  *
  * @return          the unix address
  */
-tb_char_t const*    tb_unix_cstr(tb_unix_ref_t _unix, tb_char_t* data, tb_size_t maxn);
+tb_char_t const*    tb_unixaddr_cstr(tb_unixaddr_ref_t _unix, tb_char_t* data, tb_size_t maxn);
 
 /*! set the unix from string
  *
@@ -90,7 +90,7 @@ tb_char_t const*    tb_unix_cstr(tb_unix_ref_t _unix, tb_char_t* data, tb_size_t
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_unix_cstr_set(tb_unix_ref_t _unix, tb_char_t const* cstr);
+tb_bool_t           tb_unixaddr_cstr_set(tb_unixaddr_ref_t _unix, tb_char_t const* cstr);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

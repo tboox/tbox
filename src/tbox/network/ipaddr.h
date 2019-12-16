@@ -77,7 +77,7 @@ typedef struct __tb_ipaddr_t
         tb_ipv6_t           ipv6;
 
         /// the unix
-        tb_unix_t           local;
+        tb_unixaddr_t       unixaddr;
 
     }u;
 
@@ -240,14 +240,14 @@ tb_void_t           tb_ipaddr_ipv6_set(tb_ipaddr_ref_t ipaddr, tb_ipv6_ref_t ipv
  *
  * @return          the unix
  */
-tb_unix_ref_t       tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr);
+tb_unixaddr_ref_t       tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr);
 
 /*! set the address from unix
  *
  * @param ipaddr    the address
  * @param unix      the unix, clear it if be null
  */
-tb_void_t           tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unix_ref_t _unix);
+tb_void_t           tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t _unix);
 
 /*! get the address family
  *

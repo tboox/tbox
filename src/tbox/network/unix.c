@@ -39,7 +39,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_void_t tb_unix_clear(tb_unix_ref_t unix)
+tb_void_t tb_unixaddr_clear(tb_unixaddr_ref_t unix)
 {
     // check
     tb_assert_and_check_return(unix);
@@ -47,7 +47,7 @@ tb_void_t tb_unix_clear(tb_unix_ref_t unix)
     // clear it
     tb_memset(unix->str, 0, sizeof(unix->str));
 }
-tb_bool_t tb_unix_is_equal(tb_unix_ref_t unix, tb_unix_ref_t other)
+tb_bool_t tb_unixaddr_is_equal(tb_unixaddr_ref_t unix, tb_unixaddr_ref_t other)
 {
     // check
     tb_assert_and_check_return_val(unix && other, tb_false);
@@ -55,10 +55,10 @@ tb_bool_t tb_unix_is_equal(tb_unix_ref_t unix, tb_unix_ref_t other)
     // is equal?
     return tb_strcmp(unix->str, other->str) == 0;
 }
-tb_char_t const* tb_unix_cstr(tb_unix_ref_t unix, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_unixaddr_cstr(tb_unixaddr_ref_t unix, tb_char_t* data, tb_size_t maxn)
 {
     // check
-    tb_assert_and_check_return_val(unix && data && maxn >= TB_UNIX_CSTR_MAXN, tb_null);
+    tb_assert_and_check_return_val(unix && data && maxn >= tb_unixaddr_CSTR_MAXN, tb_null);
 
     // make it
     tb_long_t size = tb_snprintf(data, maxn - 1, "%s", unix->str);
@@ -67,12 +67,12 @@ tb_char_t const* tb_unix_cstr(tb_unix_ref_t unix, tb_char_t* data, tb_size_t max
     // ok
     return data;
 }
-tb_bool_t tb_unix_cstr_set(tb_unix_ref_t unix, tb_char_t const* cstr)
+tb_bool_t tb_unixaddr_cstr_set(tb_unixaddr_ref_t unix, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
     tb_size_t len = tb_strlen(cstr);
-    tb_assert_and_check_return_val(len < TB_UNIX_CSTR_MAXN, tb_false);
+    tb_assert_and_check_return_val(len < tb_unixaddr_CSTR_MAXN, tb_false);
 
     // copy
     tb_memcpy(unix->str, cstr, len + 1);
