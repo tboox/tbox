@@ -71,12 +71,7 @@ tb_bool_t tb_unixaddr_cstr_set(tb_unixaddr_ref_t unix, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(cstr, tb_false);
-    tb_size_t len = tb_strlen(cstr);
-    tb_assert_and_check_return_val(len < TB_UNIXADDR_CSTR_MAXN, tb_false);
 
-    // copy
-    tb_memcpy(unix->str, cstr, len + 1);
-
-    // ok
-    return tb_true;
+    // copy and report
+    return tb_strlcpy(unix->str, cstr, TB_UNIXADDR_CSTR_MAXN) < TB_UNIXADDR_CSTR_MAXN;
 }
