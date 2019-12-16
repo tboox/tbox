@@ -27,19 +27,22 @@
 #include "../../network/network.h"
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "ws2tcpip.h"
-
-// hack for afunix.h
-struct tb_sockaddr_un
-{
-    ADDRESS_FAMILY sun_family;
-    tb_char_t      sun_path[108];
-};
-
-#  define sockaddr_un tb_sockaddr_un
-
 #else
 #   include <netinet/in.h>
 #   include <sys/un.h>
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+#ifdef TB_CONFIG_OS_WINDOWS
+typedef struct __tb_sockaddr_un_t
+{
+    ADDRESS_FAMILY sun_family;
+    tb_char_t      sun_path[108];
+}tb_sockaddr_un_t, *tb_sockaddr_un_ref_t;
+#else
+typedef struct sockaddr_un tb_sockaddr_un_t, *tb_sockaddr_un_ref_t;
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +128,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
         break;
     case AF_UNIX:
         {
-            struct sockaddr_un* addru = (struct sockaddr_un*)saddr;
+            tb_sockaddr_un_ref_t addru = (tb_sockaddr_un_ref_t)saddr;
 
             // save family
             tb_ipaddr_family_set(ipaddr, TB_IPADDR_FAMILY_UNIX);
@@ -150,7 +153,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
             tb_ipaddr_unix_set(ipaddr, &unixaddr);
 
             // save size
-            size = sizeof(struct sockaddr_un);
+            size = sizeof(tb_sockaddr_un_t);
         }
     default:
         tb_assert(0);
@@ -228,7 +231,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
     case TB_IPADDR_FAMILY_UNIX:
         {
             // the unix ipaddr
-            struct sockaddr_un* addru = (struct sockaddr_un*)saddr;
+            tb_sockaddr_un_ref_t addru = (tb_sockaddr_un_ref_t)saddr;
 
             // save family
             addru->sun_family = AF_UNIX;
@@ -249,7 +252,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
             }
 
             // save size
-            size = sizeof(struct sockaddr_un);
+            size = sizeof(tb_sockaddr_un_t);
         }
         break;
     default:
@@ -266,10 +269,5 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
  * extern
  */
 __tb_extern_c_leave__
-
-#ifdef TB_CONFIG_OS_WINDOWS
-// hack for afunix.h, see above
-#  undef sockaddr_un
-#endif
 
 #endif
