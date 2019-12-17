@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* [#112](https://github.com/tboox/tbox/issues/112): Support unix socket，thanks [@Codehz](https://github.com/codehz)
+
 ### Changes
 
 * improve uuid and improve uuid v4
@@ -189,6 +193,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* [#112](https://github.com/tboox/tbox/issues/112): 新增unix socket支持，感谢[@Codehz](https://github.com/codehz)的贡献
 
 ### 改进
 
