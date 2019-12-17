@@ -26,7 +26,7 @@
 #include "prefix.h"
 #include "../../network/network.h"
 #ifdef TB_CONFIG_OS_WINDOWS
-#   include "ws2tcpip.h"
+#   include <ws2tcpip.h>
 #else
 #   include <netinet/in.h>
 #   include <sys/un.h>
