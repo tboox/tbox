@@ -27,6 +27,7 @@
  */
 #include "ipv4.h"
 #include "ipv6.h"
+#include "unixaddr.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -50,6 +51,7 @@ typedef enum __tb_ipaddr_family_e
     TB_IPADDR_FAMILY_NONE     = 0
 ,   TB_IPADDR_FAMILY_IPV4     = 1
 ,   TB_IPADDR_FAMILY_IPV6     = 2
+,   TB_IPADDR_FAMILY_UNIX     = 3
 
 }tb_ipaddr_family_e;
 
@@ -73,6 +75,9 @@ typedef struct __tb_ipaddr_t
 
         /// the ipv6
         tb_ipv6_t           ipv6;
+
+        /// the unixaddr
+        tb_unixaddr_t       unixaddr;
 
     }u;
 
@@ -228,6 +233,31 @@ tb_ipv6_ref_t       tb_ipaddr_ipv6(tb_ipaddr_ref_t ipaddr);
  * @param ipv6      the ipv6, clear it if be null
  */
 tb_void_t           tb_ipaddr_ipv6_set(tb_ipaddr_ref_t ipaddr, tb_ipv6_ref_t ipv6);
+
+/*! get the unix socket path
+ *
+ * @param ipaddr    the address
+ *
+ * @return          the unixaddr
+ */
+tb_unixaddr_ref_t   tb_ipaddr_unix(tb_ipaddr_ref_t ipaddr);
+
+/*! set the path from unix
+ *
+ * @param ipaddr    the address
+ * @param unixaddr  the unixaddr, clear it if be null
+ */
+tb_void_t           tb_ipaddr_unix_set(tb_ipaddr_ref_t ipaddr, tb_unixaddr_ref_t unixaddr);
+
+/*! set the unix socket address from string
+ *
+ * @param ipaddr    the address
+ * @param cstr      the address string
+ * @param is_abstract true if the address is abstract address
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_ipaddr_unix_set_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_bool_t is_abstract);
 
 /*! get the address family
  *

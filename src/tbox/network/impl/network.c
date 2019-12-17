@@ -59,6 +59,20 @@ static tb_long_t tb_network_printf_format_ipv6(tb_cpointer_t object, tb_char_t* 
     // ok?
     return cstr? tb_strlen(cstr) : -1;
 }
+static tb_long_t tb_network_printf_format_unixaddr(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
+{
+    // check
+    tb_assert_and_check_return_val(object && cstr && maxn, -1);
+
+    // the unixaddr
+    tb_unixaddr_ref_t unixaddr = (tb_unixaddr_ref_t)object;
+
+    // make it
+    cstr = (tb_char_t*)tb_unixaddr_cstr(unixaddr, cstr, maxn);
+
+    // ok?
+    return cstr? tb_strlen(cstr) : -1;
+}
 static tb_long_t tb_network_printf_format_ipaddr(tb_cpointer_t object, tb_char_t* cstr, tb_size_t maxn)
 {
     // check
@@ -106,6 +120,9 @@ tb_bool_t tb_network_init_env()
 
     // register printf("%{ipv6}", &ipv6);
     tb_printf_object_register("ipv6", tb_network_printf_format_ipv6);
+
+    // register printf("%{unixaddr}", &unixaddr);
+    tb_printf_object_register("unixaddr", tb_network_printf_format_unixaddr);
 
     // register printf("%{ipaddr}", &ipaddr);
     tb_printf_object_register("ipaddr", tb_network_printf_format_ipaddr);

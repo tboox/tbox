@@ -24,10 +24,25 @@
  * includes
  */
 #include "prefix.h"
+#include "../../network/network.h"
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "ws2tcpip.h"
 #else
 #   include <netinet/in.h>
+#   include <sys/un.h>
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+#ifdef TB_CONFIG_OS_WINDOWS
+typedef struct __tb_sockaddr_un_t
+{
+    ADDRESS_FAMILY sun_family;
+    tb_char_t      sun_path[108];
+}tb_sockaddr_un_t, *tb_sockaddr_un_ref_t;
+#else
+typedef struct sockaddr_un tb_sockaddr_un_t, *tb_sockaddr_un_ref_t;
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +126,35 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
             size = sizeof(struct sockaddr_in6);
         }
         break;
+    case AF_UNIX:
+        {
+            tb_sockaddr_un_ref_t addru = (tb_sockaddr_un_ref_t)saddr;
+
+            // save family
+            tb_ipaddr_family_set(ipaddr, TB_IPADDR_FAMILY_UNIX);
+
+            // make unixaddr
+            tb_unixaddr_t unixaddr;
+            if (addru->sun_path[0])
+            {
+                // normal unixaddr
+                tb_size_t n = tb_strlcpy(unixaddr.path, addru->sun_path, sizeof(addru->sun_path));
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path), 0);
+            }
+            else
+            {
+                // abstract unixaddr
+                tb_size_t n = tb_strlcpy(unixaddr.path, addru->sun_path + 1, sizeof(addru->sun_path) - 1);
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path) - 1, 0);
+                unixaddr.is_abstract = tb_true;
+            }
+
+            // save unixaddr
+            tb_ipaddr_unix_set(ipaddr, &unixaddr);
+
+            // save size
+            size = sizeof(tb_sockaddr_un_t);
+        }
     default:
         tb_assert(0);
         break;
@@ -182,6 +226,33 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
 
             // save size
             size = sizeof(struct sockaddr_in6);
+        }
+        break;
+    case TB_IPADDR_FAMILY_UNIX:
+        {
+            // the unix ipaddr
+            tb_sockaddr_un_ref_t addru = (tb_sockaddr_un_ref_t)saddr;
+
+            // save family
+            addru->sun_family = AF_UNIX;
+
+            // save unix
+            if (!ipaddr->u.unixaddr.is_abstract)
+            {
+                // normal unixaddr
+                tb_size_t n = tb_strlcpy(addru->sun_path, ipaddr->u.unixaddr.path, sizeof(addru->sun_path));
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path), 0);
+            }
+            else
+            {
+                // abstract unixaddr
+                addru->sun_path[0] = '\0';
+                tb_size_t n = tb_strlcpy(addru->sun_path + 1, ipaddr->u.unixaddr.path, sizeof(addru->sun_path));
+                tb_assert_and_check_return_val(n < sizeof(addru->sun_path) - 1, 0);
+            }
+
+            // save size
+            size = sizeof(tb_sockaddr_un_t);
         }
         break;
     default:
