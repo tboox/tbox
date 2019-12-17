@@ -250,7 +250,7 @@ function check_interfaces()
         "expf")
 
     -- add the interfaces for posix
-    check_module_cfuncs("posix", {"sys/poll.h", "sys/socket.h"},     "poll")
+    check_module_cfuncs("posix", {"poll.h", "sys/socket.h"},         "poll")
     check_module_cfuncs("posix", {"sys/select.h"},                   "select")
     check_module_cfuncs("posix", "pthread.h",                        
         "pthread_mutex_init",
