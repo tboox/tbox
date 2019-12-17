@@ -25,7 +25,7 @@
 #include "../time.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
-#include <sys/poll.h>
+#include <poll.h>
 #include <fcntl.h>
 #include <errno.h>
 #ifndef TB_CONFIG_OS_ANDROID
