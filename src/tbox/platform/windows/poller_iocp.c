@@ -639,12 +639,15 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return_val(poller && sock, tb_false);
 
-    // get iocp object for this socket, @note only init event once in every thread
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
-    tb_assert_and_check_return_val(object, tb_false);
+    if (!(events & TB_POLLER_EVENT_NOEXTRA))
+    {
+        // get iocp object for this socket, @note only init event once in every thread
+        tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
+        tb_assert_and_check_return_val(object, tb_false);
 
-    // save the user private data
-    object->priv = priv;
+        // save the user private data
+        object->priv = priv;
+    }
     return tb_true;
 }
 tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)

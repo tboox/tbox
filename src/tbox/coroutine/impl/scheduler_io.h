@@ -26,6 +26,7 @@
  * includes
  */
 #include "scheduler.h"
+#include "../../memory/fixed_pool.h"
 #include "../../platform/impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -36,6 +37,17 @@ __tb_extern_c_enter__
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
+
+// the io socket data type
+typedef struct __tb_co_sockdata_io_t
+{
+    // the suspended coroutine for waiting socket/recv
+    tb_coroutine_t*     co_recv;
+
+    // the suspended coroutine for waiting socket/send
+    tb_coroutine_t*     co_send;
+
+}tb_co_sockdata_io_t, *tb_co_sockdata_io_ref_t;
 
 // the io scheduler type
 typedef struct __tb_co_scheduler_io_t
@@ -54,6 +66,12 @@ typedef struct __tb_co_scheduler_io_t
 
     // the low-precision timer (faster)
     tb_ltimer_ref_t     ltimer;
+
+    // the socket data
+    tb_sockdata_t       sockdata;
+
+    // the socket data pool
+    tb_fixed_pool_ref_t sockdata_pool;
 
     // the socket events
     tb_sockdata_t       sockevents;

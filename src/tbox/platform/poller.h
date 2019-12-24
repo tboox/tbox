@@ -62,6 +62,7 @@ typedef enum __tb_poller_event_e
     // the event flags after waiting
 ,   TB_POLLER_EVENT_CLEAR       = 0x0010 //!< edge trigger. after the event is retrieved by the user, its state is reset
 ,   TB_POLLER_EVENT_ONESHOT     = 0x0020 //!< causes the event to return only the first occurrence of the filter being triggered
+,   TB_POLLER_EVENT_NOEXTRA     = 0x0040 //!< do not pass and storage the extra userdata for events
 
     /*! the event flag will be marked if the connection be closed in the edge trigger (TB_POLLER_EVENT_CLEAR)
      *

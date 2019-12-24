@@ -236,7 +236,8 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     tb_vector_insert_tail(poller->pfds, &pfd);
 
     // bind user private data to socket
-    tb_sockdata_set(&poller->sockdata, sock, priv);
+    if (!(events & TB_POLLER_EVENT_NOEXTRA))
+        tb_sockdata_set(&poller->sockdata, sock, priv);
 
     // ok
     return tb_true;

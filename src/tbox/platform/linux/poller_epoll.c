@@ -233,7 +233,8 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     e.data.fd = (tb_int_t)tb_sock2fd(sock);
     
     // bind user private data to socket
-    tb_sockdata_set(&poller->sockdata, sock, priv);
+    if (!(events & TB_POLLER_EVENT_NOEXTRA))
+        tb_sockdata_set(&poller->sockdata, sock, priv);
 
     // add socket and events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_ADD, e.data.fd, &e) < 0)
