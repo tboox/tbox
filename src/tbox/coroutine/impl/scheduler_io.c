@@ -119,7 +119,7 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     tb_coroutine_t* co_send = (events & TB_SOCKET_EVENT_SEND)? sockdata->co_send : tb_null;
 
     // trace
-    tb_trace_d("socket: %p, events %lu, co_recv(%p), co_send(%p)", sock, events, co_recv, co_send);
+    tb_trace_d("socket: %p, trigger events %lu, co_recv(%p), co_send(%p)", sock, events, co_recv, co_send);
 
     // return the events result for the waiting coroutines
     if (co_recv && co_recv == co_send)
@@ -146,6 +146,9 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         // no coroutines are waiting? cache this events
         if ((events & TB_SOCKET_EVENT_RECV) || (events & TB_SOCKET_EVENT_SEND)) 
         {
+            // trace
+            tb_trace_d("socket: %p, cache events %lu", sock, events);
+
             // cache this events
             events_prev_save |= events;
             sockdata->poller_events_save = (tb_uint16_t)events_prev_save;
@@ -390,12 +393,12 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     // trace
     tb_trace_d("coroutine(%p): wait events(%lu) with %ld ms for socket(%p) ..", coroutine, events, timeout, sock);
 
-    // get and alloc a socket data
+    // get and allocate a socket data
     tb_co_sockdata_io_ref_t sockdata = (tb_co_sockdata_io_ref_t)tb_sockdata_get(&scheduler_io->sockdata, sock);
     if (!sockdata)
     {
         tb_assert(scheduler_io->sockdata_pool);
-        sockdata = tb_fixed_pool_malloc0(scheduler_io->sockdata_pool);
+        sockdata = (tb_co_sockdata_io_ref_t)tb_fixed_pool_malloc0(scheduler_io->sockdata_pool);
         tb_sockdata_set(&scheduler_io->sockdata, sock, sockdata);
     }
     tb_assert_and_check_return_val(sockdata, -1);
@@ -429,10 +432,18 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
             return events_prev_save & events;
         }
 
+        // modify the wait events and reserve the pending events in other coroutine
+        events_wait = events_prev_wait;
+        if ((events_wait & TB_SOCKET_EVENT_RECV) && !sockdata->co_recv) events_wait &= ~TB_SOCKET_EVENT_RECV;
+        if ((events_wait & TB_SOCKET_EVENT_SEND) && !sockdata->co_send) events_wait &= ~TB_SOCKET_EVENT_SEND;
+        events_wait |= events;
+
         // modify socket from poller for waiting events if the waiting events has been changed 
-        events_wait |= events_prev_wait;
-        if ((events_prev_wait & events) != events)
+        if ((events_prev_wait & events_wait) != events_wait)
         {
+            // trace
+            tb_trace_d("modify socket: %p events: %lx", sock, events_wait);
+
             // may be wait recv/send at same time
             if (!tb_poller_modify(poller, sock, events_wait | TB_POLLER_EVENT_NOEXTRA, tb_null))
             {
@@ -446,8 +457,11 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     }
     else
     {
+        // trace
+        tb_trace_d("insert socket: %p events: %lx", sock, events_wait);
+
         // insert socket to poller for waiting events
-        if (!tb_poller_insert(poller, sock, events | TB_POLLER_EVENT_NOEXTRA, tb_null))
+        if (!tb_poller_insert(poller, sock, events_wait | TB_POLLER_EVENT_NOEXTRA, tb_null))
         {
             // trace
             tb_trace_e("failed to insert sock(%p) to poller on coroutine(%p)!", sock, coroutine);

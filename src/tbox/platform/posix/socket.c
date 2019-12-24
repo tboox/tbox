@@ -364,6 +364,9 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     // connect
     tb_long_t r = connect(tb_sock2fd(sock), (struct sockaddr *)&d, n);
 
+    // trace
+    tb_trace_d("connect: %p, %ld, error: %d", sock, r, errno);
+
     // ok?
     if (!r || errno == EISCONN) return 1;
 
@@ -564,6 +567,9 @@ tb_long_t tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
     // recv
     tb_long_t real = recv(tb_sock2fd(sock), data, (tb_int_t)size, 0);
 
+    // trace
+    tb_trace_d("recv: %p %lu => %ld, errno: %d", sock, size, real, errno);
+
     // ok?
     if (real >= 0) return real;
 
@@ -581,6 +587,9 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
 
     // send
     tb_long_t real = send(tb_sock2fd(sock), data, (tb_int_t)size, 0);
+
+    // trace
+    tb_trace_d("send: %p %lu => %ld, errno: %d", sock, size, real, errno);
 
     // ok?
     if (real >= 0) return real;
