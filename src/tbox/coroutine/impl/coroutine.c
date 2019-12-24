@@ -24,7 +24,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME            "coroutine"
-#define TB_TRACE_MODULE_DEBUG           (0)
+#define TB_TRACE_MODULE_DEBUG           (1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -63,13 +63,13 @@ static tb_void_t tb_coroutine_entry(tb_context_from_t from)
     tb_coroutine_t* coroutine = (tb_coroutine_t*)tb_coroutine_self();
     tb_assert(coroutine);
 
+    // trace
+    tb_trace_d("entry: %p stack: %p - %p from coroutine(%p)", coroutine, coroutine->stackbase - coroutine->stacksize, coroutine->stackbase, coroutine_from);
+
 #ifdef __tb_debug__
     // check it
     tb_coroutine_check(coroutine);
 #endif
-
-    // trace
-    tb_trace_d("entry: %p stack: %p - %p from coroutine(%p)", coroutine, coroutine->stackbase - coroutine->stacksize, coroutine->stackbase, coroutine_from);
 
     // get function and private data
     tb_coroutine_func_t func = coroutine->rs.func.func;
@@ -142,6 +142,11 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
 #if defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
         // register valgrind stack 
         coroutine->valgrind_stack_id = VALGRIND_STACK_REGISTER(coroutine->stackbase - stacksize, coroutine->stackbase);
+#endif
+
+#ifdef __tb_debug__
+        // check it
+        tb_coroutine_check(coroutine);
 #endif
 
         // ok
@@ -266,7 +271,7 @@ tb_void_t tb_coroutine_check(tb_coroutine_t* coroutine)
         tb_trace_e("this coroutine stack is underflow!");
 
         // dump stack
-        tb_dump_data(coroutine->stackbase - coroutine->stacksize, tb_min(64, coroutine->stacksize));
+        tb_dump_data((tb_byte_t const*)coroutine, sizeof(tb_coroutine_t));
 
         // abort
         tb_abort();
