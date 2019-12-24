@@ -102,9 +102,8 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     tb_assert(sockdata);
 
     // get socket events
-    tb_uint32_t sockevents = tb_p2u32(tb_sockdata_get(&scheduler_io->sockevents, sock));
-    tb_size_t   events_prev_wait = sockevents & 0xffff;
-    tb_size_t   events_prev_save = sockevents >> 16;
+    tb_size_t events_prev_wait = sockdata->poller_events_wait;
+    tb_size_t events_prev_save = sockdata->poller_events_save;
 
     // eof for edge trigger?
     if (events & TB_POLLER_EVENT_EOF)
@@ -112,7 +111,7 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         // cache this eof as next recv/send event
         events &= ~TB_POLLER_EVENT_EOF;
         events_prev_save |= events_prev_wait;
-        tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_prev_save << 16) | events_prev_wait));
+        sockdata->poller_events_save = (tb_uint16_t)events_prev_save;
     }
 
     // get the waiting coroutines
@@ -124,16 +123,22 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
 
     // return the events result for the waiting coroutines
     if (co_recv && co_recv == co_send)
+    {
+        sockdata->co_recv = tb_null;
+        sockdata->co_send = tb_null;
         tb_co_scheduler_io_resume(scheduler_io->scheduler, co_recv, events);
+    }
     else 
     {
         if (co_recv) 
         {
+            sockdata->co_recv = tb_null;
             tb_co_scheduler_io_resume(scheduler_io->scheduler, co_recv, events & ~TB_SOCKET_EVENT_SEND);
             events &= ~TB_SOCKET_EVENT_RECV;
         }
         if (co_send) 
         {
+            sockdata->co_send = tb_null;
             tb_co_scheduler_io_resume(scheduler_io->scheduler, co_send, events & ~TB_SOCKET_EVENT_RECV);
             events &= ~TB_SOCKET_EVENT_SEND;
         }
@@ -143,7 +148,7 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         {
             // cache this events
             events_prev_save |= events;
-            tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p((events_prev_save << 16) | events_prev_wait));
+            sockdata->poller_events_save = (tb_uint16_t)events_prev_save;
         }
     }
 }
@@ -250,9 +255,6 @@ tb_co_scheduler_io_ref_t tb_co_scheduler_io_init(tb_co_scheduler_t* scheduler)
         // init socket data
         tb_sockdata_init(&scheduler_io->sockdata);
 
-        // init socket events
-        tb_sockdata_init(&scheduler_io->sockevents);
-
         // start the io loop coroutine
         if (!tb_co_scheduler_start(scheduler_io->scheduler, tb_co_scheduler_io_loop, scheduler_io, 0)) break;
 
@@ -276,9 +278,6 @@ tb_void_t tb_co_scheduler_io_exit(tb_co_scheduler_io_ref_t scheduler_io)
 {
     // check
     tb_assert_and_check_return(scheduler_io);
-
-    // exit socket events
-    tb_sockdata_exit(&scheduler_io->sockevents);
 
     // exit socket data
     tb_sockdata_exit(&scheduler_io->sockdata);
@@ -406,33 +405,31 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
         events |= TB_POLLER_EVENT_CLEAR;
 
     // get the previous socket events
-    tb_size_t   events_wait = events;
-    tb_uint32_t sockevents  = tb_p2u32(tb_sockdata_get(&scheduler_io->sockevents, sock));
-    tb_trace_i("sockevents: %x", sockevents);
-    if (sockevents)
+    tb_size_t events_wait = events;
+    if (sockdata->poller_events_wait)
     {
         // return the cached events directly if the waiting events exists cache
-        tb_size_t events_prev_wait = sockevents & 0xffff;
-        tb_size_t events_prev_save = sockevents >> 16;
-        tb_trace_i("events_prev_wait: %x events_prev_save: %x", events_prev_wait, events_prev_save);
+        tb_size_t events_prev_wait = sockdata->poller_events_wait;
+        tb_size_t events_prev_save = sockdata->poller_events_save;
         if (events_prev_save && (events_prev_wait & events))
         {
             // check error?
             if (events_prev_save & TB_POLLER_EVENT_ERROR)
             {
-                tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p(events_prev_wait));
+                sockdata->poller_events_wait = (tb_uint16_t)events_prev_wait;
+                sockdata->poller_events_save = 0;
                 return -1;
             }
 
             // clear cache events
-            tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p(((events_prev_save & ~events) << 16) | events_prev_wait));
+            sockdata->poller_events_wait = (tb_uint16_t)events_prev_wait;
+            sockdata->poller_events_save = (tb_uint16_t)(events_prev_save & ~events);
 
             // return the cached events
             return events_prev_save & events;
         }
 
         // modify socket from poller for waiting events if the waiting events has been changed 
-        tb_trace_i("%p ------------> %x %x", sock, events_prev_wait & events, events);
         events_wait |= events_prev_wait;
         if ((events_prev_wait & events) != events)
         {
@@ -489,7 +486,8 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     coroutine->rs.wait.is_ltimer = is_ltimer;
 
     // save waiting events to coroutine
-    tb_sockdata_set(&scheduler_io->sockevents, sock, tb_u2p(events_wait));
+    sockdata->poller_events_wait = (tb_uint16_t)events_wait;
+    sockdata->poller_events_save = 0;
 
     // save the current coroutine 
     if (events & TB_SOCKET_EVENT_RECV) sockdata->co_recv = coroutine;
@@ -514,27 +512,28 @@ tb_bool_t tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_so
     tb_co_sockdata_io_ref_t sockdata = (tb_co_sockdata_io_ref_t)tb_sockdata_get(&scheduler_io->sockdata, sock);
     if (sockdata)
     {
+        // clear the waiting coroutines
         sockdata->co_recv = tb_null;
         sockdata->co_send = tb_null;
-    }
 
-    // remove the this socket from poller
-    tb_uint32_t sockevents = tb_p2u32(tb_sockdata_get(&scheduler_io->sockevents, sock));
-    if (sockevents)
-    {
-        // remove the previous socket first if exists
-        if (!tb_poller_remove(scheduler_io->poller, sock))
+        // remove the this socket from poller
+        if (sockdata->poller_events_wait)
         {
-            // trace
-            tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock, coroutine);
+            // remove the previous socket first if exists
+            if (!tb_poller_remove(scheduler_io->poller, sock))
+            {
+                // trace
+                tb_trace_e("failed to remove sock(%p) to poller on coroutine(%p)!", sock, coroutine);
 
-            // failed
-            return tb_false;
+                // failed
+                return tb_false;
+            }
+
+            // remove the socket events
+            sockdata->poller_events_wait = 0;
+            sockdata->poller_events_save = 0;
+            return tb_true;
         }
-
-        // remove the socket events
-        tb_sockdata_reset(&scheduler_io->sockevents, sock);
-        return tb_true;
     }
 
     // no this socket

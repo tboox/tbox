@@ -177,10 +177,7 @@ tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeo
     if (tb_coroutine_self())
         return tb_coroutine_waitio(sock, events, timeout);
 #endif
-    tb_trace_i("%p, tb_socket_wait: events(%lu) ..", sock, events);
-    tb_long_t ok = tb_socket_wait_impl(sock, events, timeout);
-    tb_trace_i("%p, tb_socket_wait: ok", sock);
-    return ok;
+    return tb_socket_wait_impl(sock, events, timeout);
 }
 
 tb_bool_t tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
@@ -192,7 +189,6 @@ tb_bool_t tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
     {
         // recv it
         tb_long_t real = tb_socket_recv(sock, data + recv, size - recv);
-        tb_trace_i("%p: recv: %ld", sock, real);
 
         // has data?
         if (real > 0) 
@@ -203,11 +199,9 @@ tb_bool_t tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
         // no data? wait it
         else if (!real && !wait)
         {
-        tb_trace_i("%p wait: recv ..", sock);
             // wait it
             wait = tb_socket_wait(sock, TB_SOCKET_EVENT_RECV, -1);
             tb_check_break(wait > 0);
-        tb_trace_i("%p wait: recv ok", sock);
         }
         // failed or end?
         else break;
@@ -223,7 +217,6 @@ tb_bool_t tb_socket_bsend(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t
     {
         // send it
         tb_long_t real = tb_socket_send(sock, data + send, size - send);
-        tb_trace_i("%p: send: %ld", sock, real);
 
         // has data?
         if (real > 0) 
@@ -234,11 +227,9 @@ tb_bool_t tb_socket_bsend(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t
         // no data? wait it
         else if (!real && !wait)
         {
-        tb_trace_i("%p wait: send ..", sock);
             // wait it
             wait = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, -1);
             tb_check_break(wait > 0);
-        tb_trace_i("%p wait: send ok", sock);
         }
         // failed or end?
         else break;

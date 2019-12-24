@@ -47,6 +47,12 @@ typedef struct __tb_co_sockdata_io_t
     // the suspended coroutine for waiting socket/send
     tb_coroutine_t*     co_send;
 
+    // the waited events for poller
+    tb_uint16_t         poller_events_wait;
+
+    // the saved events for poller (triggered)
+    tb_uint16_t         poller_events_save;
+
 }tb_co_sockdata_io_t, *tb_co_sockdata_io_ref_t;
 
 // the io scheduler type
@@ -72,9 +78,6 @@ typedef struct __tb_co_scheduler_io_t
 
     // the socket data pool
     tb_fixed_pool_ref_t sockdata_pool;
-
-    // the socket events
-    tb_sockdata_t       sockevents;
 
 }tb_co_scheduler_io_t, *tb_co_scheduler_io_ref_t;
 
