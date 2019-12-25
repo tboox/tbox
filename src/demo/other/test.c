@@ -74,7 +74,7 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
     tb_co_scheduler_ref_t sche = tb_co_scheduler_init();
 
     tb_socket_ref_t pair[2];
-    tb_assert(tb_socket_pair(TB_SOCKET_TYPE_TCP, pair));
+    tb_assert(tb_socket_pair(TB_SOCKET_TYPE_SOCK_STREAM, pair));
 
     tb_thread_ref_t server_thread = tb_thread_init("server", server, pair[1], 0);
 

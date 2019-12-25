@@ -181,9 +181,9 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
     pair[1] = tb_null;
  
     // init socket type and protocol
+    tb_int_t p = 0;
     tb_int_t t = tb_socket_type(type);
-    tb_int_t p = tb_socket_proto(type, TB_IPADDR_FAMILY_NONE);
-    tb_assert_and_check_return_val(t >= 0 && p >= 0, tb_false);
+    tb_assert_and_check_return_val(t >= 0, tb_false);
 
     // done
     tb_bool_t   ok = tb_false;
