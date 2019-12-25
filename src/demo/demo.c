@@ -219,6 +219,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(coroutine_sleep)
 ,   TB_DEMO_MAIN_ITEM(coroutine_stream)
 ,   TB_DEMO_MAIN_ITEM(coroutine_switch)
+,   TB_DEMO_MAIN_ITEM(coroutine_thread)
 ,   TB_DEMO_MAIN_ITEM(coroutine_channel)
 ,   TB_DEMO_MAIN_ITEM(coroutine_semaphore)
 ,   TB_DEMO_MAIN_ITEM(coroutine_echo_server)
