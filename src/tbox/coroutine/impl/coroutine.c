@@ -284,7 +284,7 @@ tb_void_t tb_coroutine_check(tb_coroutine_t* coroutine)
         tb_trace_e("this coroutine stack is overflow!");
 
         // dump stack
-        tb_dump_data(coroutine->stackbase - coroutine->stacksize, tb_min(64, coroutine->stacksize));
+        tb_dump_data(coroutine->stackbase - 64, 64 + 2);
 
         // abort
         tb_abort();
