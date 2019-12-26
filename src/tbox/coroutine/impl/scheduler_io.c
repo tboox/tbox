@@ -88,8 +88,26 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
     // trace
     tb_trace_d("coroutine(%p): timer %s", coroutine, killed? "killed" : "timeout");
 
-    // resume the coroutine 
-    tb_co_scheduler_io_resume(scheduler, coroutine, 0);
+    if (!killed)
+    {
+        // reset the waited coroutines in the socket data
+        tb_socket_ref_t sock = coroutine->rs.wait.sock;
+        if (sock)
+        {
+            tb_co_scheduler_io_ref_t scheduler_io = tb_co_scheduler_io(scheduler);
+            tb_co_sockdata_io_ref_t  sockdata = (tb_co_sockdata_io_ref_t)(scheduler_io? tb_sockdata_get(&scheduler_io->sockdata, sock) : tb_null);
+            if (sockdata)
+            {
+                if (coroutine == sockdata->co_recv)
+                    sockdata->co_recv = tb_null;
+                if (coroutine == sockdata->co_send)
+                    sockdata->co_send = tb_null;
+            }
+        }
+
+        // resume the coroutine 
+        tb_co_scheduler_io_resume(scheduler, coroutine, 0);
+    }
 }
 static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
@@ -356,6 +374,7 @@ tb_pointer_t tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t scheduler_io, tb_
 
     // clear waiting task first
     coroutine->rs.wait.task = tb_null;
+    coroutine->rs.wait.sock = tb_null;
 
     // infinity?
     if (interval > 0)
@@ -497,6 +516,7 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
 
     // save the timer task to coroutine
     coroutine->rs.wait.task = task;
+    coroutine->rs.wait.sock = sock;
     coroutine->rs.wait.is_ltimer = is_ltimer;
 
     // save waiting events to coroutine

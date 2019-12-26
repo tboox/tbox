@@ -60,8 +60,8 @@ typedef struct __tb_coroutine_rs_func_t
 // the coroutine wait type
 typedef struct __tb_coroutine_rs_wait_t
 {
-    // reserve the list entry space, avoid to erase the coroutine list entry after waiting timer task
-    tb_single_list_entry_t          reserved;
+    // the waited socket
+    tb_socket_ref_t                 sock;
 
     // the timer task pointer for ltimer or timer
     tb_cpointer_t                   task;

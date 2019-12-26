@@ -77,7 +77,7 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
             {
                 if (!tb_coroutine_start(tb_null, tb_demo_coroutine_client, client, 0)) break;
             }
-            else if (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, -1) <= 0) break;
+            else if (tb_socket_wait(sock, TB_SOCKET_EVENT_ACPT, TB_DEMO_TIMEOUT) < 0) break;
         }
 
     } while (0);
