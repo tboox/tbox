@@ -664,6 +664,9 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
     socklen_t               n = sizeof(d);
     tb_long_t               r = recvfrom(tb_sock2fd(sock), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
+    // trace
+    tb_trace_d("urecv: %p %lu bytes => %ld bytes, errno: %d", sock, size, r, errno);
+
     // ok?
     if (r >= 0) 
     {
@@ -696,6 +699,9 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 
     // send
     tb_long_t r = sendto(tb_sock2fd(sock), data, (tb_int_t)size, 0, (struct sockaddr*)&d, n);
+
+    // trace
+    tb_trace_d("usend: %p %{ipaddr} %lu bytes => %ld bytes, errno: %d", sock, addr, size, r, errno);
 
     // ok?
     if (r >= 0) return r;

@@ -219,6 +219,9 @@ static tb_void_t tb_demo_coroutine_ping(tb_cpointer_t priv)
     tb_socket_ref_t sock = tb_socket_init(TB_SOCKET_TYPE_ICMP, TB_IPADDR_FAMILY_IPV4);
     if (sock)
     {
+        // trace
+        tb_trace_i("========================== ping %{ipaddr} ==========================", addr);
+
         // send ping
         tb_uint16_t i = 0;
         tb_uint16_t n = 10;
@@ -230,6 +233,9 @@ static tb_void_t tb_demo_coroutine_ping(tb_cpointer_t priv)
 
             // wait some time
             tb_sleep(1);
+
+            // trace
+            tb_trace_i("========================== ping %{ipaddr} ==========================", addr);
         }
 
         // exit socket

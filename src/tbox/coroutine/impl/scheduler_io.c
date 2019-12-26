@@ -86,8 +86,9 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
     tb_assert(scheduler);
 
     // trace
-    tb_trace_d("coroutine(%p): timer %s", coroutine, killed? "killed" : "timeout");
+    tb_trace_d("coroutine(%p): timer(%s) %s", coroutine, coroutine->rs.wait.sock? "socket" : "sleep", killed? "killed" : "timeout");
 
+    // resume the waited coroutine if timer task has been not canceled
     if (!killed)
     {
         // reset the waited coroutines in the socket data
