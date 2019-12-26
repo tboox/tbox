@@ -51,12 +51,6 @@ typedef struct __tb_sockdata_t
  * interfaces
  */
 
-/* get socket data instance in local thread
- *
- * @return sockdata the sockdata
- */
-tb_sockdata_ref_t   tb_sockdata(tb_noarg_t);
-
 /* init socket data
  *
  * @param sockdata  the sockdata

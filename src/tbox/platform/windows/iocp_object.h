@@ -316,18 +316,20 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
  * @note only init object once in every thread
  *
  * @param sock              the socket 
+ * @param waitevent         the socket event which will be waited
  *
  * @return                  the iocp object
  */
-tb_iocp_object_ref_t        tb_iocp_object_get_or_new(tb_socket_ref_t sock);
+tb_iocp_object_ref_t        tb_iocp_object_get_or_new(tb_socket_ref_t sock, tb_size_t waitevent);
 
 /* get iocp object from the given socket in local thread
  *
  * @param sock              the socket 
+ * @param waitevent         the socket event which will be waited
  *
  * @return                  the iocp object
  */
-tb_iocp_object_ref_t        tb_iocp_object_get(tb_socket_ref_t sock);
+tb_iocp_object_ref_t        tb_iocp_object_get(tb_socket_ref_t sock, tb_size_t waitevent);
 
 /* remove iocp object for the given socket in local thread
  *

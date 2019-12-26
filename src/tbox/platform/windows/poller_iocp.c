@@ -194,9 +194,10 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
             {
                 if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
                 {
-                    tb_iocp_object_ref_t client_object = tb_iocp_object_get_or_new(object->u.acpt.result);
-                    if (client_object)
-                        client_object->skip_cpos = 1;
+                    tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new(object->u.acpt.result, TB_SOCKET_EVENT_RECV);
+                    tb_iocp_object_ref_t client_object_send = tb_iocp_object_get_or_new(object->u.acpt.result, TB_SOCKET_EVENT_SEND);
+                    if (client_object_recv) client_object_recv->skip_cpos = 1;
+                    if (client_object_send) client_object_send->skip_cpos = 1;
                 }
             }
 
@@ -506,17 +507,28 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     // bind this socket and object to port
     if (!object->port) 
     {
+        // get the another object with this socket
+        tb_iocp_object_ref_t object_another = tb_iocp_object_get(object->sock, TB_SOCKET_EVENT_RECV);
+        if (!object_another || object_another == object)
+            object_another = tb_iocp_object_get(object->sock, TB_SOCKET_EVENT_SEND);
+
         // bind iocp port
-        HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(object->sock), poller->port, (ULONG_PTR)tb_null, 0);
-        if (port != poller->port)
+        if (!object_another || !object_another->port)
         {
             // trace
-            tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), object->sock);
-            return tb_false;
-        }
+            tb_trace_d("CreateIoCompletionPort socket(%p) to port(%d) ..", object->sock, poller->port);
 
-        // bind ok
-        object->port = port;
+            // do bind
+            HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(object->sock), poller->port, (ULONG_PTR)tb_null, 0);
+            if (port != poller->port)
+            {
+                // trace
+                tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), object->sock);
+                return tb_false;
+            }
+            if (object_another) object_another->port = port;
+            object->port = port;
+        }
     }
     return tb_true;
 }
@@ -642,11 +654,16 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     if (!(events & TB_POLLER_EVENT_NOEXTRA))
     {
         // get iocp object for this socket, @note only init event once in every thread
-        tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock);
-        tb_assert_and_check_return_val(object, tb_false);
-
-        // save the user private data
-        object->priv = priv;
+        if (events & TB_SOCKET_EVENT_RECV)
+        {
+            tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_RECV);
+            if (object) object->priv = priv;
+        }
+        if (events & TB_SOCKET_EVENT_SEND)
+        {
+            tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
+            if (object) object->priv = priv;
+        }
     }
     return tb_true;
 }

@@ -67,9 +67,26 @@ __tb_extern_c_leave__
 // the iocp object cache in the local thread (contains killing/killed object)
 static tb_thread_local_t g_iocp_object_cache_local = TB_THREAD_LOCAL_INIT;
 
+// the socket data in the local thread
+#ifndef TB_CONFIG_MICRO_ENABLE
+static tb_thread_local_t g_iocp_object_sockdata_recv_local = TB_THREAD_LOCAL_INIT;
+static tb_thread_local_t g_iocp_object_sockdata_send_local = TB_THREAD_LOCAL_INIT;
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+#ifndef TB_CONFIG_MICRO_ENABLE
+static tb_void_t tb_iocp_object_sockdata_free(tb_cpointer_t priv)
+{
+    tb_sockdata_ref_t sockdata = (tb_sockdata_ref_t)priv;
+    if (sockdata) 
+    {
+        tb_sockdata_exit(sockdata);
+        tb_free(sockdata);
+    }
+}
+#endif
 static tb_bool_t tb_iocp_object_cache_clean(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
     // the cache
@@ -185,22 +202,10 @@ static tb_iocp_object_ref_t tb_iocp_object_cache_alloc()
     }
     return result;
 }
-static __tb_inline__ tb_sockdata_ref_t tb_iocp_object_sockdata()
-{
-    return tb_poller_self()? tb_sockdata() : tb_null;
-}
-static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object)
+static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object, tb_list_entry_head_ref_t cache, tb_sockdata_ref_t sockdata)
 {
     // check
-    tb_assert_and_check_return_val(object && object->state == TB_STATE_WAITING && object->sock, tb_false);
-
-    // get the local socket data
-    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
-    tb_assert_and_check_return_val(sockdata, tb_false);
-
-    // get the iocp object cache
-    tb_list_entry_head_ref_t cache = tb_iocp_object_cache();
-    tb_assert_and_check_return_val(cache, tb_false);
+    tb_assert_and_check_return_val(object && object->state == TB_STATE_WAITING && object->sock && cache && sockdata, tb_false);
 
     // trace
     tb_trace_d("sock(%p): cancel io ..", object->sock);
@@ -226,11 +231,81 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object)
     // ok
     return tb_true;
 }
+static tb_sockdata_ref_t tb_iocp_object_sockdata(tb_size_t waitevent)
+{
+#ifndef TB_CONFIG_MICRO_ENABLE
+    if (tb_poller_self())
+    {
+        // init local socket data
+        tb_thread_local_ref_t sockdata_local = (waitevent & TB_SOCKET_EVENT_RECV)? &g_iocp_object_sockdata_recv_local : &g_iocp_object_sockdata_send_local;
+        if (!tb_thread_local_init(sockdata_local, tb_iocp_object_sockdata_free)) return tb_null;
+     
+        // init socket data
+        tb_sockdata_ref_t sockdata = (tb_sockdata_ref_t)tb_thread_local_get(sockdata_local);
+        if (!sockdata)
+        {
+            // make socket data
+            sockdata = tb_malloc0_type(tb_sockdata_t);
+            if (sockdata)
+            {
+                // init socket data
+                tb_sockdata_init(sockdata);
+
+                // save socket data to local thread
+                tb_thread_local_set(sockdata_local, sockdata);
+            }
+        }
+
+        // ok?
+        return sockdata;
+    }
+#endif
+    return tb_null;
+}
+static tb_void_t tb_iocp_object_sockdata_remove(tb_socket_ref_t sock, tb_size_t waitevent)
+{
+    // get the local socket data
+    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata(waitevent);
+    tb_check_return(sockdata);
+
+    // get cache
+    tb_list_entry_head_ref_t cache = tb_iocp_object_cache();
+    tb_assert_and_check_return(cache);
+
+    // get iocp object
+    tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
+    if (object)
+    {
+        // trace
+        tb_trace_d("sock(%p): removing, state: %s", sock, tb_state_cstr(object->state));
+
+        // clean some objects in cache
+        tb_remove_if(tb_list_entry_itor(cache), tb_iocp_object_cache_clean, cache);
+
+        // no waiting io or cancel failed? remove and free this iocp object directly
+        if (object->state != TB_STATE_WAITING || !tb_iocp_object_cancel(object, cache, sockdata))
+        {
+            // trace
+            tb_trace_d("sock(%p): removed directly, state: %s", sock, tb_state_cstr(object->state));
+
+            // remove this object from the local socket data
+            tb_sockdata_reset(sockdata, sock);
+
+            // clear and free the object data
+            tb_iocp_object_clear(object);
+
+            // insert to iocp object cache
+            if (tb_list_entry_size(cache) < TB_IOCP_OBJECT_CACHE_MAXN)
+                tb_list_entry_insert_head(cache, &object->entry);
+            else tb_free(object);
+        }
+    }
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
+tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock, tb_size_t waitevent)
 {
     // check
     tb_assert_and_check_return_val(sock, tb_null);
@@ -240,7 +315,7 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
     do
     { 
         // get the local socket data
-        tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
+        tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata(waitevent);
         tb_check_break(sockdata);
 
         // attempt to get object first if exists
@@ -269,49 +344,15 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_socket_ref_t sock)
     // done
     return object;
 }
-tb_iocp_object_ref_t tb_iocp_object_get(tb_socket_ref_t sock)
+tb_iocp_object_ref_t tb_iocp_object_get(tb_socket_ref_t sock, tb_size_t waitevent)
 {
-    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
+    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata(waitevent);
     return sockdata? (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock) : tb_null;
 }
 tb_void_t tb_iocp_object_remove(tb_socket_ref_t sock)
 {
-    // get the local socket data
-    tb_sockdata_ref_t sockdata = tb_iocp_object_sockdata();
-    tb_check_return(sockdata);
-
-    // get cache
-    tb_list_entry_head_ref_t cache = tb_iocp_object_cache();
-    tb_assert_and_check_return(cache);
-
-    // get iocp object
-    tb_iocp_object_ref_t object = (tb_iocp_object_ref_t)tb_sockdata_get(sockdata, sock);
-    if (object)
-    {
-        // trace
-        tb_trace_d("sock(%p): removing, state: %s", sock, tb_state_cstr(object->state));
-
-        // clean some objects in cache
-        tb_remove_if(tb_list_entry_itor(cache), tb_iocp_object_cache_clean, cache);
-
-        // no waiting io or cancel failed? remove and free this iocp object directly
-        if (object->state != TB_STATE_WAITING || !tb_iocp_object_cancel(object))
-        {
-            // trace
-            tb_trace_d("sock(%p): removed directly, state: %s", sock, tb_state_cstr(object->state));
-
-            // remove this object from the local socket data
-            tb_sockdata_reset(sockdata, sock);
-
-            // clear and free the object data
-            tb_iocp_object_clear(object);
-
-            // insert to iocp object cache
-            if (tb_list_entry_size(cache) < TB_IOCP_OBJECT_CACHE_MAXN)
-                tb_list_entry_insert_head(cache, &object->entry);
-            else tb_free(object);
-        }
-    }
+    tb_iocp_object_sockdata_remove(sock, TB_SOCKET_EVENT_RECV);
+    tb_iocp_object_sockdata_remove(sock, TB_SOCKET_EVENT_SEND);
 }
 tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t object)
 {
@@ -444,9 +485,10 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
         {
             if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)clientfd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
             {
-                tb_iocp_object_ref_t client_object = tb_iocp_object_get_or_new(object->u.acpt.result);
-                if (client_object)
-                    client_object->skip_cpos = 1;
+                tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new(object->u.acpt.result, TB_SOCKET_EVENT_RECV);
+                tb_iocp_object_ref_t client_object_send = tb_iocp_object_get_or_new(object->u.acpt.result, TB_SOCKET_EVENT_SEND);
+                if (client_object_recv) client_object_recv->skip_cpos = 1;
+                if (client_object_send) client_object_send->skip_cpos = 1;
             }
         }
 
@@ -531,7 +573,11 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
                 if (tb_kernel32_has_SetFileCompletionNotificationModes())
                 {
                     if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(object->sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+                    {
                         object->skip_cpos = 1;
+                        tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new(object->sock, TB_SOCKET_EVENT_RECV);
+                        if (client_object_recv) client_object_recv->skip_cpos = 1;
+                    }
                 }
 
                 // trace
@@ -610,7 +656,11 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
         if (tb_kernel32_has_SetFileCompletionNotificationModes())
         {
             if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(object->sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+            {
                 object->skip_cpos = 1;
+                tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new(object->sock, TB_SOCKET_EVENT_RECV);
+                if (client_object_recv) client_object_recv->skip_cpos = 1;
+            }
         }
 
         // trace
@@ -889,25 +939,6 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
 
     // trace
     tb_trace_d("usend(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
-
-    // has waiting io?
-    if (object->state == TB_STATE_WAITING)
-    {
-        // get bound iocp port and user private data
-        HANDLE port = object->port;
-        tb_cpointer_t priv = object->priv;
-
-        // cancel the previous io (urecv) first
-        if (!tb_iocp_object_cancel(object)) return -1;
-
-        // create a new iocp object
-        object = tb_iocp_object_get_or_new(object->sock);
-        tb_assert_and_check_return_val(object, -1);
-
-        // restore the previous bound iocp port and user private data
-        object->port = port;
-        object->priv = priv;
-    }
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
@@ -1267,25 +1298,6 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
 
     // trace
     tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", object->sock, addr, size, tb_state_cstr(object->state));
-
-    // has waiting io?
-    if (object->state == TB_STATE_WAITING)
-    {
-        // get bound iocp port and user private data
-        HANDLE port = object->port;
-        tb_cpointer_t priv = object->priv;
-
-        // cancel the previous io (urecv) first
-        if (!tb_iocp_object_cancel(object)) return -1;
-
-        // create a new iocp object
-        object = tb_iocp_object_get_or_new(object->sock);
-        tb_assert_and_check_return_val(object, -1);
-
-        // restore the previous bound iocp port and user private data
-        object->port = port;
-        object->priv = priv;
-    }
 
     // check state
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);

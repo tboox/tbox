@@ -36,60 +36,9 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// the global socket data in the local thread
-#ifndef TB_CONFIG_MICRO_ENABLE
-static tb_thread_local_t g_sockdata_local = TB_THREAD_LOCAL_INIT;
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * private implementation
- */
-#ifndef TB_CONFIG_MICRO_ENABLE
-static tb_void_t tb_sockdata_local_free(tb_cpointer_t priv)
-{
-    tb_sockdata_ref_t sockdata = (tb_sockdata_ref_t)priv;
-    if (sockdata) 
-    {
-        tb_sockdata_exit(sockdata);
-        tb_free(sockdata);
-    }
-}
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_sockdata_ref_t tb_sockdata()
-{
-#ifndef TB_CONFIG_MICRO_ENABLE
-    // init local socket data
-    if (!tb_thread_local_init(&g_sockdata_local, tb_sockdata_local_free)) return tb_null;
- 
-    // init socket data
-    tb_sockdata_ref_t sockdata = (tb_sockdata_ref_t)tb_thread_local_get(&g_sockdata_local);
-    if (!sockdata)
-    {
-        // make socket data
-        sockdata = tb_malloc0_type(tb_sockdata_t);
-        if (sockdata)
-        {
-            // init socket data
-            tb_sockdata_init(sockdata);
 
-            // save socket data to local thread
-            tb_thread_local_set(&g_sockdata_local, sockdata);
-        }
-    }
-
-    // ok?
-    return sockdata;
-#else
-    return tb_null;
-#endif
-}
 tb_void_t tb_sockdata_init(tb_sockdata_ref_t sockdata)
 {
     // check
