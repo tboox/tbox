@@ -43,15 +43,15 @@
 #   define TB_SCHEDULER_IO_LTIMER_GROW      (4096)
 #endif
 
+// the timer grow
+#define TB_SCHEDULER_IO_TIMER_GROW          (TB_SCHEDULER_IO_LTIMER_GROW >> 4)
+
 // the socket data grow
 #ifdef __tb_small__ 
 #   define TB_SCHEDULER_IO_SOCKDATA_GROW    (64)
 #else
 #   define TB_SCHEDULER_IO_SOCKDATA_GROW    (4096)
 #endif
-
-// the timer grow
-#define TB_SCHEDULER_IO_TIMER_GROW          (TB_SCHEDULER_IO_LTIMER_GROW >> 4)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -107,7 +107,7 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
         }
 
         // resume the coroutine 
-        tb_co_scheduler_io_resume(scheduler, coroutine, 0);
+        tb_co_scheduler_io_resume(scheduler, coroutine, TB_POLLER_EVENT_NONE);
     }
 }
 static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
@@ -134,8 +134,8 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
     }
 
     // get the waiting coroutines
-    tb_coroutine_t* co_recv = (events & TB_SOCKET_EVENT_RECV)? sockdata->co_recv : tb_null;
-    tb_coroutine_t* co_send = (events & TB_SOCKET_EVENT_SEND)? sockdata->co_send : tb_null;
+    tb_coroutine_t* co_recv = (events & TB_POLLER_EVENT_RECV)? sockdata->co_recv : tb_null;
+    tb_coroutine_t* co_send = (events & TB_POLLER_EVENT_SEND)? sockdata->co_send : tb_null;
 
     // trace
     tb_trace_d("socket: %p, trigger events %lu, co_recv(%p), co_send(%p)", sock, events, co_recv, co_send);
@@ -152,18 +152,18 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_socket_ref
         if (co_recv) 
         {
             sockdata->co_recv = tb_null;
-            tb_co_scheduler_io_resume(scheduler_io->scheduler, co_recv, events & ~TB_SOCKET_EVENT_SEND);
-            events &= ~TB_SOCKET_EVENT_RECV;
+            tb_co_scheduler_io_resume(scheduler_io->scheduler, co_recv, events & ~TB_POLLER_EVENT_SEND);
+            events &= ~TB_POLLER_EVENT_RECV;
         }
         if (co_send) 
         {
             sockdata->co_send = tb_null;
-            tb_co_scheduler_io_resume(scheduler_io->scheduler, co_send, events & ~TB_SOCKET_EVENT_RECV);
-            events &= ~TB_SOCKET_EVENT_SEND;
+            tb_co_scheduler_io_resume(scheduler_io->scheduler, co_send, events & ~TB_POLLER_EVENT_RECV);
+            events &= ~TB_POLLER_EVENT_SEND;
         }
 
         // no coroutines are waiting? cache this events
-        if ((events & TB_SOCKET_EVENT_RECV) || (events & TB_SOCKET_EVENT_SEND)) 
+        if ((events & TB_POLLER_EVENT_RECV) || (events & TB_POLLER_EVENT_SEND)) 
         {
             // trace
             tb_trace_d("socket: %p, cache events %lu", sock, events);
@@ -454,8 +454,8 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
 
         // modify the wait events and reserve the pending events in other coroutine
         events_wait = events_prev_wait;
-        if ((events_wait & TB_SOCKET_EVENT_RECV) && !sockdata->co_recv) events_wait &= ~TB_SOCKET_EVENT_RECV;
-        if ((events_wait & TB_SOCKET_EVENT_SEND) && !sockdata->co_send) events_wait &= ~TB_SOCKET_EVENT_SEND;
+        if ((events_wait & TB_POLLER_EVENT_RECV) && !sockdata->co_recv) events_wait &= ~TB_POLLER_EVENT_RECV;
+        if ((events_wait & TB_POLLER_EVENT_SEND) && !sockdata->co_send) events_wait &= ~TB_POLLER_EVENT_SEND;
         events_wait |= events;
 
         // modify socket from poller for waiting events if the waiting events has been changed 
@@ -525,8 +525,8 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_sock
     sockdata->poller_events_save = 0;
 
     // save the current coroutine 
-    if (events & TB_SOCKET_EVENT_RECV) sockdata->co_recv = coroutine;
-    if (events & TB_SOCKET_EVENT_SEND) sockdata->co_send = coroutine;
+    if (events & TB_POLLER_EVENT_RECV) sockdata->co_recv = coroutine;
+    if (events & TB_POLLER_EVENT_SEND) sockdata->co_send = coroutine;
 
     // suspend the current coroutine and return the waited result
     return (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);
