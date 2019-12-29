@@ -55,7 +55,7 @@
  */
 __tb_extern_c_enter__
 
-tb_poller_ref_t tb_poller_self();
+tb_poller_ref_t tb_poller_iocp_self();
 tb_bool_t       tb_poller_iocp_bind_object(tb_poller_ref_t poller, tb_iocp_object_ref_t object);
 
 __tb_extern_c_leave__
@@ -234,7 +234,7 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t object, tb_list_entr
 static tb_sockdata_ref_t tb_iocp_object_sockdata(tb_size_t waitevent)
 {
 #ifndef TB_CONFIG_MICRO_ENABLE
-    if (tb_poller_self())
+    if (tb_poller_iocp_self())
     {
         // init local socket data
         tb_thread_local_ref_t sockdata_local = (waitevent & TB_SOCKET_EVENT_RECV)? &g_iocp_object_sockdata_recv_local : &g_iocp_object_sockdata_send_local;
@@ -410,7 +410,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, tb_null);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return tb_null;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return tb_null;
 
     // post a accept event 
     tb_bool_t ok = tb_false;
@@ -603,7 +603,7 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t object, tb_ipaddr_ref_t ad
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // post a connection event 
     tb_long_t ok = -1;
@@ -727,7 +727,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_s
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data
     object->u.recv.data = data;
@@ -797,7 +797,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attempt buffer data
     object->u.send.data = data;
@@ -868,7 +868,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data
     object->u.urecv.data = data;
@@ -944,7 +944,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data and address
     object->u.usend.addr = *addr;
@@ -1027,7 +1027,7 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, 
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // do send file
     object->olap.Offset     = (DWORD)offset;
@@ -1087,7 +1087,7 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data
     object->u.recvv.list = list;
@@ -1157,7 +1157,7 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb_iovec_t const* li
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data
     object->u.sendv.list = list;
@@ -1227,7 +1227,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data
     object->u.urecvv.list = list;
@@ -1303,7 +1303,7 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t add
     tb_assert_and_check_return_val(object->state != TB_STATE_WAITING, -1);
 
     // bind iocp object first 
-    if (!tb_poller_iocp_bind_object(tb_poller_self(), object)) return -1;
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), object)) return -1;
 
     // attach buffer data and address
     object->u.usendv.addr = *addr;

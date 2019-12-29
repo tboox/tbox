@@ -29,73 +29,147 @@
  * includes
  */
 #include "poller.h"
+#include "impl/poller.h"
 #include "impl/sockdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
+ * private implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   ifndef TB_CONFIG_MICRO_ENABLE
 #       include "windows/poller_iocp.c"
+#       define TB_POLLER_ENABLE_IOCP
 #   else
 #       include "posix/poller_select.c"
+#       define TB_POLLER_ENABLE_SELECT
 #   endif
 #elif defined(TB_CONFIG_POSIX_HAVE_EPOLL_CREATE) \
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
 #   include "linux/poller_epoll.c"
+#   define TB_POLLER_ENABLE_EPOLL
 #elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/poller_kqueue.c"
+#   define TB_POLLER_ENABLE_KQUEUE
 #elif defined(TB_CONFIG_POSIX_HAVE_POLL) && !defined(TB_CONFIG_MICRO_ENABLE) /* TODO remove vector for supporting the micro mode */
 #   include "posix/poller_poll.c"
+#   define TB_POLLER_ENABLE_POLL
 #elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
 #   include "posix/poller_select.c"
-#else
-tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
-tb_void_t tb_poller_exit(tb_poller_ref_t poller)
-{
-    tb_trace_noimpl();
-}
-tb_cpointer_t tb_poller_priv(tb_poller_ref_t poller)
-{
-    tb_trace_noimpl();
-    return tb_null;
-}
-tb_void_t tb_poller_kill(tb_poller_ref_t poller)
-{
-    tb_trace_noimpl();
-}
-tb_void_t tb_poller_spak(tb_poller_ref_t poller)
-{
-    tb_trace_noimpl();
-}
-tb_bool_t tb_poller_support(tb_poller_ref_t poller, tb_size_t events)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_bool_t tb_poller_insert(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_bool_t tb_poller_remove(tb_poller_ref_t poller, tb_socket_ref_t sock)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_bool_t tb_poller_modify(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
-{
-    tb_trace_noimpl();
-    return tb_false;
-}
-tb_long_t tb_poller_wait(tb_poller_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
-{
-    tb_trace_noimpl();
-    return 0;
-}
+#   define TB_POLLER_ENABLE_SELECT
 #endif
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
+{
+    tb_bool_t       ok = tb_false;
+    tb_poller_t*    poller = tb_null;
+    do
+    {
+        // init poller
+#if defined(TB_POLLER_ENABLE_EPOLL)
+        poller = tb_poller_epoll_init();
+#elif defined(TB_POLLER_ENABLE_KQUEUE)
+        poller = tb_poller_kqueue_init();
+#elif defined(TB_POLLER_ENABLE_IOCP)
+        poller = tb_poller_iocp_init();
+#elif defined(TB_POLLER_ENABLE_POLL)
+        poller = tb_poller_poll_init();
+#elif defined(TB_POLLER_ENABLE_SELECT)
+        poller = tb_poller_select_init();
+#endif
+        tb_assert_and_check_break(poller);
+
+        // save the user private data
+        poller->priv = priv;
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed? exit the poller
+    if (!ok)
+    {
+        if (poller) tb_poller_exit((tb_poller_ref_t)poller);
+        poller = tb_null;
+    }
+    return (tb_poller_ref_t)poller;
+}
+tb_void_t tb_poller_exit(tb_poller_ref_t self)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    if (poller && poller->exit)
+        poller->exit(poller);
+}
+tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller, tb_null);
+
+    return poller->priv;
+}
+tb_size_t tb_poller_type(tb_poller_ref_t self)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller, TB_POLLER_TYPE_NONE);
+
+    return poller->type;
+}
+tb_void_t tb_poller_kill(tb_poller_ref_t self)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return(poller);
+
+    if (poller->kill) poller->kill(poller);
+}
+tb_void_t tb_poller_spak(tb_poller_ref_t self)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return(poller);
+
+    if (poller->spak) poller->spak(poller);
+}
+tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller, tb_false);
+
+    return (poller->supported_events & events) == events;
+}
+tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller && poller->insert && sock, tb_false);
+
+    return poller->insert(poller, sock, events, priv);
+}
+tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller && poller->remove && sock, tb_false);
+
+    return poller->remove(poller, sock);
+}
+tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller && poller->modify && sock, tb_false);
+
+    return poller->modify(poller, sock, events, priv);
+}
+tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return_val(poller && poller->wait && func, -1);
+
+    return poller->wait(poller, func, timeout);
+}
+tb_void_t tb_poller_attach(tb_poller_ref_t self)
+{
+    tb_poller_t* poller = (tb_poller_t*)self;
+    tb_assert_and_check_return(poller);
+
+    if (poller->attach) poller->attach(poller);
+}

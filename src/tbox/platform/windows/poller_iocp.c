@@ -52,11 +52,11 @@ typedef struct __tb_iocp_func_t
 // the poller iocp type
 typedef struct __tb_poller_iocp_t
 {
+    // the poller base
+    tb_poller_t             base;
+
     // the maxn
     tb_size_t               maxn;
-
-    // the user private data
-    tb_cpointer_t           priv;
 
     // the iocp func
     tb_iocp_func_t          func;
@@ -80,8 +80,8 @@ typedef struct __tb_poller_iocp_t
  */
 __tb_extern_c_enter__
 
-tb_poller_ref_t tb_poller_self();
-tb_bool_t       tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object);
+tb_poller_iocp_ref_t    tb_poller_iocp_self();
+tb_bool_t               tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t object);
 
 __tb_extern_c_leave__
 
@@ -532,66 +532,14 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     }
     return tb_true;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
-{
-    // done
-    tb_bool_t               ok = tb_false;
-    tb_poller_iocp_ref_t    poller = tb_null;
-    do
-    {
-        // check iovec
-        tb_assert_static(sizeof(tb_iovec_t) == sizeof(WSABUF));
-        tb_assert_and_check_break(tb_memberof_eq(tb_iovec_t, data, WSABUF, buf));
-        tb_assert_and_check_break(tb_memberof_eq(tb_iovec_t, size, WSABUF, len));
-
-        // make poller
-        poller = tb_malloc0_type(tb_poller_iocp_t);
-        tb_assert_and_check_break(poller);
-
-        // init maxn 
-        poller->maxn = 1 << 16;
-
-        // init user private data
-        poller->priv = priv;
-
-        // init func
-        poller->func.GetAcceptExSockaddrs        = tb_mswsock()->GetAcceptExSockaddrs;
-        poller->func.GetQueuedCompletionStatusEx = tb_kernel32()->GetQueuedCompletionStatusEx;
-        poller->func.WSAGetLastError             = tb_ws2_32()->WSAGetLastError;
-        tb_assert_and_check_break(poller->func.WSAGetLastError);
-
-        // init port
-        poller->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
-        tb_assert_and_check_break(poller->port && poller->port != INVALID_HANDLE_VALUE);
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed?
-    if (!ok)
-    {
-        // exit it
-        if (poller) tb_poller_exit((tb_poller_ref_t)poller);
-        poller = tb_null;
-    }
-
-    // ok?
-    return (tb_poller_ref_t)poller;
-}
-tb_void_t tb_poller_exit(tb_poller_ref_t self)
+static tb_void_t tb_poller_iocp_exit(tb_poller_t* self)
 {
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
 
     // detach poller 
-    if (tb_poller_self() == self)
+    if (tb_poller_iocp_self() == poller)
         tb_thread_local_set(&g_poller_self, tb_null);
 
     // exit port
@@ -606,20 +554,7 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // free it
     tb_free(poller);
 }
-tb_size_t tb_poller_type(tb_poller_ref_t poller)
-{
-    return TB_POLLER_TYPE_IOCP;
-}
-tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
-{
-    // check
-    tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
-    tb_assert_and_check_return_val(poller, tb_null);
-
-    // get the user private data
-    return poller->priv;
-}
-tb_void_t tb_poller_kill(tb_poller_ref_t self)
+static tb_void_t tb_poller_iocp_kill(tb_poller_t* self)
 {
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
@@ -628,7 +563,7 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     // post kill notification to iocp port
     PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_null, tb_null);
 }
-tb_void_t tb_poller_spak(tb_poller_ref_t self)
+static tb_void_t tb_poller_iocp_spak(tb_poller_t* self)
 {
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
@@ -637,7 +572,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
     // post spark notification to iocp port
     PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_u2p(1), tb_null);
 }
-tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
+static tb_bool_t tb_poller_iocp_support(tb_poller_t* self, tb_size_t events)
 {
     // all supported events 
     static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_ONESHOT;
@@ -645,7 +580,7 @@ tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
     // is supported?
     return (events_supported & events) == events;
 }
-tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_iocp_insert(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
@@ -667,20 +602,20 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     }
     return tb_true;
 }
-tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
+static tb_bool_t tb_poller_iocp_remove(tb_poller_t* self, tb_socket_ref_t sock)
 {
     return tb_true;
 }
-tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_iocp_modify(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
-    return tb_poller_insert(self, sock, events, priv);
+    return tb_poller_iocp_insert(self, sock, events, priv);
 }
-tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)
+static tb_long_t tb_poller_iocp_wait(tb_poller_t* self, tb_poller_event_func_t func, tb_long_t timeout)
 {
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return_val(poller && func, -1);
-    tb_assert(self == tb_poller_self());
+    tb_assert(self == (tb_poller_t*)tb_poller_iocp_self());
 
     // trace
     tb_trace_d("waiting with timeout(%ld) ..", timeout);
@@ -699,11 +634,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // wait ok
     return wait;
 }
-tb_poller_ref_t tb_poller_self()
-{
-    return (tb_poller_ref_t)tb_thread_local_get(&g_poller_self);
-}
-tb_void_t tb_poller_attach(tb_poller_ref_t self)
+static tb_void_t tb_poller_iocp_attach(tb_poller_t* self)
 {
     // init self poller local
     if (!tb_thread_local_init(&g_poller_self, tb_null)) return ;
@@ -711,3 +642,68 @@ tb_void_t tb_poller_attach(tb_poller_ref_t self)
     // update and overide the current scheduler
     tb_thread_local_set(&g_poller_self, self);
 }
+tb_poller_iocp_ref_t tb_poller_iocp_self()
+{
+    return (tb_poller_iocp_ref_t)tb_thread_local_get(&g_poller_self);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_poller_t* tb_poller_iocp_init()
+{
+    tb_bool_t               ok = tb_false;
+    tb_poller_iocp_ref_t    poller = tb_null;
+    do
+    {
+        // check iovec
+        tb_assert_static(sizeof(tb_iovec_t) == sizeof(WSABUF));
+        tb_assert_and_check_break(tb_memberof_eq(tb_iovec_t, data, WSABUF, buf));
+        tb_assert_and_check_break(tb_memberof_eq(tb_iovec_t, size, WSABUF, len));
+
+        // make poller
+        poller = tb_malloc0_type(tb_poller_iocp_t);
+        tb_assert_and_check_break(poller);
+
+        // init base
+        poller->base.type   = TB_POLLER_TYPE_IOCP;
+        poller->base.exit   = tb_poller_iocp_exit;
+        poller->base.kill   = tb_poller_iocp_kill;
+        poller->base.spak   = tb_poller_iocp_spak;
+        poller->base.wait   = tb_poller_iocp_wait;
+        poller->base.insert = tb_poller_iocp_insert;
+        poller->base.remove = tb_poller_iocp_remove;
+        poller->base.modify = tb_poller_iocp_modify;
+        poller->base.attach = tb_poller_iocp_attach;
+        poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_ONESHOT;
+
+        // init maxn 
+        poller->maxn = 1 << 16;
+
+        // init func
+        poller->func.GetAcceptExSockaddrs        = tb_mswsock()->GetAcceptExSockaddrs;
+        poller->func.GetQueuedCompletionStatusEx = tb_kernel32()->GetQueuedCompletionStatusEx;
+        poller->func.WSAGetLastError             = tb_ws2_32()->WSAGetLastError;
+        tb_assert_and_check_break(poller->func.WSAGetLastError);
+
+        // init port
+        poller->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
+        tb_assert_and_check_break(poller->port && poller->port != INVALID_HANDLE_VALUE);
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (poller) tb_poller_iocp_exit((tb_poller_t*)poller);
+        poller = tb_null;
+    }
+
+    // ok?
+    return (tb_poller_t*)poller;
+}
+

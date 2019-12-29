@@ -37,11 +37,11 @@
 // the epoll poller type
 typedef struct __tb_poller_epoll_t
 {
+    // the poller base
+    tb_poller_t             base;
+
     // the maxn
     tb_size_t               maxn;
-
-    // the user private data
-    tb_cpointer_t           priv;
 
     // the pair sockets for spak, kill ..
     tb_socket_ref_t         pair[2];
@@ -63,7 +63,7 @@ typedef struct __tb_poller_epoll_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_size_t tb_poller_maxfds()
+static tb_size_t tb_poller_epoll_maxfds()
 {
     // attempt to get it from getdtablesize
     tb_size_t maxfds = 0;
@@ -84,58 +84,7 @@ static tb_size_t tb_poller_maxfds()
     // ok?
     return maxfds;
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
-{
-    // done
-    tb_bool_t               ok = tb_false;
-    tb_poller_epoll_ref_t   poller = tb_null;
-    do
-    {
-        // make poller
-        poller = tb_malloc0_type(tb_poller_epoll_t);
-        tb_assert_and_check_break(poller);
-
-        // init socket data
-        tb_sockdata_init(&poller->sockdata);
-
-        // init maxn
-        poller->maxn = tb_poller_maxfds();
-        tb_assert_and_check_break(poller->maxn);
-
-        // init epoll
-        poller->epfd = epoll_create(poller->maxn);
-        tb_assert_and_check_break(poller->epfd > 0);
-
-        // init user private data
-        poller->priv = priv;
-
-        // init pair sockets
-        if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
-
-        // insert pair socket first
-        if (!tb_poller_insert((tb_poller_ref_t)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
-
-        // ok
-        ok = tb_true;
-
-    } while (0);
-
-    // failed?
-    if (!ok)
-    {
-        // exit it
-        if (poller) tb_poller_exit((tb_poller_ref_t)poller);
-        poller = tb_null;
-    }
-
-    // ok?
-    return (tb_poller_ref_t)poller;
-}
-tb_void_t tb_poller_exit(tb_poller_ref_t self)
+static tb_void_t tb_poller_epoll_exit(tb_poller_t* self)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -162,20 +111,7 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     // free it
     tb_free(poller);
 }
-tb_size_t tb_poller_type(tb_poller_ref_t poller)
-{
-    return TB_POLLER_TYPE_EPOLL;
-}
-tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
-{
-    // check
-    tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
-    tb_assert_and_check_return_val(poller, tb_null);
-
-    // get the user private data
-    return poller->priv;
-}
-tb_void_t tb_poller_kill(tb_poller_ref_t self)
+static tb_void_t tb_poller_epoll_kill(tb_poller_t* self)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -184,7 +120,7 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     // kill it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"k", 1);
 }
-tb_void_t tb_poller_spak(tb_poller_ref_t self)
+static tb_void_t tb_poller_epoll_spak(tb_poller_t* self)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -193,19 +129,7 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
     // post it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
-tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
-{
-    // all supported events 
-#ifdef EPOLLONESHOT 
-    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
-#else
-    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR;
-#endif
-
-    // is supported?
-    return (events_supported & events) == events;
-}
-tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -249,7 +173,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // ok
     return tb_true;
 }
-tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
+static tb_bool_t tb_poller_epoll_remove(tb_poller_t* self, tb_socket_ref_t sock)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -273,7 +197,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
     // ok
     return tb_true;
 }
-tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -316,7 +240,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t
     // ok
     return tb_true;
 }
-tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)
+static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t func, tb_long_t timeout)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
@@ -406,7 +330,7 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 #endif
 
         // call event function
-        func(self, sock, events, tb_sockdata_get(&poller->sockdata, sock));
+        func((tb_poller_ref_t)self, sock, events, tb_sockdata_get(&poller->sockdata, sock));
 
         // update the events count
         wait++;
@@ -415,6 +339,67 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     // ok
     return wait;
 }
-tb_void_t tb_poller_attach(tb_poller_ref_t self)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_poller_t* tb_poller_epoll_init()
 {
+    // done
+    tb_bool_t               ok = tb_false;
+    tb_poller_epoll_ref_t   poller = tb_null;
+    do
+    {
+        // make poller
+        poller = tb_malloc0_type(tb_poller_epoll_t);
+        tb_assert_and_check_break(poller);
+
+        // init base
+        poller->base.type   = TB_POLLER_TYPE_EPOLL;
+        poller->base.exit   = tb_poller_epoll_exit;
+        poller->base.kill   = tb_poller_epoll_kill;
+        poller->base.spak   = tb_poller_epoll_spak;
+        poller->base.wait   = tb_poller_epoll_wait;
+        poller->base.insert = tb_poller_epoll_insert;
+        poller->base.remove = tb_poller_epoll_remove;
+        poller->base.modify = tb_poller_epoll_modify;
+#ifdef EPOLLONESHOT 
+        poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
+#else
+        poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR;
+#endif
+
+        // init socket data
+        tb_sockdata_init(&poller->sockdata);
+
+        // init maxn
+        poller->maxn = tb_poller_epoll_maxfds();
+        tb_assert_and_check_break(poller->maxn);
+
+        // init epoll
+        poller->epfd = epoll_create(poller->maxn);
+        tb_assert_and_check_break(poller->epfd > 0);
+
+        // init pair sockets
+        if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
+
+        // insert pair socket first
+        if (!tb_poller_epoll_insert((tb_poller_t*)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
+
+        // ok
+        ok = tb_true;
+
+    } while (0);
+
+    // failed?
+    if (!ok)
+    {
+        // exit it
+        if (poller) tb_poller_epoll_exit((tb_poller_t*)poller);
+        poller = tb_null;
+    }
+
+    // ok?
+    return (tb_poller_t*)poller;
 }
+
