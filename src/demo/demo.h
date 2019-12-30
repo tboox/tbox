@@ -214,6 +214,7 @@ TB_DEMO_MAIN_DECL(coroutine_switch);
 TB_DEMO_MAIN_DECL(coroutine_channel);
 TB_DEMO_MAIN_DECL(coroutine_semaphore);
 TB_DEMO_MAIN_DECL(coroutine_thread);
+TB_DEMO_MAIN_DECL(coroutine_pipe);
 TB_DEMO_MAIN_DECL(coroutine_echo_client);
 TB_DEMO_MAIN_DECL(coroutine_echo_server);
 TB_DEMO_MAIN_DECL(coroutine_unix_echo_client);

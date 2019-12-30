@@ -216,6 +216,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(coroutine_nest)
 ,   TB_DEMO_MAIN_ITEM(coroutine_lock)
 ,   TB_DEMO_MAIN_ITEM(coroutine_ping)
+,   TB_DEMO_MAIN_ITEM(coroutine_pipe)
 ,   TB_DEMO_MAIN_ITEM(coroutine_sleep)
 ,   TB_DEMO_MAIN_ITEM(coroutine_stream)
 ,   TB_DEMO_MAIN_ITEM(coroutine_switch)
