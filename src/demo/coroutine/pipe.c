@@ -15,14 +15,14 @@
 static tb_int_t tb_demo_thread_server(tb_cpointer_t priv) 
 {
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t) priv;
-    tb_byte_t buf[BUFSIZE];
+    tb_byte_t data[BUFSIZE];
     tb_size_t count = 0;
     while (1) 
     {
         count++;
-        if (!tb_pipe_file_bread(pipe, buf, sizeof(buf))) break;
+        if (!tb_pipe_file_bread(pipe, data, sizeof(data))) break;
         tb_usleep(50000);
-        if (!tb_pipe_file_bwrit(pipe, buf, sizeof(buf))) break;
+        if (!tb_pipe_file_bwrit(pipe, data, sizeof(data))) break;
         tb_trace_i(" ===  %.4llu (%llu bytes)", count, count * BUFSIZE);
     }
     return 0;
@@ -30,22 +30,22 @@ static tb_int_t tb_demo_thread_server(tb_cpointer_t priv)
 
 static tb_void_t tb_demo_coroutine_writ(tb_cpointer_t priv) 
 {
-    tb_byte_t buf[BUFSIZE];
+    tb_byte_t data[BUFSIZE];
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t) priv;
     for (tb_size_t i = 0; i < COUNT; i++) 
     {
-        if (!tb_pipe_file_bwrit(pipe, buf, sizeof(buf))) break;
+        if (!tb_pipe_file_bwrit(pipe, data, sizeof(data))) break;
         tb_trace_i("[-->] %.4llu", i);
     }
 }
 
 static tb_void_t tb_demo_coroutine_read(tb_cpointer_t priv) 
 {
-    tb_byte_t buf[BUFSIZE];
+    tb_byte_t data[BUFSIZE];
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t) priv;
     for (tb_size_t count = 0;; count++) 
     {
-        if (!tb_pipe_file_bread(pipe, buf, sizeof(buf))) break;
+        if (!tb_pipe_file_bread(pipe, data, sizeof(data))) break;
         tb_trace_i("[<--] %.4llu", count);
     }
 }
