@@ -157,13 +157,13 @@ tb_void_t                   tb_co_scheduler_switch(tb_co_scheduler_t* scheduler,
 /* wait io events 
  *
  * @param scheduler         the scheduler
- * @param sock              the socket
+ * @param object            the poller object
  * @param events            the waited events
  * @param timeout           the timeout, infinity: -1
  *
  * @return                  > 0: the events, 0: timeout, -1: failed
  */
-tb_long_t                   tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+tb_long_t                   tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

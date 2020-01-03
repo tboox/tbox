@@ -31,6 +31,7 @@
 #include "poller.h"
 #include "impl/poller.h"
 #include "impl/sockdata.h"
+#include "impl/pollerdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -138,26 +139,26 @@ tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 
     return (poller->supported_events & events) == events;
 }
-tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     tb_poller_t* poller = (tb_poller_t*)self;
-    tb_assert_and_check_return_val(poller && poller->insert && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->insert && object, tb_false);
 
-    return poller->insert(poller, sock, events, priv);
+    return poller->insert(poller, object, events, priv);
 }
-tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_socket_ref_t sock)
+tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_poller_object_ref_t object)
 {
     tb_poller_t* poller = (tb_poller_t*)self;
-    tb_assert_and_check_return_val(poller && poller->remove && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->remove && object, tb_false);
 
-    return poller->remove(poller, sock);
+    return poller->remove(poller, object);
 }
-tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     tb_poller_t* poller = (tb_poller_t*)self;
-    tb_assert_and_check_return_val(poller && poller->modify && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->modify && object, tb_false);
 
-    return poller->modify(poller, sock, events, priv);
+    return poller->modify(poller, object, events, priv);
 }
 tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)
 {

@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../poller.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -74,33 +75,33 @@ typedef struct __tb_poller_t
     /* insert socket to poller
      *
      * @param poller    the poller
-     * @param sock      the socket
+     * @param object    the poller object
      * @param events    the poller events
      * @param priv      the private data
      *
      * @return          tb_true or tb_false
      */
-    tb_bool_t           (*insert)(struct __tb_poller_t* poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
+    tb_bool_t           (*insert)(struct __tb_poller_t* poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
     /* remove socket from poller
      *
      * @param poller    the poller
-     * @param sock      the sock
+     * @param object    the poller object
      *
      * @return          tb_true or tb_false
      */
-    tb_bool_t           (*remove)(struct __tb_poller_t* poller, tb_socket_ref_t sock);
+    tb_bool_t           (*remove)(struct __tb_poller_t* poller, tb_poller_object_ref_t object);
 
     /* modify events for the given socket
      *
      * @param poller    the poller
-     * @param sock      the socket
+     * @param object    the poller object
      * @param events    the poller events
      * @param priv      the private data
      *
      * @return          tb_true or tb_false
      */
-    tb_bool_t           (*modify)(struct __tb_poller_t* poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
+    tb_bool_t           (*modify)(struct __tb_poller_t* poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
     /* attach the poller to the current thread (only for windows/iocp now)
      *

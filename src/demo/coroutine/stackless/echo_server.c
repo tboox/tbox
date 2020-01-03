@@ -83,7 +83,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
             else if (!client->real && !client->wait)
             {
                 // wait it
-                tb_lo_coroutine_waitio(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+                tb_lo_coroutine_wait_sock(client->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
 
                 // wait ok
                 client->wait = tb_lo_coroutine_events();
@@ -138,7 +138,7 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
                 else
                 {
                     // wait accept events
-                    tb_lo_coroutine_waitio(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+                    tb_lo_coroutine_wait_sock(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
                     if (tb_lo_coroutine_events() <= 0) break;
                 }
             }

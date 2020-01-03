@@ -365,7 +365,7 @@ tb_void_t tb_co_scheduler_switch(tb_co_scheduler_t* scheduler, tb_coroutine_t* c
     // update the context
     coroutine_from->context = from.context;
 }
-tb_long_t tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+tb_long_t tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout)
 {
     // check
     tb_assert(scheduler && scheduler->running);
@@ -378,6 +378,6 @@ tb_long_t tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_socket_ref_t soc
     if (!tb_co_scheduler_io_need(scheduler)) return -1;
 
     // sleep it
-    return tb_co_scheduler_io_wait(scheduler->scheduler_io, sock, events, timeout);
+    return tb_co_scheduler_io_wait(scheduler->scheduler_io, object, events, timeout);
 }
 

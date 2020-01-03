@@ -67,8 +67,8 @@ typedef struct __tb_poller_kqueue_t
     // the events count
     tb_size_t               events_count;
    
-    // the socket data
-    tb_sockdata_t           sockdata;
+    // the poller data
+    tb_pollerdata_t         pollerdata;
 
 }tb_poller_kqueue_t, *tb_poller_kqueue_ref_t;
 
@@ -137,7 +137,7 @@ static tb_void_t tb_poller_kqueue_exit(tb_poller_t* self)
     poller->kqfd = 0;
 
     // exit socket data
-    tb_sockdata_exit(&poller->sockdata);
+    tb_pollerdata_exit(&poller->pollerdata);
 
     // free it
     tb_free(poller);
@@ -160,21 +160,25 @@ static tb_void_t tb_poller_kqueue_spak(tb_poller_t* self)
     // post it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
-static tb_bool_t tb_poller_kqueue_insert(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_kqueue_insert(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_kqueue_ref_t poller = (tb_poller_kqueue_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->kqfd > 0 && object, tb_false);
 
     // init the add event
     tb_size_t adde = EV_ADD | EV_ENABLE;
     if (events & TB_POLLER_EVENT_CLEAR) adde |= EV_CLEAR;
     if (events & TB_POLLER_EVENT_ONESHOT) adde |= EV_ONESHOT;
 
+    // bind the object type to the private data
+    if (object->type == TB_POLLER_OBJECT_PIPE)
+        priv = (tb_cpointer_t)((tb_size_t)priv | (0x1UL << (TB_CPU_BITSIZE - 1)));
+
     // insert socket and add events
     struct kevent   e[2];
     tb_size_t       n = 0;
-    tb_int_t        fd = tb_sock2fd(sock);
+    tb_int_t        fd = tb_ptr2fd(object->ref.ptr);
     if (events & TB_POLLER_EVENT_RECV)
     {
         EV_SET(&e[n], fd, EVFILT_READ, adde, NOTE_EOF, 0, (tb_pointer_t)priv); n++;
@@ -187,25 +191,25 @@ static tb_bool_t tb_poller_kqueue_insert(tb_poller_t* self, tb_socket_ref_t sock
     // change it
     tb_bool_t ok = n? tb_poller_kqueue_change(poller, e, n) : tb_true;
     
-    // save events to socket
-    if (ok) tb_sockdata_set(&poller->sockdata, sock, (tb_cpointer_t)events);
+    // save events to object
+    if (ok) tb_pollerdata_set(&poller->pollerdata, object, (tb_cpointer_t)events);
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_poller_kqueue_remove(tb_poller_t* self, tb_socket_ref_t sock)
+static tb_bool_t tb_poller_kqueue_remove(tb_poller_t* self, tb_poller_object_ref_t object)
 {
     // check
     tb_poller_kqueue_ref_t poller = (tb_poller_kqueue_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->kqfd > 0 && object, tb_false);
 
     // get the previous events
-    tb_size_t events = (tb_size_t)tb_sockdata_get(&poller->sockdata, sock);
+    tb_size_t events = (tb_size_t)tb_pollerdata_get(&poller->pollerdata, object);
 
     // remove this socket and events
     struct kevent   e[2];
     tb_size_t       n = 0;
-    tb_int_t        fd = tb_sock2fd(sock);
+    tb_int_t        fd = tb_ptr2fd(object->ref.ptr);
     if (events & TB_POLLER_EVENT_RECV)
     {
         EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, tb_null);
@@ -220,20 +224,20 @@ static tb_bool_t tb_poller_kqueue_remove(tb_poller_t* self, tb_socket_ref_t sock
     // change it
     tb_bool_t ok = n? tb_poller_kqueue_change(poller, e, n) : tb_true;
 
-    // remove events from socket
-    if (ok) tb_sockdata_reset(&poller->sockdata, sock);
+    // remove events from object
+    if (ok) tb_pollerdata_reset(&poller->pollerdata, object);
 
     // ok?
     return ok;
 }
-static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_kqueue_ref_t poller = (tb_poller_kqueue_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->kqfd > 0 && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->kqfd > 0 && object, tb_false);
 
     // get the previous events
-    tb_size_t events_old = (tb_size_t)tb_sockdata_get(&poller->sockdata, sock);
+    tb_size_t events_old = (tb_size_t)tb_pollerdata_get(&poller->pollerdata, object);
 
     // get changed events
     tb_size_t adde = events & ~events_old;
@@ -244,10 +248,14 @@ static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_socket_ref_t sock
     if (events & TB_POLLER_EVENT_CLEAR) add_event |= EV_CLEAR;
     if (events & TB_POLLER_EVENT_ONESHOT) add_event |= EV_ONESHOT;
 
+    // bind the object type to the private data
+    if (object->type == TB_POLLER_OBJECT_PIPE)
+        priv = (tb_cpointer_t)((tb_size_t)priv | (0x1UL << (TB_CPU_BITSIZE - 1)));
+
     // modify events
     struct kevent   e[2];
     tb_size_t       n = 0;
-    tb_int_t        fd = tb_sock2fd(sock);
+    tb_int_t        fd = tb_ptr2fd(object->ref.ptr);
     if (adde & TB_SOCKET_EVENT_RECV) 
     {
         EV_SET(&e[n], fd, EVFILT_READ, add_event, NOTE_EOF, 0, (tb_pointer_t)priv);
@@ -273,7 +281,7 @@ static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_socket_ref_t sock
     tb_bool_t ok = n? tb_poller_kqueue_change(poller, e, n) : tb_true;
 
     // save events to socket
-    if (ok) tb_sockdata_set(&poller->sockdata, sock, (tb_cpointer_t)events);
+    if (ok) tb_pollerdata_set(&poller->pollerdata, object, (tb_cpointer_t)events);
 
     // ok?
     return ok;
@@ -325,21 +333,24 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
     events_count = tb_min(events_count, poller->maxn);
 
     // handle events 
-    tb_size_t       i = 0;
-    tb_size_t       wait = 0;
-    struct kevent*  e = tb_null;
-    tb_socket_ref_t pair = poller->pair[1];
+    tb_size_t          i = 0;
+    tb_size_t          wait = 0;
+    struct kevent*     e = tb_null;
+    tb_socket_ref_t    pair = poller->pair[1];
+    tb_poller_object_t object;
     for (i = 0; i < events_count; i++)
     {
         // the kevents 
         e = poller->events + i;
 
-        // the socket
-        tb_socket_ref_t sock = tb_fd2sock(e->ident);
-        tb_assert(sock);
+        // get the object 
+        object.type = ((tb_size_t)e->udata & (0x1UL << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK; 
+        object.ref.ptr = tb_fd2ptr(e->ident);
+        tb_assert(object.ref.ptr);
+        e->udata = (tb_pointer_t)((tb_size_t)e->udata & ~(0x1UL << (TB_CPU_BITSIZE - 1)));
 
-        // spak?
-        if (sock == pair && e->filter == EVFILT_READ) 
+        // spank socket events?
+        if (object.ref.sock == pair && e->filter == EVFILT_READ) 
         {
             // read spak
             tb_char_t spak = '\0';
@@ -353,7 +364,7 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
         }
 
         // skip spak
-        tb_check_continue(sock != pair);
+        tb_check_continue(object.ref.sock != pair);
 
         // init events 
         tb_size_t events = TB_POLLER_EVENT_NONE;
@@ -367,7 +378,7 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
             events |= TB_POLLER_EVENT_EOF;
 
         // call event function
-        func((tb_poller_ref_t)self, sock, events, e->udata);
+        func((tb_poller_ref_t)self, &object, events, e->udata);
 
         // update the events count
         wait++;
@@ -402,7 +413,7 @@ tb_poller_t* tb_poller_kqueue_init()
         poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
 
         // init socket data
-        tb_sockdata_init(&poller->sockdata);
+        tb_pollerdata_init(&poller->pollerdata);
 
         // init kqueue
         poller->kqfd = kqueue();
@@ -416,7 +427,10 @@ tb_poller_t* tb_poller_kqueue_init()
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
 
         // insert pair socket first
-        if (!tb_poller_kqueue_insert((tb_poller_t*)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
+        tb_poller_object_t pair1;
+        pair1.type     = TB_POLLER_OBJECT_SOCK;
+        pair1.ref.sock = poller->pair[1];
+        if (!tb_poller_kqueue_insert((tb_poller_t*)poller, &pair1, TB_POLLER_EVENT_RECV, tb_null)) break;  
 
         // ok
         ok = tb_true;

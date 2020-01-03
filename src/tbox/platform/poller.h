@@ -25,6 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "pipe.h"
 #include "socket.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -75,17 +76,43 @@ typedef enum __tb_poller_event_e
 
 }tb_poller_event_e;
 
+/// the poller object type enum
+typedef enum __tb_poller_object_type_e
+{
+    TB_POLLER_OBJECT_NONE         = 0
+,   TB_POLLER_OBJECT_SOCK         = 1
+,   TB_POLLER_OBJECT_PIPE         = 2
+
+}tb_poller_object_type_e;
+
 /// the poller ref type
 typedef __tb_typeref__(poller);
+
+/// the poller object type
+typedef struct __tb_poller_object_t
+{
+    /// the object type
+    tb_uint8_t              type;
+
+    /// the object reference
+    union
+    {
+        tb_socket_ref_t     sock;
+        tb_pipe_file_ref_t  pipe;
+        tb_pointer_t        ptr;
+
+    }ref;
+
+}tb_poller_object_t, *tb_poller_object_ref_t;
 
 /*! the poller event func type
  *
  * @param poller    the poller
- * @param sock      the socket
+ * @param object    the poller object
  * @param events    the poller events
  * @param priv      the user private data for this socket
  */
-typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
+typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -142,36 +169,36 @@ tb_void_t           tb_poller_spak(tb_poller_ref_t poller);
  */
 tb_bool_t           tb_poller_support(tb_poller_ref_t poller, tb_size_t events);
 
-/*! insert socket to poller
+/*! insert object to poller
  *
  * @param poller    the poller
- * @param sock      the socket
+ * @param object    the poller object
  * @param events    the poller events
  * @param priv      the private data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_poller_insert(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
+tb_bool_t           tb_poller_insert(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
-/*! remove socket from poller
+/*! remove object from poller
  *
  * @param poller    the poller
- * @param sock      the sock
+ * @param object    the poller object
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_poller_remove(tb_poller_ref_t poller, tb_socket_ref_t sock);
+tb_bool_t           tb_poller_remove(tb_poller_ref_t poller, tb_poller_object_ref_t object);
 
-/*! modify events for the given socket
+/*! modify events for the given poller object
  *
  * @param poller    the poller
- * @param sock      the socket
+ * @param object    the poller object
  * @param events    the poller events
  * @param priv      the private data
  *
  * @return          tb_true or tb_false
  */
-tb_bool_t           tb_poller_modify(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv);
+tb_bool_t           tb_poller_modify(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
 /*! wait all sockets
  *
@@ -188,6 +215,108 @@ tb_long_t           tb_poller_wait(tb_poller_ref_t poller, tb_poller_event_func_
  * @param poller    the poller
  */
 tb_void_t           tb_poller_attach(tb_poller_ref_t poller);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inline implementation
+ */
+
+/*! insert socket to poller
+ *
+ * @param poller    the poller
+ * @param sock      the socket
+ * @param events    the poller events
+ * @param priv      the private data
+ *
+ * @return          tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_poller_insert_sock(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+{
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_SOCK;
+    object.ref.sock = sock;
+    return tb_poller_insert(poller, &object, events, priv);
+}
+
+/*! remove socket from poller
+ *
+ * @param poller    the poller
+ * @param sock      the socket
+ *
+ * @return          tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_poller_remove_sock(tb_poller_ref_t poller, tb_socket_ref_t sock)
+{
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_SOCK;
+    object.ref.sock = sock;
+    return tb_poller_remove(poller, &object);
+}
+
+/*! modify events for the given socket
+ *
+ * @param poller    the poller
+ * @param sock      the socket
+ * @param events    the poller events
+ * @param priv      the private data
+ *
+ * @return          tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_poller_modify_sock(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+{
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_SOCK;
+    object.ref.sock = sock;
+    return tb_poller_modify(poller, &object, events, priv);
+}
+
+/*! insert pipe to poller
+ *
+ * @param poller    the poller
+ * @param pipe      the pipe
+ * @param events    the poller events
+ * @param priv      the private data
+ *
+ * @return          tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_poller_insert_pipe(tb_poller_ref_t poller, tb_pipe_file_ref_t pipe, tb_size_t events, tb_cpointer_t priv)
+{
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = pipe;
+    return tb_poller_insert(poller, &object, events, priv);
+}
+
+/*! remove pipe from poller
+ *
+ * @param poller    the poller
+ * @param pipe      the pipe
+ *
+ * @return          tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_poller_remove_pipe(tb_poller_ref_t poller, tb_pipe_file_ref_t pipe)
+{
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = pipe;
+    return tb_poller_remove(poller, &object);
+}
+
+/*! modify events for the given pipe
+ *
+ * @param poller    the poller
+ * @param pipe      the pipe
+ * @param events    the poller events
+ * @param priv      the private data
+ *
+ * @return          tb_true or tb_false
+ */
+static __tb_inline__ tb_bool_t tb_poller_modify_pipe(tb_poller_ref_t poller, tb_pipe_file_ref_t pipe, tb_size_t events, tb_cpointer_t priv)
+{
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = pipe;
+    return tb_poller_modify(poller, &object, events, priv);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

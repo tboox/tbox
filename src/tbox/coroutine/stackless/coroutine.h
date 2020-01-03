@@ -28,6 +28,7 @@
 #include "core.h"
 #include "scheduler.h"
 #include "../../libc/libc.h"
+#include "../../platform/poller.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -173,11 +174,39 @@ do \
     \
 } while(0)
 
-/// wait io socket events
-#define tb_lo_coroutine_waitio(sock, events, interval) \
+/// wait io poller object events
+#define tb_lo_coroutine_waitio(object, events, interval) \
 do \
 { \
-    if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), sock, events, interval)) \
+    if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), object, events, interval)) \
+    { \
+        tb_lo_coroutine_suspend(); \
+    } \
+    \
+} while(0)
+
+/// wait io socket events
+#define tb_lo_coroutine_wait_sock(sock_, events, interval) \
+do \
+{ \
+    tb_poller_object_t object; \
+    object.type = TB_POLLER_OBJECT_SOCK; \
+    object.ref.sock = sock_; \
+    if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), &object, events, interval)) \
+    { \
+        tb_lo_coroutine_suspend(); \
+    } \
+    \
+} while(0)
+
+/// wait io pipe events
+#define tb_lo_coroutine_wait_pipe(pipe_, events, interval) \
+do \
+{ \
+    tb_poller_object_t object; \
+    object.type = TB_POLLER_OBJECT_PIPE; \
+    object.ref.pipe = pipe_; \
+    if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), &object, events, interval)) \
     { \
         tb_lo_coroutine_suspend(); \
     } \
@@ -281,13 +310,13 @@ tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, 
 /* wait io events 
  *
  * @param coroutine     the coroutine 
- * @param sock          the socket
+ * @param object        the poller object
  * @param events        the waited events
  * @param timeout       the timeout, infinity: -1
  *
  * @return              suspend coroutine if be tb_true
  */
-tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
 /* get the events after waiting socket
  *

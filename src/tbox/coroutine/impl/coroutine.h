@@ -60,8 +60,8 @@ typedef struct __tb_coroutine_rs_func_t
 // the coroutine wait type
 typedef struct __tb_coroutine_rs_wait_t
 {
-    // the waited socket
-    tb_socket_ref_t                 sock;
+    // the waited poller object
+    tb_poller_object_t              object;
 
     // the timer task pointer for ltimer or timer
     tb_cpointer_t                   task;

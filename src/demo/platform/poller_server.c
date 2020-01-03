@@ -52,7 +52,7 @@ static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref
         tb_trace_d("[%p]: send %llu", client->sock, client->offset);
 
         // remove socket from poller
-        tb_poller_remove(poller, client->sock);
+        tb_poller_remove_sock(poller, client->sock);
 
         // exit file
         if (client->file) tb_file_exit(client->file);
@@ -113,7 +113,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_socket_ref_t s
             tb_size_t events = TB_POLLER_EVENT_SEND;
             if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
                 events |= TB_POLLER_EVENT_CLEAR;
-            tb_poller_insert(poller, sock, events, client);
+            tb_poller_insert_sock(poller, sock, events, client);
         }
         else tb_demo_session_exit(client, poller);
     }
@@ -124,12 +124,12 @@ static tb_void_t tb_demo_poller_accept(tb_poller_ref_t poller, tb_socket_ref_t s
     while ((client = tb_socket_accept(sock, tb_null))) 
         tb_demo_session_start(poller, client);
 }
-static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     switch (events)
     {
     case TB_POLLER_EVENT_ACPT:
-        tb_demo_poller_accept(poller, sock);
+        tb_demo_poller_accept(poller, object->ref.sock);
         break;
     case TB_POLLER_EVENT_SEND:
         {
@@ -192,7 +192,7 @@ tb_int_t tb_demo_platform_poller_server_main(tb_int_t argc, tb_char_t** argv)
         tb_size_t events = TB_POLLER_EVENT_ACPT;
         if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
             events |= TB_POLLER_EVENT_CLEAR;
-        tb_poller_insert(poller, sock, events, tb_null);
+        tb_poller_insert_sock(poller, sock, events, tb_null);
 
         // wait events
         while (tb_poller_wait(poller, tb_demo_poller_event, -1) > 0) ;

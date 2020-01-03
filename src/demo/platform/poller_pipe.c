@@ -100,7 +100,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_pipe_file_ref_
             tb_size_t events = TB_POLLER_EVENT_RECV;
             if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
                 events |= TB_POLLER_EVENT_CLEAR;
-            //tb_poller_insert(poller, pipe, events, client);
+            tb_poller_insert_pipe(poller, pipe, events, client);
         }
         else tb_demo_session_exit(client, poller);
     }
@@ -114,7 +114,7 @@ static tb_void_t tb_demo_poller_open(tb_poller_ref_t poller)
         tb_thread_init(tb_null, tb_demo_session_writ, pair[1], 0);
     }
 }
-static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t pipe, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     switch (events)
     {

@@ -174,8 +174,13 @@ tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeo
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine
-    if (tb_coroutine_self())
-        return tb_coroutine_waitio(sock, events, timeout);
+    if (tb_coroutine_self()) 
+    {
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_SOCK;
+        object.ref.sock = sock;
+        return tb_coroutine_waitio(&object, events, timeout);
+    }
 #endif
     return tb_socket_wait_impl(sock, events, timeout);
 }

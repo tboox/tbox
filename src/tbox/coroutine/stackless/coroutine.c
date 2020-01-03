@@ -136,7 +136,7 @@ tb_void_t tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t self, tb_long_t interval)
     // sleep it
     tb_lo_scheduler_io_sleep(scheduler->scheduler_io, interval);
 }
-tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
+tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout)
 {
     // check
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
@@ -150,7 +150,7 @@ tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_socket_ref_t so
     if (!tb_lo_scheduler_io_need(scheduler)) return tb_false;
 
     // wait it
-    return tb_lo_scheduler_io_wait(scheduler->scheduler_io, sock, events, timeout);
+    return tb_lo_scheduler_io_wait(scheduler->scheduler_io, object, events, timeout);
 }
 tb_long_t tb_lo_coroutine_events_(tb_lo_coroutine_ref_t self)
 {

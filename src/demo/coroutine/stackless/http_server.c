@@ -381,7 +381,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
             while (!(session->locals.ok = tb_demo_http_session_head_recv(session)))
             {
                 // wait it
-                tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
+                tb_lo_coroutine_wait_sock(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
 
                 // wait ok
                 session->locals.wait = tb_lo_coroutine_events();
@@ -437,7 +437,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
             while (!(session->locals.ok = tb_demo_http_session_data_send(session)))
             {
                 // wait it
-                tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
+                tb_lo_coroutine_wait_sock(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
                 // wait ok
                 session->locals.wait = tb_lo_coroutine_events();
@@ -455,7 +455,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                 while (!(session->locals.ok = tb_demo_http_session_file_send(session)))
                 {
                     // wait it
-                    tb_lo_coroutine_waitio(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
+                    tb_lo_coroutine_wait_sock(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
                     // wait ok
                     session->locals.wait = tb_lo_coroutine_events();
@@ -515,7 +515,7 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
                 else
                 {
                     // wait accept events
-                    tb_lo_coroutine_waitio(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
+                    tb_lo_coroutine_wait_sock(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
                     if (tb_lo_coroutine_events() <= 0) break;
                 }
             }

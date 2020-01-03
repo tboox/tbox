@@ -42,7 +42,7 @@ static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref
         tb_trace_d("[%p]: recv %llu", client->sock, client->size);
 
         // remove socket from poller
-        tb_poller_remove(poller, client->sock);
+        tb_poller_remove_sock(poller, client->sock);
 
         // exit socket
         if (client->sock) tb_socket_exit(client->sock);
@@ -87,7 +87,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_socket_ref_t s
             tb_size_t events = TB_POLLER_EVENT_RECV;
             if (tb_poller_support(poller, TB_POLLER_EVENT_CLEAR))
                 events |= TB_POLLER_EVENT_CLEAR;
-            tb_poller_insert(poller, sock, events, client);
+            tb_poller_insert_sock(poller, sock, events, client);
         }
         else tb_demo_session_exit(client, poller);
     }
@@ -99,16 +99,16 @@ static tb_void_t tb_demo_poller_connect(tb_poller_ref_t poller, tb_ipaddr_ref_t 
     {
         tb_long_t ok = tb_socket_connect(sock, addr);
         if (ok > 0) tb_demo_session_start(poller, sock);
-        else if (!ok) tb_poller_insert(poller, sock, TB_POLLER_EVENT_CONN | TB_POLLER_EVENT_ONESHOT, tb_null);
+        else if (!ok) tb_poller_insert_sock(poller, sock, TB_POLLER_EVENT_CONN | TB_POLLER_EVENT_ONESHOT, tb_null);
         else tb_socket_exit(sock);
     }
 }
-static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     switch (events)
     {
     case TB_POLLER_EVENT_CONN:
-        tb_demo_session_start(poller, sock);
+        tb_demo_session_start(poller, object->ref.sock);
         break;
     case TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_EOF:
     case TB_POLLER_EVENT_RECV:

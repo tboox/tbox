@@ -27,7 +27,8 @@
  */
 #include "scheduler.h"
 #include "../../memory/fixed_pool.h"
-#include "../../platform/impl/sockdata.h"
+#include "../../platform/poller.h"
+#include "../../platform/impl/pollerdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -38,13 +39,13 @@ __tb_extern_c_enter__
  * types
  */
 
-// the io socket data type
-typedef struct __tb_co_sockdata_io_t
+// the io poller data type
+typedef struct __tb_co_pollerdata_io_t
 {
-    // the suspended coroutine for waiting socket/recv
+    // the suspended coroutine for waiting poller/recv
     tb_coroutine_t*     co_recv;
 
-    // the suspended coroutine for waiting socket/send
+    // the suspended coroutine for waiting poller/send
     tb_coroutine_t*     co_send;
 
     // the waited events for poller
@@ -53,7 +54,7 @@ typedef struct __tb_co_sockdata_io_t
     // the saved events for poller (triggered)
     tb_uint16_t         poller_events_save;
 
-}tb_co_sockdata_io_t, *tb_co_sockdata_io_ref_t;
+}tb_co_pollerdata_io_t, *tb_co_pollerdata_io_ref_t;
 
 // the io scheduler type
 typedef struct __tb_co_scheduler_io_t
@@ -73,11 +74,11 @@ typedef struct __tb_co_scheduler_io_t
     // the low-precision timer (faster)
     tb_ltimer_ref_t     ltimer;
 
-    // the socket data
-    tb_sockdata_t       sockdata;
+    // the poller data
+    tb_pollerdata_t     pollerdata;
 
-    // the socket data pool
-    tb_fixed_pool_ref_t sockdata_pool;
+    // the poller data pool
+    tb_fixed_pool_ref_t pollerdata_pool;
 
 }tb_co_scheduler_io_t, *tb_co_scheduler_io_ref_t;
 
@@ -127,22 +128,22 @@ tb_pointer_t                tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t sc
 /*! wait io events 
  *
  * @param scheduler_io      the io scheduler
- * @param sock              the socket
+ * @param object            the poller object
  * @param events            the waited events
  * @param timeout           the timeout, infinity: -1
  *
  * @return                  > 0: the events, 0: timeout, -1: failed
  */
-tb_long_t                   tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
+tb_long_t                   tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
-/*! cancel io events for the given socket 
+/*! cancel io events for the given poller object
  *
  * @param scheduler_io      the io scheduler
- * @param sock              the socket
+ * @param object            the poller object
  *
  * @return                  tb_true or tb_false
  */
-tb_bool_t                   tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_socket_ref_t sock);
+tb_bool_t                   tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object);
 
 /* get the current io scheduler
  *

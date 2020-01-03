@@ -38,8 +38,8 @@ __tb_extern_c_enter__
 // the coroutine wait type
 typedef struct __tb_lo_coroutine_rs_wait_t
 {
-    // the waited socket
-    tb_socket_ref_t             sock;
+    // the waited poller object
+    tb_poller_object_t          object;
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // the timer task pointer for ltimer or timer
