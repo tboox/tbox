@@ -33,6 +33,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -175,6 +180,19 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
     // trace
     tb_trace_d("close: %p", file);
 
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to cancel waiting from coroutine first
+    tb_pointer_t scheduler_io = tb_null;
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = file;
+#   ifndef TB_CONFIG_MICRO_ENABLE
+    if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel((tb_co_scheduler_io_ref_t)scheduler_io, &object)) {}
+    else
+#   endif
+    if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel((tb_lo_scheduler_io_ref_t)scheduler_io, &object)) {}
+#endif
+
     // close it
     tb_bool_t ok = !close(tb_pipefile2fd(file));
     if (!ok)
@@ -192,6 +210,9 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t 
 
     // read
     tb_long_t real = read(tb_pipefile2fd(file), data, (tb_int_t)size);
+
+    // trace
+    tb_trace_d("read: %p %lu => %ld, errno: %d", file, size, real, errno);
 
     // ok?
     if (real >= 0) return real;
@@ -211,6 +232,9 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_s
     // write
     tb_long_t real = write(tb_pipefile2fd(file), data, (tb_int_t)size);
 
+    // trace
+    tb_trace_d("write: %p %lu => %ld, errno: %d", file, size, real, errno);
+
     // ok?
     if (real >= 0) return real;
 
@@ -222,6 +246,17 @@ tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_s
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
 {
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+    // attempt to wait it in coroutine
+    if (tb_coroutine_self()) 
+    {
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_PIPE;
+        object.ref.pipe = file;
+        return tb_coroutine_waitio(&object, events, timeout);
+    }
+#endif
     // we use poll/select to wait pipe/fd events
     return tb_socket_wait_impl((tb_socket_ref_t)file, events, timeout);
 }

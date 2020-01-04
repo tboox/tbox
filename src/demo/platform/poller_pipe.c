@@ -38,11 +38,8 @@ static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref
 {
     if (client)
     {
-        // trace
-        tb_trace_d("[%p]: read %llu", client->pipe, client->size);
-
         // remove pipe from poller
-//        tb_poller_remove(poller, client->pipe);
+        tb_poller_remove_pipe(poller, client->pipe);
 
         // exit pipe file
         if (client->pipe) tb_pipe_file_exit(client->pipe);
@@ -69,6 +66,7 @@ static tb_long_t tb_demo_session_read(tb_demo_client_ref_t client)
         }
         else return -1;
     }
+    tb_trace_d("[%p]: read %llu", client->pipe, client->size);
     return 0;
 }
 static tb_int_t tb_demo_session_writ(tb_cpointer_t priv) 
@@ -76,11 +74,13 @@ static tb_int_t tb_demo_session_writ(tb_cpointer_t priv)
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t)priv;
     tb_byte_t data[8192 * 16];
     tb_size_t count = 100;
-    tb_usleep(50000);
+    tb_hize_t total = 0;
     while (count--) 
     {
-        tb_trace_d("[%p]: write %llu", pipe, sizeof(data));
+        total += sizeof(data);
+        tb_trace_d("[%p]: write %llu", pipe, total);
         if (!tb_pipe_file_bwrit(pipe, data, sizeof(data))) break;
+        tb_usleep(50000);
     }
     return 0;
 }

@@ -173,7 +173,7 @@ static tb_bool_t tb_poller_kqueue_insert(tb_poller_t* self, tb_poller_object_ref
 
     // bind the object type to the private data
     if (object->type == TB_POLLER_OBJECT_PIPE)
-        priv = (tb_cpointer_t)((tb_size_t)priv | (0x1UL << (TB_CPU_BITSIZE - 1)));
+        priv = tb_poller_priv_mark_pipe(priv);
 
     // insert socket and add events
     struct kevent   e[2];
@@ -250,7 +250,7 @@ static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_poller_object_ref
 
     // bind the object type to the private data
     if (object->type == TB_POLLER_OBJECT_PIPE)
-        priv = (tb_cpointer_t)((tb_size_t)priv | (0x1UL << (TB_CPU_BITSIZE - 1)));
+        priv = tb_poller_priv_mark_pipe(priv);
 
     // modify events
     struct kevent   e[2];
@@ -343,11 +343,9 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
         // the kevents 
         e = poller->events + i;
 
-        // get the object 
-        object.type = ((tb_size_t)e->udata & (0x1UL << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK; 
+        // get the object pointer
         object.ref.ptr = tb_fd2ptr(e->ident);
         tb_assert(object.ref.ptr);
-        e->udata = (tb_pointer_t)((tb_size_t)e->udata & ~(0x1UL << (TB_CPU_BITSIZE - 1)));
 
         // spank socket events?
         if (object.ref.sock == pair && e->filter == EVFILT_READ) 
@@ -378,7 +376,8 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
             events |= TB_POLLER_EVENT_EOF;
 
         // call event function
-        func((tb_poller_ref_t)self, &object, events, e->udata);
+        object.type = tb_poller_priv_get_object_type(e->udata);
+        func((tb_poller_ref_t)self, &object, events, tb_poller_priv_get_original(e->udata));
 
         // update the events count
         wait++;

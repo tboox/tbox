@@ -29,6 +29,16 @@
 #include "../poller.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// get the poller object type from the private pointer
+#define tb_poller_priv_get_object_type(ptr) (((tb_size_t)(ptr) & (0x1UL << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK) 
+
+// get the original private pointer
+#define tb_poller_priv_get_original(ptr)    ((tb_cpointer_t)((tb_size_t)(ptr) & ~(0x1UL << (TB_CPU_BITSIZE - 1))))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -110,5 +120,17 @@ typedef struct __tb_poller_t
     tb_void_t           (*attach)(struct __tb_poller_t* poller);
 
 }tb_poller_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inline implementation
+ */
+
+// mark pipe bit to the private pointer
+static __tb_inline__ tb_cpointer_t tb_poller_priv_mark_pipe(tb_cpointer_t ptr)
+{
+    // must be a valid pointer address 
+    tb_assert(!((tb_size_t)ptr & (0x1UL << (TB_CPU_BITSIZE - 1))));
+    return (tb_cpointer_t)((tb_size_t)ptr | (0x1UL << (TB_CPU_BITSIZE - 1)));
+}
 
 #endif
