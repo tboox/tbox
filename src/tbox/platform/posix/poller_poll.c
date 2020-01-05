@@ -52,7 +52,7 @@ typedef struct __tb_poller_poll_t
     tb_vector_ref_t         cfds;
 
     // the socket data
-    tb_sockdata_t           sockdata;
+    tb_pollerdata_t           pollerdata;
     
 }tb_poller_poll_t, *tb_poller_poll_ref_t;
 
@@ -122,7 +122,7 @@ static tb_void_t tb_poller_poll_exit(tb_poller_t* self)
     poller->cfds = tb_null;
 
     // exit socket data
-    tb_sockdata_exit(&poller->sockdata);
+    tb_pollerdata_exit(&poller->pollerdata);
 
     // free it
     tb_free(poller);
@@ -145,11 +145,11 @@ static tb_void_t tb_poller_poll_spak(tb_poller_t* self)
     // post it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
-static tb_bool_t tb_poller_poll_insert(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_poll_insert(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_poll_ref_t poller = (tb_poller_poll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->pfds && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->pfds && object, tb_false);
 
     // oneshot is not supported now
     tb_assertf(!(events & TB_POLLER_EVENT_ONESHOT), "cannot insert events with oneshot, not supported!");
@@ -160,48 +160,55 @@ static tb_bool_t tb_poller_poll_insert(tb_poller_t* self, tb_socket_ref_t sock, 
     if (events & TB_POLLER_EVENT_SEND) pfd.events |= POLLOUT;
 
     // save fd, TODO uses binary search
-    pfd.fd = tb_sock2fd(sock);
+    pfd.fd = tb_ptr2fd(object->ref.ptr);
     tb_vector_insert_tail(poller->pfds, &pfd);
 
+    // bind the object type to the private data
+    priv = tb_poller_priv_set_object_type(object, priv);
+
     // bind user private data to socket
-    if (!(events & TB_POLLER_EVENT_NOEXTRA))
-        tb_sockdata_set(&poller->sockdata, sock, priv);
+    if (!(events & TB_POLLER_EVENT_NOEXTRA) || object->type == TB_POLLER_OBJECT_PIPE)
+        tb_pollerdata_set(&poller->pollerdata, object, priv);
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_poller_poll_remove(tb_poller_t* self, tb_socket_ref_t sock)
+static tb_bool_t tb_poller_poll_remove(tb_poller_t* self, tb_poller_object_ref_t object)
 {
     // check
     tb_poller_poll_ref_t poller = (tb_poller_poll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->pfds && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->pfds && object, tb_false);
 
-    // remove this socket and events, TODO uses binary search
-    tb_remove_first_if(poller->pfds, tb_poller_poll_walk_remove, (tb_cpointer_t)(tb_long_t)tb_sock2fd(sock));
+    // remove this object and events, TODO uses binary search
+    tb_remove_first_if(poller->pfds, tb_poller_poll_walk_remove, (tb_cpointer_t)(tb_long_t)tb_ptr2fd(object->ref.ptr));
 
     // remove user private data from this socket
-    tb_sockdata_reset(&poller->sockdata, sock);
+    tb_pollerdata_reset(&poller->pollerdata, object);
 
     // ok
     return tb_true;
 }
-static tb_bool_t tb_poller_poll_modify(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_poll_modify(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_poll_ref_t poller = (tb_poller_poll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->pfds && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->pfds && object, tb_false);
 
     // oneshot is not supported now
     tb_assertf(!(events & TB_POLLER_EVENT_ONESHOT), "cannot insert events with oneshot, not supported!");
 
     // modify events, TODO uses binary search
     tb_value_t tuple[2];
-    tuple[0].l       = tb_sock2fd(sock);
+    tuple[0].l       = tb_ptr2fd(object->ref.ptr);
     tuple[1].ul      = events;
     tb_walk_all(poller->pfds, tb_poller_poll_walk_modify, tuple);
 
+    // bind the object type to the private data
+    priv = tb_poller_priv_set_object_type(object, priv);
+
     // modify user private data to socket
-    tb_sockdata_set(&poller->sockdata, sock, priv);
+    if (!(events & TB_POLLER_EVENT_NOEXTRA) || object->type == TB_POLLER_OBJECT_PIPE)
+        tb_pollerdata_set(&poller->pollerdata, object, priv);
 
     // ok
     return tb_true;
@@ -239,18 +246,19 @@ static tb_long_t tb_poller_poll_wait(tb_poller_t* self, tb_poller_event_func_t f
 
         // sync
         tb_size_t i = 0;
+        tb_poller_object_t object;
         for (i = 0; i < pfdm; i++)
         {
-            // the sock
-            tb_socket_ref_t sock = tb_fd2sock(pfds[i].fd);
-            tb_assert_and_check_return_val(sock, -1);
+            // get the object pointer
+            object.ref.ptr = tb_fd2ptr(pfds[i].fd);
+            tb_assert_and_check_return_val(object.ref.ptr, -1);
 
             // the poll events
             tb_size_t poll_events = pfds[i].revents;
             tb_check_continue(poll_events);
 
             // spak?
-            if (sock == poller->pair[1] && (poll_events & POLLIN))
+            if (object.ref.sock == poller->pair[1] && (poll_events & POLLIN))
             {
                 // read spak
                 tb_char_t spak = '\0';
@@ -267,7 +275,7 @@ static tb_long_t tb_poller_poll_wait(tb_poller_t* self, tb_poller_event_func_t f
             }
 
             // skip spak
-            tb_check_continue(sock != poller->pair[1]);
+            tb_check_continue(object.ref.sock != poller->pair[1]);
 
             // init events
             tb_size_t events = TB_POLLER_EVENT_NONE;
@@ -277,7 +285,9 @@ static tb_long_t tb_poller_poll_wait(tb_poller_t* self, tb_poller_event_func_t f
                 events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
             // call event function
-            func((tb_poller_ref_t)self, sock, events, tb_sockdata_get(&poller->sockdata, sock));
+            tb_cpointer_t priv = tb_pollerdata_get(&poller->pollerdata, &object);
+            object.type = tb_poller_priv_get_object_type(priv);
+            func((tb_poller_ref_t)self, &object, events, tb_poller_priv_get_original(priv));
 
             // update the events count
             wait++;
@@ -312,8 +322,8 @@ tb_poller_t* tb_poller_poll_init()
         poller->base.modify = tb_poller_poll_modify;
         poller->base.supported_events = TB_POLLER_EVENT_EALL;
 
-        // init socket data
-        tb_sockdata_init(&poller->sockdata);
+        // init poller data
+        tb_pollerdata_init(&poller->pollerdata);
 
         // init poll fds
         poller->pfds = tb_vector_init(0, tb_element_mem(sizeof(struct pollfd), tb_null, tb_null));
@@ -327,7 +337,10 @@ tb_poller_t* tb_poller_poll_init()
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
 
         // insert pair socket first
-        if (!tb_poller_poll_insert((tb_poller_t*)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_SOCK;
+        object.ref.sock = poller->pair[1];
+        if (!tb_poller_poll_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;  
 
         // ok
         ok = tb_true;
