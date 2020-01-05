@@ -56,7 +56,7 @@ typedef struct __tb_poller_epoll_t
     tb_size_t               events_count;
 
     // the socket data
-    tb_sockdata_t           sockdata;
+    tb_pollerdata_t           pollerdata;
     
 }tb_poller_epoll_t, *tb_poller_epoll_ref_t;
 
@@ -106,7 +106,7 @@ static tb_void_t tb_poller_epoll_exit(tb_poller_t* self)
     poller->epfd = 0;
 
     // exit socket data
-    tb_sockdata_exit(&poller->sockdata);
+    tb_pollerdata_exit(&poller->pollerdata);
 
     // free it
     tb_free(poller);
@@ -129,11 +129,11 @@ static tb_void_t tb_poller_epoll_spak(tb_poller_t* self)
     // post it
     if (poller->pair[0]) tb_socket_send(poller->pair[0], (tb_byte_t const*)"p", 1);
 }
-static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->epfd > 0 && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->epfd > 0 && object, tb_false);
 
     // init event
     struct epoll_event e = {0};
@@ -154,17 +154,20 @@ static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_socket_ref_t sock,
 #endif
 
     // save fd
-    e.data.fd = (tb_int_t)tb_sock2fd(sock);
+    e.data.fd = (tb_int_t)tb_ptr2fd(object->ref.ptr);
     
-    // bind user private data to socket
-    if (!(events & TB_POLLER_EVENT_NOEXTRA))
-        tb_sockdata_set(&poller->sockdata, sock, priv);
+    // bind the object type to the private data
+    priv = tb_poller_priv_set_object_type(object, priv);
+
+    // bind user private data to object
+    if (!(events & TB_POLLER_EVENT_NOEXTRA) || object->type == TB_POLLER_OBJECT_PIPE)
+        tb_pollerdata_set(&poller->pollerdata, object, priv);
 
     // add socket and events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_ADD, e.data.fd, &e) < 0)
     {
         // trace
-        tb_trace_e("insert socket(%p) events: %lu failed, errno: %d", sock, events, errno);
+        tb_trace_e("insert object(%p) events: %lu failed, errno: %d", object->ref.ptr, events, errno);
 
         // failed
         return tb_false;
@@ -173,35 +176,31 @@ static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_socket_ref_t sock,
     // ok
     return tb_true;
 }
-static tb_bool_t tb_poller_epoll_remove(tb_poller_t* self, tb_socket_ref_t sock)
+static tb_bool_t tb_poller_epoll_remove(tb_poller_t* self, tb_poller_object_ref_t object)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->epfd > 0 && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->epfd > 0 && object, tb_false);
 
-    // remove socket and events
+    // remove object and events
     struct epoll_event  e = {0};
-    tb_long_t           fd = tb_sock2fd(sock);
+    tb_long_t           fd = tb_ptr2fd(object->ref.ptr);
     if (epoll_ctl(poller->epfd, EPOLL_CTL_DEL, fd, &e) < 0)
     {
         // trace
-        tb_trace_e("remove socket(%p) failed, errno: %d", sock, errno);
-
-        // failed
+        tb_trace_e("remove object(%p) failed, errno: %d", object->ref.ptr, errno);
         return tb_false;
     }
 
-    // remove user private data from this socket
-    tb_sockdata_reset(&poller->sockdata, sock);
-    
-    // ok
+    // remove user private data from this object
+    tb_pollerdata_reset(&poller->pollerdata, object);
     return tb_true;
 }
-static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_socket_ref_t sock, tb_size_t events, tb_cpointer_t priv)
+static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check
     tb_poller_epoll_ref_t poller = (tb_poller_epoll_ref_t)self;
-    tb_assert_and_check_return_val(poller && poller->epfd > 0 && sock, tb_false);
+    tb_assert_and_check_return_val(poller && poller->epfd > 0 && object, tb_false);
 
     // init event
     struct epoll_event e = {0};
@@ -222,22 +221,22 @@ static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_socket_ref_t sock,
 #endif
 
     // save fd
-    e.data.fd = (tb_int_t)tb_sock2fd(sock);
-    
-    // modify user private data to socket
-    tb_sockdata_set(&poller->sockdata, sock, priv);
+    e.data.fd = (tb_int_t)tb_ptr2fd(object->ref.ptr);
+   
+    // bind the object type to the private data
+    priv = tb_poller_priv_set_object_type(object, priv);
+
+    // bind user private data to object
+    if (!(events & TB_POLLER_EVENT_NOEXTRA) || object->type == TB_POLLER_OBJECT_PIPE)
+        tb_pollerdata_set(&poller->pollerdata, object, priv);
 
     // modify events
     if (epoll_ctl(poller->epfd, EPOLL_CTL_MOD, e.data.fd, &e) < 0) 
     {
         // trace
-        tb_trace_e("modify socket(%p) events: %lu failed, errno: %d", sock, events, errno);
-
-        // failed
+        tb_trace_e("modify object(%p) events: %lu failed, errno: %d", object->ref.ptr, events, errno);
         return tb_false;
     }
-
-    // ok
     return tb_true;
 }
 static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t func, tb_long_t timeout)
@@ -288,6 +287,7 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
     tb_size_t           wait = 0; 
     struct epoll_event* e = tb_null;
     tb_socket_ref_t     pair = poller->pair[1];
+    tb_poller_object_t  object;
     for (i = 0; i < events_count; i++)
     {
         // the epoll event
@@ -297,11 +297,12 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
         tb_size_t epoll_events = e->events;
 
         // the socket
-        tb_long_t       fd = e->data.fd;
-        tb_socket_ref_t sock = tb_fd2sock(fd);
+        tb_long_t fd = e->data.fd;
+        object.ref.ptr = tb_fd2ptr(fd);
+        tb_assert(object.ref.ptr);
 
-        // spak?
-        if (sock == pair && (epoll_events & EPOLLIN)) 
+        // spank socket events?
+        if (object.ref.sock == pair && (epoll_events & EPOLLIN)) 
         {
             // read spak
             tb_char_t spak = '\0';
@@ -313,9 +314,7 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
             // continue it
             continue ;
         }
-
-        // skip spak
-        tb_check_continue(sock != pair);
+        tb_check_continue(object.ref.sock != pair);
 
         // init events 
         tb_size_t events = TB_POLLER_EVENT_NONE;
@@ -330,7 +329,9 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
 #endif
 
         // call event function
-        func((tb_poller_ref_t)self, sock, events, tb_sockdata_get(&poller->sockdata, sock));
+        tb_cpointer_t priv = tb_pollerdata_get(&poller->pollerdata, &object);
+        object.type = tb_poller_priv_get_object_type(priv);
+        func((tb_poller_ref_t)self, &object, events, tb_poller_priv_get_original(priv));
 
         // update the events count
         wait++;
@@ -369,8 +370,8 @@ tb_poller_t* tb_poller_epoll_init()
         poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR;
 #endif
 
-        // init socket data
-        tb_sockdata_init(&poller->sockdata);
+        // init poller data
+        tb_pollerdata_init(&poller->pollerdata);
 
         // init maxn
         poller->maxn = tb_poller_epoll_maxfds();
@@ -384,7 +385,10 @@ tb_poller_t* tb_poller_epoll_init()
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, poller->pair)) break;
 
         // insert pair socket first
-        if (!tb_poller_epoll_insert((tb_poller_t*)poller, poller->pair[1], TB_POLLER_EVENT_RECV, tb_null)) break;  
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_SOCK;
+        object.ref.sock = poller->pair[1];
+        if (!tb_poller_epoll_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;  
 
         // ok
         ok = tb_true;
