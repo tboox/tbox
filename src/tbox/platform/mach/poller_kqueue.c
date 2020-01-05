@@ -172,8 +172,7 @@ static tb_bool_t tb_poller_kqueue_insert(tb_poller_t* self, tb_poller_object_ref
     if (events & TB_POLLER_EVENT_ONESHOT) adde |= EV_ONESHOT;
 
     // bind the object type to the private data
-    if (object->type == TB_POLLER_OBJECT_PIPE)
-        priv = tb_poller_priv_mark_pipe(priv);
+    priv = tb_poller_priv_set_object_type(object, priv);
 
     // insert socket and add events
     struct kevent   e[2];
@@ -249,8 +248,7 @@ static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_poller_object_ref
     if (events & TB_POLLER_EVENT_ONESHOT) add_event |= EV_ONESHOT;
 
     // bind the object type to the private data
-    if (object->type == TB_POLLER_OBJECT_PIPE)
-        priv = tb_poller_priv_mark_pipe(priv);
+    priv = tb_poller_priv_set_object_type(object, priv);
 
     // modify events
     struct kevent   e[2];

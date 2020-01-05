@@ -125,12 +125,12 @@ typedef struct __tb_poller_t
  * inline implementation
  */
 
-// mark pipe bit to the private pointer
-static __tb_inline__ tb_cpointer_t tb_poller_priv_mark_pipe(tb_cpointer_t ptr)
+// set the object type to the private pointer
+static __tb_inline__ tb_cpointer_t tb_poller_priv_set_object_type(tb_poller_object_ref_t object, tb_cpointer_t ptr)
 {
     // must be a valid pointer address 
     tb_assert(!((tb_size_t)ptr & (0x1UL << (TB_CPU_BITSIZE - 1))));
-    return (tb_cpointer_t)((tb_size_t)ptr | (0x1UL << (TB_CPU_BITSIZE - 1)));
+    return object->type == TB_POLLER_OBJECT_PIPE? (tb_cpointer_t)((tb_size_t)ptr | (0x1UL << (TB_CPU_BITSIZE - 1))) : ptr;
 }
 
 #endif
