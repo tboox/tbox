@@ -207,6 +207,11 @@ static tb_bool_t tb_poller_select_insert(tb_poller_t* self, tb_poller_object_ref
     // check size
     tb_assert_and_check_return_val(poller->count < FD_SETSIZE, tb_false);
 
+#ifdef TB_CONFIG_OS_WINDOWS
+    // do not support pipe fd on windows
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PIPE, tb_false);
+#endif
+
     // save fd
     tb_long_t fd = tb_ptr2fd(object->ref.ptr);
     if (fd > (tb_long_t)poller->sfdm) poller->sfdm = (tb_size_t)fd;

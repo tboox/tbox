@@ -168,8 +168,6 @@ static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_poller_object_ref_
     {
         // trace
         tb_trace_e("insert object(%p) events: %lu failed, errno: %d", object->ref.ptr, events, errno);
-
-        // failed
         return tb_false;
     }
 
