@@ -252,13 +252,8 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             // check
             tb_check_return_val(tb_string_size(&url->path), tb_null);
 
-            // add protocol
-            if (!url->is_win)
-            {
-                if (url->is_ssl) tb_string_cstrncpy(&url->cache, "files://", 8);
-                else tb_string_cstrncpy(&url->cache, "file://", 7);
-            }
-            else
+            // add protocol for win
+            if (url->is_win)
             {
                 tb_assert(url->pwin);
                 tb_string_cstrfcpy(&url->cache, "%c:/", url->pwin);
