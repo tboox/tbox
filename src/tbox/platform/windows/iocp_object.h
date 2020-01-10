@@ -35,6 +35,13 @@
 __tb_extern_c_enter__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// this iocp object is pipe? 
+#define tb_iocp_object_is_pipe(iocp_object)     ((iocp_object)->code == TB_IOCP_OBJECT_CODE_READ || (iocp_object)->code == TB_IOCP_OBJECT_CODE_WRITE)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -269,12 +276,6 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
     // the bound iocp port
     HANDLE                          port;
 
-    // the socket
-    tb_socket_ref_t                 sock;
-
-    // the pipe file
-    tb_pipe_file_ref_t              pipe;
-
     // the user private data
     tb_cpointer_t                   priv;
 
@@ -287,6 +288,15 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
      * urecv and recvv: sizeof(struct sockaddr_storage)) + sizeof(tb_int_t) + sizeof(DWORD)
      */
     tb_pointer_t                    buffer;
+
+    /// the object reference
+    union
+    {
+        tb_socket_ref_t             sock;
+        tb_pipe_file_ref_t          pipe;
+        tb_pointer_t                ptr;
+
+    } ref;
 
     /* the objects 
      *

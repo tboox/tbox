@@ -101,7 +101,7 @@ static tb_bool_t tb_iocp_object_cache_clean(tb_iterator_ref_t iterator, tb_cpoin
     if (tb_list_entry_size(cache) > TB_IOCP_OBJECT_CACHE_MAXN && iocp_object->state != TB_STATE_KILLING)
     {
         // trace
-        tb_trace_d("clean %s iocp_object(%p) in cache(%lu)", tb_state_cstr(iocp_object->state), iocp_object->sock, tb_list_entry_size(cache));
+        tb_trace_d("clean %s iocp_object(%p) in cache(%lu)", tb_state_cstr(iocp_object->state), iocp_object->ref.sock, tb_list_entry_size(cache));
         return tb_true;
     }
     return tb_false;
@@ -129,7 +129,7 @@ static tb_void_t tb_iocp_object_cache_free(tb_cpointer_t priv)
             if (iocp_object) 
             {
                 // trace
-                tb_trace_d("exit %s iocp_object(%p) in cache", tb_state_cstr(iocp_object->state), iocp_object->sock);
+                tb_trace_d("exit %s iocp_object(%p) in cache", tb_state_cstr(iocp_object->state), iocp_object->ref.sock);
 
                 // clear iocp object first
                 tb_iocp_object_clear(iocp_object);
@@ -207,14 +207,14 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t iocp_object)
     // check
     tb_assert_and_check_return_val(iocp_object && iocp_object->state == TB_STATE_WAITING, tb_false);
 
-    // cancel pipe object?
-    if (iocp_object->code == TB_IOCP_OBJECT_CODE_WRITE || iocp_object->code == TB_IOCP_OBJECT_CODE_READ)
-    {
-        // trace
-        tb_trace_d("object(%p): cancel pipe ..", iocp_object->pipe);
+    // trace
+    tb_trace_d("object(%p): cancel io ..", iocp_object->ref.ptr);
 
+    // cancel pipe object?
+    if (tb_iocp_object_is_pipe(iocp_object))
+    {
         // check
-        tb_assert_and_check_return_val(iocp_object->pipe, tb_false);
+        tb_assert_and_check_return_val(iocp_object->ref.pipe, tb_false);
         
         // TODO
         tb_trace_noimpl();
@@ -222,17 +222,14 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t iocp_object)
     }
     else
     {
-        // trace
-        tb_trace_d("object(%p): cancel socket ..", iocp_object->sock);
-
         // check
-        tb_assert_and_check_return_val(iocp_object->sock, tb_false);
+        tb_assert_and_check_return_val(iocp_object->ref.sock, tb_false);
 
         // cancel io
-        if (!CancelIo((HANDLE)(tb_size_t)tb_sock2fd(iocp_object->sock)))
+        if (!CancelIo((HANDLE)(tb_size_t)tb_sock2fd(iocp_object->ref.sock)))
         {
             // trace
-            tb_trace_e("sock(%p): cancel io failed(%d)!", iocp_object->sock, GetLastError());
+            tb_trace_e("sock(%p): cancel io failed(%d)!", iocp_object->ref.sock, GetLastError());
             return tb_false;
         }
     }
@@ -354,8 +351,8 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_poller_object_ref_t object, tb
 
             // init iocp object
             if (object->type == TB_POLLER_OBJECT_SOCK)
-                iocp_object->sock = object->ref.sock;
-            else iocp_object->pipe = object->ref.pipe;
+                iocp_object->ref.sock = object->ref.sock;
+            else iocp_object->ref.pipe = object->ref.pipe;
             tb_iocp_object_clear(iocp_object);
 
             // save iocp object
@@ -388,7 +385,7 @@ tb_void_t tb_iocp_object_clear(tb_iocp_object_ref_t iocp_object)
     }
 
     // trace
-    tb_trace_d("iocp_object(%p): clear %s ..", (iocp_object->code == TB_IOCP_OBJECT_CODE_READ || iocp_object->code == TB_IOCP_OBJECT_CODE_WRITE)? iocp_object->pipe : iocp_object->sock, tb_state_cstr(iocp_object->state));
+    tb_trace_d("iocp_object(%p): clear %s ..", iocp_object->ref.ptr, tb_state_cstr(iocp_object->state));
 
     // clear iocp object code and state
     iocp_object->code  = TB_IOCP_OBJECT_CODE_NONE;
@@ -408,7 +405,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("accept(%p): state: %s, result: %p", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.acpt.result);
+            tb_trace_d("accept(%p): state: %s, result: %p", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.acpt.result);
 
             // get result
             iocp_object->state = TB_STATE_OK;
@@ -419,13 +416,13 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
         else if (iocp_object->state == TB_STATE_WAITING)
         {
             // trace
-            tb_trace_d("accept(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("accept(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return tb_null;
         }
     }
 
     // trace
-    tb_trace_d("accept(%p): state: %s ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+    tb_trace_d("accept(%p): state: %s ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, tb_null);
@@ -450,7 +447,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
         struct sockaddr_storage bound_addr;
         socklen_t len = sizeof(bound_addr);
         tb_size_t family = TB_IPADDR_FAMILY_IPV4;
-        if (getsockname((SOCKET)tb_sock2fd(iocp_object->sock), (struct sockaddr *)&bound_addr, &len) != -1 && bound_addr.ss_family == AF_INET6)
+        if (getsockname((SOCKET)tb_sock2fd(iocp_object->ref.sock), (struct sockaddr *)&bound_addr, &len) != -1 && bound_addr.ss_family == AF_INET6)
             family = TB_IPADDR_FAMILY_IPV6;
 
         // make accept socket
@@ -466,7 +463,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
          * @note this socket have been bound to local address in tb_socket_connect()
          */
         DWORD real = 0;
-        AcceptEx_ok = tb_mswsock()->AcceptEx(   (SOCKET)tb_sock2fd(iocp_object->sock)
+        AcceptEx_ok = tb_mswsock()->AcceptEx(   (SOCKET)tb_sock2fd(iocp_object->ref.sock)
                                             ,   clientfd
                                             ,   (tb_byte_t*)iocp_object->buffer
                                             ,   0
@@ -476,11 +473,11 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
                                             ,   (LPOVERLAPPED)&iocp_object->olap)? tb_true : tb_false;
 
         // trace
-        tb_trace_d("accept(%p): AcceptEx: %d, lasterror: %d", iocp_object->sock, AcceptEx_ok, tb_ws2_32()->WSAGetLastError());
+        tb_trace_d("accept(%p): AcceptEx: %d, lasterror: %d", iocp_object->ref.sock, AcceptEx_ok, tb_ws2_32()->WSAGetLastError());
         tb_check_break(AcceptEx_ok);
 
         // update the accept context, otherwise shutdown and getsockname will be failed
-        SOCKET acceptfd = (SOCKET)tb_sock2fd(iocp_object->sock);
+        SOCKET acceptfd = (SOCKET)tb_sock2fd(iocp_object->ref.sock);
         tb_ws2_32()->setsockopt(clientfd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acceptfd, sizeof(acceptfd));
 
         // non-block
@@ -540,12 +537,12 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
                 tb_sockaddr_save(addr, client_addr);
 
                 // trace
-                tb_trace_d("accept(%p): client address: %{ipaddr}", iocp_object->sock, addr);
+                tb_trace_d("accept(%p): client address: %{ipaddr}", iocp_object->ref.sock, addr);
             }
         }
 
         // trace
-        tb_trace_d("accept(%p): result: %p, state: finished directly", iocp_object->sock, iocp_object->u.acpt.result);
+        tb_trace_d("accept(%p): result: %p, state: finished directly", iocp_object->ref.sock, iocp_object->u.acpt.result);
 
         // ok
         ok = tb_true;
@@ -593,16 +590,16 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
                 // skip the completion notification on success
                 if (tb_kernel32_has_SetFileCompletionNotificationModes())
                 {
-                    if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(iocp_object->sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+                    if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(iocp_object->ref.sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
                     {
                         iocp_object->skip_cpos = 1;
-                        tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->sock, TB_SOCKET_EVENT_RECV);
+                        tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->ref.sock, TB_SOCKET_EVENT_RECV);
                         if (client_object_recv) client_object_recv->skip_cpos = 1;
                     }
                 }
 
                 // trace
-                tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: %s, result: %ld", iocp_object->sock, addr, iocp_object->skip_cpos, tb_state_cstr(iocp_object->state), iocp_object->u.conn.result);
+                tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: %s, result: %ld", iocp_object->ref.sock, addr, iocp_object->skip_cpos, tb_state_cstr(iocp_object->state), iocp_object->u.conn.result);
 
                 // ok
                 return iocp_object->u.conn.result;
@@ -612,13 +609,13 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
         else if (iocp_object->state == TB_STATE_WAITING && tb_ipaddr_is_equal(&iocp_object->u.conn.addr, addr))
         {
             // trace
-            tb_trace_d("connect(%p, %{ipaddr}): %s, continue ..", iocp_object->sock, addr, tb_state_cstr(iocp_object->state));
+            tb_trace_d("connect(%p, %{ipaddr}): %s, continue ..", iocp_object->ref.sock, addr, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("connect(%p, %{ipaddr}): %s ..", iocp_object->sock, addr, tb_state_cstr(iocp_object->state));
+    tb_trace_d("connect(%p, %{ipaddr}): %s ..", iocp_object->ref.sock, addr, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -648,10 +645,10 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
         if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
 
         // bind it first for ConnectEx
-        if (SOCKET_ERROR == tb_ws2_32()->bind((SOCKET)tb_sock2fd(iocp_object->sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
+        if (SOCKET_ERROR == tb_ws2_32()->bind((SOCKET)tb_sock2fd(iocp_object->ref.sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
         {
             // trace
-            tb_trace_e("connect(%p, %{ipaddr}): bind failed, error: %u", iocp_object->sock, addr, GetLastError());
+            tb_trace_e("connect(%p, %{ipaddr}): bind failed, error: %u", iocp_object->ref.sock, addr, GetLastError());
             break;
         }
         init_ok = tb_true;
@@ -661,7 +658,7 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
          * @note this socket have been bound to local address in tb_socket_connect()
          */
         DWORD real = 0;
-        ConnectEx_ok = tb_mswsock()->ConnectEx( (SOCKET)tb_sock2fd(iocp_object->sock)
+        ConnectEx_ok = tb_mswsock()->ConnectEx( (SOCKET)tb_sock2fd(iocp_object->ref.sock)
                                             ,   (struct sockaddr const*)&caddr_data
                                             ,   (tb_int_t)caddr_size
                                             ,   tb_null
@@ -670,22 +667,22 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
                                             ,   (LPOVERLAPPED)&iocp_object->olap)? tb_true : tb_false;
 
         // trace
-        tb_trace_d("connect(%p): ConnectEx: %d, lasterror: %d", iocp_object->sock, ConnectEx_ok, tb_ws2_32()->WSAGetLastError());
+        tb_trace_d("connect(%p): ConnectEx: %d, lasterror: %d", iocp_object->ref.sock, ConnectEx_ok, tb_ws2_32()->WSAGetLastError());
         tb_check_break(ConnectEx_ok);
 
         // skip the completion notification on success
         if (tb_kernel32_has_SetFileCompletionNotificationModes())
         {
-            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(iocp_object->sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(iocp_object->ref.sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
             {
                 iocp_object->skip_cpos = 1;
-                tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->sock, TB_SOCKET_EVENT_RECV);
+                tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->ref.sock, TB_SOCKET_EVENT_RECV);
                 if (client_object_recv) client_object_recv->skip_cpos = 1;
             }
         }
 
         // trace
-        tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: finished directly", iocp_object->sock, addr, iocp_object->skip_cpos);
+        tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: finished directly", iocp_object->ref.sock, addr, iocp_object->skip_cpos);
 
         // ok
         ok = 1;
@@ -724,7 +721,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("recv(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.recv.result);
+            tb_trace_d("recv(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.recv.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -736,13 +733,13 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
             tb_assert_and_check_return_val(iocp_object->u.recv.data == data, -1);
 
             // trace
-            tb_trace_d("recv(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("recv(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("recv(%p, %lu): %s ..", iocp_object->sock, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("recv(%p, %lu): %s ..", iocp_object->ref.sock, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -757,18 +754,18 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
     // attempt to recv data directly
     DWORD flag = 0;
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.recv, 1, &real, &flag, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.recv, 1, &real, &flag, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // finished and skip iocp notification? return it directly
     if (!ok && iocp_object->skip_cpos)
     {
         // trace
-        tb_trace_d("recv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", iocp_object->sock, real, iocp_object->skip_cpos);
+        tb_trace_d("recv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", iocp_object->ref.sock, real, iocp_object->skip_cpos);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
-    tb_trace_d("recv(%p): WSARecv: %ld, skip: %d, lasterror: %d", iocp_object->sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("recv(%p): WSARecv: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -793,7 +790,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t iocp_object, tb_byte_t const*
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("send(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.send.result);
+            tb_trace_d("send(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.send.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -806,13 +803,13 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t iocp_object, tb_byte_t const*
             tb_assert_and_check_return_val(iocp_object->u.send.data == data, -1);
 
             // trace
-            tb_trace_d("send(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("send(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("send(%p, %lu): %s ..", iocp_object->sock, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("send(%p, %lu): %s ..", iocp_object->ref.sock, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -826,18 +823,18 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t iocp_object, tb_byte_t const*
 
     // attempt to send data directly
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.send, 1, &real, 0, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.send, 1, &real, 0, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // finished and skip iocp notification? return it directly
     if (!ok && iocp_object->skip_cpos)
     {
         // trace
-        tb_trace_d("send(%p): WSASend: %u bytes, skip: %d, state: finished directly", iocp_object->sock, real, iocp_object->skip_cpos);
+        tb_trace_d("send(%p): WSASend: %u bytes, skip: %d, state: finished directly", iocp_object->ref.sock, real, iocp_object->skip_cpos);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
-    tb_trace_d("send(%p): WSASend: %ld, skip: %d, lasterror: %d", iocp_object->sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("send(%p): WSASend: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -863,7 +860,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("urecv(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.urecv.result);
+            tb_trace_d("urecv(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.urecv.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -877,13 +874,13 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
             tb_assert_and_check_return_val(iocp_object->u.urecv.data == data, -1);
 
             // trace
-            tb_trace_d("urecv(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("urecv(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("urecv(%p, %lu): %s ..", iocp_object->sock, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("urecv(%p, %lu): %s ..", iocp_object->ref.sock, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -912,10 +909,10 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
      * It's not safe to skip completion notifications for UDP:
      * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
      */
-    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.urecv, 1, tb_null, pflag, (struct sockaddr*)iocp_object->buffer, psize, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.urecv, 1, tb_null, pflag, (struct sockaddr*)iocp_object->buffer, psize, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // trace
-    tb_trace_d("urecv(%p): WSARecvFrom: %ld, lasterror: %d", iocp_object->sock, ok, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("urecv(%p): WSARecvFrom: %ld, lasterror: %d", iocp_object->ref.sock, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -940,7 +937,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %ld", iocp_object->sock, addr, tb_state_cstr(iocp_object->state), iocp_object->u.usend.result);
+            tb_trace_d("usend(%p, %{ipaddr}): state: %s, result: %ld", iocp_object->ref.sock, addr, tb_state_cstr(iocp_object->state), iocp_object->u.usend.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -953,13 +950,13 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
             tb_assert_and_check_return_val(iocp_object->u.usend.data == data, -1);
 
             // trace
-            tb_trace_d("usend(%p, %{ipaddr}): state: %s, continue ..", iocp_object->sock, addr, tb_state_cstr(iocp_object->state));
+            tb_trace_d("usend(%p, %{ipaddr}): state: %s, continue ..", iocp_object->ref.sock, addr, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("usend(%p, %{ipaddr}, %lu): %s ..", iocp_object->sock, addr, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("usend(%p, %{ipaddr}, %lu): %s ..", iocp_object->ref.sock, addr, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -985,19 +982,19 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
      * So we attempt to send data firstly without overlapped.
      */
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.usend, 1, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.usend, 1, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
     if (!ok && real)
     {
         // trace
-        tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", iocp_object->sock, addr, real);
+        tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", iocp_object->ref.sock, addr, real);
         return (tb_long_t)real;
     }
 
     // post a send event
-    ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.usend, 1, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.usend, 1, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // trace
-    tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", iocp_object->sock, addr, ok, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", iocp_object->ref.sock, addr, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -1022,7 +1019,7 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t iocp_object, tb_file_ref_t f
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("sendfile(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.sendf.result);
+            tb_trace_d("sendfile(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.sendf.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1036,13 +1033,13 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t iocp_object, tb_file_ref_t f
             tb_assert_and_check_return_val(iocp_object->u.sendf.offset == offset, -1);
 
             // trace
-            tb_trace_d("sendfile(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("sendfile(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("sendfile(%p, %llu at %llu): %s ..", iocp_object->sock, size, offset, tb_state_cstr(iocp_object->state));
+    tb_trace_d("sendfile(%p, %llu at %llu): %s ..", iocp_object->ref.sock, size, offset, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1053,10 +1050,10 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t iocp_object, tb_file_ref_t f
     // do send file
     iocp_object->olap.Offset     = (DWORD)offset;
     iocp_object->olap.OffsetHigh = (DWORD)(offset >> 32);
-    BOOL ok = tb_mswsock()->TransmitFile((SOCKET)tb_sock2fd(iocp_object->sock), (HANDLE)file, (DWORD)size, (1 << 16), (LPOVERLAPPED)&iocp_object->olap, tb_null, 0);
+    BOOL ok = tb_mswsock()->TransmitFile((SOCKET)tb_sock2fd(iocp_object->ref.sock), (HANDLE)file, (DWORD)size, (1 << 16), (LPOVERLAPPED)&iocp_object->olap, tb_null, 0);
 
     // trace
-    tb_trace_d("sendfile(%p): TransmitFile: %d, lasterror: %d", iocp_object->sock, ok, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("sendfile(%p): TransmitFile: %d, lasterror: %d", iocp_object->ref.sock, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -1084,7 +1081,7 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("recvv(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.recvv.result);
+            tb_trace_d("recvv(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.recvv.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1096,13 +1093,13 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
             tb_assert_and_check_return_val(iocp_object->u.recvv.list == list, -1);
 
             // trace
-            tb_trace_d("recvv(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("recvv(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("recvv(%p, %lu): %s ..", iocp_object->sock, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("recvv(%p, %lu): %s ..", iocp_object->ref.sock, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1117,18 +1114,18 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
     // attempt to recv data directly
     DWORD flag = 0;
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.recvv.list, (DWORD)iocp_object->u.recvv.size, &real, &flag, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSARecv((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.recvv.list, (DWORD)iocp_object->u.recvv.size, &real, &flag, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // finished and skip iocp notification? return it directly
     if (!ok && iocp_object->skip_cpos)
     {
         // trace
-        tb_trace_d("recvv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", iocp_object->sock, real, iocp_object->skip_cpos);
+        tb_trace_d("recvv(%p): WSARecv: %u bytes, skip: %d, state: finished directly", iocp_object->ref.sock, real, iocp_object->skip_cpos);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
-    tb_trace_d("recvv(%p): WSARecv: %ld, skip: %d, lasterror: %d", iocp_object->sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("recvv(%p): WSARecv: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -1153,7 +1150,7 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("sendv(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.sendv.result);
+            tb_trace_d("sendv(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.sendv.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1166,13 +1163,13 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
             tb_assert_and_check_return_val(iocp_object->u.sendv.list == list, -1);
 
             // trace
-            tb_trace_d("sendv(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("sendv(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("sendv(%p, %lu): %s ..", iocp_object->sock, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("sendv(%p, %lu): %s ..", iocp_object->ref.sock, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1186,18 +1183,18 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
 
     // attempt to send data directly
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.sendv.list, (DWORD)iocp_object->u.sendv.size, &real, 0, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSASend((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.sendv.list, (DWORD)iocp_object->u.sendv.size, &real, 0, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // finished and skip iocp notification? return it directly
     if (!ok && iocp_object->skip_cpos)
     {
         // trace
-        tb_trace_d("sendv(%p): WSASend: %u bytes, skip: %d, state: finished directly", iocp_object->sock, real, iocp_object->skip_cpos);
+        tb_trace_d("sendv(%p): WSASend: %u bytes, skip: %d, state: finished directly", iocp_object->ref.sock, real, iocp_object->skip_cpos);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
-    tb_trace_d("sendv(%p): WSASend: %ld, skip: %d, lasterror: %d", iocp_object->sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("sendv(%p): WSASend: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -1222,7 +1219,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("urecvv(%p): state: %s, result: %ld", iocp_object->sock, tb_state_cstr(iocp_object->state), iocp_object->u.urecvv.result);
+            tb_trace_d("urecvv(%p): state: %s, result: %ld", iocp_object->ref.sock, tb_state_cstr(iocp_object->state), iocp_object->u.urecvv.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1236,13 +1233,13 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
             tb_assert_and_check_return_val(iocp_object->u.urecvv.list == list, -1);
 
             // trace
-            tb_trace_d("urecvv(%p): state: %s, continue ..", iocp_object->sock, tb_state_cstr(iocp_object->state));
+            tb_trace_d("urecvv(%p): state: %s, continue ..", iocp_object->ref.sock, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("urecvv(%p, %lu): %s ..", iocp_object->sock, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("urecvv(%p, %lu): %s ..", iocp_object->ref.sock, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1271,10 +1268,10 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
      * It's not safe to skip completion notifications for UDP:
      * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
      */
-    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.urecvv.list, (DWORD)iocp_object->u.urecvv.size, tb_null, pflag, (struct sockaddr*)iocp_object->buffer, psize, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSARecvFrom((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.urecvv.list, (DWORD)iocp_object->u.urecvv.size, tb_null, pflag, (struct sockaddr*)iocp_object->buffer, psize, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // trace
-    tb_trace_d("urecvv(%p): WSARecvFrom: %ld, lasterror: %d", iocp_object->sock, ok, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("urecvv(%p): WSARecvFrom: %ld, lasterror: %d", iocp_object->ref.sock, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -1299,7 +1296,7 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %ld", iocp_object->sock, addr, tb_state_cstr(iocp_object->state), iocp_object->u.usendv.result);
+            tb_trace_d("usendv(%p, %{ipaddr}): state: %s, result: %ld", iocp_object->ref.sock, addr, tb_state_cstr(iocp_object->state), iocp_object->u.usendv.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1312,13 +1309,13 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
             tb_assert_and_check_return_val(iocp_object->u.usendv.list == list, -1);
 
             // trace
-            tb_trace_d("usendv(%p, %{ipaddr}): state: %s, continue ..", iocp_object->sock, addr, tb_state_cstr(iocp_object->state));
+            tb_trace_d("usendv(%p, %{ipaddr}): state: %s, continue ..", iocp_object->ref.sock, addr, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", iocp_object->sock, addr, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("usendv(%p, %{ipaddr}, %lu): %s ..", iocp_object->ref.sock, addr, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1344,19 +1341,19 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
      * So we attempt to send data firstly without overlapped.
      */
     DWORD real = 0;
-    tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)iocp_object->u.usendv.list, (DWORD)iocp_object->u.usendv.size, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
+    tb_long_t ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)iocp_object->u.usendv.list, (DWORD)iocp_object->u.usendv.size, &real, 0, (struct sockaddr*)&d, (tb_int_t)n, tb_null, tb_null);
     if (!ok && real)
     {
         // trace
-        tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", iocp_object->sock, addr, real);
+        tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %u bytes, state: finished directly", iocp_object->ref.sock, addr, real);
         return (tb_long_t)real;
     }
 
     // post a send event
-    ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->sock), (WSABUF*)&iocp_object->u.usendv.list, (DWORD)iocp_object->u.usendv.size, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&iocp_object->olap, tb_null);
+    ok = tb_ws2_32()->WSASendTo((SOCKET)tb_sock2fd(iocp_object->ref.sock), (WSABUF*)&iocp_object->u.usendv.list, (DWORD)iocp_object->u.usendv.size, tb_null, 0, (struct sockaddr*)&d, (tb_int_t)n, (LPOVERLAPPED)&iocp_object->olap, tb_null);
 
     // trace
-    tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", iocp_object->sock, addr, ok, tb_ws2_32()->WSAGetLastError());
+    tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", iocp_object->ref.sock, addr, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
     if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
@@ -1382,7 +1379,7 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("read(%p): state: %s, result: %ld", iocp_object->pipe, tb_state_cstr(iocp_object->state), iocp_object->u.read.result);
+            tb_trace_d("read(%p): state: %s, result: %ld", iocp_object->ref.pipe, tb_state_cstr(iocp_object->state), iocp_object->u.read.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1391,13 +1388,13 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
         else if (iocp_object->state == TB_STATE_WAITING)
         {
             // trace
-            tb_trace_d("read(%p): state: %s, continue ..", iocp_object->pipe, tb_state_cstr(iocp_object->state));
+            tb_trace_d("read(%p): state: %s, continue ..", iocp_object->ref.pipe, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("read(%p, %lu): %s ..", iocp_object->pipe, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("read(%p, %lu): %s ..", iocp_object->ref.pipe, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1407,18 +1404,18 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
 
     // attempt to read data directly
     DWORD real = 0;
-    BOOL ok = ReadFile((HANDLE)iocp_object->pipe, data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
+    BOOL ok = ReadFile((HANDLE)iocp_object->ref.pipe, data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
 
     // finished? return it directly
     if (ok)
     {
         // trace
-        tb_trace_d("read(%p): ReadFile: %u bytes, state: finished directly", iocp_object->pipe, real);
+        tb_trace_d("read(%p): ReadFile: %u bytes, state: finished directly", iocp_object->ref.pipe, real);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
-    tb_trace_d("read(%p): ReadFile: %ld, lasterror: %d", iocp_object->pipe, ok, GetLastError());
+    tb_trace_d("read(%p): ReadFile: %ld, lasterror: %d", iocp_object->ref.pipe, ok, GetLastError());
 
     // pending? continue to wait it
     if (!ok && (ERROR_IO_PENDING == WSAGetLastError()))
@@ -1443,7 +1440,7 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
         if (iocp_object->state == TB_STATE_FINISHED)
         {
             // trace
-            tb_trace_d("write(%p): state: %s, result: %ld", iocp_object->pipe, tb_state_cstr(iocp_object->state), iocp_object->u.write.result);
+            tb_trace_d("write(%p): state: %s, result: %ld", iocp_object->ref.pipe, tb_state_cstr(iocp_object->state), iocp_object->u.write.result);
 
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
@@ -1453,13 +1450,13 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
         else if (iocp_object->state == TB_STATE_WAITING)
         {
             // trace
-            tb_trace_d("write(%p): state: %s, continue ..", iocp_object->pipe, tb_state_cstr(iocp_object->state));
+            tb_trace_d("write(%p): state: %s, continue ..", iocp_object->ref.pipe, tb_state_cstr(iocp_object->state));
             return 0;
         }
     }
 
     // trace
-    tb_trace_d("write(%p, %lu): %s ..", iocp_object->pipe, size, tb_state_cstr(iocp_object->state));
+    tb_trace_d("write(%p, %lu): %s ..", iocp_object->ref.pipe, size, tb_state_cstr(iocp_object->state));
 
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
@@ -1469,18 +1466,18 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
 
     // attempt to write data directly
     DWORD real = 0;
-    BOOL ok = WriteFile((HANDLE)iocp_object->pipe, data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
+    BOOL ok = WriteFile((HANDLE)iocp_object->ref.pipe, data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
 
     // finished? return it directly
     if (ok)
     {
         // trace
-        tb_trace_d("write(%p): WriteFile: %u bytes, state: finished directly", iocp_object->pipe, real);
+        tb_trace_d("write(%p): WriteFile: %u bytes, state: finished directly", iocp_object->ref.pipe, real);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
     // trace
-    tb_trace_d("write(%p): WriteFile: %ld, lasterror: %d", iocp_object->pipe, ok, GetLastError());
+    tb_trace_d("write(%p): WriteFile: %ld, lasterror: %d", iocp_object->ref.pipe, ok, GetLastError());
 
     // ok or pending? continue to wait it
     if (!ok && (ERROR_IO_PENDING == GetLastError()))
