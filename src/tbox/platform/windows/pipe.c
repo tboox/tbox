@@ -29,6 +29,14 @@
 #   include "../../coroutine/coroutine.h"
 #   include "../../coroutine/impl/impl.h"
 #endif
+#include "../atomic.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the anonymous pipe name prefix
+#define TB_PIPE_ANONYMOUS_PREFIX    "tbox_pipe_"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -48,6 +56,9 @@ typedef struct __tb_pipe_file_t
 
     // the real writed/readed size
     DWORD               real;
+
+    // is connected
+    tb_bool_t           connected;
 
     // the overlap
     OVERLAPPED          overlap; 
@@ -74,21 +85,6 @@ static __tb_inline__ tb_wchar_t const* tb_pipe_file_name(tb_char_t const* name, 
     tb_assert_and_check_return_val(size > 0, tb_null);
     return tb_atow(data, pipename, maxn) != -1? data : tb_null;
 }
-static tb_pipe_file_t* tb_pipe_file_init_impl(tb_char_t const* name, HANDLE pipe)
-{
-    // check
-    tb_assert_and_check_return_val(pipe, tb_null);
-
-    // init pipe file
-    tb_pipe_file_t* file = tb_malloc0_type(tb_pipe_file_t);
-    tb_assert_and_check_return_val(file, tb_null);
-
-    file->data = tb_null;
-    file->real = 0;
-    file->pipe = pipe;
-    file->name = name? tb_strdup(name) : tb_null;
-    return file;
-}
 HANDLE tb_pipe_file_handle(tb_pipe_file_t* file)
 {
     tb_assert_and_check_return_val(file, tb_null);
@@ -104,14 +100,25 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
     tb_assert_and_check_return_val(name, tb_null);
     tb_assert_and_check_return_val(mode == TB_FILE_MODE_WO || mode == TB_FILE_MODE_RO, tb_null);
     
-    HANDLE    pipefd = tb_null;
-    tb_bool_t ok = tb_false;
+    tb_bool_t       ok = tb_false;
+    tb_pipe_file_t* file = tb_null;
     do
     {
+        // init pipe file
+        file = tb_malloc0_type(tb_pipe_file_t);
+        tb_assert_and_check_break(file);
+
         // get pipe name
         tb_wchar_t buffer[TB_PATH_MAXN];
         tb_wchar_t const* pipename = tb_pipe_file_name(name, buffer, tb_arrayn(buffer));
         tb_assert_and_check_break(pipename);
+
+        // save the pipe name if be named pipe
+        if (!tb_strstr(name, TB_PIPE_ANONYMOUS_PREFIX)) 
+        {
+            file->name = tb_strdup(name);
+            tb_assert_and_check_break(file->name);
+        }
 
         // set pipe handles are not inherited 
         SECURITY_ATTRIBUTES sattr; 
@@ -122,17 +129,14 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         if (mode == TB_FILE_MODE_WO)
         {
             // create named pipe
-            pipefd = CreateNamedPipeW(pipename, PIPE_ACCESS_INBOUND | PIPE_ACCESS_OUTBOUND, PIPE_WAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
-            tb_assert_and_check_break(pipefd && pipefd != INVALID_HANDLE_VALUE);
-
-            // connect pipe
-            if (!ConnectNamedPipe(pipefd, tb_null)) break;
+            file->pipe = CreateNamedPipeW(pipename, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_REJECT_REMOTE_CLIENTS | PIPE_TYPE_BYTE | PIPE_WAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
+            tb_assert_and_check_break(file->pipe && file->pipe != INVALID_HANDLE_VALUE);
         }
         else
         {
             // open named pipe
-            pipefd = CreateFileW(pipename, GENERIC_READ | GENERIC_WRITE, 0, tb_null, OPEN_EXISTING, 0, tb_null);
-            tb_assert_and_check_break(pipefd && pipefd != INVALID_HANDLE_VALUE);
+            file->pipe = CreateFileW(pipename, GENERIC_READ, 0, tb_null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, tb_null);
+            tb_assert_and_check_break(file->pipe && file->pipe != INVALID_HANDLE_VALUE);
         }
 
         // ok
@@ -143,37 +147,67 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
     // failed? 
     if (!ok)
     {
-        if (pipefd != INVALID_HANDLE_VALUE)
-            CloseHandle(pipefd);
-        pipefd = tb_null;
+        // exit the pipe file
+        if (file) tb_pipe_file_exit((tb_pipe_file_ref_t)file);
+        file = tb_null;
     }
-    return pipefd? (tb_pipe_file_ref_t)tb_pipe_file_init_impl(name, pipefd) : tb_null;
+    return (tb_pipe_file_ref_t)file;
 }
 tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
 {
     // check
     tb_assert_and_check_return_val(pair, tb_false);
 
-    HANDLE    pipefd[2] = {0};
     tb_bool_t ok = tb_false;
     do
     {
-        // set pipe handles are not inherited 
-        SECURITY_ATTRIBUTES sattr; 
-        sattr.nLength              = sizeof(SECURITY_ATTRIBUTES);
-        sattr.bInheritHandle       = FALSE;
-        sattr.lpSecurityDescriptor = tb_null;
+        // init the pipe pair
+        pair[0] = tb_null;
+        pair[1] = tb_null;
 
-        // create pipe fd pair
-        if (!CreatePipe(&pipefd[0], &pipefd[1], &sattr, (DWORD)buffer_size)) break;
-        tb_assert_and_check_break(pipefd[0] != INVALID_HANDLE_VALUE);
-        tb_assert_and_check_break(pipefd[1] != INVALID_HANDLE_VALUE);
+        // get pid and tid
+        DWORD pid = GetCurrentProcessId();
+        DWORD tid = GetCurrentThreadId();
 
-        // save to file pair
-        pair[0] = (tb_pipe_file_ref_t)tb_pipe_file_init_impl(tb_null, pipefd[0]);
-        pair[1] = (tb_pipe_file_ref_t)tb_pipe_file_init_impl(tb_null, pipefd[1]);
-        tb_assert_and_check_break(pair[0] && pair[1]);
-        
+        // get the timestamp
+        LARGE_INTEGER timestamp;
+        BOOL success = QueryPerformanceCounter(&timestamp);
+        tb_assert_and_check_break(success);
+
+        // get the pipe name id
+        static tb_atomic32_t s_pipe_id = 0;
+
+        /* get the unique pipe name
+         *
+         * asynchronous (overlapped) read and write operations are not supported by anonymous pipes.
+         * @see https://docs.microsoft.com/zh-cn/windows/win32/ipc/anonymous-pipe-operations?redirectedfrom=MSDN
+         *
+         * so we need to use a named pipe with a unique name to support it. (for overlapped/io and iocp)
+         */
+        tb_char_t name[128] = {0};
+        tb_long_t size = tb_snprintf(name, sizeof(name), TB_PIPE_ANONYMOUS_PREFIX "%08x_%08x_%08x_%08x%08x", pid, tid, tb_atomic32_fetch_and_add(&s_pipe_id, 1), timestamp.HighPart, timestamp.LowPart);
+        tb_assert_and_check_break(size > 0);
+
+        // init the anonymous pipe for writing
+        pair[1] = tb_pipe_file_init(name, TB_FILE_MODE_WO, buffer_size);
+        tb_assert_and_check_break(pair[1]);
+
+        // connect the writed pipe first
+        tb_long_t connected = tb_pipe_file_connect(pair[1]);
+
+        // init the anonymous pipe for reading
+        pair[0] = tb_pipe_file_init(name, TB_FILE_MODE_RO, buffer_size);
+        tb_assert_and_check_break(pair[0]);
+
+        // wait the connected result
+        do 
+        {
+            tb_long_t wait = tb_pipe_file_wait(pair[1], TB_PIPE_EVENT_CONN, -1);
+            tb_assert_and_check_break(wait > 0);
+
+        } while (!(connected = tb_pipe_file_connect(pair[1])));
+        tb_assert_and_check_break(connected > 0);
+
         // ok
         ok = tb_true;
 
@@ -188,6 +222,26 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
     }
     return ok;
 }
+tb_long_t tb_pipe_file_connect(tb_pipe_file_ref_t self)
+{
+    // check
+    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
+    tb_assert_and_check_return_val(file && file->pipe, -1);
+
+    // has the completed result?
+    tb_check_return_val(!file->connected, 1);
+
+    // connect pipe
+    BOOL ok = ConnectNamedPipe(file->pipe, &file->overlap);
+    if (ok) return 1;
+    else
+    {
+        // pending?
+        if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+            return 0;
+        else return -1;
+    }
+}
 tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
 {
     // check
@@ -195,7 +249,7 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
     tb_assert_and_check_return_val(file, tb_false);
 
     // disconnect the named pipe
-    if (file->name && file->pipe) DisconnectNamedPipe(file->pipe);
+    if (file->connected && file->pipe) DisconnectNamedPipe(file->pipe);
 
     // close pipe
     if (file->pipe) 
@@ -226,43 +280,36 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
     if (iocp_object) return tb_iocp_object_read(iocp_object, data, size);
 #endif
 
-    // read
-    if (file->name)
+    // has the completed result?
+    if (file->real)
     {
-        // has the completed result?
-        tb_check_return_val(!file->real, (tb_long_t)file->real);
+         tb_long_t result = (tb_long_t)file->real;
+         file->real = 0;
+         return result;
+    }
 
-        // read data
-        file->data = data;
+    // read data
+    file->data = data;
+    file->real = 0;
+    BOOL ok = ReadFile(file->pipe, data, (DWORD)size, &file->real, &file->overlap);
+    if (ok && file->real == size)
+    {
+        DWORD real_size = file->real;
+        file->data = tb_null;
         file->real = 0;
-        BOOL ok = ReadFile(file->pipe, data, (DWORD)size, &file->real, &file->overlap);
-        if (ok && file->real == size)
+        return (tb_long_t)real_size;
+    }
+    else
+    {
+        // pending?
+        if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+            return 0;
+        else 
         {
-            DWORD real_size = file->real;
             file->data = tb_null;
             file->real = 0;
-            return (tb_long_t)real_size;
+            return -1;
         }
-        else
-        {
-            // pending?
-            if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
-                return 0;
-            else 
-            {
-                file->data = tb_null;
-                file->real = 0;
-                return -1;
-            }
-        }
-    }
-    else 
-    {
-        DWORD real_size = 0;
-        BOOL  ok = PeekNamedPipe(file->pipe, data, 1, &real_size, tb_null, tb_null);
-        if (ok && real_size > 0)
-            return ReadFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
-        else return -1;
     }
 }
 tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_size_t size)
@@ -278,40 +325,36 @@ tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_
     if (iocp_object) return tb_iocp_object_write(iocp_object, data, size);
 #endif
 
-    // write
-    if (file->name)
+    // has the completed result?
+    if (file->real)
     {
-        // has the completed result?
-        tb_check_return_val(!file->real, (tb_long_t)file->real);
+         tb_long_t result = (tb_long_t)file->real;
+         file->real = 0;
+         return result;
+    }
 
-        // write data
-        file->data = (tb_byte_t*)data;
+    // write data
+    file->data = (tb_byte_t*)data;
+    file->real = 0;
+    BOOL ok = WriteFile(file->pipe, file->data, (DWORD)size, &file->real, &file->overlap);
+    if (ok && file->real == size)
+    {
+        DWORD real_size = file->real;
+        file->data = tb_null;
         file->real = 0;
-        BOOL ok = WriteFile(file->pipe, file->data, (DWORD)size, &file->real, &file->overlap);
-        if (ok && file->real == size)
+        return (tb_long_t)real_size;
+    }
+    else
+    {
+        // pending?
+        if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+            return 0;
+        else 
         {
-            DWORD real_size = file->real;
             file->data = tb_null;
             file->real = 0;
-            return (tb_long_t)real_size;
+            return -1;
         }
-        else
-        {
-            // pending?
-            if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
-                return 0;
-            else 
-            {
-                file->data = tb_null;
-                file->real = 0;
-                return -1;
-            }
-        }
-    }
-    else 
-    {
-        DWORD real_size = 0;
-        return WriteFile(file->pipe, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
     }
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t timeout)
@@ -327,14 +370,13 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t
     {
     case WAIT_OBJECT_0: // ok
         {
-            // wait for named pipe?
-            if (file->name)
+            // get pending result?
+            if (GetOverlappedResult(file->pipe, &file->overlap, &file->real, FALSE))
             {
-                // pending?
-                if (file->data && GetOverlappedResult(file->pipe, &file->overlap, &file->real, FALSE))
-                    ok = 1;
-            } 
-            else ok = 1;
+                if (events & TB_PIPE_EVENT_CONN)
+                    file->connected = tb_true;
+                ok = events;
+            }
         }
         break;
     case WAIT_TIMEOUT: // timeout 

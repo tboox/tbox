@@ -80,7 +80,7 @@ tb_bool_t tb_pipe_file_bread(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t
     while (read < size)
     {
         // read it
-        tb_long_t real = tb_pipe_file_read(file, data + read, size - read);
+        tb_long_t real = tb_pipe_file_read(file, data + read, tb_min(size - read, 8192));
 
         // has data?
         if (real > 0) 
@@ -108,7 +108,7 @@ tb_bool_t tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_
     while (writ < size)
     {
         // write it
-        tb_long_t real = tb_pipe_file_write(file, data + writ, size - writ);
+        tb_long_t real = tb_pipe_file_write(file, data + writ, tb_min(size - writ, 8192));
 
         // has data?
         if (real > 0) 

@@ -202,6 +202,10 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t file)
     }
     return ok;
 }
+tb_long_t tb_pipe_file_connect(tb_pipe_file_ref_t file)
+{
+    return 1;
+}
 tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size)
 {
     // check

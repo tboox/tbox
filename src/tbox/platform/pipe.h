@@ -44,6 +44,7 @@ typedef __tb_typeref__(pipe_file);
 typedef enum __tb_event_event_e
 {
     TB_PIPE_EVENT_NONE = TB_SOCKET_EVENT_NONE
+,   TB_PIPE_EVENT_CONN = 0x4                    ///!< only for windows
 ,   TB_PIPE_EVENT_READ = TB_SOCKET_EVENT_RECV
 ,   TB_PIPE_EVENT_WRIT = TB_SOCKET_EVENT_SEND
 
@@ -83,6 +84,14 @@ tb_bool_t               tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_si
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_pipe_file_exit(tb_pipe_file_ref_t file);
+
+/*! connect the given named pipe file on server side
+ *
+ * @param file          the pipe file
+ *
+ * @return              ok: 1, continue: 0; failed: -1
+ */
+tb_long_t               tb_pipe_file_connect(tb_pipe_file_ref_t file);
 
 /*! read the pipe file data (non-block)
  * 
