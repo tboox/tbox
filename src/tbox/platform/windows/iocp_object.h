@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../impl/pollerdata.h"
 #include "../../container/list_entry.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -52,8 +53,10 @@ typedef enum __tb_iocp_object_code_e
 ,   TB_IOCP_OBJECT_CODE_URECVV = 9       //!< recv iovec data for udp
 ,   TB_IOCP_OBJECT_CODE_USENDV = 10      //!< send iovec data for udp
 ,   TB_IOCP_OBJECT_CODE_SENDF  = 11      //!< maybe return TB_STATE_NOT_SUPPORTED
+,   TB_IOCP_OBJECT_CODE_READ   = 12      //!< read data for pipe
+,   TB_IOCP_OBJECT_CODE_WRITE  = 13      //!< write data for pipe
 
-,   TB_IOCP_OBJECT_CODE_MAXN   = 12
+,   TB_IOCP_OBJECT_CODE_MAXN   = 14
 
 }tb_iocp_object_code_e;
 
@@ -241,6 +244,22 @@ typedef struct __tb_iocp_object_sendf_t
 
 }tb_iocp_object_sendf_t;
 
+// the read iocp object type for ReadFile
+typedef struct __tb_iocp_object_read_t
+{
+    // the result
+    tb_long_t                       result;
+
+}tb_iocp_object_read_t;
+
+// the write iocp object type for WriteFile
+typedef struct __tb_iocp_object_write_t
+{
+    // the result
+    tb_long_t                       result;  
+
+}tb_iocp_object_write_t;
+
 // the iocp object type
 typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
 {
@@ -252,6 +271,9 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
 
     // the socket
     tb_socket_ref_t                 sock;
+
+    // the pipe file
+    tb_pipe_file_ref_t              pipe;
 
     // the user private data
     tb_cpointer_t                   priv;
@@ -283,7 +305,8 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
         tb_iocp_object_urecvv_t     urecvv;
         tb_iocp_object_usendv_t     usendv;
         tb_iocp_object_sendf_t      sendf;
-
+        tb_iocp_object_read_t       read;
+        tb_iocp_object_write_t      write;
     } u;
 
     // the object code
@@ -311,37 +334,57 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
  * interfaces
  */
 
-/* get or new an iocp object from the given socket in local thread
+/* get or new an iocp object from the given poller object in local thread
  *
  * @note only init object once in every thread
  *
- * @param sock              the socket 
- * @param waitevent         the socket event which will be waited
+ * @param object            the poller object 
+ * @param waitevent         the poller event which will be waited
  *
  * @return                  the iocp object
  */
-tb_iocp_object_ref_t        tb_iocp_object_get_or_new(tb_socket_ref_t sock, tb_size_t waitevent);
+tb_iocp_object_ref_t        tb_iocp_object_get_or_new(tb_poller_object_ref_t object, tb_size_t waitevent);
 
-/* get iocp object from the given socket in local thread
+/* get iocp object from the given poller object in local thread
  *
- * @param sock              the socket 
- * @param waitevent         the socket event which will be waited
+ * @param object            the poller object 
+ * @param waitevent         the poller event which will be waited
  *
  * @return                  the iocp object
  */
-tb_iocp_object_ref_t        tb_iocp_object_get(tb_socket_ref_t sock, tb_size_t waitevent);
+tb_iocp_object_ref_t        tb_iocp_object_get(tb_poller_object_ref_t object, tb_size_t waitevent);
 
-/* remove iocp object for the given socket in local thread
+/* remove iocp object for the given poller object in local thread
  *
- * @param sock              the socket 
+ * @param object            the poller object 
  */
-tb_void_t                   tb_iocp_object_remove(tb_socket_ref_t sock);
+tb_void_t                   tb_iocp_object_remove(tb_poller_object_ref_t object);
 
 /* clear iocp object state and buffer
  *
  * @param object            the iocp object 
  */
 tb_void_t                   tb_iocp_object_clear(tb_iocp_object_ref_t object);
+
+/* read the pipe data 
+ *
+ * @param object            the iocp object 
+ * @param data              the data
+ * @param size              the size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_read(tb_iocp_object_ref_t object, tb_byte_t* data, tb_size_t size);
+
+/* write the pipe data
+ *
+ * @param object            the iocp object 
+ * @param data              the data
+ * @param size              the size
+ *
+ * @return                  the real size or -1
+ */
+tb_long_t                   tb_iocp_object_write(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
 
 /*! accept socket
  *
@@ -371,7 +414,7 @@ tb_long_t                   tb_iocp_object_connect(tb_iocp_object_ref_t object, 
  */
 tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_byte_t* data, tb_size_t size);
 
-/* connect the given client address
+/* send the socket data for tcp
  *
  * @param object            the iocp object 
  * @param data              the data
@@ -455,6 +498,38 @@ tb_long_t                   tb_iocp_object_usendv(tb_iocp_object_ref_t object, t
  * @return                  the real size or -1
  */
 tb_hong_t                   tb_iocp_object_sendf(tb_iocp_object_ref_t object, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * inline implementation
+ */
+static __tb_inline__ tb_iocp_object_ref_t tb_iocp_object_get_or_new_from_sock(tb_socket_ref_t sock, tb_size_t waitevent)
+{
+    tb_poller_object_t object;
+    object.type = TB_POLLER_OBJECT_SOCK;
+    object.ref.sock = sock;
+    return tb_iocp_object_get_or_new(&object, waitevent);
+}
+static __tb_inline__ tb_iocp_object_ref_t tb_iocp_object_get_from_sock(tb_socket_ref_t sock, tb_size_t waitevent)
+{
+    tb_poller_object_t object;
+    object.type = TB_POLLER_OBJECT_SOCK;
+    object.ref.sock = sock;
+    return tb_iocp_object_get(&object, waitevent);
+}
+static __tb_inline__ tb_iocp_object_ref_t tb_iocp_object_get_or_new_from_pipe(tb_pipe_file_ref_t pipe, tb_size_t waitevent)
+{
+    tb_poller_object_t object;
+    object.type = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = pipe;
+    return tb_iocp_object_get_or_new(&object, waitevent);
+}
+static __tb_inline__ tb_iocp_object_ref_t tb_iocp_object_get_from_pipe(tb_pipe_file_ref_t pipe, tb_size_t waitevent)
+{
+    tb_poller_object_t object;
+    object.type = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = pipe;
+    return tb_iocp_object_get(&object, waitevent);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -427,8 +427,8 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to connect if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_CONN);
-    if (object) return tb_iocp_object_connect(object, addr);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_CONN);
+    if (iocp_object) return tb_iocp_object_connect(iocp_object, addr);
 #endif
 
     // load addr
@@ -509,8 +509,8 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to accept if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_ACPT);
-    if (object) return tb_iocp_object_accept(object, addr);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_ACPT);
+    if (iocp_object) return tb_iocp_object_accept(iocp_object, addr);
 #endif
 
     // done
@@ -659,8 +659,8 @@ tb_long_t tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to recv data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_RECV);
-    if (object) return tb_iocp_object_recv(object, data, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_RECV);
+    if (iocp_object) return tb_iocp_object_recv(iocp_object, data, size);
 #endif
 
     // recv
@@ -686,8 +686,8 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to send data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
-    if (object) return tb_iocp_object_send(object, data, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_send(iocp_object, data, size);
 #endif
 
     // recv
@@ -712,8 +712,8 @@ tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t of
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to send file data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
-    if (object) return tb_iocp_object_sendf(object, file, offset, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_sendf(iocp_object, file, offset, size);
 #endif
 
     // read data
@@ -734,8 +734,8 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to urecv data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_RECV);
-    if (object) return tb_iocp_object_urecv(object, addr, data, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_RECV);
+    if (iocp_object) return tb_iocp_object_urecv(iocp_object, addr, data, size);
 #endif
 
     // recv
@@ -767,8 +767,8 @@ tb_long_t tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t 
 
 #ifndef TB_CONFIG_MICRO_ENABLE
     // attempt to use iocp object to usend data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
-    if (object) return tb_iocp_object_usend(object, addr, data, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_usend(iocp_object, addr, data, size);
 #endif
 
     // load addr
@@ -795,8 +795,8 @@ tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
     tb_assert_and_check_return_val(sock && list && size, -1);
 
     // attempt to use iocp object to recv data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_RECV);
-    if (object) return tb_iocp_object_recvv(object, list, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_RECV);
+    if (iocp_object) return tb_iocp_object_recvv(iocp_object, list, size);
 
     // walk read
     tb_size_t i = 0;
@@ -837,8 +837,8 @@ tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_
     tb_assert_and_check_return_val(sock && list && size, -1);
 
     // attempt to use iocp object to send data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
-    if (object) return tb_iocp_object_sendv(object, list, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_sendv(iocp_object, list, size);
 
     // walk writ
     tb_size_t i = 0;
@@ -879,8 +879,8 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
     tb_assert_and_check_return_val(sock && list && size, -1);
 
     // attempt to use iocp object to recv data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
-    if (object) return tb_iocp_object_urecvv(object, addr, list, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_urecvv(iocp_object, addr, list, size);
 
     // done
     tb_size_t               i = 0;
@@ -927,8 +927,8 @@ tb_long_t tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
     tb_assert_and_check_return_val(!tb_ipaddr_is_empty(addr), -1);
 
     // attempt to use iocp object to send data if exists
-    tb_iocp_object_ref_t object = tb_iocp_object_get_or_new(sock, TB_SOCKET_EVENT_SEND);
-    if (object) return tb_iocp_object_usendv(object, addr, list, size);
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_sock(sock, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_usendv(iocp_object, addr, list, size);
 
     // load addr
     tb_size_t               n = 0;

@@ -33,10 +33,10 @@
  */
 
 // get the poller object type from the private pointer
-#define tb_poller_priv_get_object_type(ptr) (((tb_size_t)(ptr) & (0x1UL << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK) 
+#define tb_poller_priv_get_object_type(ptr) (((tb_size_t)(ptr) & ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK) 
 
 // get the original private pointer
-#define tb_poller_priv_get_original(ptr)    ((tb_cpointer_t)((tb_size_t)(ptr) & ~(0x1UL << (TB_CPU_BITSIZE - 1))))
+#define tb_poller_priv_get_original(ptr)    ((tb_cpointer_t)((tb_size_t)(ptr) & ~((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1))))
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -129,8 +129,8 @@ typedef struct __tb_poller_t
 static __tb_inline__ tb_cpointer_t tb_poller_priv_set_object_type(tb_poller_object_ref_t object, tb_cpointer_t ptr)
 {
     // must be a valid pointer address 
-    tb_assert(!((tb_size_t)ptr & (0x1UL << (TB_CPU_BITSIZE - 1))));
-    return object->type == TB_POLLER_OBJECT_PIPE? (tb_cpointer_t)((tb_size_t)ptr | (0x1UL << (TB_CPU_BITSIZE - 1))) : ptr;
+    tb_assert(!((tb_size_t)ptr & ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1))));
+    return object->type == TB_POLLER_OBJECT_PIPE? (tb_cpointer_t)((tb_size_t)ptr | ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1))) : ptr;
 }
 
 #endif

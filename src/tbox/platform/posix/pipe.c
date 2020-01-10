@@ -223,7 +223,7 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t 
     // error
     return -1;
 }
-tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);

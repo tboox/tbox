@@ -25,6 +25,10 @@
 #include "prefix.h"
 #include "../pipe.h"
 #include "../file.h"
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -216,6 +220,12 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
     tb_assert_and_check_return_val(file && file->pipe && data, -1);
     tb_check_return_val(size, 0);
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // attempt to use iocp object to read data if exists
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_pipe(self, TB_POLLER_EVENT_RECV);
+    if (iocp_object) return tb_iocp_object_read(iocp_object, data, size);
+#endif
+
     // read
     if (file->name)
     {
@@ -255,12 +265,18 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
         else return -1;
     }
 }
-tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_pipe_file_t* file = (tb_pipe_file_t*)self;
     tb_assert_and_check_return_val(file && file->pipe && data, -1);
     tb_check_return_val(size, 0);
+
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // attempt to use iocp object to read data if exists
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_pipe(self, TB_POLLER_EVENT_SEND);
+    if (iocp_object) return tb_iocp_object_write(iocp_object, data, size);
+#endif
 
     // write
     if (file->name)

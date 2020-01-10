@@ -102,7 +102,7 @@ tb_long_t               tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* da
  *
  * @return              the real size or -1
  */
-tb_long_t               tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size);
+tb_long_t               tb_pipe_file_write(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /*! wait the pipe file events
  *

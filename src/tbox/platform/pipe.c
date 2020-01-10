@@ -60,7 +60,7 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t 
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_pipe_file_writ(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
@@ -108,7 +108,7 @@ tb_bool_t tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_
     while (writ < size)
     {
         // write it
-        tb_long_t real = tb_pipe_file_writ(file, data + writ, size - writ);
+        tb_long_t real = tb_pipe_file_write(file, data + writ, size - writ);
 
         // has data?
         if (real > 0) 
