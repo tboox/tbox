@@ -350,10 +350,8 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_poller_object_ref_t object, tb
             tb_assert_and_check_break(iocp_object);
 
             // init iocp object
-            if (object->type == TB_POLLER_OBJECT_SOCK)
-                iocp_object->ref.sock = object->ref.sock;
-            else iocp_object->ref.pipe = object->ref.pipe;
             tb_iocp_object_clear(iocp_object);
+            iocp_object->ref.ptr = object->ref.ptr;
 
             // save iocp object
             tb_pollerdata_set(pollerdata, object, (tb_cpointer_t)iocp_object);
@@ -498,18 +496,6 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
         tb_int_t enable = 1;
         tb_ws2_32()->setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
-        // skip the completion notification on success
-        if (tb_kernel32_has_SetFileCompletionNotificationModes())
-        {
-            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)clientfd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
-            {
-                tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->u.acpt.result, TB_SOCKET_EVENT_RECV);
-                tb_iocp_object_ref_t client_object_send = tb_iocp_object_get_or_new_from_sock(iocp_object->u.acpt.result, TB_SOCKET_EVENT_SEND);
-                if (client_object_recv) client_object_recv->skip_cpos = 1;
-                if (client_object_send) client_object_send->skip_cpos = 1;
-            }
-        }
-
         // get accept socket addresses
         INT                         server_size = 0;
         INT                         client_size = 0;
@@ -587,17 +573,6 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
             tb_iocp_object_clear(iocp_object);
             if (tb_ipaddr_is_equal(&iocp_object->u.conn.addr, addr))
             {
-                // skip the completion notification on success
-                if (tb_kernel32_has_SetFileCompletionNotificationModes())
-                {
-                    if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(iocp_object->ref.sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
-                    {
-                        iocp_object->skip_cpos = 1;
-                        tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->ref.sock, TB_SOCKET_EVENT_RECV);
-                        if (client_object_recv) client_object_recv->skip_cpos = 1;
-                    }
-                }
-
                 // trace
                 tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: %s, result: %ld", iocp_object->ref.sock, addr, iocp_object->skip_cpos, tb_state_cstr(iocp_object->state), iocp_object->u.conn.result);
 
@@ -669,17 +644,6 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
         // trace
         tb_trace_d("connect(%p): ConnectEx: %d, lasterror: %d", iocp_object->ref.sock, ConnectEx_ok, tb_ws2_32()->WSAGetLastError());
         tb_check_break(ConnectEx_ok);
-
-        // skip the completion notification on success
-        if (tb_kernel32_has_SetFileCompletionNotificationModes())
-        {
-            if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)(SOCKET)tb_sock2fd(iocp_object->ref.sock), FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
-            {
-                iocp_object->skip_cpos = 1;
-                tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->ref.sock, TB_SOCKET_EVENT_RECV);
-                if (client_object_recv) client_object_recv->skip_cpos = 1;
-            }
-        }
 
         // trace
         tb_trace_d("connect(%p): %{ipaddr}, skip: %d, state: finished directly", iocp_object->ref.sock, addr, iocp_object->skip_cpos);

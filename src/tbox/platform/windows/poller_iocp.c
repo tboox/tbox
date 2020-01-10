@@ -189,18 +189,6 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
             tb_int_t enable = 1;
             tb_ws2_32()->setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (tb_char_t*)&enable, sizeof(enable));
 
-            // skip the completion notification on success
-            if (tb_kernel32_has_SetFileCompletionNotificationModes())
-            {
-                if (tb_kernel32()->SetFileCompletionNotificationModes((HANDLE)fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
-                {
-                    tb_iocp_object_ref_t client_object_recv = tb_iocp_object_get_or_new_from_sock(iocp_object->u.acpt.result, TB_POLLER_EVENT_RECV);
-                    tb_iocp_object_ref_t client_object_send = tb_iocp_object_get_or_new_from_sock(iocp_object->u.acpt.result, TB_POLLER_EVENT_SEND);
-                    if (client_object_recv) client_object_recv->skip_cpos = 1;
-                    if (client_object_send) client_object_send->skip_cpos = 1;
-                }
-            }
-
             // get accept socket addresses
             INT                         server_size = 0;
             INT                         client_size = 0;
@@ -507,7 +495,7 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     tb_assert(iocp_object);
     tb_assert_and_check_return_val(poller, tb_false);
 
-    // bind this socket and iocp object to port
+    // bind this iocp object to port
     if (!iocp_object->port) 
     {
         // get the another iocp object with this socket
@@ -528,8 +516,13 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
         if (!iocp_object_another || iocp_object_another == iocp_object)
             iocp_object_another = tb_iocp_object_get(&object, TB_POLLER_EVENT_SEND);
 
-        // bind iocp port
-        if (!iocp_object_another || !iocp_object_another->port)
+        if (iocp_object_another && iocp_object_another->port)
+        {
+            // sync port and skip mode from the another iocp object with same handle
+            iocp_object->port      = iocp_object_another->port;
+            iocp_object->skip_cpos = iocp_object_another->skip_cpos;
+        }
+        else
         {
             // trace
             tb_trace_d("CreateIoCompletionPort handle(%p) to port(%d) ..", handle, poller->port);
@@ -539,11 +532,17 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
             if (port != poller->port)
             {
                 // trace
-                tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), iocp_object->ref.sock);
+                tb_trace_e("CreateIoCompletionPort handle(%p) to port(%d), error: %d", handle, poller->port, GetLastError());
                 return tb_false;
             }
-            if (iocp_object_another) iocp_object_another->port = port;
             iocp_object->port = port;
+
+            // skip the completion notification on success
+            if (tb_kernel32_has_SetFileCompletionNotificationModes())
+            {
+                if (tb_kernel32()->SetFileCompletionNotificationModes(handle, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS))
+                    iocp_object->skip_cpos = 1;
+            }
         }
     }
     return tb_true;
