@@ -519,36 +519,39 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     if (!iocp_object->port) 
     {
         // get the another iocp object with this socket
+        HANDLE handle = tb_null;
         tb_poller_object_t object;
         if (iocp_object->code == TB_IOCP_OBJECT_CODE_READ || iocp_object->code == TB_IOCP_OBJECT_CODE_WRITE)
         {
             object.type = TB_POLLER_OBJECT_PIPE;
             object.ref.pipe = iocp_object->pipe;
+            handle = (HANDLE)iocp_object->pipe;
         }
         else
         {
             object.type = TB_POLLER_OBJECT_SOCK;
             object.ref.sock = iocp_object->sock;
+            handle = (HANDLE)(SOCKET)tb_sock2fd(iocp_object->sock);
         }
         tb_iocp_object_ref_t iocp_object_another = tb_iocp_object_get(&object, TB_POLLER_EVENT_RECV);
         if (!iocp_object_another || iocp_object_another == iocp_object)
             iocp_object_another = tb_iocp_object_get(&object, TB_POLLER_EVENT_SEND);
 
         // bind iocp port
-        if (!object_another || !object_another->port)
+        if (!iocp_object_another || !iocp_object_another->port)
         {
             // trace
-            tb_trace_d("CreateIoCompletionPort socket(%p) to port(%d) ..", iocp_object->sock, poller->port);
+            tb_trace_d("CreateIoCompletionPort handle(%p) to port(%d) ..", handle, poller->port);
 
             // do bind
-            HANDLE port = CreateIoCompletionPort((HANDLE)(SOCKET)tb_sock2fd(iocp_object->sock), poller->port, (ULONG_PTR)tb_null, 0);
+            HANDLE port = CreateIoCompletionPort(handle, poller->port, (ULONG_PTR)tb_null, 0);
             if (port != poller->port)
             {
                 // trace
                 tb_trace_e("CreateIoCompletionPort failed: %d, socket: %p", GetLastError(), iocp_object->sock);
                 return tb_false;
             }
-            if (object_another) object_another->port = port;
+            if (iocp_object_another) iocp_object_another->port = port;
             iocp_object->port = port;
         }
     }
@@ -606,7 +609,7 @@ static tb_bool_t tb_poller_iocp_insert(tb_poller_t* self, tb_poller_object_ref_t
 {
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
-    tb_assert_and_check_return_val(poller && sock, tb_false);
+    tb_assert_and_check_return_val(poller && object, tb_false);
 
     if (!(events & TB_POLLER_EVENT_NOEXTRA))
     {
