@@ -382,6 +382,18 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t
     tb_pipe_file_t* file = (tb_pipe_file_t*)self;
     tb_assert_and_check_return_val(file && file->pipe, -1);
 
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+    // attempt to wait it in coroutine
+    if (tb_coroutine_self()) 
+    {
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_PIPE;
+        object.ref.pipe = self;
+        return tb_coroutine_waitio(&object, events, timeout);
+    }
+#endif
+
     // wait it
     tb_long_t   ok = -1;
     DWORD       result = WaitForSingleObject(file->pipe, timeout < 0? INFINITE : (DWORD)timeout);
