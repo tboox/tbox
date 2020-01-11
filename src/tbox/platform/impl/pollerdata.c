@@ -23,8 +23,12 @@
  * includes
  */
 #include "pollerdata.h"
+#include "../pipe.h"
 #include "../thread_local.h"
 #include "../../libc/libc.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+#    include "../windows/windows.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -34,6 +38,37 @@
 #else
 #   define TB_POLLERDATA_GROW     (256)
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+#ifdef TB_CONFIG_OS_WINDOWS
+__tb_extern_c_enter__
+HANDLE tb_pipe_file_handle(tb_pipe_file_ref_t file);
+__tb_extern_c_leave__
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_long_t tb_pollerdata_object2fd(tb_poller_object_ref_t object)
+{
+    // check
+    tb_assert(object && object->ref.ptr);
+
+    // get the fd
+    tb_long_t fd;
+#ifdef TB_CONFIG_OS_WINDOWS
+    if (object->type == TB_POLLER_OBJECT_PIPE)
+        fd = (tb_long_t)tb_pipe_file_handle(object->ref.pipe);
+    else fd = tb_ptr2fd(object->ref.ptr);
+#else
+    fd = tb_ptr2fd(object->ref.ptr);
+#endif
+    tb_assert(fd > 0 && fd < TB_MAXS16);
+
+    return fd;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -57,12 +92,6 @@ tb_void_t tb_pollerdata_exit(tb_pollerdata_ref_t pollerdata)
     if (pollerdata->data) tb_free(pollerdata->data);
     pollerdata->data = tb_null;
     pollerdata->maxn = 0;
-
-#ifdef TB_CONFIG_OS_WINDOWS
-    // exit the pipe data
-    if (pollerdata->pipedata) tb_hash_map_exit(pollerdata->pipedata);
-    pollerdata->pipedata = tb_null;
-#endif
 }
 tb_void_t tb_pollerdata_clear(tb_pollerdata_ref_t pollerdata)
 {
@@ -71,34 +100,23 @@ tb_void_t tb_pollerdata_clear(tb_pollerdata_ref_t pollerdata)
 
     // clear data
     if (pollerdata->data) tb_memset(pollerdata->data, 0, pollerdata->maxn * sizeof(tb_cpointer_t));
+}
+tb_cpointer_t tb_pollerdata_get(tb_pollerdata_ref_t pollerdata, tb_poller_object_ref_t object)
+{
+    // check
+    tb_assert(pollerdata);
 
-#ifdef TB_CONFIG_OS_WINDOWS
-    // clear the pipe data
-    if (pollerdata->pipedata) tb_hash_map_clear(pollerdata->pipedata);
-#endif
+    // get the poller private data
+    tb_long_t fd = tb_pollerdata_object2fd(object);
+    return (pollerdata->data && fd < pollerdata->maxn)? pollerdata->data[fd] : tb_null;
 }
 tb_void_t tb_pollerdata_set(tb_pollerdata_ref_t pollerdata, tb_poller_object_ref_t object, tb_cpointer_t priv)
 {
     // check
     tb_assert(pollerdata && object);
 
-#ifdef TB_CONFIG_OS_WINDOWS
-    if (object->type == TB_POLLER_OBJECT_PIPE)
-    {
-        // init the pipe data if not exists
-        if (!pollerdata->pipedata)
-            pollerdata->pipedata = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
-        tb_assert(pollerdata->pipedata);
-
-        // save the private data for the pipe data 
-        tb_hash_map_insert(pollerdata->pipedata, object->ref.ptr, priv);
-        return ;
-    }
-#endif
-
     // get fd
-    tb_long_t fd = tb_ptr2fd(object->ref.ptr);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
+    tb_long_t fd = tb_pollerdata_object2fd(object);
 
     // no data? init it first
     tb_size_t need = fd + 1;
@@ -134,18 +152,8 @@ tb_void_t tb_pollerdata_reset(tb_pollerdata_ref_t pollerdata, tb_poller_object_r
     // check
     tb_assert(pollerdata && object);
 
-#ifdef TB_CONFIG_OS_WINDOWS
-    // remove the private data for the pipe data 
-    if (object->type == TB_POLLER_OBJECT_PIPE)
-    {
-        if (pollerdata->pipedata) tb_hash_map_remove(pollerdata->pipedata, object->ref.ptr);
-        return ;
-    }
-#endif
-
     // get fd
-    tb_long_t fd = tb_ptr2fd(object->ref.ptr);
-    tb_assert(fd > 0 && fd < TB_MAXS32);
+    tb_long_t fd = tb_pollerdata_object2fd(object);
 
     // remove the poller private data
     if (fd < pollerdata->maxn) pollerdata->data[fd] = tb_null;

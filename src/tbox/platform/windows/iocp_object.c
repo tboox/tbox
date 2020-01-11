@@ -207,32 +207,22 @@ static tb_bool_t tb_iocp_object_cancel(tb_iocp_object_ref_t iocp_object)
 {
     // check
     tb_assert_and_check_return_val(iocp_object && iocp_object->state == TB_STATE_WAITING, tb_false);
+    tb_assert_and_check_return_val(iocp_object->ref.ptr, tb_false);
 
     // trace
     tb_trace_d("object(%p): cancel io ..", iocp_object->ref.ptr);
 
-    // cancel pipe object?
+    // get the iocp object handle
+    HANDLE handle = tb_null;
     if (tb_iocp_object_is_pipe(iocp_object))
-    {
-        // check
-        tb_assert_and_check_return_val(iocp_object->ref.pipe, tb_false);
-        
-        // TODO
-        tb_trace_noimpl();
-        return tb_false;
-    }
-    else
-    {
-        // check
-        tb_assert_and_check_return_val(iocp_object->ref.sock, tb_false);
+        handle = (HANDLE)tb_pipe_file_handle(iocp_object->ref.pipe);
+    else handle = (HANDLE)(SOCKET)tb_sock2fd(iocp_object->ref.sock);
 
-        // cancel io
-        if (!CancelIo((HANDLE)(tb_size_t)tb_sock2fd(iocp_object->ref.sock)))
-        {
-            // trace
-            tb_trace_e("sock(%p): cancel io failed(%d)!", iocp_object->ref.sock, GetLastError());
-            return tb_false;
-        }
+    // cancel io
+    if (!CancelIo(handle))
+    {
+        tb_trace_e("object(%p): cancel io failed(%d)!", iocp_object->ref.ptr, GetLastError());
+        return tb_false;
     }
     return tb_true;
 }
