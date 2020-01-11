@@ -81,7 +81,7 @@ typedef struct __tb_poller_iocp_t
 __tb_extern_c_enter__
 
 tb_poller_iocp_ref_t    tb_poller_iocp_self();
-tb_bool_t               tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object);
+tb_bool_t               tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_bool_t is_pipe);
 
 __tb_extern_c_leave__
 
@@ -489,7 +489,7 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
     // ok
     return wait;
 }
-tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object)
+tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_bool_t is_pipe)
 {
     // check
     tb_assert(iocp_object);
@@ -501,7 +501,7 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
         // get the another iocp object with this socket
         HANDLE handle = tb_null;
         tb_poller_object_t object;
-        if (tb_iocp_object_is_pipe(iocp_object))
+        if (is_pipe)
         {
             object.type = TB_POLLER_OBJECT_PIPE;
             handle = (HANDLE)iocp_object->ref.pipe;

@@ -57,6 +57,12 @@ tb_void_t tb_pollerdata_exit(tb_pollerdata_ref_t pollerdata)
     if (pollerdata->data) tb_free(pollerdata->data);
     pollerdata->data = tb_null;
     pollerdata->maxn = 0;
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    // exit the pipe data
+    if (pollerdata->pipedata) tb_hash_map_exit(pollerdata->pipedata);
+    pollerdata->pipedata = tb_null;
+#endif
 }
 tb_void_t tb_pollerdata_clear(tb_pollerdata_ref_t pollerdata)
 {
@@ -65,11 +71,30 @@ tb_void_t tb_pollerdata_clear(tb_pollerdata_ref_t pollerdata)
 
     // clear data
     if (pollerdata->data) tb_memset(pollerdata->data, 0, pollerdata->maxn * sizeof(tb_cpointer_t));
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    // clear the pipe data
+    if (pollerdata->pipedata) tb_hash_map_clear(pollerdata->pipedata);
+#endif
 }
 tb_void_t tb_pollerdata_set(tb_pollerdata_ref_t pollerdata, tb_poller_object_ref_t object, tb_cpointer_t priv)
 {
     // check
     tb_assert(pollerdata && object);
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    if (object->type == TB_POLLER_OBJECT_PIPE)
+    {
+        // init the pipe data if not exists
+        if (!pollerdata->pipedata)
+            pollerdata->pipedata = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_ptr(tb_null, tb_null), tb_element_ptr(tb_null, tb_null));
+        tb_assert(pollerdata->pipedata);
+
+        // save the private data for the pipe data 
+        tb_hash_map_insert(pollerdata->pipedata, object->ref.ptr, priv);
+        return ;
+    }
+#endif
 
     // get fd
     tb_long_t fd = tb_ptr2fd(object->ref.ptr);
@@ -108,6 +133,15 @@ tb_void_t tb_pollerdata_reset(tb_pollerdata_ref_t pollerdata, tb_poller_object_r
 {
     // check
     tb_assert(pollerdata && object);
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    // remove the private data for the pipe data 
+    if (object->type == TB_POLLER_OBJECT_PIPE)
+    {
+        if (pollerdata->pipedata) tb_hash_map_remove(pollerdata->pipedata, object->ref.ptr);
+        return ;
+    }
+#endif
 
     // get fd
     tb_long_t fd = tb_ptr2fd(object->ref.ptr);

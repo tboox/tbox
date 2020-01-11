@@ -249,6 +249,24 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
     tb_pipe_file_t* file = (tb_pipe_file_t*)self;
     tb_assert_and_check_return_val(file, tb_false);
 
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to cancel waiting from coroutine first
+    tb_poller_object_t object;
+    tb_pointer_t scheduler_io = tb_null;
+    object.type     = TB_POLLER_OBJECT_PIPE;
+    object.ref.pipe = self;
+#   ifndef TB_CONFIG_MICRO_ENABLE
+    if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel((tb_co_scheduler_io_ref_t)scheduler_io, &object)) {}
+    else
+#   endif
+    if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel((tb_lo_scheduler_io_ref_t)scheduler_io, &object)) {}
+#endif
+
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // remove iocp object for this pipe file if exists
+    tb_iocp_object_remove(&object);
+#endif
+
     // disconnect the named pipe
     if (file->connected && file->pipe) DisconnectNamedPipe(file->pipe);
 

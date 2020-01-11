@@ -26,6 +26,7 @@
  * includes
  */
 #include "poller.h"
+#include "../../container/hash_map.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -54,6 +55,11 @@ typedef struct __tb_pollerdata_t
 
     // the poller data maximum count
     tb_size_t               maxn;
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    // the pipe data for windows, because the pipe reference is not fd on windows.
+    tb_hash_map_ref_t       pipedata;
+#endif
     
 }tb_pollerdata_t, *tb_pollerdata_ref_t;
 
@@ -99,6 +105,15 @@ tb_void_t               tb_pollerdata_reset(tb_pollerdata_ref_t pollerdata, tb_p
  */
 static __tb_inline__ tb_cpointer_t tb_pollerdata_get(tb_pollerdata_ref_t pollerdata, tb_poller_object_ref_t object)
 {
+    // check
+    tb_assert(pollerdata && object && object->ref.ptr);
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    // save the private data for the pipe data 
+    if (object->type == TB_POLLER_OBJECT_PIPE)
+        return pollerdata->pipedata? tb_hash_map_get(pollerdata->pipedata, object->ref.ptr) : tb_null;
+#endif
+
     // check
     tb_long_t fd = tb_ptr2fd(object->ref.ptr);
     tb_assert(pollerdata && fd > 0 && fd < TB_MAXS32);
