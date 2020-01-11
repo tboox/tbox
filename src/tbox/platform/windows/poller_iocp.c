@@ -82,6 +82,7 @@ __tb_extern_c_enter__
 
 tb_poller_iocp_ref_t    tb_poller_iocp_self();
 tb_bool_t               tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_bool_t is_pipe);
+HANDLE                  tb_pipe_file_handle(tb_pipe_file_ref_t file);
 
 __tb_extern_c_leave__
 
@@ -504,7 +505,7 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
         if (is_pipe)
         {
             object.type = TB_POLLER_OBJECT_PIPE;
-            handle = (HANDLE)iocp_object->ref.pipe;
+            handle = (HANDLE)tb_pipe_file_handle(iocp_object->ref.pipe);
         }
         else
         {

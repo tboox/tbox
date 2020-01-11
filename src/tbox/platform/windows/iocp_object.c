@@ -57,6 +57,7 @@ __tb_extern_c_enter__
 
 tb_poller_ref_t tb_poller_iocp_self();
 tb_bool_t       tb_poller_iocp_bind_object(tb_poller_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_bool_t is_pipe);
+HANDLE          tb_pipe_file_handle(tb_pipe_file_ref_t file);
 
 __tb_extern_c_leave__
 
@@ -1368,7 +1369,7 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
 
     // attempt to read data directly
     DWORD real = 0;
-    BOOL ok = ReadFile((HANDLE)iocp_object->ref.pipe, data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
+    BOOL ok = ReadFile(tb_pipe_file_handle(iocp_object->ref.pipe), data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
 
     // finished? return it directly
     if (ok)
@@ -1430,7 +1431,7 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
 
     // attempt to write data directly
     DWORD real = 0;
-    BOOL ok = WriteFile((HANDLE)iocp_object->ref.pipe, data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
+    BOOL ok = WriteFile(tb_pipe_file_handle(iocp_object->ref.pipe), data, (DWORD)size, &real, (LPOVERLAPPED)&iocp_object->olap);
 
     // finished? return it directly
     if (ok)
