@@ -26,7 +26,6 @@
  */
 #include "dns.h"
 #include "socket.h"
-#include "sockdata.h"
 #include "pollerdata.h"
 #include "exception.h"
 #include "thread_local.h"

@@ -30,7 +30,6 @@
  */
 #include "poller.h"
 #include "impl/poller.h"
-#include "impl/sockdata.h"
 #include "impl/pollerdata.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
