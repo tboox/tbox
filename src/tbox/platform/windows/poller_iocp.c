@@ -110,6 +110,8 @@ static tb_size_t tb_poller_iocp_event_from_code(tb_size_t code)
     ,   TB_POLLER_EVENT_RECV
     ,   TB_POLLER_EVENT_SEND
     ,   TB_POLLER_EVENT_SEND
+    ,   TB_POLLER_EVENT_RECV
+    ,   TB_POLLER_EVENT_SEND
     };
     tb_assert_and_check_return_val(code < tb_arrayn(s_events), TB_POLLER_EVENT_NONE);
     return s_events[code];
@@ -310,6 +312,35 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
     // ok
     return 1;
 }
+static tb_long_t tb_poller_iocp_event_spak_pipe(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_size_t real, tb_size_t error)
+{
+    // have been finished?
+    tb_check_return_val(iocp_object->state != TB_STATE_FINISHED, 1);
+
+    // ok?
+    tb_long_t result = -1;
+    if (real)
+    {
+        // trace
+        tb_trace_d("pipe(%p): code: %u, real: %lu", iocp_object->ref.pipe, iocp_object->code, real);
+
+        // save the result 
+        result = real;
+    }
+    else
+    {
+        // trace
+        tb_trace_e("pipe(%p): code: %u, unknown error: %lu", iocp_object->ref.pipe, iocp_object->code, error);
+    }
+
+    // save the result
+    if (iocp_object->code == TB_IOCP_OBJECT_CODE_READ)
+        iocp_object->u.read.result = result;
+    else iocp_object->u.write.result = result;
+
+    // ok
+    return 1;
+}
 static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_iocp_object_ref_t iocp_object, tb_size_t real, tb_size_t error)
 {
     // trace
@@ -333,6 +364,8 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
     ,   tb_poller_iocp_event_spak_iorw
     ,   tb_poller_iocp_event_spak_iorw
     ,   tb_poller_iocp_event_spak_iorw
+    ,   tb_poller_iocp_event_spak_pipe
+    ,   tb_poller_iocp_event_spak_pipe
     };
     tb_assert_and_check_return_val(iocp_object->code < tb_arrayn(s_spak), -1);
 

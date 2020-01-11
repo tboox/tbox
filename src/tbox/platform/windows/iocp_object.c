@@ -1375,7 +1375,7 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
     if (ok)
     {
         // trace
-        tb_trace_d("read(%p): ReadFile: %u bytes, state: finished directly", iocp_object->ref.pipe, real);
+        tb_trace_d("read(%p): ReadFile: %u bytes, skip: %d, state: finished directly", iocp_object->ref.pipe, real, iocp_object->skip_cpos);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
@@ -1437,7 +1437,7 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
     if (ok)
     {
         // trace
-        tb_trace_d("write(%p): WriteFile: %u bytes, state: finished directly", iocp_object->ref.pipe, real);
+        tb_trace_d("write(%p): WriteFile: %u bytes, skip: %d, state: finished directly", iocp_object->ref.pipe, real, iocp_object->skip_cpos);
         return (tb_long_t)(real > 0? real : (tb_long_t)-1);
     }
 
