@@ -452,7 +452,6 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
         proclist[procsize] = (*pprocess)->pi.hProcess;
     tb_assertf(procsize < tb_arrayn(proclist), "too much waited processes!");
 
-
     // wait processes
     DWORD       exitcode = 0;
     tb_long_t   infosize = 0;
