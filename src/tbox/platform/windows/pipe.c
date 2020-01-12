@@ -260,9 +260,7 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
     else
 #   endif
     if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel((tb_lo_scheduler_io_ref_t)scheduler_io, &object)) {}
-#endif
 
-#ifndef TB_CONFIG_MICRO_ENABLE
     // remove iocp object for this pipe file if exists
     tb_iocp_object_remove(&object);
 #endif
