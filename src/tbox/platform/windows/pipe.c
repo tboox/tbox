@@ -311,7 +311,7 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
     file->data = data;
     file->real = 0;
     BOOL ok = ReadFile(file->pipe, data, (DWORD)size, &file->real, &file->overlap);
-    if (ok && file->real == size)
+    if (ok)
     {
         DWORD real_size = file->real;
         file->data = tb_null;
@@ -356,7 +356,7 @@ tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_
     file->data = (tb_byte_t*)data;
     file->real = 0;
     BOOL ok = WriteFile(file->pipe, file->data, (DWORD)size, &file->real, &file->overlap);
-    if (ok && file->real == size)
+    if (ok)
     {
         DWORD real_size = file->real;
         file->data = tb_null;
