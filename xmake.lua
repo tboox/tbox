@@ -145,5 +145,10 @@ else
     add_syslinks("pthread", "dl", "m", "c") 
 end
 
+-- enable backtrace symbols for linux 
+if is_plat("linux") and is_mode("debug") then
+    add_ldflags("-rdynamic")
+end
+
 -- include project sources
 includes("src") 
