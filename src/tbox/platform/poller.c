@@ -146,6 +146,11 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return(poller);
 
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // kill the process poller
+    if (poller->process_poller) tb_poller_process_kill(poller->process_poller);
+#endif
+
     // kill the poller
     if (poller->kill) poller->kill(poller);
 }
@@ -154,6 +159,11 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
     // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return(poller);
+
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // spank the process poller
+    if (poller->process_poller) tb_poller_process_spak(poller->process_poller);
+#endif
 
     // spank the poller
     if (poller->spak) poller->spak(poller);
