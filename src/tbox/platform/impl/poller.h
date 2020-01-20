@@ -42,82 +42,90 @@
  * types
  */
 
+/// the process poller ref type
+typedef __tb_typeref__(poller_process);
+
 // the poller type
 typedef struct __tb_poller_t
 {
     // the user private data
-    tb_cpointer_t       priv;
+    tb_cpointer_t           priv;
 
     // the poller type
-    tb_uint16_t         type;
+    tb_uint16_t             type;
 
     // the supported events
-    tb_uint16_t         supported_events;
+    tb_uint16_t             supported_events;
+
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // the process poller 
+    tb_poller_process_ref_t process_poller;
+#endif
 
     /* exit poller
      *
-     * @param poller    the poller
+     * @param poller        the poller
      */
-    tb_void_t           (*exit)(struct __tb_poller_t* poller);
+    tb_void_t               (*exit)(struct __tb_poller_t* poller);
 
     /* kill all waited events, tb_poller_wait() will return -1
      *
-     * @param poller    the poller
+     * @param poller        the poller
      */
-    tb_void_t           (*kill)(struct __tb_poller_t* poller);
+    tb_void_t               (*kill)(struct __tb_poller_t* poller);
 
     /* spak the poller, break the tb_poller_wait() and return all events
      *
-     * @param poller    the poller
+     * @param poller        the poller
      */
-    tb_void_t           (*spak)(struct __tb_poller_t* poller);
+    tb_void_t               (*spak)(struct __tb_poller_t* poller);
 
     /* wait events for all objects
      *
-     * @param poller    the poller
-     * @param func      the events function
-     * @param timeout   the timeout, infinity: -1
+     * @param poller        the poller
+     * @param func          the events function
+     * @param timeout       the timeout, infinity: -1
      *
-     * @return          > 0: the events number, 0: timeout, -1: failed
+     * @return              > 0: the events number, 0: timeout, -1: failed
      */
-    tb_long_t           (*wait)(struct __tb_poller_t* poller, tb_poller_event_func_t func, tb_long_t timeout);
+    tb_long_t               (*wait)(struct __tb_poller_t* poller, tb_poller_event_func_t func, tb_long_t timeout);
     
     /* insert socket to poller
      *
-     * @param poller    the poller
-     * @param object    the poller object
-     * @param events    the poller events
-     * @param priv      the private data
+     * @param poller        the poller
+     * @param object        the poller object
+     * @param events        the poller events
+     * @param priv          the private data
      *
-     * @return          tb_true or tb_false
+     * @return              tb_true or tb_false
      */
-    tb_bool_t           (*insert)(struct __tb_poller_t* poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
+    tb_bool_t               (*insert)(struct __tb_poller_t* poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
     /* remove socket from poller
      *
-     * @param poller    the poller
-     * @param object    the poller object
+     * @param poller        the poller
+     * @param object        the poller object
      *
-     * @return          tb_true or tb_false
+     * @return              tb_true or tb_false
      */
-    tb_bool_t           (*remove)(struct __tb_poller_t* poller, tb_poller_object_ref_t object);
+    tb_bool_t               (*remove)(struct __tb_poller_t* poller, tb_poller_object_ref_t object);
 
     /* modify events for the given socket
      *
-     * @param poller    the poller
-     * @param object    the poller object
-     * @param events    the poller events
-     * @param priv      the private data
+     * @param poller        the poller
+     * @param object        the poller object
+     * @param events        the poller events
+     * @param priv          the private data
      *
-     * @return          tb_true or tb_false
+     * @return              tb_true or tb_false
      */
-    tb_bool_t           (*modify)(struct __tb_poller_t* poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
+    tb_bool_t               (*modify)(struct __tb_poller_t* poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
 
     /* attach the poller to the current thread (only for windows/iocp now)
      *
-     * @param poller    the poller
+     * @param poller        the poller
      */
-    tb_void_t           (*attach)(struct __tb_poller_t* poller);
+    tb_void_t               (*attach)(struct __tb_poller_t* poller);
 
 }tb_poller_t;
 

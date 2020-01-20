@@ -114,7 +114,7 @@ static tb_void_t tb_demo_poller_open(tb_poller_ref_t poller)
         tb_thread_init(tb_null, tb_demo_session_writ, pair[1], 0);
     }
 }
-static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
 {
     switch (events)
     {

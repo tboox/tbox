@@ -695,7 +695,9 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
             }
         }
 
-        // wait some time
+        /* wait some time, TODO we need use ISGCHLD and select to improve it
+         * @see https://stackoverflow.com/questions/282176/waitpid-equivalent-with-timeout
+         */
         if (timeout > 0) tb_msleep(tb_min(timeout, 60));
 
     } while (timeout > 0 && tb_mclock() - time < (tb_hong_t)timeout);

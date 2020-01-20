@@ -103,7 +103,7 @@ static tb_void_t tb_demo_poller_connect(tb_poller_ref_t poller, tb_ipaddr_ref_t 
         else tb_socket_exit(sock);
     }
 }
-static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
 {
     switch (events)
     {

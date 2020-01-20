@@ -117,7 +117,7 @@ static tb_void_t tb_lo_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
     }
 }
 #endif
-static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
 {
     // check
     tb_lo_scheduler_io_ref_t scheduler_io = (tb_lo_scheduler_io_ref_t)tb_poller_priv(poller);

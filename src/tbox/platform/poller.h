@@ -27,6 +27,7 @@
  */
 #include "pipe.h"
 #include "socket.h"
+#include "process.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -82,6 +83,7 @@ typedef enum __tb_poller_object_type_e
     TB_POLLER_OBJECT_NONE         = 0
 ,   TB_POLLER_OBJECT_SOCK         = 1
 ,   TB_POLLER_OBJECT_PIPE         = 2
+,   TB_POLLER_OBJECT_PROC         = 3
 
 }tb_poller_object_type_e;
 
@@ -99,6 +101,7 @@ typedef struct __tb_poller_object_t
     {
         tb_socket_ref_t     sock;
         tb_pipe_file_ref_t  pipe;
+        tb_process_ref_t    proc;
         tb_pointer_t        ptr;
 
     }ref;
@@ -109,10 +112,10 @@ typedef struct __tb_poller_object_t
  *
  * @param poller    the poller
  * @param object    the poller object
- * @param events    the poller events
+ * @param events    the poller events or process status
  * @param priv      the user private data for this socket
  */
-typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv);
+typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -173,7 +176,7 @@ tb_bool_t           tb_poller_support(tb_poller_ref_t poller, tb_size_t events);
  *
  * @param poller    the poller
  * @param object    the poller object
- * @param events    the poller events
+ * @param events    the poller events, it will be ignored if be process object
  * @param priv      the private data
  *
  * @return          tb_true or tb_false
@@ -193,7 +196,7 @@ tb_bool_t           tb_poller_remove(tb_poller_ref_t poller, tb_poller_object_re
  *
  * @param poller    the poller
  * @param object    the poller object
- * @param events    the poller events
+ * @param events    the poller events, it will be ignored if be process object
  * @param priv      the private data
  *
  * @return          tb_true or tb_false

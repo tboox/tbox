@@ -124,7 +124,7 @@ static tb_void_t tb_demo_poller_accept(tb_poller_ref_t poller, tb_socket_ref_t s
     while ((client = tb_socket_accept(sock, tb_null))) 
         tb_demo_session_start(poller, client);
 }
-static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
 {
     switch (events)
     {

@@ -58,6 +58,16 @@
 #   define TB_POLLER_ENABLE_SELECT
 #endif
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+#   if defined(TB_CONFIG_OS_WINDOWS)
+#       include "windows/poller_process.c"
+#       define TB_POLLER_ENABLE_PROCESS
+#   elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) 
+#       include "posix/poller_process.c"
+#       define TB_POLLER_ENABLE_PROCESS
+#   endif
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -99,8 +109,21 @@ tb_poller_ref_t tb_poller_init(tb_cpointer_t priv)
 }
 tb_void_t tb_poller_exit(tb_poller_ref_t self)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
-    if (poller && poller->exit)
+    tb_assert_and_check_return(poller);
+
+    // kill the poller first
+    tb_poller_kill(self);
+
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // exit the process poller
+    if (poller->process_poller) tb_poller_process_exit(poller->process_poller);
+    poller->process_poller = tb_null;
+#endif
+
+    // exit poller 
+    if (poller->exit)
         poller->exit(poller);
 }
 tb_cpointer_t tb_poller_priv(tb_poller_ref_t self)
@@ -119,16 +142,20 @@ tb_size_t tb_poller_type(tb_poller_ref_t self)
 }
 tb_void_t tb_poller_kill(tb_poller_ref_t self)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return(poller);
 
+    // kill the poller
     if (poller->kill) poller->kill(poller);
 }
 tb_void_t tb_poller_spak(tb_poller_ref_t self)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return(poller);
 
+    // spank the poller
     if (poller->spak) poller->spak(poller);
 }
 tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
@@ -140,36 +167,87 @@ tb_bool_t tb_poller_support(tb_poller_ref_t self, tb_size_t events)
 }
 tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return_val(poller && poller->insert && object, tb_false);
 
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // is the process object?
+    if (object->type == TB_POLLER_OBJECT_PROC)
+    {
+        // init the process poller first
+        if (!poller->process_poller) poller->process_poller = tb_poller_process_init();
+        tb_assert_and_check_return_val(poller->process_poller, tb_false);
+
+        // insert this process and the user private data
+        return tb_poller_process_insert(poller->process_poller, object->ref.proc, priv);
+    }
+#else
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
+#endif
+
+    // insert the poller object
     return poller->insert(poller, object, events, priv);
 }
 tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_poller_object_ref_t object)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return_val(poller && poller->remove && object, tb_false);
 
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // is the process object?
+    if (object->type == TB_POLLER_OBJECT_PROC)
+    {
+        // remove this process and the user private data
+        if (poller->process_poller)
+            return tb_poller_process_remove(poller->process_poller, object->ref.proc);
+        return tb_true;
+    }
+#else
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
+#endif
+
+    // remove the poller object 
     return poller->remove(poller, object);
 }
 tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return_val(poller && poller->modify && object, tb_false);
 
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // is the process object?
+    if (object->type == TB_POLLER_OBJECT_PROC)
+    {
+        // modify the user private data of this process
+        if (poller->process_poller)
+            return tb_poller_process_modify(poller->process_poller, object->ref.proc, priv);
+        return tb_true;
+    }
+#else
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
+#endif
+
+    // modify the poller object 
     return poller->modify(poller, object, events, priv);
 }
 tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return_val(poller && poller->wait && func, -1);
 
+    // wait the poller objects
     return poller->wait(poller, func, timeout);
 }
 tb_void_t tb_poller_attach(tb_poller_ref_t self)
 {
+    // check
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return(poller);
 
+    // attach the poller to the current thread (only for windows/iocp now)
     if (poller->attach) poller->attach(poller);
 }

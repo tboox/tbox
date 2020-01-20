@@ -109,7 +109,7 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
         tb_co_scheduler_io_resume(scheduler, coroutine, TB_POLLER_EVENT_NONE);
     }
 }
-static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
+static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
 {
     // check
     tb_co_scheduler_io_ref_t scheduler_io = (tb_co_scheduler_io_ref_t)tb_poller_priv(poller);
