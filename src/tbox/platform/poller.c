@@ -186,7 +186,7 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_poller_object_ref_t object, 
     if (object->type == TB_POLLER_OBJECT_PROC)
     {
         // init the process poller first
-        if (!poller->process_poller) poller->process_poller = tb_poller_process_init();
+        if (!poller->process_poller) poller->process_poller = tb_poller_process_init(poller);
         tb_assert_and_check_return_val(poller->process_poller, tb_false);
 
         // insert this process and the user private data
@@ -249,8 +249,27 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
     tb_poller_t* poller = (tb_poller_t*)self;
     tb_assert_and_check_return_val(poller && poller->wait && func, -1);
 
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // prepare to wait the processes
+    if (poller->process_poller && !tb_poller_process_wait_prepare(poller->process_poller))
+        return -1;
+#endif
+
     // wait the poller objects
-    return poller->wait(poller, func, timeout);
+    tb_long_t wait = poller->wait(poller, func, timeout);
+    tb_assert_and_check_return_val(wait >= 0, -1);
+
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // poll all waited processes
+    if (poller->process_poller)
+    {
+        tb_long_t proc_wait = tb_poller_process_wait_poll(poller->process_poller, func);
+        tb_assert_and_check_return_val(proc_wait >= 0, -1);
+        
+        wait += proc_wait;
+    }
+#endif
+    return wait;
 }
 tb_void_t tb_poller_attach(tb_poller_ref_t self)
 {

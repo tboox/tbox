@@ -78,6 +78,13 @@ typedef struct __tb_process_t
 extern tb_char_t**  environ;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+tb_int_t tb_process_pid(tb_process_ref_t self);
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_int_t tb_process_file_flags(tb_size_t mode)
@@ -109,6 +116,15 @@ static tb_int_t tb_process_file_modes(tb_size_t mode)
     // ok?
     return modes;
 }
+tb_int_t tb_process_pid(tb_process_ref_t self)
+{
+    // check
+    tb_process_t* process = (tb_process_t*)self;
+    tb_assert_and_check_return_val(process, -1);
+
+    return (tb_int_t)process->pid;
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
