@@ -223,6 +223,14 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
     tb_poller_process_t* poller = tb_null;
     do
     {
+        // @note only support one process poller instance
+        static tb_size_t s_poller_process_num = 0;
+        if (s_poller_process_num++)
+        {
+            tb_trace_e("only support one process poller!");
+            break;
+        }
+
         // make the process poller
         poller = tb_malloc0_type(tb_poller_process_t);
         tb_assert_and_check_break(poller);
@@ -340,6 +348,8 @@ static tb_bool_t tb_poller_process_remove(tb_poller_process_ref_t self, tb_proce
 }
 static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
 {
+    // trace
+    tb_trace_d("process: prepare %lu", tb_hash_map_size(((tb_poller_process_t*)self)->processes_data));
     return tb_true;
 }
 static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_poller_event_func_t func)
