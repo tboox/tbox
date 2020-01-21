@@ -186,6 +186,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_poller_pipe)
 ,   TB_DEMO_MAIN_ITEM(platform_poller_client)
 ,   TB_DEMO_MAIN_ITEM(platform_poller_server)
+,   TB_DEMO_MAIN_ITEM(platform_poller_process)
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
 ,   TB_DEMO_MAIN_ITEM(platform_context)
 #endif
