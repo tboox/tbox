@@ -173,15 +173,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 }
 static tb_void_t tb_poller_process_signal_handler(tb_int_t signo)
 {
-    // check
-    tb_poller_process_t* poller = g_process_poller;
-    tb_assert_and_check_return(poller);
-
-    // trace
-    tb_trace_d("process: signo: %d", signo);
-
     // post semaphore to wait processes
-    if (poller->semaphore) tb_semaphore_post(poller->semaphore, 1);
+    if (g_process_poller && g_process_poller->semaphore)
+        tb_semaphore_post(g_process_poller->semaphore, 1);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -382,8 +376,14 @@ static tb_bool_t tb_poller_process_remove(tb_poller_process_ref_t self, tb_proce
 }
 static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
 {
+    // check
+    tb_poller_process_t* poller = (tb_poller_process_t*)self;
+
     // trace
     tb_trace_d("process: prepare %lu", tb_hash_map_size(((tb_poller_process_t*)self)->processes_data));
+
+    // post semaphore to wait processes
+    if (poller->semaphore) tb_semaphore_post(poller->semaphore, 1);
     return tb_true;
 }
 static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_poller_event_func_t func)

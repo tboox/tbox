@@ -35,7 +35,7 @@
 // the thread type
 typedef struct __tb_thread_t
 {
-    // the pthread 
+    // the pthread, @note We must put it at the beginning, because posix/mach/thread_affinity will use it.
     pthread_t   pthread;
 
     // is joined?

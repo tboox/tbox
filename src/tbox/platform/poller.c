@@ -29,6 +29,7 @@
  * includes
  */
 #include "poller.h"
+#include "time.h"
 #include "impl/poller.h"
 #include "impl/pollerdata.h"
 
@@ -251,25 +252,24 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
 
 #ifdef TB_POLLER_ENABLE_PROCESS
     // prepare to wait the processes
-    if (poller->process_poller && !tb_poller_process_wait_prepare(poller->process_poller))
-        return -1;
-#endif
-
-    // wait the poller objects
-    tb_long_t wait = poller->wait(poller, func, timeout);
-    tb_assert_and_check_return_val(wait >= 0, -1);
-
-#ifdef TB_POLLER_ENABLE_PROCESS
-    // poll all waited processes
     if (poller->process_poller)
     {
+        // prepare to wait processes
+        if (!tb_poller_process_wait_prepare(poller->process_poller))
+            return -1;
+
+        // wait the poller objects
+        tb_long_t wait = poller->wait(poller, func, timeout);
+        tb_check_return_val(wait >= 0, -1);
+
+        // poll all waited processes
         tb_long_t proc_wait = tb_poller_process_wait_poll(poller->process_poller, func);
-        tb_assert_and_check_return_val(proc_wait >= 0, -1);
-        
+        tb_check_return_val(proc_wait >= 0, -1);
         wait += proc_wait;
+        return wait;
     }
 #endif
-    return wait;
+    return poller->wait(poller, func, timeout);
 }
 tb_void_t tb_poller_attach(tb_poller_ref_t self)
 {

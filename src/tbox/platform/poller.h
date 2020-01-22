@@ -209,7 +209,7 @@ tb_bool_t           tb_poller_modify(tb_poller_ref_t poller, tb_poller_object_re
  * @param func      the events function
  * @param timeout   the timeout, infinity: -1
  *
- * @return          > 0: the events number, 0: timeout, -1: failed
+ * @return          > 0: the events number, 0: timeout or interrupted, -1: failed
  */
 tb_long_t           tb_poller_wait(tb_poller_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout);
 
