@@ -232,10 +232,13 @@ static tb_long_t tb_poller_poll_wait(tb_poller_t* self, tb_poller_event_func_t f
 
         // wait
         tb_long_t pfdn = poll(pfds, pfdm, timeout);
-        tb_assert_and_check_return_val(pfdn >= 0, -1);
 
-        // timeout?
-        tb_check_return_val(pfdn, 0);
+        // timeout or interrupted?
+        if (!pfdn || (pfdn == -1 && errno == EINTR)) 
+            return 0;
+
+        // error?
+        tb_assert_and_check_return_val(pfdn >= 0, -1);
 
         // copy fds
         tb_vector_copy(poller->cfds, poller->pfds);

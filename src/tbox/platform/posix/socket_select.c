@@ -27,6 +27,7 @@
 #else
 #   include <sys/socket.h>
 #   include <sys/select.h>
+#   include <errno.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -84,13 +85,13 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
     // select
 #ifdef TB_CONFIG_OS_WINDOWS
     tb_long_t r = tb_ws2_32()->select((tb_int_t)fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
+    if (!r) return 0; // timeout?
 #else
     tb_long_t r = select(fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);
+    if (!r || (r == -1 && errno == EINTR)) // timeout or interrupted?
+        return 0;
 #endif
     tb_assert_and_check_return_val(r >= 0, -1);
-
-    // timeout?
-    tb_check_return_val(r, 0);
 
     // check socket error?
 #ifdef TB_CONFIG_OS_WINDOWS

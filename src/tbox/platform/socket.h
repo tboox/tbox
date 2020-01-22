@@ -323,7 +323,7 @@ tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr,
  * @param events    the socket events
  * @param timeout   the timeout, infinity: -1
  *
- * @return          > 0: the events code, 0: timeout, -1: failed
+ * @return          > 0: the events code, 0: timeout or interrupted, -1: failed
  */
 tb_long_t           tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
 

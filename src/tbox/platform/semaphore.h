@@ -72,7 +72,7 @@ tb_long_t           tb_semaphore_value(tb_semaphore_ref_t semaphore);
  * @param semaphore the semaphore 
  * @param timeout   the timeout
  *
- * @return          ok: 1, timeout: 0, fail: -1
+ * @return          ok: 1, timeout or interrupted: 0, fail: -1
  */
 tb_long_t           tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout);
 

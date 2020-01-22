@@ -122,7 +122,10 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 
         // wait semaphore
         tb_long_t wait = tb_semaphore_wait(poller->semaphore, -1);
-        tb_assert_and_check_break(wait > 0);
+        tb_assert_and_check_break(wait >= 0);
+
+        // interrupted? continue to wait
+        tb_check_continue(wait != 0); 
 
         tb_int_t  result = -1;
         tb_bool_t has_exited = tb_false;
@@ -376,14 +379,8 @@ static tb_bool_t tb_poller_process_remove(tb_poller_process_ref_t self, tb_proce
 }
 static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
 {
-    // check
-    tb_poller_process_t* poller = (tb_poller_process_t*)self;
-
     // trace
     tb_trace_d("process: prepare %lu", tb_hash_map_size(((tb_poller_process_t*)self)->processes_data));
-
-    // post semaphore to wait processes
-    if (poller->semaphore) tb_semaphore_post(poller->semaphore, 1);
     return tb_true;
 }
 static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_poller_event_func_t func)

@@ -120,7 +120,7 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     tb_check_return_val(r, 1);
 
     // timeout?
-    tb_check_return_val(errno != EAGAIN && errno != ETIMEDOUT, 0);
+    if (errno == EINTR || errno == EAGAIN || errno == ETIMEDOUT) return 0;
 
     // error
     return -1;

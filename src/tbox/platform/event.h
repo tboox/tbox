@@ -61,7 +61,7 @@ tb_bool_t           tb_event_post(tb_event_ref_t event);
  * @param event     the event 
  * @param timeout   the timeout
  *
- * @return          ok: 1, timeout: 0, fail: -1
+ * @return          ok: 1, timeout or interrupted: 0, fail: -1
  */
 tb_long_t           tb_event_wait(tb_event_ref_t event, tb_long_t timeout);
 

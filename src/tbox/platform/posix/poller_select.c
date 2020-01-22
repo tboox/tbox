@@ -30,6 +30,7 @@
 #else
 #   include <sys/socket.h>
 #   include <sys/select.h>
+#   include <errno.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -302,14 +303,16 @@ static tb_long_t tb_poller_select_wait(tb_poller_t* self, tb_poller_event_func_t
         // wait
 #ifdef TB_CONFIG_OS_WINDOWS
         tb_long_t sfdn = tb_ws2_32()->select((tb_int_t) poller->sfdm + 1, &poller->rfdc, &poller->wfdc, tb_null, timeout >= 0? &t : tb_null);
+        if (!sfdn) return 0; // timeout
 #else
         tb_long_t sfdn = select(poller->sfdm + 1, &poller->rfdc, &poller->wfdc, tb_null, timeout >= 0? &t : tb_null);
+        if (!sfdn || (sfdn == -1 && errno == EINTR)) // timeout or interrupted?
+            return 0;
 #endif
+
+        // error?
         tb_assert_and_check_return_val(sfdn >= 0, -1);
 
-        // timeout?
-        tb_check_return_val(sfdn, 0);
-        
         // dispatch events
         tb_size_t i = 0;
         tb_size_t n = poller->list_size;

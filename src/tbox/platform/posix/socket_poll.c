@@ -25,6 +25,7 @@
 #include "prefix.h"
 #include <poll.h>
 #include <sys/socket.h>
+#include <errno.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -42,12 +43,15 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
 
     // poll
     tb_long_t r = poll(&pfd, 1, timeout);
+
+    // timeout or interrupted?
+    if (!r || (r == -1 && errno == EINTR)) 
+        return 0;
+
+    // poll error?
     tb_assert_and_check_return_val(r >= 0, -1);
 
-    // timeout?
-    tb_check_return_val(r, 0);
-
-    // error?
+    // socket error?
     tb_int_t o = 0;
     socklen_t n = sizeof(socklen_t);
     getsockopt(pfd.fd, SOL_SOCKET, SO_ERROR, &o, &n);

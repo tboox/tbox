@@ -146,8 +146,8 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     // wait
     tb_long_t ok = semaphore_timedwait(impl->semaphore, spec);
 
-    // timeout?
-    tb_check_return_val(ok != KERN_OPERATION_TIMED_OUT, 0);
+    // timeout or interrupted?
+    tb_check_return_val(ok != KERN_OPERATION_TIMED_OUT && ok != KERN_ABORTED, 0);
 
     // ok?
     tb_check_return_val(ok == KERN_SUCCESS, -1);

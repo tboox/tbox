@@ -195,7 +195,7 @@ tb_int_t tb_demo_platform_poller_server_main(tb_int_t argc, tb_char_t** argv)
         tb_poller_insert_sock(poller, sock, events, tb_null);
 
         // wait events
-        while (tb_poller_wait(poller, tb_demo_poller_event, -1) > 0) ;
+        while (tb_poller_wait(poller, tb_demo_poller_event, -1) >= 0) ;
 
     } while (0);
 
