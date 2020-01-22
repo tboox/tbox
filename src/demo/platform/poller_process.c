@@ -4,6 +4,12 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */ 
+
+#define COUNT   (20)
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */ 
 static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
@@ -11,11 +17,19 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_r
     // check
     tb_assert_and_check_return(poller && object && object->type == TB_POLLER_OBJECT_PROC);
 
+    // update count
+    static tb_size_t count = 0;
+    count++;
+
     // trace
-    tb_trace_i("process(%p): %p, status: %ld", priv, object->ref.proc, events);
+    tb_trace_i("process(%p): exited %p, status: %ld, count: %lu", priv, object->ref.proc, events, count);
 
     // exit process
     tb_process_exit(object->ref.proc);
+
+    // finished?
+    if (count == COUNT)
+        tb_poller_kill(poller);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +52,7 @@ tb_int_t tb_demo_platform_poller_process_main(tb_int_t argc, tb_char_t** argv)
         tb_poller_attach(poller);
 
         // start processes
-        tb_size_t count = 20;
+        tb_size_t count = COUNT;
         while (count--)
         {
             tb_process_ref_t process = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), tb_null);

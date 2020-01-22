@@ -100,6 +100,13 @@ tb_int_t tb_process_pid(tb_process_ref_t self);
 __tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+
+// the global process poller
+static tb_poller_process_t* g_process_poller = tb_null;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
@@ -117,19 +124,19 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
         tb_long_t wait = tb_semaphore_wait(poller->semaphore, -1);
         tb_assert_and_check_break(wait > 0);
 
-        tb_int_t result = -1;
+        tb_int_t  result = -1;
+        tb_bool_t has_exited = tb_false;
         do
         {
             // poll processes
             tb_int_t status = -1;
             result = waitpid(-1, &status, WNOHANG | WUNTRACED);
-            tb_assert_and_check_break(result != -1);
 
             // trace
             tb_trace_d("process: waitpid: %d, status: %d", result, status);
 
             // has exited process?
-            if (result != 0)
+            if (result != 0 && result != -1)
             {
                 /* get status, only get 8bits retval
                  *
@@ -145,10 +152,19 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                 // save the process status
                 tb_spinlock_enter(&poller->lock);
                 tb_vector_insert_tail(poller->processes_status, &proc_status);
+                has_exited = tb_true;
                 tb_spinlock_leave(&poller->lock);
             }
 
-        } while (result != 0);
+        } while (result != 0 && result != -1);
+
+        // has exited child processes? notify the main poller to poll them
+        if (has_exited)
+        {
+            tb_poller_t* main_poller = poller->main_poller;
+            if (main_poller && main_poller->spak)
+                main_poller->spak(main_poller);
+        }
     }
 
     // mark this thread is stopped
@@ -157,8 +173,15 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 }
 static tb_void_t tb_poller_process_signal_handler(tb_int_t signo)
 {
+    // check
+    tb_poller_process_t* poller = g_process_poller;
+    tb_assert_and_check_return(poller);
+
     // trace
     tb_trace_d("process: signo: %d", signo);
+
+    // post semaphore to wait processes
+    if (poller->semaphore) tb_semaphore_post(poller->semaphore, 1);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +224,7 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
 
     // clear signal 
     signal(SIGCHLD, SIG_DFL);
+    g_process_poller = tb_null;
 
     // exit the processes data
     if (poller->processes_data) tb_hash_map_exit(poller->processes_data);
@@ -269,6 +293,7 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
 
         // register signal 
         signal(SIGCHLD, tb_poller_process_signal_handler);
+        g_process_poller = poller;
 
         // ok
         ok = tb_true;
@@ -372,7 +397,10 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     tb_vector_clear(poller->processes_status_copied);
     tb_spinlock_enter(&poller->lock);
     if (tb_vector_size(poller->processes_status))
+    {
         tb_vector_copy(poller->processes_status_copied, poller->processes_status);
+        tb_vector_clear(poller->processes_status);
+    }
     tb_spinlock_leave(&poller->lock);
 
     // trace
@@ -384,6 +412,9 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     object.type = TB_POLLER_OBJECT_PROC;
     tb_for_all_if (tb_poller_processes_status_t*, proc_status, poller->processes_status_copied, proc_status)
     {
+        // trace
+        tb_trace_d("process: pid: %d", proc_status->pid);
+
         tb_poller_processes_data_t* proc_data = tb_hash_map_get(poller->processes_data, tb_i2p(proc_status->pid));
         if (proc_data)
         {

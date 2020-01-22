@@ -308,7 +308,8 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
     }
 
     // wait events
-    tb_long_t events_count = kevent(poller->kqfd, tb_null, 0, poller->events, poller->events_count, timeout >= 0? &t : tb_null);
+    tb_long_t events_count = 0;
+    do { events_count = kevent(poller->kqfd, tb_null, 0, poller->events, poller->events_count, timeout >= 0? &t : tb_null); } while (events_count == -1 && errno == EINTR);
     tb_assert_and_check_return_val(events_count >= 0 && events_count <= poller->events_count, -1);
     
     // timeout?
