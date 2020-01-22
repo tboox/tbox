@@ -25,7 +25,7 @@
  */
 #include "exception.h"
 #include "../thread_local.h"
-#include "../../libc/misc/signal.h"
+#include <signal.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -58,11 +58,11 @@ static tb_void_t tb_exception_signal_func(tb_int_t sig)
         tb_trace_e("exception: no handler for signal: %d", sig);
 
         // ignore signal
-        tb_signal(TB_SIGILL, TB_SIG_DFL);
-        tb_signal(TB_SIGFPE, TB_SIG_DFL);
-        tb_signal(TB_SIGBUS, TB_SIG_DFL);
-        tb_signal(TB_SIGSEGV, TB_SIG_DFL);
-        tb_signal(TB_SIGABRT, TB_SIG_DFL);
+        signal(SIGILL, SIG_DFL);
+        signal(SIGFPE, SIG_DFL);
+        signal(SIGBUS, SIG_DFL);
+        signal(SIGSEGV, SIG_DFL);
+        signal(SIGABRT, SIG_DFL);
 
 #ifdef TB_CONFIG_LIBC_HAVE_KILL
         // kill it
@@ -80,13 +80,13 @@ tb_bool_t tb_exception_init_env()
     if (!tb_thread_local_init(&g_exception_local, tb_exception_stack_exit)) return tb_false;
 
     // register signal handler
-//  tb_signal(TB_SIGINT, tb_exception_signal_func);
-    tb_signal(TB_SIGILL, tb_exception_signal_func);
-    tb_signal(TB_SIGFPE, tb_exception_signal_func);
-    tb_signal(TB_SIGBUS, tb_exception_signal_func);
-    tb_signal(TB_SIGSEGV, tb_exception_signal_func);
-    tb_signal(TB_SIGABRT, tb_exception_signal_func);
-//  tb_signal(TB_SIGTRAP, tb_exception_signal_func);
+//  signal(SIGINT, tb_exception_signal_func);
+    signal(SIGILL, tb_exception_signal_func);
+    signal(SIGFPE, tb_exception_signal_func);
+    signal(SIGBUS, tb_exception_signal_func);
+    signal(SIGSEGV, tb_exception_signal_func);
+    signal(SIGABRT, tb_exception_signal_func);
+//  signal(SIGTRAP, tb_exception_signal_func);
 
     // ok
     return tb_true;
@@ -94,13 +94,13 @@ tb_bool_t tb_exception_init_env()
 tb_void_t tb_exception_exit_env()
 {
     // unregister signal handler
-//  tb_signal(TB_SIGINT, TB_SIG_DFL);
-    tb_signal(TB_SIGILL, TB_SIG_DFL);
-    tb_signal(TB_SIGFPE, TB_SIG_DFL);
-    tb_signal(TB_SIGBUS, TB_SIG_DFL);
-    tb_signal(TB_SIGSEGV, TB_SIG_DFL);
-    tb_signal(TB_SIGABRT, TB_SIG_DFL);
-//  tb_signal(TB_SIGTRAP, TB_SIG_DFL);
+//  signal(SIGINT, SIG_DFL);
+    signal(SIGILL, SIG_DFL);
+    signal(SIGFPE, SIG_DFL);
+    signal(SIGBUS, SIG_DFL);
+    signal(SIGSEGV, SIG_DFL);
+    signal(SIGABRT, SIG_DFL);
+//  signal(SIGTRAP, SIG_DFL);
 
     // exit the thread local
     tb_thread_local_exit(&g_exception_local);

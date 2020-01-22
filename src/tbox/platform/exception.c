@@ -31,7 +31,7 @@
  */
 #if defined(TB_CONFIG_EXCEPTION_ENABLE) && defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/exception.c"
-#elif defined(TB_CONFIG_EXCEPTION_ENABLE) && defined(tb_signal)
+#elif defined(TB_CONFIG_EXCEPTION_ENABLE) && defined(TB_CONFIG_LIBC_HAVE_SIGNAL)
 #   include "libc/exception.c"
 #else
 tb_bool_t tb_exception_init_env()

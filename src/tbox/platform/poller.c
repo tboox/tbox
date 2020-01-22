@@ -62,7 +62,7 @@
 #   if defined(TB_CONFIG_OS_WINDOWS)
 #       include "windows/poller_process.c"
 #       define TB_POLLER_ENABLE_PROCESS
-#   elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) 
+#   elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && defined(TB_CONFIG_LIBC_HAVE_SIGNAL)
 #       include "posix/poller_process.c"
 #       define TB_POLLER_ENABLE_PROCESS
 #   endif

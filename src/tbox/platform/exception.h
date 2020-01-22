@@ -26,10 +26,9 @@
  */
 #include "prefix.h"
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
-#   include "../libc/misc/signal.h"
 #   if defined(TB_CONFIG_OS_WINDOWS)
 #       include "windows/exception.h"
-#   elif defined(tb_signal) 
+#   elif defined(TB_CONFIG_LIBC_HAVE_SIGNAL) 
 #       include "libc/exception.h"
 #   endif
 #endif

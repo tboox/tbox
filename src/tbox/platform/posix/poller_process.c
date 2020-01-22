@@ -33,11 +33,9 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/wait.h>
-#ifdef TB_CONFIG_LIBC_HAVE_KILL
-#   include <signal.h>
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -157,6 +155,11 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
     tb_atomic32_set(&poller->is_stopped, 1);
     return 0;
 }
+static tb_void_t tb_poller_process_signal_handler(tb_int_t signo)
+{
+    // trace
+    tb_trace_d("process: signo: %d", signo);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -195,6 +198,9 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
         tb_thread_exit(poller->thread);
         poller->thread = tb_null;
     }
+
+    // clear signal 
+    signal(SIGCHLD, SIG_DFL);
 
     // exit the processes data
     if (poller->processes_data) tb_hash_map_exit(poller->processes_data);
@@ -260,6 +266,9 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
         // start the poller thread for processes first
         poller->thread = tb_thread_init(tb_null, tb_poller_process_loop, poller, 0);
         tb_assert_and_check_break(poller->thread);
+
+        // register signal 
+        signal(SIGCHLD, tb_poller_process_signal_handler);
 
         // ok
         ok = tb_true;
