@@ -36,7 +36,7 @@ tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     tb_assert_and_check_return_val(cpuset, tb_false);
 
     // get thread
-    pthread_t pthread = thread? (pthread_t)thread : pthread_self();
+    pthread_t pthread = thread? *((pthread_t*)thread) : pthread_self();
 
     // set cpu affinity
     tb_int_t i;
@@ -55,7 +55,7 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     tb_assert_and_check_return_val(cpuset, tb_false);
 
     // get thread
-    pthread_t pthread = thread? (pthread_t)thread : pthread_self();
+    pthread_t pthread = thread? *((pthread_t*)thread) : pthread_self();
 
     // get cpu affinity
     cpu_set_t cpu_set;

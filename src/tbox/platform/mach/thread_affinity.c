@@ -36,7 +36,7 @@ tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     tb_assert_and_check_return_val(cpuset, tb_false);
 
     // get mach thread
-    pthread_t pthread = thread? (pthread_t)thread : pthread_self();
+    pthread_t pthread = thread? *((pthread_t*)thread) : pthread_self();
     thread_port_t mach_thread = pthread_mach_thread_np(pthread);
     tb_assert_and_check_return_val(mach_thread != MACH_PORT_NULL, tb_false);
 
@@ -54,7 +54,7 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     tb_assert_and_check_return_val(cpuset, tb_false);
 
     // get mach thread
-    pthread_t pthread = thread? (pthread_t)thread : pthread_self();
+    pthread_t pthread = thread? *((pthread_t*)thread) : pthread_self();
     thread_port_t mach_thread = pthread_mach_thread_np(pthread);
     tb_assert_and_check_return_val(mach_thread != MACH_PORT_NULL, tb_false);
 
