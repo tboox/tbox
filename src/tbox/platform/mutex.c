@@ -33,6 +33,35 @@
 #elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_MUTEX_INIT)
 #   include "posix/mutex.c"
 #else
+#   include "impl/mutex.h"
+tb_mutex_ref_t tb_mutex_init_impl(tb_mutex_t* mutex)
+{
+    // init mutex, @note we cannot use asset/trace because them will use mutex
+    tb_assert_static(sizeof(tb_spinlock_t) == sizeof(tb_mutex_t));
+    return (mutex && tb_spinlock_init(mutex))? ((tb_mutex_ref_t)mutex) : tb_null;
+}
+tb_void_t tb_mutex_exit_impl(tb_mutex_t* mutex)
+{
+    // exit it
+    if (mutex) tb_spinlock_exit(mutex);
+}
+tb_bool_t tb_mutex_enter_without_profiler(tb_mutex_ref_t mutex)
+{
+    // check, @note we cannot use asset/trace because them will use mutex
+    tb_check_return_val(mutex, tb_false);
+
+    // enter
+    tb_spinlock_enter_without_profiler((tb_spinlock_ref_t)mutex);
+    return tb_true;
+}
+tb_bool_t tb_mutex_entry_try_without_profiler(tb_mutex_ref_t mutex)
+{    
+    // check, @note we cannot use asset/trace because them will use mutex
+    tb_check_return_val(mutex, tb_false);
+
+    // try to enter
+    return tb_spinlock_enter_try_without_profiler((tb_spinlock_ref_t)mutex);
+}
 tb_mutex_ref_t tb_mutex_init()
 {
     // done
@@ -81,32 +110,28 @@ tb_void_t tb_mutex_exit(tb_mutex_ref_t mutex)
 }
 tb_bool_t tb_mutex_enter(tb_mutex_ref_t mutex)
 {
-    // check
-    tb_assert_and_check_return_val(mutex, tb_false);
+    // check, @note we cannot use asset/trace because them will use mutex
+    tb_check_return_val(mutex, tb_false);
 
     // enter
     tb_spinlock_enter((tb_spinlock_ref_t)mutex);
-
-    // ok
     return tb_true;
 }
 tb_bool_t tb_mutex_enter_try(tb_mutex_ref_t mutex)
 {
-    // check
-    tb_assert_and_check_return_val(mutex, tb_false);
+    // check, @note we cannot use asset/trace because them will use mutex
+    tb_check_return_val(mutex, tb_false);
 
     // try to enter
     return tb_spinlock_enter_try((tb_spinlock_ref_t)mutex);
 }
 tb_bool_t tb_mutex_leave(tb_mutex_ref_t mutex)
 {
-    // check
-    tb_assert_and_check_return_val(mutex, tb_false);
+    // check, @note we cannot use asset/trace because them will use mutex
+    tb_check_return_val(mutex, tb_false);
 
     // leave
     tb_spinlock_leave((tb_spinlock_ref_t)mutex);
-
-    // ok
     return tb_true;
 }
 #endif

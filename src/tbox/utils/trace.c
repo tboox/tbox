@@ -26,6 +26,7 @@
 #include "trace.h"
 #include "../libc/libc.h"
 #include "../platform/platform.h"
+#include "../platform/impl/mutex.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -61,7 +62,8 @@ static tb_bool_t        g_bref = tb_false;
 static tb_char_t        g_line[TB_TRACE_LINE_MAXN];
 
 // the lock
-static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT; 
+static tb_mutex_t       g_lock_mutex; 
+static tb_mutex_ref_t   g_lock = tb_null;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -69,7 +71,8 @@ static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
 tb_bool_t tb_trace_init()
 {
     // init lock
-    return tb_spinlock_init(&g_lock);
+    g_lock = tb_mutex_init_impl(&g_lock_mutex);
+    return g_lock? tb_true : tb_false;
 }
 tb_void_t tb_trace_exit()
 {
@@ -77,7 +80,7 @@ tb_void_t tb_trace_exit()
     tb_trace_sync();
 
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // clear mode
     g_mode = TB_TRACE_MODE_PRINT;
@@ -90,21 +93,22 @@ tb_void_t tb_trace_exit()
 #endif
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 
     // exit lock
-    tb_spinlock_exit(&g_lock);
+    tb_mutex_exit_impl(&g_lock_mutex);
+    g_lock = tb_null;
 }
 tb_size_t tb_trace_mode()
 {
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // the mode
     tb_size_t mode = g_mode;
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 
     // ok?
     return mode;
@@ -112,13 +116,13 @@ tb_size_t tb_trace_mode()
 tb_bool_t tb_trace_mode_set(tb_size_t mode)
 {
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // set the mode
     g_mode = mode;
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 
     // ok
     return tb_true;
@@ -127,13 +131,13 @@ tb_bool_t tb_trace_mode_set(tb_size_t mode)
 tb_file_ref_t tb_trace_file()
 {
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // the file
     tb_file_ref_t file = g_file;
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 
     // ok?
     return file;
@@ -144,7 +148,7 @@ tb_bool_t tb_trace_file_set(tb_file_ref_t file)
     tb_check_return_val(file, tb_false);
 
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // exit the previous file
     if (g_file && !g_bref) tb_file_exit(g_file);
@@ -154,7 +158,7 @@ tb_bool_t tb_trace_file_set(tb_file_ref_t file)
     g_bref = tb_true;
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 
     // ok
     return tb_true;
@@ -165,7 +169,7 @@ tb_bool_t tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend)
     tb_check_return_val(path, tb_false);
 
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // exit the previous file
     if (g_file && !g_bref) tb_file_exit(g_file);
@@ -178,7 +182,7 @@ tb_bool_t tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend)
     tb_bool_t ok = g_file? tb_true : tb_false;
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 
     // ok?
     return ok;
@@ -190,7 +194,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
     tb_check_return(format);
 
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // done
     do
@@ -255,7 +259,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
     } while (0);
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 }
 tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...)
 {
@@ -278,7 +282,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
     tb_check_return(format);
 
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // done
     do
@@ -327,12 +331,12 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
     } while (0);
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 }
 tb_void_t tb_trace_sync()
 {
     // enter
-    tb_spinlock_enter_without_profiler(&g_lock);
+    if (g_lock) tb_mutex_enter_without_profiler(g_lock);
 
     // sync it
     if (g_mode & TB_TRACE_MODE_PRINT) tb_print_sync();
@@ -343,5 +347,5 @@ tb_void_t tb_trace_sync()
 #endif
 
     // leave
-    tb_spinlock_leave(&g_lock);
+    if (g_lock) tb_mutex_leave(g_lock);
 }

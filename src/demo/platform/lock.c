@@ -11,8 +11,8 @@
 #define TB_TEST_LOOP_MAXN   (20)
 
 // the lock type
-//#define TB_TEST_LOCK_MUTEX
-#define TB_TEST_LOCK_SPINLOCK
+#define TB_TEST_LOCK_MUTEX
+//#define TB_TEST_LOCK_SPINLOCK
 //#define TB_TEST_LOCK_ATOMIC
 
 /* //////////////////////////////////////////////////////////////////////////////////////
