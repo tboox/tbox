@@ -112,20 +112,32 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
     while (!tb_atomic32_get(&poller->is_stopped))
     {
         // add semaphore first
-        procsize = 0;
-        proclist[procsize++] = poller->semaphore;
-
-        // get all waited processes and make wait list 
+        proclist[0] = poller->semaphore;
         tb_spinlock_enter(&poller->lock);
-        if (tb_vector_size(poller->processes_data))
         {
-            tb_for_all_if (tb_poller_processes_data_t*, proc_data, poller->processes_data, proc_data)
+            // append all previous pending processes
+            if (procsize > 1)
             {
-                tb_assert_and_check_continue(procsize < tb_arrayn(proclist));
-                procdata[procsize]   = *proc_data;
-                proclist[procsize++] = tb_process_handle(proc_data->process);
+                tb_size_t i;
+                for (i = 1; i < procsize; i++)
+                {
+                    if (procdata[i].process)
+                        tb_vector_insert_tail(poller->processes_data, &procdata[i]);
+                }
             }
-            tb_vector_clear(poller->processes_data);
+
+            // generate waited processes list
+            procsize = 1;
+            if (tb_vector_size(poller->processes_data))
+            {
+                tb_for_all_if (tb_poller_processes_data_t*, proc_data, poller->processes_data, proc_data)
+                {
+                    tb_assert_and_check_continue(procsize < tb_arrayn(proclist));
+                    procdata[procsize]   = *proc_data;
+                    proclist[procsize++] = tb_process_handle(proc_data->process);
+                }
+                tb_vector_clear(poller->processes_data);
+            }
         }
         tb_spinlock_leave(&poller->lock);
 
@@ -133,7 +145,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
         tb_trace_d("process: wait %lu ..", procsize - 1);
 
         // wait processes
-        DWORD     exitcode = 0;
+        DWORD exitcode = 0;
         DWORD result = tb_kernel32()->WaitForMultipleObjects((DWORD)procsize, proclist, FALSE, -1);
         tb_assert_and_check_break(result != WAIT_FAILED);
 
@@ -157,6 +169,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                 proc_status.process = procdata[index].process;
                 proc_status.priv    = procdata[index].priv;
                 tb_assert(proc_status.process);
+
+                // mark as finished
+                procdata[index].process = tb_null;
 
                 // trace
                 tb_trace_d("process: finished: %p, status: %d", proc_status.process, proc_status.status);
@@ -195,6 +210,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                     proc_status.process = procdata[index].process;
                     proc_status.priv    = procdata[index].priv;
                     tb_assert(proc_status.process);
+
+                    // mark as finished
+                    procdata[index].process = tb_null;
 
                     // trace
                     tb_trace_d("process: finished: %p, status: %d", proc_status.process, proc_status.status);
@@ -268,7 +286,10 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
         // wait it
         tb_long_t wait = 0;
         if ((wait = tb_thread_wait(poller->thread, 5000, tb_null)) <= 0)
+        {
+            // trace
             tb_trace_e("wait process poller thread failed: %ld!", wait);
+        }
 
         // exit it
         tb_thread_exit(poller->thread);
@@ -310,7 +331,7 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
         poller->main_poller = main_poller;
 
         // init semaphore
-        poller->semaphore = CreateSemaphoreA(tb_null, 1, 128, tb_null);
+        poller->semaphore = CreateSemaphoreA(tb_null, 0, 128, tb_null);
         tb_assert_and_check_break(poller->semaphore && poller->semaphore != INVALID_HANDLE_VALUE);
 
         // init lock
@@ -370,8 +391,8 @@ static tb_bool_t tb_poller_process_insert(tb_poller_process_ref_t self, tb_proce
     tb_spinlock_enter(&poller->lock);
     {
         tb_poller_processes_data_t procdata;
-        procdata.process = process;
-        procdata.priv    = priv;
+        procdata.process  = process;
+        procdata.priv     = priv;
         tb_vector_insert_tail(poller->processes_data, &procdata);
     }
     tb_spinlock_leave(&poller->lock);
@@ -395,10 +416,8 @@ static tb_bool_t tb_poller_process_modify(tb_poller_process_ref_t self, tb_proce
         tb_size_t itor = tb_find_all_if(poller->processes_data, tb_poller_process_data_pred, process);
         if (itor != tb_iterator_tail(poller->processes_data))
         {
-            tb_poller_processes_data_t procdata;
-            procdata.process = process;
-            procdata.priv    = priv;
-            tb_vector_replace(poller->processes_data, itor, &procdata);
+            tb_poller_processes_data_t* procdata = (tb_poller_processes_data_t*)tb_iterator_item(poller->processes_data, itor);
+            if (procdata) procdata->priv = priv;
         }
     }
     tb_spinlock_leave(&poller->lock);

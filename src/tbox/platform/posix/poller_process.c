@@ -212,7 +212,10 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
         // wait it
         tb_long_t wait = 0;
         if ((wait = tb_thread_wait(poller->thread, 5000, tb_null)) <= 0)
+        {
+            // trace
             tb_trace_e("wait process poller thread failed: %ld!", wait);
+        }
 
         // exit it
         tb_thread_exit(poller->thread);
