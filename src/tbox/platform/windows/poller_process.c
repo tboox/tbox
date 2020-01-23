@@ -149,6 +149,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
         DWORD result = tb_kernel32()->WaitForMultipleObjects((DWORD)procsize, proclist, FALSE, -1);
         tb_assert_and_check_break(result != WAIT_FAILED);
 
+        // trace
+        tb_trace_d("process: wait ok, result: %d", result);
+
         // has exited processes?
         tb_bool_t has_exited = tb_false;
         tb_poller_processes_status_t proc_status;
@@ -450,16 +453,19 @@ static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
     tb_poller_process_t* poller = (tb_poller_process_t*)self;
     tb_assert_and_check_return_val(poller && poller->processes_data, tb_false);
 
+    // is stopped?
+    tb_check_return_val(!tb_atomic32_get(&poller->is_stopped), tb_false);
+
     // get the current waited processes size
     tb_spinlock_enter(&poller->lock);
     tb_size_t size = tb_vector_size(poller->processes_data);
     tb_spinlock_leave(&poller->lock);
 
-    // notify to wait processes
-    if (size) ReleaseSemaphore(poller->semaphore, 1, tb_null);
-
     // trace
     tb_trace_d("process: prepare %lu", size);
+
+    // notify to wait processes
+    if (size) ReleaseSemaphore(poller->semaphore, 1, tb_null);
     return tb_true;
 }
 static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_poller_event_func_t func)

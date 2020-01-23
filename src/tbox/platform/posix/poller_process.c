@@ -382,9 +382,15 @@ static tb_bool_t tb_poller_process_remove(tb_poller_process_ref_t self, tb_proce
 }
 static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
 {
+    // check
+    tb_poller_process_t* poller = (tb_poller_process_t*)self;
+    tb_assert_and_check_return_val(poller && poller->processes_data, tb_false);
+
     // trace
-    tb_trace_d("process: prepare %lu", tb_hash_map_size(((tb_poller_process_t*)self)->processes_data));
-    return tb_true;
+    tb_trace_d("process: prepare %lu", tb_hash_map_size(poller->processes_data));
+
+    // is stopped?
+    return !tb_atomic32_get(&poller->is_stopped);
 }
 static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_poller_event_func_t func)
 {
