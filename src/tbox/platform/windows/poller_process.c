@@ -129,6 +129,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
         }
         tb_spinlock_leave(&poller->lock);
 
+        // trace
+        tb_trace_d("process: wait %lu ..", procsize - 1);
+
         // wait processes
         DWORD     exitcode = 0;
         DWORD result = tb_kernel32()->WaitForMultipleObjects((DWORD)procsize, proclist, FALSE, -1);
@@ -154,6 +157,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                 proc_status.process = procdata[index].process;
                 proc_status.priv    = procdata[index].priv;
                 tb_assert(proc_status.process);
+
+                // trace
+                tb_trace_d("process: finished: %p, status: %d", proc_status.process, proc_status.status);
 
                 // close process handles first
                 tb_process_handle_close(proc_status.process);
@@ -189,6 +195,9 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                     proc_status.process = procdata[index].process;
                     proc_status.priv    = procdata[index].priv;
                     tb_assert(proc_status.process);
+
+                    // trace
+                    tb_trace_d("process: finished: %p, status: %d", proc_status.process, proc_status.status);
 
                     // close process handles first
                     tb_process_handle_close(proc_status.process);

@@ -136,7 +136,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
             result = waitpid(-1, &status, WNOHANG | WUNTRACED);
 
             // trace
-            tb_trace_d("process: waitpid: %d, status: %d", result, status);
+            tb_trace_d("process: finished: %d, status: %d", result, status);
 
             // has exited process?
             if (result != 0 && result != -1)
