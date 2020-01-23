@@ -75,10 +75,10 @@ typedef struct __tb_poller_process_t
     // the waited processes data, pid => process and user private data
     tb_hash_map_ref_t       processes_data;
 
-    // the processes status queue
+    // the processes status 
     tb_vector_ref_t         processes_status;
 
-    // the processes status queue
+    // the copied processes status 
     tb_vector_ref_t         processes_status_copied;
 
     // the semaphore

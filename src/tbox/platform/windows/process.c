@@ -43,6 +43,12 @@ typedef struct __tb_process_t
     // the process info
     PROCESS_INFORMATION     pi;
 
+    /// the stdout redirect type
+    tb_uint16_t             outtype;
+
+    /// the stderr redirect type
+    tb_uint16_t             errtype;
+
     // the user private data
     tb_cpointer_t           priv;
 
@@ -52,8 +58,48 @@ typedef struct __tb_process_t
  * declaration
  */
 __tb_extern_c_enter__
-HANDLE tb_pipe_file_handle(tb_pipe_file_ref_t file);
+HANDLE      tb_pipe_file_handle(tb_pipe_file_ref_t file);
+HANDLE      tb_process_handle(tb_process_ref_t self);
+tb_void_t   tb_process_handle_close(tb_process_ref_t self);
 __tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+HANDLE tb_process_handle(tb_process_ref_t self)
+{
+    // check
+    tb_process_t* process = (tb_process_t*)self;
+    tb_assert_and_check_return_val(process, tb_null);
+
+    return process->pi.hProcess != INVALID_HANDLE_VALUE? process->pi.hProcess : tb_null;
+}
+tb_void_t tb_process_handle_close(tb_process_ref_t self)
+{
+    // check
+    tb_process_t* process = (tb_process_t*)self;
+    tb_assert_and_check_return(process);
+
+    // close thread handle
+    if (process->pi.hThread != INVALID_HANDLE_VALUE)
+        CloseHandle(process->pi.hThread);
+    process->pi.hThread = INVALID_HANDLE_VALUE;
+
+    // close process handle
+    if (process->pi.hProcess != INVALID_HANDLE_VALUE)
+        CloseHandle(process->pi.hProcess);
+    process->pi.hProcess = INVALID_HANDLE_VALUE;
+
+    // exit stdout file
+    if (process->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdOutput && process->si.hStdOutput != INVALID_HANDLE_VALUE) 
+        tb_file_exit((tb_file_ref_t)process->si.hStdOutput);
+    process->si.hStdOutput = INVALID_HANDLE_VALUE;
+
+    // exit stderr file
+    if (process->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdError && process->si.hStdError != INVALID_HANDLE_VALUE) 
+        tb_file_exit((tb_file_ref_t)process->si.hStdError);
+    process->si.hStdError = INVALID_HANDLE_VALUE;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -208,6 +254,8 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         BOOL bInheritHandle = FALSE;
         if (attr)
         {
+            process->outtype = attr->outtype;
+            process->errtype = attr->errtype;
             if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->outpath)
             {
                 // the outmode
@@ -332,23 +380,8 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
     tb_process_t* process = (tb_process_t*)self;
     tb_assert_and_check_return(process);
 
-    // close thread handle
-    if (process->pi.hThread != INVALID_HANDLE_VALUE)
-        CloseHandle(process->pi.hThread);
-    process->pi.hThread = INVALID_HANDLE_VALUE;
-
-    // close process handle
-    if (process->pi.hProcess != INVALID_HANDLE_VALUE)
-        CloseHandle(process->pi.hProcess);
-    process->pi.hProcess = INVALID_HANDLE_VALUE;
-
-    // exit stdout file
-    if (process->si.hStdOutput) tb_file_exit((tb_file_ref_t)process->si.hStdOutput);
-    process->si.hStdOutput = tb_null;
-
-    // exit stderr file
-    if (process->si.hStdError) tb_file_exit((tb_file_ref_t)process->si.hStdError);
-    process->si.hStdError = tb_null;
+    // close process handles
+    tb_process_handle_close(self);
 
     // exit it
     tb_free(process);
@@ -416,13 +449,8 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
             DWORD exitcode = 0;
             if (pstatus) *pstatus = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;  
 
-            // close thread handle
-            CloseHandle(process->pi.hThread);
-            process->pi.hThread = INVALID_HANDLE_VALUE;
-
-            // close process
-            CloseHandle(process->pi.hProcess);
-            process->pi.hProcess = INVALID_HANDLE_VALUE;
+            // close process handles
+            tb_process_handle_close(self);
 
             // ok
             ok = 1;
@@ -477,13 +505,8 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
             infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_int_t)exitcode : -1;  
             infosize++;
 
-            // close thread handle
-            CloseHandle(process->pi.hThread);
-            process->pi.hThread = INVALID_HANDLE_VALUE;
-
-            // close process
-            CloseHandle(process->pi.hProcess);
-            process->pi.hProcess = INVALID_HANDLE_VALUE;
+            // close process handles
+            tb_process_handle_close((tb_process_ref_t)process);
 
             // next index
             index++;
@@ -514,13 +537,8 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
                         infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;  
                         infosize++;
 
-                        // close thread handle
-                        CloseHandle(process->pi.hThread);
-                        process->pi.hThread = INVALID_HANDLE_VALUE;
-
-                        // close process
-                        CloseHandle(process->pi.hProcess);
-                        process->pi.hProcess = INVALID_HANDLE_VALUE;
+                        // close process handles
+                        tb_process_handle_close((tb_process_ref_t)process);
 
                         // next index
                         index++;
