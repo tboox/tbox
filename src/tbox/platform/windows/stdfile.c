@@ -448,8 +448,8 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
                 // next line
                 p = lf + 1;
 
-                // need flush
-                flush = tb_true;
+                // flush data
+                if (!tb_stream_sync(stdfile->ofstream, tb_false)) break;
             }
             else
             {
@@ -460,9 +460,6 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
             }
         }
         tb_check_break(p == e);
-
-        // flush data
-        if (flush && !tb_stream_sync(stdfile->ofstream, tb_false)) break;
 
         // ok
         ok = tb_true;
