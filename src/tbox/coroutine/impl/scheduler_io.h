@@ -128,13 +128,24 @@ tb_pointer_t                tb_co_scheduler_io_sleep(tb_co_scheduler_io_ref_t sc
 /*! wait io events 
  *
  * @param scheduler_io      the io scheduler
- * @param object            the poller object
+ * @param object            the poller object, socket or pipe
  * @param events            the waited events
  * @param timeout           the timeout, infinity: -1
  *
  * @return                  > 0: the events, 0: timeout, -1: failed
  */
 tb_long_t                   tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
+
+/*! wait process status 
+ *
+ * @param scheduler_io      the io scheduler
+ * @param object            the process poller object
+ * @param pstatus           the process exited status pointer, maybe null
+ * @param timeout           the timeout, infinity: -1
+ *
+ * @return                  > 0: process exited, 0: timeout, -1: failed
+ */
+tb_long_t                   tb_co_scheduler_io_wait_proc(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
 
 /*! cancel io events for the given poller object
  *

@@ -66,6 +66,9 @@ typedef struct __tb_coroutine_rs_wait_t
     // the timer task pointer for ltimer or timer
     tb_cpointer_t                   task;
 
+    // the process status
+    tb_int_t                        proc_status;
+
     // is ltimer?
     tb_uint16_t                     is_ltimer    : 1;
 

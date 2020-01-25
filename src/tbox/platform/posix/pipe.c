@@ -252,8 +252,8 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t
 {
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
-    // attempt to wait it in coroutine
-    if (tb_coroutine_self()) 
+    // attempt to wait it in coroutine if timeout is non-zero
+    if (timeout && tb_coroutine_self()) 
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_PIPE;

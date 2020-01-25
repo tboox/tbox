@@ -103,6 +103,16 @@ tb_pointer_t            tb_coroutine_sleep(tb_long_t interval);
  */
 tb_long_t               tb_coroutine_waitio(tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
+/*! wait process status 
+ *
+ * @param object        the poller object
+ * @param pstatus       the process exited status pointer, maybe null
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              > 0: process exited, 0: timeout, -1: failed
+ */
+tb_long_t               tb_coroutine_waitproc(tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
+
 /*! get the current coroutine
  *
  * @return              the current coroutine

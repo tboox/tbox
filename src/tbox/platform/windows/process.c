@@ -29,6 +29,11 @@
 #include "../environment.h"
 #include "../../string/string.h"
 #include "interface/interface.h"
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -380,6 +385,19 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
     tb_process_t* process = (tb_process_t*)self;
     tb_assert_and_check_return(process);
 
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to cancel waiting from coroutine first
+    tb_pointer_t scheduler_io = tb_null;
+    tb_poller_object_t object;
+    object.type     = TB_POLLER_OBJECT_PROC;
+    object.ref.proc = self;
+#   ifndef TB_CONFIG_MICRO_ENABLE
+    if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel((tb_co_scheduler_io_ref_t)scheduler_io, &object)) {}
+    else
+#   endif
+    if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel((tb_lo_scheduler_io_ref_t)scheduler_io, &object)) {}
+#endif
+
     // close process handles
     tb_process_handle_close(self);
 
@@ -437,6 +455,18 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
     // check
     tb_process_t* process = (tb_process_t*)self;
     tb_assert_and_check_return_val(process && process->pi.hProcess != INVALID_HANDLE_VALUE && process->pi.hThread != INVALID_HANDLE_VALUE, -1);
+
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+    // attempt to wait it in coroutine if timeout is non-zero
+    if (timeout && tb_coroutine_self()) 
+    {
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_PROC;
+        object.ref.proc = self;
+        return tb_coroutine_waitproc(&object, pstatus, timeout);
+    }
+#endif
 
     // wait it
     tb_long_t   ok = -1;

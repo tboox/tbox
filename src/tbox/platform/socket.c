@@ -171,6 +171,12 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
 #endif
 tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout)
 {
+#ifndef TB_CONFIG_OS_WINDOWS
+    // poll it directly if timeout is zero
+    if (!timeout)
+        return tb_socket_wait_impl(sock, events, 0);
+#endif
+
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine

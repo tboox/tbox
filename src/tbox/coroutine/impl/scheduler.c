@@ -377,7 +377,21 @@ tb_long_t tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_poller_object_re
     // need io scheduler
     if (!tb_co_scheduler_io_need(scheduler)) return -1;
 
-    // sleep it
+    // wait it
     return tb_co_scheduler_io_wait(scheduler->scheduler_io, object, events, timeout);
 }
+tb_long_t tb_co_scheduler_wait_proc(tb_co_scheduler_t* scheduler, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout)
+{
+    // check
+    tb_assert(scheduler && scheduler->running);
+    tb_assert(scheduler->running == (tb_coroutine_t*)tb_coroutine_self());
 
+    // have been stopped? return it directly
+    tb_check_return_val(!scheduler->stopped, -1);
+
+    // need io scheduler
+    if (!tb_co_scheduler_io_need(scheduler)) return -1;
+
+    // wait it
+    return tb_co_scheduler_io_wait_proc(scheduler->scheduler_io, object, pstatus, timeout);
+}
