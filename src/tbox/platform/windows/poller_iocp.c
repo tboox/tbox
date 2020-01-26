@@ -470,8 +470,6 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
         if (tb_poller_iocp_event_spak(poller, func, iocp_object, real, error) > 0)
             wait++;
     }
-
-    // ok
     return wait;
 }
 static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_long_t timeout)
@@ -519,8 +517,6 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         if (tb_poller_iocp_event_spak(poller, func, iocp_object, real, error) > 0)
             wait++;
     }
-
-    // ok
     return wait;
 }
 tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_bool_t is_pipe)
@@ -609,6 +605,9 @@ static tb_void_t tb_poller_iocp_kill(tb_poller_t* self)
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
 
+    // trace
+    tb_trace_d("iocp: kill ..");
+
     // post kill notification to iocp port
     PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_null, tb_null);
 }
@@ -617,6 +616,9 @@ static tb_void_t tb_poller_iocp_spak(tb_poller_t* self)
     // check
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
+
+    // trace
+    tb_trace_d("iocp: spak ..");
 
     // post spark notification to iocp port
     PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_u2p(1), tb_null);

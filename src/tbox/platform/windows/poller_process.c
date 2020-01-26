@@ -505,6 +505,6 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     }
 
     // trace
-    tb_trace_d("process: wait %ld", wait);
+    tb_trace_d("process: poll wait %ld", wait);
     return wait;
 }
