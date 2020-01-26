@@ -49,9 +49,9 @@
 
 // the poller data grow
 #ifdef __tb_small__ 
-#   define TB_SCHEDULER_IO_pollerdata_GROW    (64)
+#   define TB_SCHEDULER_IO_POLLERDATA_GROW    (64)
 #else
-#   define TB_SCHEDULER_IO_pollerdata_GROW    (4096)
+#   define TB_SCHEDULER_IO_POLLERDATA_GROW    (4096)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ tb_lo_scheduler_io_ref_t tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler)
 #endif
 
         // init poller data pool
-        scheduler_io->pollerdata_pool = tb_fixed_pool_init(tb_null, TB_SCHEDULER_IO_pollerdata_GROW, sizeof(tb_lo_pollerdata_io_t), tb_null, tb_null, tb_null);
+        scheduler_io->pollerdata_pool = tb_fixed_pool_init(tb_null, TB_SCHEDULER_IO_POLLERDATA_GROW, sizeof(tb_lo_pollerdata_io_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(scheduler_io->pollerdata_pool);
 
         // init poller data

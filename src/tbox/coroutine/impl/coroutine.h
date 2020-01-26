@@ -69,8 +69,14 @@ typedef struct __tb_coroutine_rs_wait_t
     // the process status
     tb_int_t                        proc_status;
 
+    // has pending process status?
+    tb_uint16_t                     proc_pending  : 1;
+
+    // waiting process?
+    tb_uint16_t                     proc_waiting  : 1;
+
     // is ltimer?
-    tb_uint16_t                     is_ltimer    : 1;
+    tb_uint16_t                     is_ltimer     : 1;
 
 }tb_coroutine_rs_wait_t;
 
