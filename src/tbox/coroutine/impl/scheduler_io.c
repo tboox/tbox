@@ -248,7 +248,11 @@ static tb_void_t tb_co_scheduler_io_loop(tb_cpointer_t priv)
         tb_trace_d("loop: wait %lu ms, %lu pending coroutines ..", tb_min(delay, ldelay), tb_co_scheduler_suspend_count(scheduler));
 
         // no more ready coroutines? wait io events and timers
-        if (tb_poller_wait(poller, tb_co_scheduler_io_events, tb_min(delay, ldelay)) < 0) break;
+        if (tb_poller_wait(poller, tb_co_scheduler_io_events, tb_min(delay, ldelay)) < 0) 
+        {
+            tb_trace_e("loop: wait poller failed!");
+            break;
+        }
 
         // trace
         tb_trace_d("loop: wait ok, left %lu pending coroutines ..", tb_co_scheduler_suspend_count(scheduler));

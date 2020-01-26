@@ -17,6 +17,10 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
     tb_char_t** argv = (tb_char_t**)priv;
     tb_assert_and_check_return(argv);
 
+    // init id
+    static tb_size_t count = 0;
+    tb_size_t id = count++;
+
     // init pipe files
     tb_pipe_file_ref_t file[2] = {0};
     if (tb_pipe_file_init_pair(file, 0))
@@ -52,14 +56,14 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
             }
 
             // dump data
-            if (read) tb_dump_data(data, read);
+            tb_trace_i("[%lu]: read pipe: %ld", id, read);
 
             // wait process
             tb_long_t status = 0;
             tb_process_wait(process, &status, -1);
 
             // trace
-            tb_trace_i("run: %s, status: %ld", argv[1], status);
+            tb_trace_i("[%lu]: run: %s, status: %ld", id, argv[1], status);
 
             // exit process
             tb_process_exit(process);
@@ -69,6 +73,9 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
         tb_pipe_file_exit(file[0]);
         tb_pipe_file_exit(file[1]);
     }
+
+    // end        
+    tb_trace_i("[%lu]: end", id);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
