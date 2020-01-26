@@ -384,10 +384,14 @@ static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
 {
     // check
     tb_poller_process_t* poller = (tb_poller_process_t*)self;
-    tb_assert_and_check_return_val(poller && poller->processes_data, tb_false);
+    tb_assert_and_check_return_val(poller && poller->processes_data && poller->semaphore, tb_false);
 
     // trace
     tb_trace_d("process: prepare %lu", tb_hash_map_size(poller->processes_data));
+
+    // some processes maybe have been exited before starting the loop thread, so we need notify to waitpid
+    if (tb_hash_map_size(poller->processes_data) && !tb_semaphore_post(poller->semaphore, 1))
+        return tb_false;
 
     // is stopped?
     return !tb_atomic32_get(&poller->is_stopped);
