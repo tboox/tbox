@@ -22,6 +22,6 @@ target("demo")
 
     -- add the source files for coroutine
     if has_config("coroutine") then
-        add_files("coroutine/stackless/*.c") 
+        add_files("coroutine/stackless/*.c|process.c") 
     end
 

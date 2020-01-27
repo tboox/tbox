@@ -81,7 +81,7 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
                 tb_lo_coroutine_wait_sock(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
                 
                 // wait failed?
-                if (tb_lo_coroutine_events() <= 0) break;
+                if (tb_lo_coroutine_wait_result() <= 0) break;
             }
 
             // connect ok?
@@ -113,7 +113,7 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
                     tb_lo_coroutine_wait_sock(client->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
                     // wait ok
-                    client->wait = tb_lo_coroutine_events();
+                    client->wait = tb_lo_coroutine_wait_result();
                     tb_assert_and_check_break(client->wait >= 0);
                 }
                 // failed or end?

@@ -47,9 +47,11 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
         {
             // wait process
             tb_lo_coroutine_wait_proc(process->proc, &process->status, -1);
-
-            // trace
-            tb_trace_i("run: %s, status: %ld", process->argv[1], process->status);
+            if (tb_lo_coroutine_wait_result() > 0)
+            {
+                // trace
+                tb_trace_i("run: %s, status: %ld", process->argv[1], process->status);
+            }
 
             // exit process
             tb_process_exit(process->proc);

@@ -230,8 +230,8 @@ do \
 /// wait while coroutine be true
 #define tb_lo_coroutine_wait_while(pt, cond)    tb_lo_coroutine_wait_until(!(cond))
 
-/// get socket events after waiting
-#define tb_lo_coroutine_events()                tb_lo_coroutine_events_(tb_lo_coroutine_self())
+/// get waited return result
+#define tb_lo_coroutine_wait_result()           tb_lo_coroutine_waitret_(tb_lo_coroutine_self())
 
 /*! pass the user private data 
  *
@@ -332,13 +332,13 @@ tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine,
  */
 tb_bool_t               tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
 
-/* get the events after waiting socket
+/* get the waited return results 
  *
  * @param coroutine     the coroutine 
  *
- * @return              events: > 0, failed: -1, timeout: 0
+ * @return              ok or events: > 0, failed: -1, timeout: 0
  */
-tb_long_t               tb_lo_coroutine_events_(tb_lo_coroutine_ref_t coroutine);
+tb_long_t               tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t coroutine);
 
 /* free the user private data for pass()
  *

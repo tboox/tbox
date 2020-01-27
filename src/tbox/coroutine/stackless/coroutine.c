@@ -152,6 +152,7 @@ tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_poller_object_r
     // wait it
     return tb_lo_scheduler_io_wait(scheduler->scheduler_io, object, events, timeout);
 }
+#ifndef TB_CONFIG_MICRO_ENABLE
 tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout)
 {
     // check
@@ -168,14 +169,15 @@ tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object
     // wait it
     return tb_lo_scheduler_io_wait_proc(scheduler->scheduler_io, object, pstatus, timeout);
 }
-tb_long_t tb_lo_coroutine_events_(tb_lo_coroutine_ref_t self)
+#endif
+tb_long_t tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t self)
 {
     // check
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
     tb_assert(coroutine);
 
     // get events
-    return coroutine->rs.wait.events_result;
+    return coroutine->rs.wait.result;
 }
 tb_void_t tb_lo_coroutine_pass_free_(tb_cpointer_t priv)
 {

@@ -384,7 +384,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                 tb_lo_coroutine_wait_sock(session->sock, TB_SOCKET_EVENT_RECV, TB_DEMO_TIMEOUT);
 
                 // wait ok
-                session->locals.wait = tb_lo_coroutine_events();
+                session->locals.wait = tb_lo_coroutine_wait_result();
                 tb_assert_and_check_break(session->locals.wait >= 0);
             }
             tb_check_break(session->locals.ok > 0);
@@ -440,7 +440,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                 tb_lo_coroutine_wait_sock(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
                 // wait ok
-                session->locals.wait = tb_lo_coroutine_events();
+                session->locals.wait = tb_lo_coroutine_wait_result();
                 tb_assert_and_check_break(session->locals.wait >= 0);
             }
             tb_check_break(session->locals.ok > 0);
@@ -458,7 +458,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
                     tb_lo_coroutine_wait_sock(session->sock, TB_SOCKET_EVENT_SEND, TB_DEMO_TIMEOUT);
 
                     // wait ok
-                    session->locals.wait = tb_lo_coroutine_events();
+                    session->locals.wait = tb_lo_coroutine_wait_result();
                     tb_assert_and_check_break(session->locals.wait >= 0);
                 }
                 tb_check_break(session->locals.ok > 0);
@@ -516,7 +516,7 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
                 {
                     // wait accept events
                     tb_lo_coroutine_wait_sock(listen->sock, TB_SOCKET_EVENT_ACPT, -1);
-                    if (tb_lo_coroutine_events() <= 0) break;
+                    if (tb_lo_coroutine_wait_result() <= 0) break;
                 }
             }
 
