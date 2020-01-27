@@ -80,7 +80,7 @@ If you want to know more, please refer to:
 
 #### The coroutine library 
 
-- Provides high-performance coroutine switch(refer to [reports](https://tboox.org/2016/10/28/benchbox-coroutine/))
+- Provides high-performance coroutine switch
 - Supports arm, arm64, x86, x86_64 ..
 - Provides channel interfaces
 - Provides semaphore and lock interfaces
@@ -88,6 +88,7 @@ If you want to know more, please refer to:
 - Provides some io servers (http ..) using coroutine
 - Provides stackfull and stackless coroutines
 - Support epoll, kqueue, poll, select and IOCP
+- Support to wait pipe, socket and process in coroutine and poller at same time
 
 #### The database library
 

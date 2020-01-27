@@ -5,7 +5,7 @@
 ### New features
 
 * [#112](https://github.com/tboox/tbox/issues/112): Support unix socket，thanks [@Codehz](https://github.com/codehz)
-* Support to wait pipe and socket in coroutine and poller at same time
+* Support to wait pipe, socket and process in coroutine and poller at same time
 
 ### Changes
 
@@ -198,7 +198,7 @@
 ### 新特性
 
 * [#112](https://github.com/tboox/tbox/issues/112): 新增unix socket支持，感谢[@Codehz](https://github.com/codehz)的贡献
-* 在协程和poller中支持同时等待和调度socket和pipe io
+* 在协程和poller中支持同时等待和调度socket，pipe io和process
 
 ### 改进
 

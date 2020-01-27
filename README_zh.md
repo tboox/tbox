@@ -84,7 +84,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 #### 协程库
 
-- 快速高效的协程切换支持（具体性能参考：[基准测试报告](https://tboox.org/cn/2016/10/28/benchbox-coroutine/)）
+- 快速高效的协程切换支持
 - 提供跨平台支持，核心切换算法参考boost，并且对其进行重写和优化，目前支持架构：x86, x86_64, arm, arm64, mips32
 - 提供channel协程间数据通信支持，基于生产、消费者模型
 - 提供信号量、协程锁支持
@@ -92,6 +92,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 提供http、file等基于协程的简单服务器实例，只需几百行代码，就可以从socket开始写个高性能io服务器，代码逻辑比异步回调模式更加清晰
 - 同时提供stackfull, stackless两种协程模式支持，stackless协程更加的轻量（每个协程只占用几十个bytes），切换更快（会牺牲部分易用性）
 - 支持epoll, kqueue, poll, select 和 IOCP
+- 在协程和poller中支持同时等待和调度socket，pipe io和process
 
 #### 数据库
 
