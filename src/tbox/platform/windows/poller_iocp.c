@@ -439,11 +439,12 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
         // get iocp object
         tb_iocp_object_ref_t iocp_object = (tb_iocp_object_ref_t)e->lpOverlapped;
 
+        // spank notification? 
+        if (!iocp_object && tb_p2u32(e->lpCompletionKey) == 0x1)
+            continue ;
+
         // iocp port is killed?
         tb_check_return_val(iocp_object, -1);
-
-        // spark notification, is 1? 
-        tb_check_continue(!e->lpCompletionKey);
 
         // this iocp object is killing? ignore it directly
         if (iocp_object->state == TB_STATE_KILLING)
@@ -492,8 +493,13 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         // the last error
         tb_size_t error = (tb_size_t)GetLastError();
 
-        // timeout or spark?
-        if ((!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) || pkey) break;
+        // timeout?
+        if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) 
+            break;
+
+        // spank notification? 
+        if (!iocp_object && tb_p2u32(pkey) == 0x1)
+            break ;
 
         // iocp port is killed?
         tb_check_return_val(iocp_object, -1);
