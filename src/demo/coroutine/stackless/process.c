@@ -21,9 +21,6 @@ typedef struct __tb_demo_lo_process_t
     // the arguments
     tb_char_t**         argv;
 
-    // the exit status
-    tb_long_t           status;
-
     // wait ok?
     tb_long_t           ok;
 
@@ -46,11 +43,11 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
         if (process->proc)
         {
             // wait process
-            tb_lo_coroutine_wait_proc(process->proc, &process->status, -1);
+            tb_lo_coroutine_wait_proc(process->proc, -1);
             if (tb_lo_coroutine_wait_result() > 0)
             {
                 // trace
-                tb_trace_i("run: %s, status: %ld", process->argv[1], process->status);
+                tb_trace_i("run: %s, status: %ld", process->argv[1], tb_lo_coroutine_proc_status());
             }
 
             // exit process

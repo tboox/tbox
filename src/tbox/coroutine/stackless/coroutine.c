@@ -153,7 +153,7 @@ tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_poller_object_r
     return tb_lo_scheduler_io_wait(scheduler->scheduler_io, object, events, timeout);
 }
 #ifndef TB_CONFIG_MICRO_ENABLE
-tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout)
+tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object_ref_t object, tb_long_t timeout)
 {
     // check
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
@@ -167,7 +167,16 @@ tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object
     if (!tb_lo_scheduler_io_need(scheduler)) return tb_false;
 
     // wait it
-    return tb_lo_scheduler_io_wait_proc(scheduler->scheduler_io, object, pstatus, timeout);
+    return tb_lo_scheduler_io_wait_proc(scheduler->scheduler_io, object, timeout);
+}
+tb_long_t tb_lo_coroutine_proc_status_(tb_lo_coroutine_ref_t self)
+{
+    // check
+    tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
+    tb_assert(coroutine);
+
+    // get process status
+    return coroutine->rs.wait.proc_status;
 }
 #endif
 tb_long_t tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t self)
@@ -176,7 +185,7 @@ tb_long_t tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t self)
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
     tb_assert(coroutine);
 
-    // get events
+    // get wait result
     return coroutine->rs.wait.result;
 }
 tb_void_t tb_lo_coroutine_pass_free_(tb_cpointer_t priv)

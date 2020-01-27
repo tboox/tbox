@@ -140,12 +140,11 @@ tb_bool_t                   tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t sch
  *
  * @param scheduler_io      the io scheduler
  * @param object            the poller object
- * @param pstatus           the process exited status pointer, maybe null
  * @param timeout           the timeout, infinity: -1
  *
  * @return                  suspend coroutine if be tb_true
  */
-tb_bool_t                   tb_lo_scheduler_io_wait_proc(tb_lo_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
+tb_bool_t                   tb_lo_scheduler_io_wait_proc(tb_lo_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_long_t timeout);
 
 /*! cancel io events for the given poller 
  *

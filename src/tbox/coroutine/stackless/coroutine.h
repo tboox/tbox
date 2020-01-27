@@ -203,13 +203,13 @@ do \
 } while(0)
 
 /// wait process status
-#define tb_lo_coroutine_wait_proc(process_, pstatus, interval) \
+#define tb_lo_coroutine_wait_proc(process_, interval) \
 do \
 { \
     tb_poller_object_t object; \
     object.type = TB_POLLER_OBJECT_PROC; \
     object.ref.proc = process_; \
-    if (tb_lo_coroutine_waitproc_(tb_lo_coroutine_self(), &object, pstatus, interval)) \
+    if (tb_lo_coroutine_waitproc_(tb_lo_coroutine_self(), &object, interval)) \
     { \
         tb_lo_coroutine_suspend(); \
     } \
@@ -232,6 +232,9 @@ do \
 
 /// get waited return result
 #define tb_lo_coroutine_wait_result()           tb_lo_coroutine_waitret_(tb_lo_coroutine_self())
+
+/// get waited exited status of process
+#define tb_lo_coroutine_proc_status()           tb_lo_coroutine_proc_status_(tb_lo_coroutine_self())
 
 /*! pass the user private data 
  *
@@ -325,12 +328,11 @@ tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine,
  *
  * @param coroutine     the coroutine 
  * @param object        the poller object
- * @param pstatus       the process exited status pointer, maybe null
  * @param timeout       the timeout, infinity: -1
  *
  * @return              suspend coroutine if be tb_true
  */
-tb_bool_t               tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
+tb_bool_t               tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_long_t timeout);
 
 /* get the waited return results 
  *
@@ -339,6 +341,14 @@ tb_bool_t               tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t coroutin
  * @return              ok or events: > 0, failed: -1, timeout: 0
  */
 tb_long_t               tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t coroutine);
+
+/* get the waited process status 
+ *
+ * @param coroutine     the coroutine 
+ *
+ * @return              process status
+ */
+tb_long_t               tb_lo_coroutine_proc_status_(tb_lo_coroutine_ref_t coroutine);
 
 /* free the user private data for pass()
  *
