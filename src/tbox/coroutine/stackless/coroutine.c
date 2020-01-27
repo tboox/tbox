@@ -152,6 +152,22 @@ tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_poller_object_r
     // wait it
     return tb_lo_scheduler_io_wait(scheduler->scheduler_io, object, events, timeout);
 }
+tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout)
+{
+    // check
+    tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
+    tb_assert(coroutine);
+
+    // get scheduler
+    tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
+    tb_assert(scheduler);
+   
+    // init io scheduler first
+    if (!tb_lo_scheduler_io_need(scheduler)) return tb_false;
+
+    // wait it
+    return tb_lo_scheduler_io_wait_proc(scheduler->scheduler_io, object, pstatus, timeout);
+}
 tb_long_t tb_lo_coroutine_events_(tb_lo_coroutine_ref_t self)
 {
     // check

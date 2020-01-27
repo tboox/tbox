@@ -569,6 +569,10 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_poll
     // suspend the current coroutine
     return tb_true;
 }
+tb_bool_t tb_lo_scheduler_io_wait_proc(tb_lo_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout)
+{
+    return tb_false;
+}
 tb_bool_t tb_lo_scheduler_io_cancel(tb_lo_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object)
 {
     // check

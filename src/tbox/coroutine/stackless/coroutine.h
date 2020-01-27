@@ -174,17 +174,6 @@ do \
     \
 } while(0)
 
-/// wait io poller object events
-#define tb_lo_coroutine_waitio(object, events, interval) \
-do \
-{ \
-    if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), object, events, interval)) \
-    { \
-        tb_lo_coroutine_suspend(); \
-    } \
-    \
-} while(0)
-
 /// wait io socket events
 #define tb_lo_coroutine_wait_sock(sock_, events, interval) \
 do \
@@ -207,6 +196,20 @@ do \
     object.type = TB_POLLER_OBJECT_PIPE; \
     object.ref.pipe = pipe_; \
     if (tb_lo_coroutine_waitio_(tb_lo_coroutine_self(), &object, events, interval)) \
+    { \
+        tb_lo_coroutine_suspend(); \
+    } \
+    \
+} while(0)
+
+/// wait process status
+#define tb_lo_coroutine_wait_proc(process_, pstatus, interval) \
+do \
+{ \
+    tb_poller_object_t object; \
+    object.type = TB_POLLER_OBJECT_PROC; \
+    object.ref.proc = process_; \
+    if (tb_lo_coroutine_waitproc_(tb_lo_coroutine_self(), &object, pstatus, interval)) \
     { \
         tb_lo_coroutine_suspend(); \
     } \
@@ -317,6 +320,17 @@ tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, 
  * @return              suspend coroutine if be tb_true
  */
 tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
+
+/* wait process status 
+ *
+ * @param coroutine     the coroutine 
+ * @param object        the poller object
+ * @param pstatus       the process exited status pointer, maybe null
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              suspend coroutine if be tb_true
+ */
+tb_bool_t               tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
 
 /* get the events after waiting socket
  *
