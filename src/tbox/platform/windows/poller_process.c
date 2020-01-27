@@ -496,7 +496,7 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     tb_for_all_if (tb_poller_processes_status_t*, proc_status, poller->processes_status_copied, proc_status)
     {
         // trace
-        tb_trace_d("process: %p, status: %ld", proc_status->process, proc_status->status);
+        tb_trace_d("process: %p, status: %d", proc_status->process, proc_status->status);
 
         // do callback
         object.ref.proc = proc_status->process;

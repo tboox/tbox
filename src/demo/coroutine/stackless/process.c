@@ -21,9 +21,6 @@ typedef struct __tb_demo_lo_process_t
     // the arguments
     tb_char_t**         argv;
 
-    // wait ok?
-    tb_long_t           ok;
-
 }tb_demo_lo_process_t, *tb_demo_lo_process_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
