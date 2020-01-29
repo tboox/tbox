@@ -578,7 +578,7 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_poll
     coroutine->rs.wait.object = *object;
     coroutine->rs.wait.result = 0;
 
-    // save waiting events to coroutine
+    // save waiting events 
     pollerdata->poller_events_wait = (tb_uint16_t)events_wait;
     pollerdata->poller_events_save = 0;
 
