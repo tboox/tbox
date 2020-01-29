@@ -496,14 +496,12 @@ tb_bool_t tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_poll
             // check error?
             if (events_prev_save & TB_POLLER_EVENT_ERROR)
             {
-                pollerdata->poller_events_wait = (tb_uint16_t)events_prev_wait;
                 pollerdata->poller_events_save = 0;
                 coroutine->rs.wait.result = -1;
                 return tb_false;
             }
 
             // clear cache events
-            pollerdata->poller_events_wait = (tb_uint16_t)events_prev_wait;
             pollerdata->poller_events_save = (tb_uint16_t)(events_prev_save & ~events);
 
             // return the cached events
