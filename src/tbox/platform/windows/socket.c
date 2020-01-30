@@ -625,21 +625,23 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
     // trace
     tb_trace_d("close: %p", sock);
 
-#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
-    // attempt to cancel waiting from coroutine first
+    // init poller object
     tb_poller_object_t object;
-    tb_pointer_t scheduler_io = tb_null;
     object.type     = TB_POLLER_OBJECT_SOCK;
     object.ref.sock = sock;
+
+#ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
+    // attempt to cancel waiting from coroutine first
+    tb_pointer_t scheduler_io = tb_null;
 #   ifndef TB_CONFIG_MICRO_ENABLE
     if ((scheduler_io = tb_co_scheduler_io_self()) && tb_co_scheduler_io_cancel((tb_co_scheduler_io_ref_t)scheduler_io, &object)) {}
     else
 #   endif
     if ((scheduler_io = tb_lo_scheduler_io_self()) && tb_lo_scheduler_io_cancel((tb_lo_scheduler_io_ref_t)scheduler_io, &object)) {}
+#endif
 
     // remove iocp object for this socket if exists
     tb_iocp_object_remove(&object);
-#endif
 
     // close it
     tb_bool_t ok = !tb_ws2_32()->closesocket(tb_sock2fd(sock))? tb_true : tb_false;
