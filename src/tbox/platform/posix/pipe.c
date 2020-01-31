@@ -98,10 +98,6 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         // this pipe is not exists? we create it first
         if (access(pipename, F_OK) != 0)
         {
-            // readonly? We need to wait for other write-client to create a pipe
-            if (mode & TB_FILE_MODE_RO)
-                break;
-
             // 0644: -rw-r--r-- 
             if (mkfifo(pipename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0)
                 break;
