@@ -158,16 +158,19 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         sattr.bInheritHandle       = FALSE;
         sattr.lpSecurityDescriptor = tb_null;
 
+        // open or create named pipe
         if (mode == TB_FILE_MODE_WO)
         {
-            // create named pipe
-            file->pipe = CreateNamedPipeW(pipename, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_REJECT_REMOTE_CLIENTS | PIPE_TYPE_BYTE | PIPE_WAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
+            file->pipe = CreateFileW(pipename, GENERIC_WRITE, 0, tb_null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, tb_null);
+            if (file->pipe == INVALID_HANDLE_VALUE)
+                file->pipe = CreateNamedPipeW(pipename, PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_REJECT_REMOTE_CLIENTS | PIPE_TYPE_BYTE | PIPE_WAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
             tb_assert_and_check_break(file->pipe && file->pipe != INVALID_HANDLE_VALUE);
         }
         else
         {
-            // open named pipe
             file->pipe = CreateFileW(pipename, GENERIC_READ, 0, tb_null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, tb_null);
+            if (file->pipe == INVALID_HANDLE_VALUE)
+                file->pipe = CreateNamedPipeW(pipename, PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_REJECT_REMOTE_CLIENTS | PIPE_TYPE_BYTE | PIPE_WAIT, 1, (DWORD)buffer_size, (DWORD)buffer_size, 0, &sattr);
             tb_assert_and_check_break(file->pipe && file->pipe != INVALID_HANDLE_VALUE);
         }
 
