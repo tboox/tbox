@@ -112,6 +112,7 @@ static tb_size_t tb_poller_iocp_event_from_code(tb_size_t code)
     ,   TB_POLLER_EVENT_SEND
     ,   TB_POLLER_EVENT_RECV
     ,   TB_POLLER_EVENT_SEND
+    ,   TB_POLLER_EVENT_CONN
     };
     tb_assert_and_check_return_val(code < tb_arrayn(s_events), TB_POLLER_EVENT_NONE);
     return s_events[code];
@@ -341,6 +342,49 @@ static tb_long_t tb_poller_iocp_event_spak_pipe(tb_poller_iocp_ref_t poller, tb_
     // ok
     return 1;
 }
+static tb_long_t tb_poller_iocp_event_spak_connpipe(tb_poller_iocp_ref_t poller, tb_iocp_object_ref_t iocp_object, tb_size_t real, tb_size_t error)
+{
+    // have been finished?
+    tb_check_return_val(iocp_object->state != TB_STATE_FINISHED, 1);
+
+    // done
+    switch (error)
+    {
+        // ok?
+    case ERROR_SUCCESS:
+        iocp_object->u.connpipe.result = 1;
+        break;
+        // pending?
+    case WAIT_TIMEOUT:
+    case ERROR_IO_PENDING:
+        iocp_object->u.connpipe.result = 0;
+        break;
+       // timeout?
+    case WSAEINTR:
+    case ERROR_SEM_TIMEOUT:
+    case ERROR_OPERATION_ABORTED:
+        iocp_object->u.connpipe.result = 0;
+        break;
+        // failed?
+    case WSAENOTCONN:
+    case WSAECONNREFUSED:
+    case ERROR_CONNECTION_REFUSED:
+        iocp_object->u.connpipe.result = -1;
+        break;
+        // unknown error
+    default:
+        // trace
+        tb_trace_e("connect_pipe(%p): unknown error: %u", iocp_object->ref.pipe, error);
+        iocp_object->u.connpipe.result = -1;
+        break;
+    }
+
+    // trace
+    tb_trace_d("connect_pipe(%p) return: %ld", iocp_object->ref.pipe, iocp_object->u.connpipe.result);
+
+    // ok
+    return 1;
+}
 static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_poller_event_func_t func, tb_iocp_object_ref_t iocp_object, tb_size_t real, tb_size_t error)
 {
     // trace
@@ -366,10 +410,11 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
     ,   tb_poller_iocp_event_spak_iorw
     ,   tb_poller_iocp_event_spak_pipe
     ,   tb_poller_iocp_event_spak_pipe
+    ,   tb_poller_iocp_event_spak_connpipe
     };
     tb_assert_and_check_return_val(iocp_object->code < tb_arrayn(s_spak), -1);
 
-    // spark event
+    // spank event
     tb_long_t ok = (s_spak[iocp_object->code])? s_spak[iocp_object->code](poller, iocp_object, real, error) : -1;
 
     // finish to wait events    

@@ -39,7 +39,7 @@ __tb_extern_c_enter__
  */
 
 // this iocp object is pipe? 
-#define tb_iocp_object_is_pipe(iocp_object)     ((iocp_object)->code == TB_IOCP_OBJECT_CODE_READ || (iocp_object)->code == TB_IOCP_OBJECT_CODE_WRITE)
+#define tb_iocp_object_is_pipe(iocp_object)     ((iocp_object)->code >= TB_IOCP_OBJECT_CODE_READ && (iocp_object)->code <= TB_IOCP_OBJECT_CODE_CONNPIPE)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -48,22 +48,23 @@ __tb_extern_c_enter__
 // the iocp object code enum
 typedef enum __tb_iocp_object_code_e
 {
-    TB_IOCP_OBJECT_CODE_NONE   = 0
-,   TB_IOCP_OBJECT_CODE_ACPT   = 1       //!< accept it
-,   TB_IOCP_OBJECT_CODE_CONN   = 2       //!< connect to the host address
-,   TB_IOCP_OBJECT_CODE_RECV   = 3       //!< recv data for tcp
-,   TB_IOCP_OBJECT_CODE_SEND   = 4       //!< send data for tcp
-,   TB_IOCP_OBJECT_CODE_URECV  = 5       //!< recv data for udp
-,   TB_IOCP_OBJECT_CODE_USEND  = 6       //!< send data for udp
-,   TB_IOCP_OBJECT_CODE_RECVV  = 7       //!< recv iovec data for tcp
-,   TB_IOCP_OBJECT_CODE_SENDV  = 8       //!< send iovec data for tcp
-,   TB_IOCP_OBJECT_CODE_URECVV = 9       //!< recv iovec data for udp
-,   TB_IOCP_OBJECT_CODE_USENDV = 10      //!< send iovec data for udp
-,   TB_IOCP_OBJECT_CODE_SENDF  = 11      //!< maybe return TB_STATE_NOT_SUPPORTED
-,   TB_IOCP_OBJECT_CODE_READ   = 12      //!< read data for pipe
-,   TB_IOCP_OBJECT_CODE_WRITE  = 13      //!< write data for pipe
+    TB_IOCP_OBJECT_CODE_NONE     = 0
+,   TB_IOCP_OBJECT_CODE_ACPT     = 1       //!< accept it
+,   TB_IOCP_OBJECT_CODE_CONN     = 2       //!< connect to the host address
+,   TB_IOCP_OBJECT_CODE_RECV     = 3       //!< recv data for tcp
+,   TB_IOCP_OBJECT_CODE_SEND     = 4       //!< send data for tcp
+,   TB_IOCP_OBJECT_CODE_URECV    = 5       //!< recv data for udp
+,   TB_IOCP_OBJECT_CODE_USEND    = 6       //!< send data for udp
+,   TB_IOCP_OBJECT_CODE_RECVV    = 7       //!< recv iovec data for tcp
+,   TB_IOCP_OBJECT_CODE_SENDV    = 8       //!< send iovec data for tcp
+,   TB_IOCP_OBJECT_CODE_URECVV   = 9       //!< recv iovec data for udp
+,   TB_IOCP_OBJECT_CODE_USENDV   = 10      //!< send iovec data for udp
+,   TB_IOCP_OBJECT_CODE_SENDF    = 11      //!< maybe return TB_STATE_NOT_SUPPORTED
+,   TB_IOCP_OBJECT_CODE_READ     = 12      //!< read data from pipe
+,   TB_IOCP_OBJECT_CODE_WRITE    = 13      //!< write data to pipe
+,   TB_IOCP_OBJECT_CODE_CONNPIPE = 14      //!< connect to pipe
 
-,   TB_IOCP_OBJECT_CODE_MAXN   = 14
+,   TB_IOCP_OBJECT_CODE_MAXN     = 15
 
 }tb_iocp_object_code_e;
 
@@ -267,6 +268,14 @@ typedef struct __tb_iocp_object_write_t
 
 }tb_iocp_object_write_t;
 
+// the pipe connection iocp object type
+typedef struct __tb_iocp_object_connpipe_t
+{
+    // the result
+    tb_long_t                       result;
+
+}tb_iocp_object_connpipe_t;
+
 // the iocp object type
 typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
 {
@@ -317,6 +326,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
         tb_iocp_object_sendf_t      sendf;
         tb_iocp_object_read_t       read;
         tb_iocp_object_write_t      write;
+        tb_iocp_object_connpipe_t   connpipe;
     } u;
 
     // the object code
@@ -395,6 +405,14 @@ tb_long_t                   tb_iocp_object_read(tb_iocp_object_ref_t object, tb_
  * @return                  the real size or -1
  */
 tb_long_t                   tb_iocp_object_write(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
+
+/* connect to the pipe (server-side)
+ *
+ * @param object            the iocp object 
+ *
+ * @return                  ok: 1, continue: 0; failed: -1
+ */
+tb_long_t                   tb_iocp_object_connect_pipe(tb_iocp_object_ref_t object);
 
 /*! accept socket
  *

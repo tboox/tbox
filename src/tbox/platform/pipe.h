@@ -44,7 +44,7 @@ typedef __tb_typeref__(pipe_file);
 typedef enum __tb_event_event_e
 {
     TB_PIPE_EVENT_NONE = TB_SOCKET_EVENT_NONE
-,   TB_PIPE_EVENT_CONN = 0x4                    ///!< only for windows
+,   TB_PIPE_EVENT_CONN = TB_SOCKET_EVENT_CONN
 ,   TB_PIPE_EVENT_READ = TB_SOCKET_EVENT_RECV
 ,   TB_PIPE_EVENT_WRIT = TB_SOCKET_EVENT_SEND
 

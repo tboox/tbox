@@ -58,6 +58,9 @@ typedef struct __tb_pipe_file_t
     // the real writed/readed size
     DWORD               real;
 
+    // is connecting?
+    tb_bool_t           connecting;
+
     // is connected
     tb_bool_t           connected;
 
@@ -86,6 +89,29 @@ static __tb_inline__ tb_wchar_t const* tb_pipe_file_name(tb_char_t const* name, 
     tb_assert_and_check_return_val(size > 0, tb_null);
     return tb_atow(data, pipename, maxn) != -1? data : tb_null;
 }
+static tb_long_t tb_pipe_file_connect_direct(tb_pipe_file_ref_t self)
+{
+    // check
+    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
+    tb_assert_and_check_return_val(file && file->pipe, -1);
+
+    // has the completed result?
+    tb_check_return_val(!file->connected, 1);
+    tb_assert_and_check_return_val(!file->connecting, 0);
+
+    // connect pipe
+    BOOL ok = ConnectNamedPipe(file->pipe, &file->overlap);
+    if (ok) return 1;
+    else 
+    {
+        if (GetLastError() == ERROR_IO_PENDING)
+        {
+            file->connecting = tb_true;
+            return 0;
+        }
+        else return -1;
+    }
+}
 static tb_long_t tb_pipe_file_wait_direct(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t timeout)
 {
     // check
@@ -102,10 +128,10 @@ static tb_long_t tb_pipe_file_wait_direct(tb_pipe_file_ref_t self, tb_size_t eve
             // get pending result?
             if (GetOverlappedResult(file->pipe, &file->overlap, &file->real, FALSE))
             {
-                if (events & TB_PIPE_EVENT_CONN)
-                    file->connected = tb_true;
+                if (file->connecting) file->connected = tb_true;
                 ok = events;
             }
+            file->connecting = tb_false;
         }
         break;
     case WAIT_TIMEOUT: // timeout 
@@ -113,6 +139,7 @@ static tb_long_t tb_pipe_file_wait_direct(tb_pipe_file_ref_t self, tb_size_t eve
         break;
     case WAIT_FAILED: // failed
     default:
+        file->connecting = tb_false;
         break;
     }
     return ok;
@@ -228,7 +255,7 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
         tb_assert_and_check_break(pair[1]);
 
         // connect the writed pipe first
-        tb_long_t connected = tb_pipe_file_connect(pair[1]);
+        tb_long_t connected = tb_pipe_file_connect_direct(pair[1]);
 
         // init the anonymous pipe for reading
         pair[0] = tb_pipe_file_init(name, TB_FILE_MODE_RO, buffer_size);
@@ -240,7 +267,7 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
             tb_long_t wait = tb_pipe_file_wait_direct(pair[1], TB_PIPE_EVENT_CONN, -1);
             tb_assert_and_check_break(wait > 0);
 
-        } while (!(connected = tb_pipe_file_connect(pair[1])));
+        } while (!(connected = tb_pipe_file_connect_direct(pair[1])));
         tb_assert_and_check_break(connected > 0);
 
         // ok
@@ -259,23 +286,12 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
 }
 tb_long_t tb_pipe_file_connect(tb_pipe_file_ref_t self)
 {
-    // check
-    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
-    tb_assert_and_check_return_val(file && file->pipe, -1);
-
-    // has the completed result?
-    tb_check_return_val(!file->connected, 1);
-
-    // connect pipe
-    BOOL ok = ConnectNamedPipe(file->pipe, &file->overlap);
-    if (ok) return 1;
-    else
-    {
-        // pending?
-        if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
-            return 0;
-        else return -1;
-    }
+#ifndef TB_CONFIG_MICRO_ENABLE
+    // attempt to use iocp object to read data if exists
+    tb_iocp_object_ref_t iocp_object = tb_iocp_object_get_or_new_from_pipe(self, TB_POLLER_EVENT_CONN);
+    if (iocp_object) return tb_iocp_object_connect_pipe(iocp_object);
+#endif
+    return tb_pipe_file_connect_direct(self);
 }
 tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
 {
@@ -412,10 +428,6 @@ tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t timeout)
 {
-    // check
-    tb_pipe_file_t* file = (tb_pipe_file_t*)self;
-    tb_assert_and_check_return_val(file && file->pipe, -1);
-
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine

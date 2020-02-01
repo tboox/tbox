@@ -1370,10 +1370,10 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
     }
 
     // trace
-    tb_trace_d("read(%p): ReadFile: %ld, lasterror: %d", iocp_object->ref.pipe, ok, GetLastError());
+    tb_trace_d("read(%p): ReadFile: %ld, lasterror: %d", iocp_object->ref.pipe, real, GetLastError());
 
     // pending? continue to wait it
-    if (!ok && (ERROR_IO_PENDING == WSAGetLastError()))
+    if (ERROR_IO_PENDING == WSAGetLastError())
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_READ;
         iocp_object->state = TB_STATE_WAITING;
@@ -1432,12 +1432,73 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
     }
 
     // trace
-    tb_trace_d("write(%p): WriteFile: %ld, lasterror: %d", iocp_object->ref.pipe, ok, GetLastError());
+    tb_trace_d("write(%p): WriteFile: %ld, lasterror: %d", iocp_object->ref.pipe, real, GetLastError());
 
     // ok or pending? continue to wait it
-    if (!ok && (ERROR_IO_PENDING == GetLastError()))
+    if (ERROR_IO_PENDING == GetLastError())
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_WRITE;
+        iocp_object->state = TB_STATE_WAITING;
+        return 0;
+    }
+
+    // failed
+    tb_iocp_object_clear(iocp_object);
+    return -1;
+}
+tb_long_t tb_iocp_object_connect_pipe(tb_iocp_object_ref_t iocp_object)
+{
+    // check
+    tb_assert_and_check_return_val(iocp_object, -1);
+
+    // attempt to get the result if be finished
+    if (iocp_object->code == TB_IOCP_OBJECT_CODE_CONNPIPE)
+    {
+        if (iocp_object->state == TB_STATE_FINISHED)
+        {
+            // trace
+            tb_trace_d("connect_pipe(%p): skip: %d, state: %s, result: %ld", iocp_object->ref.pipe, iocp_object->skip_cpos, tb_state_cstr(iocp_object->state), iocp_object->u.connpipe.result);
+
+            // ok
+            tb_iocp_object_clear(iocp_object);
+            return iocp_object->u.connpipe.result;
+        }
+        // waiting timeout before?
+        else if (iocp_object->state == TB_STATE_WAITING)
+        {
+            // trace
+            tb_trace_d("connect_pipe(%p): %s, continue ..", iocp_object->ref.pipe, tb_state_cstr(iocp_object->state));
+            return 0;
+        }
+    }
+
+    // trace
+    tb_trace_d("connect_pipe(%p): %s ..", iocp_object->ref.pipe, tb_state_cstr(iocp_object->state));
+
+    // check state
+    tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
+
+    // bind iocp object first 
+    if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_true)) return -1;
+
+    // attempt to connect pipe directly
+    BOOL ok = ConnectNamedPipe(tb_pipe_file_handle(iocp_object->ref.pipe), (LPOVERLAPPED)&iocp_object->olap);
+
+    // finished? return it directly
+    if (ok)
+    {
+        // trace
+        tb_trace_d("connect_pipe(%p): ConnectNamedPipe: ok, skip: %d, state: finished directly", iocp_object->ref.pipe, iocp_object->skip_cpos);
+        return 1;
+    }
+
+    // trace
+    tb_trace_d("connect_pipe(%p): ConnectNamedPipe lasterror: %d", iocp_object->ref.pipe, GetLastError());
+
+    // ok or pending? continue to wait it
+    if (ERROR_IO_PENDING == GetLastError())
+    {
+        iocp_object->code  = TB_IOCP_OBJECT_CODE_CONNPIPE;
         iocp_object->state = TB_STATE_WAITING;
         return 0;
     }
