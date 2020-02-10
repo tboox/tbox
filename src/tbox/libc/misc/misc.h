@@ -29,7 +29,6 @@
 #include "ctype.h"
 #include "stdarg.h"
 #include "setjmp.h"
-#include "signal.h"
 #include "limits.h"
 #include "./time/time.h"
 
