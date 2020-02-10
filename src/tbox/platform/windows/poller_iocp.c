@@ -674,14 +674,6 @@ static tb_void_t tb_poller_iocp_spak(tb_poller_t* self)
     // post spark notification to iocp port
     PostQueuedCompletionStatus(poller->port, 0, (ULONG_PTR)tb_u2p(1), tb_null);
 }
-static tb_bool_t tb_poller_iocp_support(tb_poller_t* self, tb_size_t events)
-{
-    // all supported events 
-    static const tb_size_t events_supported = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_ONESHOT;
-
-    // is supported?
-    return (events_supported & events) == events;
-}
 static tb_bool_t tb_poller_iocp_insert(tb_poller_t* self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
 {
     // check

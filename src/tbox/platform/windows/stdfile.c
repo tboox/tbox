@@ -426,7 +426,6 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
         }
 
         // write data by lines
-        tb_bool_t flush = tb_false;
         tb_char_t const* p = (tb_char_t const*)data;
         tb_char_t const* e = p + size;
         tb_char_t const* lf = tb_null;

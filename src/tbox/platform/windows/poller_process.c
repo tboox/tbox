@@ -490,7 +490,6 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
 
     // poll all waited processes status 
     tb_long_t     wait = 0;
-    tb_cpointer_t priv = tb_null;
     tb_poller_object_t object;
     object.type = TB_POLLER_OBJECT_PROC;
     tb_for_all_if (tb_poller_processes_status_t*, proc_status, poller->processes_status_copied, proc_status)
