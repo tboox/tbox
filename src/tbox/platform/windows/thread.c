@@ -53,8 +53,11 @@ tb_thread_ref_t tb_thread_init(tb_char_t const* name, tb_thread_func_t func, tb_
         args[1].ptr = (tb_pointer_t)priv;
 
         // init thread
-//        thread = CreateThread(NULL, (DWORD)stack, tb_thread_func, (LPVOID)args, 0, NULL);
+#if defined(TB_COMPILER_IS_MSVC) || defined(_beginthreadex)
         thread = (HANDLE)_beginthreadex(NULL, (DWORD)stack, tb_thread_func, (LPVOID)args, 0, NULL);
+#else
+        thread = CreateThread(NULL, (DWORD)stack, tb_thread_func, (LPVOID)args, 0, NULL);
+#endif
         tb_assert_and_check_break(thread != INVALID_HANDLE_VALUE);
 
         // ok
