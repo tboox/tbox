@@ -207,7 +207,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // reset size
         size = 0;
 
-        // FIXME no effect
+        // FIXME no effect, GetEnvironmentStringsW? tb_char_t?
         // make environment
         tb_char_t const*    p = tb_null;
         tb_size_t           maxn = 0;

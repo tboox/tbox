@@ -33,7 +33,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   include "windows/file.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_OPEN)
 #   include "posix/file.c"

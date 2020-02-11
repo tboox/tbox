@@ -30,7 +30,7 @@
  */
 
 // the separator
-#ifdef TB_CONFIG_OS_WINDOWS 
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   define TM_ENVIRONMENT_SEP       ';'
 #else
 #   define TM_ENVIRONMENT_SEP       ':'
@@ -39,7 +39,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   include "windows/environment.c"
 #else
 #   include "libc/environment.c"

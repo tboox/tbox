@@ -27,7 +27,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   include "windows/directory.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_OPENDIR)
 #   include "posix/directory.c"

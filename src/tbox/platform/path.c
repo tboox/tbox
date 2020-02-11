@@ -38,14 +38,14 @@
  */
 
 // the path separator
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   define TB_PATH_SEPARATOR            '\\'
 #else
 #   define TB_PATH_SEPARATOR            '/'
 #endif
 
 // is path separator?
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   define tb_path_is_separator(c)      ('/' == (c) || '\\' == (c))
 #else
 #   define tb_path_is_separator(c)      ('/' == (c))
@@ -141,6 +141,11 @@ tb_bool_t tb_path_is_absolute(tb_char_t const* path)
     // is absolute?
 #ifdef TB_CONFIG_OS_WINDOWS
     return (    path[0] == '~'
+#   ifdef TB_COMPILER_LIKE_UNIX
+            ||  path[0] == '/'
+            ||  path[0] == '\\'
+            ||  !tb_strnicmp(path, "file:", 5)
+#   endif
             ||  (tb_isalpha(path[0]) && path[1] == ':'));
 #else
     return (    path[0] == '/'

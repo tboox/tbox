@@ -108,15 +108,14 @@ static tb_bool_t tb_directory_walk_impl(tb_char_t const* path, tb_long_t recursi
     if ((directory = opendir(path)))
     {
         // walk
+        tb_char_t name[1024];
         struct dirent* item = tb_null;
         while ((item = readdir(directory)))
         {
-            // check
-            tb_assert_and_check_continue(item->d_reclen);
+            // get the item name
+            if (sizeof(name) == tb_strlcpy(name, item->d_name, sizeof(name)))
+                continue ;
 
-            // the item name
-            tb_char_t name[1024] = {0};
-            tb_strncpy(name, item->d_name, tb_min(item->d_reclen, sizeof(name) - 1));
             if (tb_strcmp(name, ".") && tb_strcmp(name, ".."))
             {
                 // the temp path
