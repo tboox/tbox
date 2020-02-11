@@ -52,7 +52,11 @@
  * we cannot use tb_size_t because sizeof(tb_size_t) != sizeof(u_long) for windows 64bits
  */
 #ifdef TB_CONFIG_OS_WINDOWS
+#   ifdef TB_COMPILER_IS_MSVC
 typedef  unsigned long      tb_iovec_size_t;
+#   else
+typedef  unsigned int       tb_iovec_size_t;
+#   endif
 #else
 typedef  tb_size_t          tb_iovec_size_t;
 #endif

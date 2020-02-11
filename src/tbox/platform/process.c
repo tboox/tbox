@@ -33,7 +33,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_OS_WINDOWS
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   include "windows/process.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && \
         defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
