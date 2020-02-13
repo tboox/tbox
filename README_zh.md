@@ -300,6 +300,28 @@ int main(int argc, char** argv)
 * 邮箱：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * 主页：[TBOOX开源工程](https://tboox.org/cn)
 * 社区：[Reddit论坛](https://www.reddit.com/r/tboox/)
+* 聊天：[Telegram群组](https://t.me/tbooxorg), [Gitter聊天室](https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 * QQ群：343118190(满), 662147501
 * 微信公众号：tboox-os
+
+## 支持项目
+
+tbox项目属于个人开源项目，它的发展需要您的帮助，如果您愿意支持tbox项目的开发，欢迎为其捐赠，支持它的发展。 🙏 [[支持此项目](https://opencollective.com/tbox#backer)]
+
+<a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
+
+## 赞助项目
+
+通过赞助支持此项目，您的logo和网站链接将显示在这里。[[赞助此项目](https://opencollective.com/tbox#sponsor)]
+
+<a href="https://opencollective.com/tbox/sponsor/0/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/1/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/2/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/3/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/4/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/5/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/6/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/7/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/8/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/9/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/9/avatar.svg"></a>
 

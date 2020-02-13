@@ -293,6 +293,28 @@ int main(int argc, char** argv)
 * Email：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * Homepage：[tboox.org](https://tboox.org)
 * Community：[/r/tboox on reddit](https://www.reddit.com/r/tboox/)
+* ChatRoom：[Char on telegram](https://t.me/tbooxorg), [Chat on gitter](https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 * QQ Group: 343118190(full), 662147501
 * Wechat Public: tboox-os
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/tbox#backer)]
+
+<a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/tbox#sponsor)]
+
+<a href="https://opencollective.com/tbox/sponsor/0/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/1/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/2/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/3/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/4/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/5/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/6/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/7/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/8/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/tbox/sponsor/9/website" target="_blank"><img src="https://opencollective.com/tbox/sponsor/9/avatar.svg"></a>
 
