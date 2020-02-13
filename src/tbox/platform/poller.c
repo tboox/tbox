@@ -60,7 +60,7 @@
 #endif
 
 #ifndef TB_CONFIG_MICRO_ENABLE
-#   if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
+#   if defined(TB_CONFIG_OS_WINDOWS)
 #       include "windows/poller_process.c"
 #       define TB_POLLER_ENABLE_PROCESS
 #   elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && defined(TB_CONFIG_LIBC_HAVE_SIGNAL)

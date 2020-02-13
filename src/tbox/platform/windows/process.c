@@ -69,6 +69,14 @@ tb_void_t   tb_process_handle_close(tb_process_ref_t self);
 __tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+// the user environment
+#ifdef TB_COMPILER_LIKE_UNIX
+extern tb_char_t** environ;
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
 HANDLE tb_process_handle(tb_process_ref_t self)
@@ -211,6 +219,10 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_char_t const*    p = tb_null;
         tb_size_t           maxn = 0;
         tb_char_t const**   envp = attr? attr->envp : tb_null;
+#ifdef TB_COMPILER_LIKE_UNIX
+        // we use unix environments on msys/cygwin, because GetEnvironmentStringsW cannot get all envars
+        if (!envp) envp = environ;
+#endif
         while (envp && (p = *envp++))
         {
             // get size
