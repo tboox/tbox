@@ -157,7 +157,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
                 // wrap "arg" if exists escape characters and spaces?
                 if (wrap_quote) tb_string_chrcat(&args, '\"');
-                tb_string_cstrcat(&args, arg);
+                if (i) tb_string_cstrncat(&args, arg, i);
                 if (wrap_quote) tb_string_chrcat(&args, '\"');
                 
                 // add space 
