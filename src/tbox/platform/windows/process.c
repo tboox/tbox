@@ -122,7 +122,6 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     // check
     tb_assert_and_check_return_val(pathname || argv, tb_null);
 
-    // done
     tb_string_t         args;
     tb_process_ref_t    process = tb_null;
     do
@@ -135,24 +134,31 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         {
             tb_char_t ch;
             tb_char_t const* p = tb_null;
+            tb_char_t arg[8192];
             while ((p = *argv++)) 
             {
-                // has space?
-                tb_bool_t has_space = !!tb_strchr(p, ' ');
-
-                // patch '\"'
-                if (has_space) tb_string_chrcat(&args, '\"');
-
-                // add argument
-                while ((ch = *p))
+                // escape argument block
+                tb_size_t i = 0;
+                tb_size_t m = tb_arrayn(arg);
+                tb_bool_t wrap_quote = tb_false;
+                while ((ch = *p) && i < m)
                 {
-                    if (ch == '\"') tb_string_chrcat(&args, '\\');
-                    tb_string_chrcat(&args, ch);
+                    if (ch == '\"') 
+                    {
+                        if (i < m) arg[i++] = '\\';
+                        wrap_quote = tb_true;
+                    }
+                    else if (ch == ' ') wrap_quote = tb_true;
+                    if (i < m) arg[i++] = ch;
                     p++;
                 }
+                tb_assert_and_check_break(i < m);
+                arg[i] = '\0';
 
-                // patch '\"'
-                if (has_space) tb_string_chrcat(&args, '\"');
+                // wrap "arg" if exists escape characters and spaces?
+                if (wrap_quote) tb_string_chrcat(&args, '\"');
+                tb_string_cstrcat(&args, arg);
+                if (wrap_quote) tb_string_chrcat(&args, '\"');
                 
                 // add space 
                 tb_string_chrcat(&args, ' ');
@@ -177,7 +183,6 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
     // check
     tb_assert_and_check_return_val(cmd, tb_null);
 
-    // done
     tb_bool_t       ok          = tb_false;
     tb_process_t*   process     = tb_null;
     tb_char_t*      environment = tb_null;
