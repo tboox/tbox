@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * pragma
  */
-#ifndef TB_COMPILER_IS_MINGW
+#ifdef TB_COMPILER_IS_MSVC
 #   pragma comment(lib, "Ws2_32.lib")
 #endif
 

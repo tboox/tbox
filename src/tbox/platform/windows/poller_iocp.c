@@ -176,7 +176,7 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
             tb_ws2_32()->setsockopt(fd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acpt, sizeof(acpt));
 
             // non-block
-            ULONG nb = 1;
+            u_long nb = 1;
             tb_ws2_32()->ioctlsocket(fd, FIONBIO, &nb);
 
             /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)

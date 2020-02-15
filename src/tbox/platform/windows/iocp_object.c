@@ -470,7 +470,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
         tb_ws2_32()->setsockopt(clientfd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (tb_char_t*)&acceptfd, sizeof(acceptfd));
 
         // non-block
-        ULONG nb = 1;
+        u_long nb = 1;
         tb_ws2_32()->ioctlsocket(clientfd, FIONBIO, &nb);
 
         /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)

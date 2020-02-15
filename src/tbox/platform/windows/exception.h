@@ -25,68 +25,71 @@
  * includes
  */
 #include "prefix.h"
+#if !defined(TB_COMPILER_IS_MSVC) && \
+        defined(TB_CONFIG_LIBC_HAVE_SETJMP) && \
+            defined(TB_ASSEMBLER_IS_GAS) && !TB_CPU_BIT64
+#   include <setjmp.h>
+#   define TB_WINDOWS_EXCEPTION_USE_SETJMP
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */ 
 
-#if defined(tb_setjmp) && defined(tb_longjmp)
+#if defined(TB_COMPILER_IS_MSVC)
+#   define __tb_try                 __try
+#   define __tb_except(x)           __except(!!(x))
+#   define __tb_leave               __leave
+#   define __tb_end                 
+#elif defined(TB_WINDOWS_EXCEPTION_USE_SETJMP)
 
-#   if defined(TB_COMPILER_IS_MSVC)
-#       define __tb_try                 __try
-#       define __tb_except(x)           __except(!!(x))
-#       define __tb_leave               __leave
-#       define __tb_end                 
-#   elif defined(TB_ASSEMBLER_IS_GAS) && !TB_CPU_BIT64
+    // try
+#   define __tb_try \
+    do \
+    { \
+        /* init */ \
+        tb_exception_handler_t __h = {{0}}; \
+        tb_exception_registration_t __r = {0}; \
+        \
+        /* init handler */ \
+        __r.handler = (tb_exception_func_t)tb_exception_func_impl; \
+        __r.exception_handler = &__h; \
+        /* push seh */ \
+        __tb_asm__ __tb_volatile__ ("movl %%fs:0, %0" : "=r" (__r.prev)); \
+        __tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (&__r)); \
+        \
+        /* save jmpbuf */ \
+        __tb_volatile__ tb_int_t __j = tb_setjmp(__h.jmpbuf); \
+        if (!__j) \
+        {
 
-        // try
-#       define __tb_try \
-        do \
+    // except
+#   define __tb_except(x) \
+        } \
+        \
+        /* check */ \
+        tb_assert(x >= 0); \
+        /* do not this catch? goto the top exception stack */ \
+        if (__j && !(x)) \
         { \
-            /* init */ \
-            tb_exception_handler_t __h = {{0}}; \
-            tb_exception_registration_t __r = {0}; \
-            \
-            /* init handler */ \
-            __r.handler = (tb_exception_func_t)tb_exception_func_impl; \
-            __r.exception_handler = &__h; \
-            /* push seh */ \
-            __tb_asm__ __tb_volatile__ ("movl %%fs:0, %0" : "=r" (__r.prev)); \
-            __tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (&__r)); \
-            \
-            /* save jmpbuf */ \
-            __tb_volatile__ tb_int_t __j = tb_setjmp(__h.jmpbuf); \
-            if (!__j) \
-            {
-
-        // except
-#       define __tb_except(x) \
-            } \
-            \
-            /* check */ \
-            tb_assert(x >= 0); \
-            /* do not this catch? goto the top exception stack */ \
-            if (__j && !(x)) \
+            if (__r.prev && __r.prev->exception_handler) tb_longjmp(__r.prev->exception_handler->jmpbuf, 1); \
+            else \
             { \
-                if (__r.prev && __r.prev->exception_handler) tb_longjmp(__r.prev->exception_handler->jmpbuf, 1); \
-                else \
-                { \
-                    /* no exception handler */ \
-                    tb_assert_and_check_break(0); \
-                } \
+                /* no exception handler */ \
+                tb_assert_and_check_break(0); \
             } \
-            /* pop seh */ \
-            __tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
-            if (__j)
+        } \
+        /* pop seh */ \
+        __tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
+        if (__j)
 
-        // end
-#       define __tb_end \
-        } while (0);
+    // end
+#   define __tb_end \
+    } while (0);
 
-        // leave
-#       define __tb_leave   break
+    // leave
+#   define __tb_leave   break
 
-#   endif
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -94,11 +97,7 @@
  */ 
 
 // for mingw
-#if defined(tb_setjmp) \
-    && defined(tb_longjmp) \
-    && !defined(TB_COMPILER_IS_MSVC) \
-    && defined(TB_ASSEMBLER_IS_GAS) \
-    && !TB_CPU_BIT64
+#if defined(TB_WINDOWS_EXCEPTION_USE_SETJMP)
 
 #include "../../prefix/packed.h"
 

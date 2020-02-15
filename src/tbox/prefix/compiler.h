@@ -136,8 +136,8 @@
 #   if defined(__CYGWIN__) || defined(__CYGWIN32__)
 #       define TB_COMPILER_ON_CYGWIN
 #   endif
-#   if (defined(__unix__) || defined(__unix) || defined(unix)) || \
-        defined(TB_COMPILER_ON_MSYS) || defined(TB_COMPILER_ON_MSYS)
+#   if defined(__unix__) || defined(__unix) || defined(unix) || \
+        defined(TB_COMPILER_ON_MSYS) || defined(TB_COMPILER_ON_CYGWIN)
 #       define TB_COMPILER_LIKE_UNIX
 #   endif
 #   define TB_COMPILER_VERSION_BT(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) > ((major) * 100 + (minor)))

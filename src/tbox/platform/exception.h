@@ -28,7 +28,8 @@
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
 #   if defined(TB_CONFIG_OS_WINDOWS)
 #       include "windows/exception.h"
-#   elif defined(TB_CONFIG_LIBC_HAVE_SIGNAL) 
+#   elif defined(TB_CONFIG_LIBC_HAVE_SIGNAL) && \
+        (defined(TB_CONFIG_LIBC_HAVE_SETJMP) || defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP))
 #       include "libc/exception.h"
 #   endif
 #endif

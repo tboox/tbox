@@ -226,7 +226,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_char_t const**   envp = attr? attr->envp : tb_null;
 #ifdef TB_COMPILER_LIKE_UNIX
         // we use unix environments on msys/cygwin, because GetEnvironmentStringsW cannot get all envars
-        if (!envp) envp = environ;
+        if (!envp) envp = (tb_char_t const**)environ;
 #endif
         while (envp && (p = *envp++))
         {

@@ -25,6 +25,7 @@
  */
 #include "exception.h"
 #include "../thread_local.h"
+#include <setjmp.h>
 #include <signal.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -44,12 +45,12 @@ static tb_void_t tb_exception_signal_func(tb_int_t sig)
     tb_stack_ref_t stack = (tb_stack_ref_t)tb_thread_local_get(&g_exception_local);
     if (stack && tb_stack_size(stack)) 
     {
-#if defined(tb_sigsetjmp) && defined(tb_siglongjmp)
-        tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(stack);
-        if (jmpbuf) tb_siglongjmp(*jmpbuf, 1);
+#if defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP)
+        sigjmp_buf* jmpbuf = (sigjmp_buf*)tb_stack_top(stack);
+        if (jmpbuf) siglongjmp(*jmpbuf, 1);
 #else
-        tb_jmpbuf_t* jmpbuf = (tb_jmpbuf_t*)tb_stack_top(stack);
-        if (jmpbuf) tb_longjmp(*jmpbuf, 1);
+        jmpbuf* jmpbuf = (jmpbuf*)tb_stack_top(stack);
+        if (jmpbuf) longjmp(*jmpbuf, 1);
 #endif
     }
     else 

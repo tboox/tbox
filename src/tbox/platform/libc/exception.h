@@ -27,9 +27,9 @@
  */
 #include "prefix.h"
 #include "../thread_local.h"
-#include "../../libc/misc/setjmp.h"
 #include "../../container/container.h"
-#ifdef TB_CONFIG_LIBC_HAVE_KILL
+#if defined(TB_CONFIG_LIBC_HAVE_SETJMP) || defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP)
+#   include <setjmp.h>
 #   include <unistd.h>
 #endif
 
@@ -42,7 +42,7 @@ extern tb_thread_local_t g_exception_local;
  * macros
  */
 
-#if defined(tb_sigsetjmp) && defined(tb_siglongjmp)
+#if defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP)
 
     // try
 #   define __tb_try \
@@ -52,7 +52,7 @@ extern tb_thread_local_t g_exception_local;
         tb_stack_ref_t __stack = tb_null; \
         if (!(__stack = (tb_stack_ref_t)tb_thread_local_get(&g_exception_local))) \
         { \
-            tb_stack_ref_t __stack_new = tb_stack_init(16, tb_element_mem(sizeof(tb_sigjmpbuf_t), tb_null, tb_null)); \
+            tb_stack_ref_t __stack_new = tb_stack_init(16, tb_element_mem(sizeof(sigjmp_buf), tb_null, tb_null)); \
             if (__stack_new && tb_thread_local_set(&g_exception_local, __stack_new)) \
                 __stack = __stack_new; \
             else if (__stack_new) \
@@ -60,16 +60,16 @@ extern tb_thread_local_t g_exception_local;
         } \
         \
         /* push jmpbuf */ \
-        tb_sigjmpbuf_t* __top = tb_null; \
+        sigjmp_buf* __top = tb_null; \
         if (__stack) \
         { \
-            tb_sigjmpbuf_t __buf; \
+            sigjmp_buf __buf; \
             tb_stack_put(__stack, &__buf); \
-            __top = (tb_sigjmpbuf_t*)tb_stack_top(__stack); \
+            __top = (sigjmp_buf*)tb_stack_top(__stack); \
         } \
         \
         /* init jmpbuf and save sigmask */ \
-        __tb_volatile__ tb_int_t __j = __top? tb_sigsetjmp(*__top, 1) : 0; \
+        __tb_volatile__ tb_int_t __j = __top? sigsetjmp(*__top, 1) : 0; \
         /* done try */ \
         if (!__j) \
         {
@@ -88,8 +88,8 @@ extern tb_thread_local_t g_exception_local;
             /* goto the top exception stack */ \
             if (__stack && tb_stack_size(__stack)) \
             { \
-                tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(__stack); \
-                if (jmpbuf) tb_siglongjmp(*jmpbuf, 1); \
+                sigjmp_buf* jmpbuf = (sigjmp_buf*)tb_stack_top(__stack); \
+                if (jmpbuf) siglongjmp(*jmpbuf, 1); \
             } \
             else \
             { \
@@ -100,7 +100,7 @@ extern tb_thread_local_t g_exception_local;
         /* exception been catched? */ \
         if (__j)
 
-#else
+#elif defined(TB_CONFIG_LIBC_HAVE_SETJMP)
 
     // try
 #   define __tb_try \
@@ -110,7 +110,7 @@ extern tb_thread_local_t g_exception_local;
         tb_stack_ref_t __stack = tb_null; \
         if (!(__stack = (tb_stack_ref_t)tb_thread_local_get(&g_exception_local))) \
         { \
-            tb_stack_ref_t __stack_new = tb_stack_init(16, tb_element_mem(sizeof(tb_jmpbuf_t), tb_null, tb_null)); \
+            tb_stack_ref_t __stack_new = tb_stack_init(16, tb_element_mem(sizeof(jmpbuf), tb_null, tb_null)); \
             if (__stack_new && tb_thread_local_set(&g_exception_local, __stack_new)) \
                 __stack = __stack_new; \
             else if (__stack_new) \
@@ -118,16 +118,16 @@ extern tb_thread_local_t g_exception_local;
         } \
         \
         /* push jmpbuf */ \
-        tb_jmpbuf_t* __top = tb_null; \
+        jmpbuf* __top = tb_null; \
         if (__stack) \
         { \
-            tb_jmpbuf_t __buf; \
+            jmpbuf __buf; \
             tb_stack_put(__stack, &__buf); \
-            __top = (tb_jmpbuf_t*)tb_stack_top(__stack); \
+            __top = (jmpbuf*)tb_stack_top(__stack); \
         } \
         \
         /* init jmpbuf */ \
-        __tb_volatile__ tb_int_t __j = __top? tb_setjmp(*__top) : 0; \
+        __tb_volatile__ tb_int_t __j = __top? setjmp(*__top) : 0; \
         /* done try */ \
         if (!__j) \
         {
@@ -146,8 +146,8 @@ extern tb_thread_local_t g_exception_local;
             /* goto the top exception stack */ \
             if (__stack && tb_stack_size(__stack)) \
             { \
-                tb_jmpbuf_t* jmpbuf = (tb_jmpbuf_t*)tb_stack_top(__stack); \
-                if (jmpbuf) tb_longjmp(*jmpbuf, 1); \
+                jmpbuf* jmpbuf = (jmpbuf*)tb_stack_top(__stack); \
+                if (jmpbuf) longjmp(*jmpbuf, 1); \
             } \
             else \
             { \
