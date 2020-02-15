@@ -35,7 +35,7 @@ __tb_extern_c_enter__
  * macros
  */
 
-// fix FIONBIO for msys/mingw for tb_ws2_32()->ioctlsocket(), we do not use mingw/ioctlsocket
+// fix FIONBIO for tb_ws2_32()->ioctlsocket() on msys/gcc
 #if defined(FIONBIO) && !defined(TB_COMPILER_IS_MSVC)
 #   undef FIONBIO
 #   define FIONBIO     (0x8004667e)
