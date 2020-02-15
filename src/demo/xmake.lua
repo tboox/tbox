@@ -66,6 +66,7 @@ target("demo")
         add_files("object/*.c")
     end
 
+    -- enable utf8?
     add_options("force-utf8")
 
     -- add the source files for the charset module
@@ -84,6 +85,6 @@ target("demo")
     end
 
     -- link mingw/libgcc
-    if is_plat("mingw") then
+    if is_plat("mingw", "msys", "cygwin") then
         add_ldflags("-static-libgcc", {force = true})
     end

@@ -25,3 +25,17 @@ target("demo")
         add_files("coroutine/stackless/*.c|process.c") 
     end
 
+    -- enable xp compatibility mode
+    if is_plat("windows") then
+        if is_arch("x86") then
+            add_ldflags("/subsystem:console,5.01")
+        else
+            add_ldflags("/subsystem:console,5.02")
+        end
+    end
+
+    -- link mingw/libgcc
+    if is_plat("mingw", "msys", "cygwin") then
+        add_ldflags("-static-libgcc", {force = true})
+    end
+
