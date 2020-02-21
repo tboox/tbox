@@ -44,7 +44,6 @@
 #   include "../../coroutine/coroutine.h"
 #   include "../../coroutine/impl/impl.h"
 #endif
-
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
@@ -208,8 +207,13 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         if (!envp) envp = (tb_char_t const**)environ;
 
         // spawn the process
-        tb_long_t status = posix_spawnp(&process->pid, pathname, &process->spawn_action, &process->spawn_attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
-        tb_check_break(status == 0);
+        tb_int_t status = posix_spawnp(&process->pid, pathname, &process->spawn_action, &process->spawn_attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
+        if (status != 0)
+        {
+            // pass the error code to parent/errno 
+            errno = status;
+            break;
+        }
 
         // check pid
         tb_assert_and_check_break(process->pid > 0);
