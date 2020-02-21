@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <errno.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -161,8 +162,8 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     tb_assert_and_check_return_val(path, tb_false);
 
     // make it (0755: drwxr-xr-x)
-    tb_bool_t ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO)? tb_true : tb_false;
-    if (!ok)
+    tb_bool_t ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (!ok && (errno != EPERM && errno != EACCES))
     {
         // make directory
         tb_char_t           temp[TB_PATH_MAXN] = {0};
@@ -175,7 +176,11 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
             if (*p == '/')
             {
                 // make directory if not exists
-                if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO);
+                if (!tb_file_info(temp, tb_null)) 
+                {
+                    if (mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO) != 0)
+                        return tb_false;
+                }
 
                 // skip repeat '/'
                 while (*p && *p == '/') p++;
@@ -184,10 +189,8 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
         }
 
         // make it again
-        ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO)? tb_true : tb_false;
+        ok = !mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
     }
-
-    // ok?
     return ok;
 }
 tb_bool_t tb_directory_remove(tb_char_t const* path)
