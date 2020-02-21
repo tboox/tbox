@@ -82,7 +82,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
     // open it, @note need absolute path
     tb_long_t fd = open(path, flags, modes);
-    if (fd < 0 && (mode & TB_FILE_MODE_CREAT))
+    if (fd < 0 && (mode & TB_FILE_MODE_CREAT) && (errno != EPERM && errno != EACCES))
     {
 #ifndef TB_CONFIG_MICRO_ENABLE
         // open it again after creating the file directory
@@ -402,7 +402,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 
     // attempt to copy it directly
     if (!copyfile(path, dest, 0, COPYFILE_ALL)) return tb_true;
-    else
+    else if (errno != EPERM && errno != EACCES)
     {
         // attempt to copy it again after creating directory
         tb_char_t dir[TB_PATH_MAXN];
@@ -442,7 +442,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 
         // open destinate file and copy file mode
         ofd = open(dest, O_RDWR | O_CREAT | O_TRUNC, st.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
-        if (ofd < 0)
+        if (ofd < 0 && (errno != EPERM && errno != EACCES))
         {
             // attempt to open it again after creating directory
             tb_char_t dir[TB_PATH_MAXN];
@@ -557,7 +557,7 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 
     // attempt to rename it directly
     if (!rename(path, dest)) return tb_true;
-    else
+    else if (errno != EPERM && errno != EACCES)
     {
         // attempt to rename it again after creating directory
         tb_char_t dir[TB_PATH_MAXN];
@@ -583,7 +583,7 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 
     // attempt to link it directly
     if (!symlink(path, dest)) return tb_true;
-    else
+    else if (errno != EPERM && errno != EACCES)
     {
         // attempt to link it again after creating directory
         tb_char_t dir[TB_PATH_MAXN];

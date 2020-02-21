@@ -133,7 +133,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
     case TB_STATE_DATABASE_UNKNOWN_HOST:        return "database: unknown host";
     case TB_STATE_DATABASE_UNKNOWN_ERROR:       return "database: unknown error";
 
-    case TB_STATE_SYSERROR_NOT_PERM:            return "syserror: not permitted";
+    case TB_STATE_SYSERROR_NOT_PERM:            return "syserror: permission denied";
     case TB_STATE_SYSERROR_NOT_FILEDIR:         return "syserror: not file or directory";
     case TB_STATE_SYSERROR_UNKNOWN_ERROR:       return "syserror: unknown error";
 
