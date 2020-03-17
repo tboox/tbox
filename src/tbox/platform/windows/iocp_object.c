@@ -599,13 +599,13 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
         tb_memset(&iocp_object->olap, 0, sizeof(OVERLAPPED));
 
         // load client address
-        tb_size_t               caddr_size = 0;
-        struct sockaddr_storage caddr_data = {0};
+        tb_size_t caddr_size = 0;
+        struct sockaddr_storage caddr_data;
         if (!(caddr_size = tb_sockaddr_load(&caddr_data, addr))) break;
 
         // load local address
         tb_size_t               laddr_size = 0;
-        struct sockaddr_storage laddr_data = {0};
+        struct sockaddr_storage laddr_data;
         tb_ipaddr_t             laddr;
         if (!tb_ipaddr_set(&laddr, tb_null, 0, (tb_uint8_t)tb_ipaddr_family(addr))) break;
         if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
@@ -925,8 +925,8 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     iocp_object->u.usend.size = (tb_iovec_size_t)size;
 
     // load address
-    tb_size_t               n = 0;
-	struct sockaddr_storage d = {0};
+    tb_size_t n = 0;
+	struct sockaddr_storage d;
     if (!(n = tb_sockaddr_load(&d, &iocp_object->u.usend.addr))) return tb_false;
 
     /* attempt to send data directly
@@ -1284,8 +1284,8 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
     iocp_object->u.usendv.size = (tb_iovec_size_t)size;
 
     // load address
-    tb_size_t               n = 0;
-	struct sockaddr_storage d = {0};
+    tb_size_t n = 0;
+	struct sockaddr_storage d;
     if (!(n = tb_sockaddr_load(&d, &iocp_object->u.usendv.addr))) return -1;
 
     /* attempt to send data directly
