@@ -224,8 +224,12 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
     tb_wchar_t  home[TB_PATH_MAXN] = {0};
     do
     {
-        // get the appdata folder location
-        if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x1a /* CSIDL_APPDATA */, &pidl)) break;
+        /* get the local appdata folder location
+         *
+         * CSIDL_APPDATA 0x1a
+         * CSIDL_LOCAL_APPDATA 0x1c
+         */
+        if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x1c /* CSIDL_LOCAL_APPDATA */, &pidl)) break;
         tb_check_break(pidl);
 
         // get the home directory   
