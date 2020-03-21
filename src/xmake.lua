@@ -162,13 +162,13 @@ end
 function check_module_cfuncs(module, includes, ...)
     for _, func in ipairs({...}) do
         local funcname = get_function_name(func)
-        configvar_check_cfuncs(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), func, {name = module .. "_" .. funcname, includes = includes, defines = "_GNU_SOURCE=1"})
+        configvar_check_cfuncs(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), func, {name = module .. "_" .. funcname, includes = includes, defines = "_GNU_SOURCE=1", languages = stdc})
     end
 end
 
 -- check c snippet in the given module
 function check_module_csnippet(module, includes, name, snippet, opt)
-    configvar_check_csnippets(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), snippet, table.join({name = module .. "_" .. name, includes = includes, defines = "_GNU_SOURCE=1"}, opt))
+    configvar_check_csnippets(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), snippet, table.join({name = module .. "_" .. name, includes = includes, defines = "_GNU_SOURCE=1", languages = stdc}, opt))
 end
 
 -- check interfaces
