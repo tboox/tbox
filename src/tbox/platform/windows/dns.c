@@ -65,11 +65,8 @@ tb_bool_t tb_dns_init_env()
         tb_trace_d("server: %s", info->DnsServerList.IpAddress.String);
 
         // add the first dns address
-        if (info->DnsServerList.IpAddress.String)
-        {
-            tb_dns_server_add(info->DnsServerList.IpAddress.String);
-            count++;
-        }
+        tb_dns_server_add(info->DnsServerList.IpAddress.String);
+        count++;
 
         // walk dns address
         IP_ADDR_STRING* addr = info->DnsServerList.Next;
@@ -79,11 +76,8 @@ tb_bool_t tb_dns_init_env()
             tb_trace_d("server: %s", addr->IpAddress.String);
             
             // add the dns address
-            if (addr->IpAddress.String)
-            {
-                tb_dns_server_add(addr->IpAddress.String);
-                count++;
-            }
+            tb_dns_server_add(addr->IpAddress.String);
+            count++;
         }
 
     } while (0);

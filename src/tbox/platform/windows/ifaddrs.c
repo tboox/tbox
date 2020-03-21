@@ -102,8 +102,7 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
             {
                 // done
                 tb_ipaddr_t ipaddr;
-                if (    ipAddress->IpAddress.String
-                    &&  tb_ipaddr_ip_cstr_set(&ipaddr, ipAddress->IpAddress.String, TB_IPADDR_FAMILY_NONE))
+                if (tb_ipaddr_ip_cstr_set(&ipaddr, ipAddress->IpAddress.String, TB_IPADDR_FAMILY_NONE))
                 {
                     if (ipaddr.family == TB_IPADDR_FAMILY_IPV4)
                     {
