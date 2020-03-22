@@ -42,7 +42,7 @@ typedef enum __tb_process_flag_e
 {
     TB_PROCESS_FLAG_NONE    = 0
 ,   TB_PROCESS_FLAG_SUSPEND = 1     //!< suspend process
-,   TB_PROCESS_FLAG_DETACH  = 2     //!< detach process from the parent process group, this process will be not exited after the parent process exited
+,   TB_PROCESS_FLAG_DETACH  = 2     //!< all subprocesses will be exited when the parent process is exited (ctrl+c or onexit) if this flag is not setted
 
 }tb_process_flag_e;
 

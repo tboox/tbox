@@ -4,18 +4,18 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * main
+ * private implementation
  */ 
-tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
+static tb_void_t tb_demo_process_test_run(tb_char_t const** argv)
 {
-#if 0
     // run 
     tb_long_t ok = tb_process_run(argv[1], (tb_char_t const**)(argv + 1), tb_null);
 
     // trace
     tb_trace_i("run: %s: %ld", argv[1], ok);
-
-#elif 1
+}
+static tb_void_t tb_demo_process_test_pipe(tb_char_t const** argv)
+{
     // init pipe files
     tb_pipe_file_ref_t file[2] = {0};
     if (tb_pipe_file_init_pair(file, 0))
@@ -68,8 +68,9 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
         tb_pipe_file_exit(file[0]);
         tb_pipe_file_exit(file[1]);
     }
-#else
- 
+}
+static tb_void_t tb_demo_process_test_waitlist(tb_char_t const** argv)
+{
     // init processes
     tb_size_t           count1 = 0;
     tb_process_ref_t    processes1[5] = {0};
@@ -117,8 +118,57 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
             count1 = count2;
         }
     }
+}
+static tb_void_t tb_demo_process_test_exit(tb_char_t** argv, tb_bool_t detach)
+{
+    tb_size_t i = 0;
+    tb_process_attr_t attr = {0};
+    tb_process_ref_t processes[10];
+    if (detach) attr.flags |= TB_PROCESS_FLAG_DETACH;
+    for (i = 0; i < 10; i++)
+        processes[i] = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
+    
+    // we attempt to enter or do ctrl+c and see process list in process monitor
+    tb_getchar();
+
+    // exit processes
+    for (i = 0; i < 10; i++)
+    {
+        tb_process_exit(processes[i]);
+        processes[i] = tb_null;
+    }
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
+{
+#if 0
+    tb_demo_process_test_run(argv);
+#else
+    tb_used(tb_demo_process_test_run);
 #endif
 
-    // ok
+#if 0
+    tb_demo_process_test_pipe(argv);
+#else
+    tb_used(tb_demo_process_test_pipe);
+#endif
+
+#if 0
+    tb_demo_process_test_waitlist(argv);
+#else
+    tb_used(tb_demo_process_test_waitlist);
+#endif
+
+#if 1
+    // we can run `xxx.bat` or `xxx.sh` shell command to test it
+    // @see https://github.com/xmake-io/xmake/issues/719
+    tb_demo_process_test_exit(argv, tb_false);
+//    tb_demo_process_test_exit(argv, tb_true);
+#else
+    tb_used(tb_demo_process_test_exit);
+#endif
     return 0;
 }
