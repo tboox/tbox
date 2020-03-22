@@ -43,6 +43,12 @@ typedef __tb_typeref__(process_group);
  * interfaces
  */
 
+/*! get the global process group
+ *
+ * @return              the process group
+ */
+tb_process_group_ref_t  tb_process_group();
+
 /*! init a given process 
  * 
  * @code

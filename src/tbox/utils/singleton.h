@@ -94,8 +94,11 @@ typedef enum __tb_singleton_type_e
     /// the stdfile(stderr) type
 ,   TB_SINGLETON_TYPE_STDFILE_STDERR        = 15
 
+    /// the process group type
+,   TB_SINGLETON_TYPE_PROCESS_GROUP         = 16
+
     /// the user defined type
-,   TB_SINGLETON_TYPE_USER                  = 16
+,   TB_SINGLETON_TYPE_USER                  = 17
 
 #endif
 

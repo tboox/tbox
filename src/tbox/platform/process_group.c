@@ -31,6 +31,22 @@
 #include "process_group.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * instance implementation
+ */
+static tb_handle_t tb_process_group_instance_init(tb_cpointer_t* ppriv)
+{
+    return (tb_handle_t)tb_process_group_init(tb_null);
+}
+static tb_void_t tb_process_group_instance_exit(tb_handle_t group, tb_cpointer_t priv)
+{
+    tb_process_group_exit((tb_process_group_ref_t)group);
+}
+static tb_void_t tb_process_group_instance_kill(tb_handle_t group, tb_cpointer_t priv)
+{
+    tb_process_group_kill((tb_process_group_ref_t)group);
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
@@ -56,5 +72,8 @@ tb_void_t tb_process_group_kill(tb_process_group_ref_t group)
 {
     tb_trace_noimpl();
 }
-
 #endif
+tb_process_group_ref_t tb_process_group()
+{
+    return (tb_process_group_ref_t)tb_singleton_instance(TB_SINGLETON_TYPE_PROCESS_GROUP, tb_process_group_instance_init, tb_process_group_instance_exit, tb_process_group_instance_kill, tb_null);
+}
