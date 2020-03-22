@@ -66,6 +66,8 @@ __tb_extern_c_enter__
 HANDLE      tb_pipe_file_handle(tb_pipe_file_ref_t file);
 HANDLE      tb_process_handle(tb_process_ref_t self);
 tb_void_t   tb_process_handle_close(tb_process_ref_t self);
+tb_bool_t   tb_process_group_init();
+tb_void_t   tb_process_group_exit();
 __tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +77,9 @@ __tb_extern_c_leave__
 #ifdef TB_COMPILER_LIKE_UNIX
 extern tb_char_t** environ;
 #endif
+
+// the global process group
+static HANDLE g_process_group = tb_null;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
@@ -112,6 +117,29 @@ tb_void_t tb_process_handle_close(tb_process_ref_t self)
     if (process->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdError && process->si.hStdError != INVALID_HANDLE_VALUE) 
         tb_file_exit((tb_file_ref_t)process->si.hStdError);
     process->si.hStdError = INVALID_HANDLE_VALUE;
+}
+tb_bool_t tb_process_group_init()
+{
+    if (!g_process_group)
+    {
+        // create process job 
+        g_process_group = tb_kernel32()->CreateJobObjectW(tb_null, tb_null);
+        tb_assert_and_check_break(g_process_group && g_process_group != INVALID_HANDLE_VALUE);
+
+        // set job limits, kill all processes on job when the job is destroyed.
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION job_limits;
+        memset(&job_limits, 0, sizeof(job_limits));
+        job_limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+        tb_kernel32()->SetInformationJobObject(g_process_group, JobObjectExtendedLimitInformation, &job_limits, sizeof(job_limits));
+
+    } while (0);
+    return g_process_group != tb_null;
+}
+tb_void_t tb_process_group_exit()
+{
+    // kill all processes on job
+    if (g_process_group)
+        tb_kernel32()->TerminateJobObject(g_process_group, 0);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -200,10 +228,13 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // save the user private data
         if (attr) process->priv = attr->priv;
 
+        // detach process?
+        tb_bool_t detach = attr && (attr->flags & TB_PROCESS_FLAG_DETACH);
+
         // init flags
         DWORD flags = 0;
         if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
-        if (attr && attr->group) flags |= CREATE_BREAKAWAY_FROM_JOB;
+        if (!detach) flags |= CREATE_BREAKAWAY_FROM_JOB; // create process with parent process group by default
 //        if (attr && attr->envp) flags |= CREATE_UNICODE_ENVIRONMENT;
 
         // get the cmd size
@@ -362,9 +393,9 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
             break;
 
-        // attach this process to the process group/job
-        HANDLE job = attr? (HANDLE)attr->group : tb_null;
-        if (job) tb_kernel32()->AssignProcessToJobObject(job, process->pi.hProcess);
+        // attach this process to the parent process group by default
+        if (g_process_group && !detach)
+            tb_kernel32()->AssignProcessToJobObject(g_process_group, process->pi.hProcess);
 
         // check it
         tb_assert_and_check_break(process->pi.hThread != INVALID_HANDLE_VALUE);

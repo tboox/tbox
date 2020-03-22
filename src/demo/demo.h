@@ -184,7 +184,6 @@ TB_DEMO_MAIN_DECL(platform_poller_pipe);
 TB_DEMO_MAIN_DECL(platform_poller_client);
 TB_DEMO_MAIN_DECL(platform_poller_server);
 TB_DEMO_MAIN_DECL(platform_poller_process);
-TB_DEMO_MAIN_DECL(platform_process_group);
 TB_DEMO_MAIN_DECL(platform_context);
 
 // container

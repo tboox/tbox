@@ -27,7 +27,6 @@
  */
 #include "prefix.h"
 #include "pipe.h"
-#include "process_group.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -43,6 +42,7 @@ typedef enum __tb_process_flag_e
 {
     TB_PROCESS_FLAG_NONE    = 0
 ,   TB_PROCESS_FLAG_SUSPEND = 1     //!< suspend process
+,   TB_PROCESS_FLAG_DETACH  = 2     //!< detach process from the parent process group, this process will be not exited after the parent process exited
 
 }tb_process_flag_e;
 
@@ -138,9 +138,6 @@ typedef struct __tb_process_attr_t
      * the environment of the parent process.
      */
     tb_char_t const**       envp;
-
-    /// the process group
-    tb_process_group_ref_t  group;
 
     /// the user private data
     tb_cpointer_t           priv;
