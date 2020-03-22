@@ -103,6 +103,18 @@ typedef BOOL (WINAPI* tb_kernel32_SetFileCompletionNotificationModes_t)(HANDLE F
 // the CreateSymbolicLinkW func type
 typedef BOOLEAN (WINAPI* tb_kernel32_CreateSymbolicLinkW_t)(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags);
 
+// the CreateJobObjectW func type
+typedef HANDLE (WINAPI* tb_kernel32_CreateJobObjectW_t)(LPSECURITY_ATTRIBUTES lpJobAttributes, LPCWSTR lpName);
+
+// the TerminateJobObject func type
+typedef BOOL (WINAPI* tb_kernel32_TerminateJobObject_t)(HANDLE hJob, UINT uExitCode);
+
+// the AssignProcessToJobObject func type
+typedef BOOL (WINAPI* tb_kernel32_AssignProcessToJobObject_t)(HANDLE hJob, HANDLE hProcess);
+
+// the  SetInformationJobObject func type
+typedef BOOL (WINAPI* tb_kernel32_SetInformationJobObject_t)(HANDLE hJob, JOBOBJECTINFOCLASS JobObjectInformationClass, LPVOID lpJobObjectInformation, DWORD cbJobObjectInformationLength);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -153,6 +165,18 @@ typedef struct __tb_kernel32_t
 
     // CreateSymbolicLinkW
     tb_kernel32_CreateSymbolicLinkW_t                   CreateSymbolicLinkW;
+
+    // CreateJobObjectW
+    tb_kernel32_CreateJobObjectW_t                      CreateJobObjectW;
+
+    // TerminateJobObject
+    tb_kernel32_TerminateJobObject_t                    TerminateJobObject;
+
+    // AssignProcessToJobObject
+    tb_kernel32_AssignProcessToJobObject_t              AssignProcessToJobObject;
+
+    // SetInformationJobObject
+    tb_kernel32_SetInformationJobObject_t               SetInformationJobObject;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 

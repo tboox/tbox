@@ -27,6 +27,7 @@
  */
 #include "prefix.h"
 #include "pipe.h"
+#include "process_group.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -137,6 +138,9 @@ typedef struct __tb_process_attr_t
      * the environment of the parent process.
      */
     tb_char_t const**       envp;
+
+    /// the process group
+    tb_process_group_ref_t  group;
 
     /// the user private data
     tb_cpointer_t           priv;

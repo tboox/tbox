@@ -203,6 +203,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // init flags
         DWORD flags = 0;
         if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
+        if (attr && attr->group) flags |= CREATE_BREAKAWAY_FROM_JOB;
 //        if (attr && attr->envp) flags |= CREATE_UNICODE_ENVIRONMENT;
 
         // get the cmd size
@@ -360,6 +361,10 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // create process
         if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
             break;
+
+        // attach this process to the process group/job
+        HANDLE job = attr? (HANDLE)attr->group : tb_null;
+        if (job) tb_kernel32()->AssignProcessToJobObject(job, process->pi.hProcess);
 
         // check it
         tb_assert_and_check_break(process->pi.hThread != INVALID_HANDLE_VALUE);

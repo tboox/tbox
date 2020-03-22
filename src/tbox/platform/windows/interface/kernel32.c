@@ -56,6 +56,10 @@ static tb_bool_t tb_kernel32_instance_init(tb_kernel32_ref_t kernel32)
     TB_INTERFACE_LOAD(kernel32, SetHandleInformation);
     TB_INTERFACE_LOAD(kernel32, SetFileCompletionNotificationModes);
     TB_INTERFACE_LOAD(kernel32, CreateSymbolicLinkW);
+    TB_INTERFACE_LOAD(kernel32, CreateJobObjectW);
+    TB_INTERFACE_LOAD(kernel32, TerminateJobObject);
+    TB_INTERFACE_LOAD(kernel32, AssignProcessToJobObject);
+    TB_INTERFACE_LOAD(kernel32, SetInformationJobObject);
 
     // ok
     return tb_true;
