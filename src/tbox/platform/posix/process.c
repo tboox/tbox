@@ -28,6 +28,9 @@
 #include "../time.h"
 #include "../process.h"
 #include "../environment.h"
+#include "../spinlock.h"
+#include "../../container/container.h"
+#include "../../algorithm/algorithm.h"
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -83,7 +86,11 @@ typedef struct __tb_process_t
  */
 
 // the user environment
-extern tb_char_t**  environ;
+extern tb_char_t**          environ;
+
+// the processes in the parent process group
+static tb_hash_set_ref_t    g_processes_group = tb_null;
+static tb_spinlock_t        g_processes_lock = TB_SPINLOCK_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -134,10 +141,26 @@ tb_int_t tb_process_pid(tb_process_ref_t self)
 }
 tb_bool_t tb_process_group_init()
 {
-    return tb_true;
+    if (!g_processes_group)
+        g_processes_group = tb_hash_set_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_ptr(tb_null, tb_null));
+    return g_processes_group != tb_null;
 }
 tb_void_t tb_process_group_exit()
 {
+    // we need not lock it in tb_exit()
+    if (g_processes_group)
+    {
+        // send kill signal to all subprocesses
+        tb_for_all_if (tb_process_t*, process, g_processes_group, process)
+        {
+            tb_process_kill((tb_process_ref_t)process);
+            tb_process_exit((tb_process_ref_t)process);
+        }
+
+        // exit it
+        tb_hash_set_exit(g_processes_group);
+        g_processes_group = tb_null;
+    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -241,6 +264,15 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
 
         // check pid
         tb_assert_and_check_break(process->pid > 0);
+
+        // save this pid if not detached
+        if (!process->detached)
+        {
+            tb_spinlock_enter(&g_processes_lock);
+            if (g_processes_group)
+                tb_hash_set_insert(g_processes_group, process);
+            tb_spinlock_leave(&g_processes_lock);
+        }
 
         // ok
         ok = tb_true;
@@ -405,6 +437,15 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         // check pid
         tb_assert_and_check_break(process->pid > 0);
 
+        // save this pid if not detached
+        if (!process->detached)
+        {
+            tb_spinlock_enter(&g_processes_lock);
+            if (g_processes_group)
+                tb_hash_set_insert(g_processes_group, process);
+            tb_spinlock_leave(&g_processes_lock);
+        }
+
         // ok
         ok = tb_true;
 
@@ -563,6 +604,15 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
     // check
     tb_process_t* process = (tb_process_t*)self;
     tb_assert_and_check_return(process);
+
+    // remove this pid from the parent process group if not detached
+    if (!process->detached)
+    {
+        tb_spinlock_enter(&g_processes_lock);
+        if (g_processes_group)
+            tb_hash_set_remove(g_processes_group, process);
+        tb_spinlock_leave(&g_processes_lock);
+    }
 
 #ifdef TB_CONFIG_MODULE_HAVE_COROUTINE
     // attempt to cancel waiting from coroutine first

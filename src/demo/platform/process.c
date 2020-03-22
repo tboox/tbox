@@ -130,13 +130,6 @@ static tb_void_t tb_demo_process_test_exit(tb_char_t** argv, tb_bool_t detach)
     
     // we attempt to enter or do ctrl+c and see process list in process monitor
     tb_getchar();
-
-    // exit processes
-    for (i = 0; i < 10; i++)
-    {
-        tb_process_exit(processes[i]);
-        processes[i] = tb_null;
-    }
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
