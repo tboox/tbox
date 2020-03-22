@@ -61,6 +61,9 @@ typedef struct __tb_process_t
     // the pid
     pid_t                       pid;
 
+    // is detached?
+    tb_bool_t                   detached;
+
     // the user private data
     tb_cpointer_t               priv;
 
@@ -192,14 +195,27 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             }
 
             // suspend it first
+            tb_int_t spawn_flags = 0;
             if (attr->flags & TB_PROCESS_FLAG_SUSPEND)
             {
 #ifdef POSIX_SPAWN_START_SUSPENDED
-                posix_spawnattr_setflags(&process->spawn_attr, POSIX_SPAWN_START_SUSPENDED);
+                spawn_flags |= POSIX_SPAWN_START_SUSPENDED;
 #else
                 tb_assertf(0, "suspend process not supported!");
 #endif
             }
+             
+            // put the child in its own process group, so ctrl-c won't reach it.
+            if (attr->flags & TB_PROCESS_FLAG_DETACH)
+            {
+                // no need to posix_spawnattr_setpgroup(&attr, 0), it's the default.
+                spawn_flags |= POSIX_SPAWN_SETPGROUP;
+                process->detached = tb_true;
+            }
+
+            // set spawn flags
+            if (spawn_flags)
+                posix_spawnattr_setflags(&process->spawn_attr, spawn_flags);
         }
 
         // no given environment? uses the current user environment
@@ -273,6 +289,13 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
             // TODO
             // check
             tb_assertf(!attr || !(attr->flags & TB_PROCESS_FLAG_SUSPEND), "suspend process not supported!");
+
+            // put the child in its own process group, so ctrl-c won't reach it.
+            if (attr && attr->flags & TB_PROCESS_FLAG_DETACH)
+            {
+                setpgid(0, 0);
+                process->detached = tb_true;
+            }
 
             // set attributes
             if (attr)
@@ -567,7 +590,12 @@ tb_void_t tb_process_kill(tb_process_ref_t self)
     if (process->pid > 0)
     {
 #ifdef TB_CONFIG_LIBC_HAVE_KILL
-        kill(process->pid, SIGKILL);
+        if (process->detached)
+        {
+            // send kill to every process in the subprocess group if the subprocess is detached
+            kill(-process->pid, SIGKILL);
+        }
+        else kill(process->pid, SIGKILL);
 #else
         // noimpl
         tb_trace_noimpl();
