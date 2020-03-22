@@ -66,8 +66,6 @@ __tb_extern_c_enter__
 HANDLE      tb_pipe_file_handle(tb_pipe_file_ref_t file);
 HANDLE      tb_process_handle(tb_process_ref_t self);
 tb_void_t   tb_process_handle_close(tb_process_ref_t self);
-tb_bool_t   tb_process_group_init();
-tb_void_t   tb_process_group_exit();
 __tb_extern_c_leave__
 
 /* //////////////////////////////////////////////////////////////////////////////////////

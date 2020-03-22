@@ -36,6 +36,14 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+tb_bool_t tb_process_group_init();
+tb_void_t tb_process_group_exit();
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 
@@ -71,11 +79,17 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
     (tb_void_t)tb_cpu_count();
 #endif
 
+    // init the global process group
+    if (!tb_process_group_init()) return tb_false;
+
     // ok
     return tb_true;
 }
 tb_void_t tb_platform_exit_env()
 {
+    // exit all process in the process group
+    tb_process_group_exit();
+
     // exit exception envirnoment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
     tb_exception_exit_env();

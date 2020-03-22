@@ -44,6 +44,7 @@
 #   include "../../coroutine/coroutine.h"
 #   include "../../coroutine/impl/impl.h"
 #endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
@@ -130,6 +131,13 @@ tb_int_t tb_process_pid(tb_process_ref_t self)
     tb_assert_and_check_return_val(process, -1);
 
     return (tb_int_t)process->pid;
+}
+tb_bool_t tb_process_group_init()
+{
+    return tb_true;
+}
+tb_void_t tb_process_group_exit()
+{
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////

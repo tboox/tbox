@@ -31,6 +31,14 @@
 #include "process.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+__tb_extern_c_enter__
+tb_bool_t   tb_process_group_init();
+tb_void_t   tb_process_group_exit();
+__tb_extern_c_leave__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
@@ -87,6 +95,13 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
 {
     tb_trace_noimpl();
     return -1;
+}
+tb_bool_t tb_process_group_init()
+{
+    return tb_true;
+}
+tb_void_t tb_process_group_exit()
+{
 }
 #endif
 tb_long_t tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)

@@ -27,14 +27,6 @@
 #include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
- */
-__tb_extern_c_enter__
-tb_bool_t tb_process_group_init();
-tb_void_t tb_process_group_exit();
-__tb_extern_c_leave__
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_windows_init_env()
@@ -47,15 +39,10 @@ tb_bool_t tb_windows_init_env()
     tb_ws2_32_ref_t ws2_32 = tb_ws2_32();
     tb_assert_and_check_return_val(ws2_32, tb_false);
 
-    // init the global process group
-    tb_process_group_init();
-
     // ok
     return tb_true;
 }
 tb_void_t tb_windows_exit_env()
 {
-    // exit all process in the process group
-    tb_process_group_exit();
 }
 
