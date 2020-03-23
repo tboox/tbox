@@ -97,12 +97,12 @@ tb_void_t tb_process_handle_close(tb_process_ref_t self)
     tb_assert_and_check_return(process);
 
     // close thread handle
-    if (process->pi.hThread != INVALID_HANDLE_VALUE)
+    if (process->pi.hThread && process->pi.hThread != INVALID_HANDLE_VALUE)
         CloseHandle(process->pi.hThread);
     process->pi.hThread = INVALID_HANDLE_VALUE;
 
     // close process handle
-    if (process->pi.hProcess != INVALID_HANDLE_VALUE)
+    if (process->pi.hProcess && process->pi.hProcess != INVALID_HANDLE_VALUE)
         CloseHandle(process->pi.hProcess);
     process->pi.hProcess = INVALID_HANDLE_VALUE;
 
