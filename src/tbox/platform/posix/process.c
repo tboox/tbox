@@ -151,10 +151,10 @@ tb_void_t tb_process_group_exit()
     if (g_processes_group)
     {
         // send kill signal to all subprocesses
+        // @note we do not destroy these leaked processes now.
         tb_for_all_if (tb_process_t*, process, g_processes_group, process)
         {
             tb_process_kill((tb_process_ref_t)process);
-            tb_process_exit((tb_process_ref_t)process);
         }
 
         // exit it
