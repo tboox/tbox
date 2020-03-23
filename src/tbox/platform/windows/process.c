@@ -122,7 +122,7 @@ tb_bool_t tb_process_group_init()
     {
         // create process job 
         g_process_group = tb_kernel32()->CreateJobObjectW(tb_null, tb_null);
-        tb_assert_and_check_break(g_process_group && g_process_group != INVALID_HANDLE_VALUE);
+        tb_assert_and_check_return_val(g_process_group && g_process_group != INVALID_HANDLE_VALUE, tb_false);
 
         // set job limits, kill all processes on job when the job is destroyed.
         JOBOBJECT_EXTENDED_LIMIT_INFORMATION job_limits;
@@ -130,7 +130,7 @@ tb_bool_t tb_process_group_init()
         job_limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
         tb_kernel32()->SetInformationJobObject(g_process_group, JobObjectExtendedLimitInformation, &job_limits, sizeof(job_limits));
 
-    } while (0);
+    }
     return g_process_group != tb_null;
 }
 tb_void_t tb_process_group_exit()
