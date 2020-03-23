@@ -127,7 +127,7 @@ tb_bool_t tb_process_group_init()
         // set job limits, kill all processes on job when the job is destroyed.
         JOBOBJECT_EXTENDED_LIMIT_INFORMATION job_limits;
         memset(&job_limits, 0, sizeof(job_limits));
-        job_limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+        job_limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_BREAKAWAY_OK;
         tb_kernel32()->SetInformationJobObject(g_process_group, JobObjectExtendedLimitInformation, &job_limits, sizeof(job_limits));
 
     }
@@ -232,7 +232,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // init flags
         DWORD flags = 0;
         if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
-        if (!detach) flags |= CREATE_BREAKAWAY_FROM_JOB; // create process with parent process group by default
+        if (!detach) flags |= CREATE_BREAKAWAY_FROM_JOB; // create process with parent process group by default, need set JOB_OBJECT_LIMIT_BREAKAWAY_OK limit for job
 //        if (attr && attr->envp) flags |= CREATE_UNICODE_ENVIRONMENT;
 
         // get the cmd size
