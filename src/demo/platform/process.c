@@ -123,10 +123,9 @@ static tb_void_t tb_demo_process_test_exit(tb_char_t** argv, tb_bool_t detach)
 {
     tb_size_t i = 0;
     tb_process_attr_t attr = {0};
-    tb_process_ref_t processes[10];
     if (detach) attr.flags |= TB_PROCESS_FLAG_DETACH;
     for (i = 0; i < 10; i++)
-        processes[i] = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
+        tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
     
     // we attempt to enter or do ctrl+c and see process list in process monitor
     tb_getchar();
