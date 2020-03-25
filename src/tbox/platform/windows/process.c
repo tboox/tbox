@@ -139,6 +139,46 @@ tb_void_t tb_process_group_exit()
     if (g_process_group)
         tb_kernel32()->TerminateJobObject(g_process_group, 0);
 }
+static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const* cstr)
+{
+    // wrap and escape characters
+    tb_char_t ch;
+    tb_size_t n = 0;
+    tb_char_t const* p = cstr;
+    tb_bool_t wrap_quote = tb_false;
+    tb_char_t buff[TB_PATH_MAXN];
+    tb_size_t m = tb_arrayn(buff);
+    while ((ch = *p) && n < m)
+    {
+        // escape '"'
+        if (ch == '\"') 
+        {
+            if (n < m) buff[n++] = '\\';
+        }
+        else if (ch == ' ' || ch == '(' || ch == ')') wrap_quote = tb_true;
+        if (n < m) buff[n++] = ch;
+        p++;
+    }
+    tb_assert_and_check_return(n < m);
+    buff[n] = '\0';
+
+    // wrap "" if exists escape characters and spaces?
+    if (wrap_quote) 
+    {
+        tb_string_chrcat(result, '\"');
+        tb_size_t i = 0;
+        tb_char_t ch;
+        for (i = 0; i < n; i++)
+        {
+            ch = buff[i];
+            if (ch == '\\') // escape the '\\' characters in ""
+                tb_string_chrcat(result, '\\');
+            tb_string_chrcat(result, ch);
+        }
+        tb_string_chrcat(result, '\"');
+    }
+    else if (n) tb_string_cstrncat(result, buff, n);
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -158,40 +198,17 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         // make arguments
         if (argv)
         {
-            tb_char_t ch;
+            tb_bool_t first = tb_true;
             tb_char_t const* p = tb_null;
-            tb_char_t arg[8192];
             while ((p = *argv++)) 
             {
-                // escape argument block
-                tb_size_t i = 0;
-                tb_size_t m = tb_arrayn(arg);
-                tb_bool_t wrap_quote = tb_false;
-                while ((ch = *p) && i < m)
-                {
-                    if (ch == '\"') 
-                    {
-                        if (i < m) arg[i++] = '\\';
-                        wrap_quote = tb_true;
-                    }
-                    else if (ch == ' ') wrap_quote = tb_true;
-                    if (i < m) arg[i++] = ch;
-                    p++;
-                }
-                tb_assert_and_check_break(i < m);
-                arg[i] = '\0';
-
-                // wrap "arg" if exists escape characters and spaces?
-                if (wrap_quote) tb_string_chrcat(&args, '\"');
-                if (i) tb_string_cstrncat(&args, arg, i);
-                if (wrap_quote) tb_string_chrcat(&args, '\"');
-                
-                // add space 
-                tb_string_chrcat(&args, ' ');
+                if (first) first = tb_false;
+                else tb_string_chrcat(&args, ' ');
+                tb_process_args_append(&args, p);
             }
         }
         // only path name?
-        else tb_string_cstrcpy(&args, pathname);
+        else tb_process_args_append(&args, pathname);
 
         // init process
         process = tb_process_init_cmd(tb_string_cstr(&args), attr);
