@@ -80,7 +80,9 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
 #endif
 
     // init the global process group
+#ifndef TB_CONFIG_MICRO_ENABLE
     if (!tb_process_group_init()) return tb_false;
+#endif
 
     // ok
     return tb_true;
@@ -88,7 +90,9 @@ tb_bool_t tb_platform_init_env(tb_handle_t priv)
 tb_void_t tb_platform_exit_env()
 {
     // exit all process in the process group
+#ifndef TB_CONFIG_MICRO_ENABLE
     tb_process_group_exit();
+#endif
 
     // exit exception envirnoment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
