@@ -5,20 +5,17 @@
   </a>  
 
   <div>
-    <a href="https://travis-ci.org/tboox/tbox">
-      <img src="https://img.shields.io/travis/tboox/tbox/master.svg?style=flat-square" alt="travis-ci" />
+    <a href="https://github.com/tboox/tbox/actions?query=workflow%3Abuild">
+      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/build/master.svg?style=flat-square" alt="github-ci" />
     </a>
-    <a href="https://ci.appveyor.com/project/waruqi/tbox/branch/master">
-      <img src="https://img.shields.io/appveyor/ci/waruqi/tbox/master.svg?style=flat-square" alt="appveyor-ci" />
+    <a href="https://github.com/tboox/tbox/blob/master/LICENSE.md">
+      <img src="https://img.shields.io/github/license/tboox/tbox.svg?colorB=f48041&style=flat-square" alt="license" />
     </a>
     <a href="https://github.com/tboox/tbox/releases">
       <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
     </a>
   </div>
   <div>
-    <a href="https://github.com/tboox/tbox/blob/master/LICENSE.md">
-      <img src="https://img.shields.io/github/license/tboox/tbox.svg?colorB=f48041&style=flat-square" alt="license" />
-    </a>
     <a href="https://www.reddit.com/r/tboox/">
       <img src="https://img.shields.io/badge/chat-on%20reddit-ff3f34.svg?style=flat-square" alt="Reddit" />
     </a>
