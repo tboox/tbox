@@ -406,7 +406,21 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
         // create process
         if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
-            break;
+        {
+            /* It maybe fails because inside some sessions all user processes belong to a system-created job object named like
+             * "\Sessions\x\BaseNamedObjects\Winlogon Job x-xxxxxxxx" (including rdpinit.exe and rdpshell.exe processes), 
+             * and this job doesn't allow their procceses to escape via CREATE_BREAKAWAY_FROM_JOB flag (it doesn't have the JOB_OBJECT_LIMIT_BREAKAWAY_OK limit/right set).
+             *
+             * we attempt to remove CREATE_BREAKAWAY_FROM_JOB flag and try to run it again
+             */
+            if ((flags & CREATE_BREAKAWAY_FROM_JOB) && GetLastError() == ERROR_ACCESS_DENIED)
+            {
+                flags &= ~CREATE_BREAKAWAY_FROM_JOB;
+                if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
+                    break;
+            }
+            else break;
+        }
 
         // attach this process to the parent process group by default
         if (g_process_group && !detach)
