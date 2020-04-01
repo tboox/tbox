@@ -12,12 +12,10 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - uses: xmake-io/github-action-setup-xmake@master
+    - uses: xmake-io/github-action-setup-xmake@v1
       with:
         xmake-version: latest
     - name: build
-      env:
-        CI: true
       run: |
         xmake 
         xmake run demo
