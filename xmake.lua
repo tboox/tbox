@@ -2,7 +2,7 @@
 set_project("tbox")
 
 -- set xmake minimum version
-set_xmakever("2.2.5")
+set_xmakever("2.3.2")
 
 -- set project version
 set_version("1.6.5", {build = "%Y%m%d%H%M"})
@@ -23,7 +23,7 @@ add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
 
 -- add build modes
-add_rules("mode.release", "mode.debug", "mode.coverage", "mode.valgrind", "mode.asan", "mode.tsan")
+add_rules("mode.release", "mode.debug", "mode.coverage")-- TODO, "mode.valgrind", "mode.asan", "mode.tsan")
 if is_mode("debug") then
     add_defines("__tb_debug__")
 end
