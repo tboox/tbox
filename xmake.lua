@@ -23,7 +23,7 @@ add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
 
 -- add build modes
-add_rules("mode.release", "mode.debug", "mode.profile", "mode.coverage")-- TODO, "mode.valgrind", "mode.asan", "mode.tsan") for xmake v2.3.3
+add_rules("mode.release", "mode.debug", "mode.profile", "mode.coverage")-- TODO, "mode.valgrind", "mode.asan", "mode.tsan", "mode.ubsan") -- for xmake v2.3.3
 if is_mode("debug") then
     add_defines("__tb_debug__")
 end
