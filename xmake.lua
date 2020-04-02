@@ -22,93 +22,29 @@ set_configvar("_REENTRANT", 1)
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
 
--- the debug, coverage, valgrind or sanitize-address/thread mode
-if is_mode("debug", "coverage", "valgrind", "asan", "tsan") then
-    
-    -- enable the debug symbols
-    set_symbols("debug")
-
-    -- disable optimization
-    set_optimize("none")
-
-    -- add defines for debug
-    if is_mode("debug") then
-        add_defines("__tb_debug__")
-    end
-
-    -- add defines for valgrind
-    if is_mode("valgrind") then
-        add_defines("__tb_valgrind__")
-    end
-
-    -- attempt to enable sanitize-address 
-    if is_mode("asan") then
-        add_cxflags("-fsanitize=address", "-ftrapv")
-        add_mxflags("-fsanitize=address", "-ftrapv")
-        add_ldflags("-fsanitize=address")
-        add_defines("__tb_sanitize_address__")
-    end
-
-    -- attempt to enable sanitize-thread 
-    if is_mode("tsan") then
-        add_cxflags("-fsanitize=thread")
-        add_mxflags("-fsanitize=thread")
-        add_ldflags("-fsanitize=thread")
-        add_defines("__tb_sanitize_thread__")
-    end
-
-    -- enable coverage
-    if is_mode("coverage") then
-        add_cxflags("--coverage")
-        add_mxflags("--coverage")
-        add_ldflags("--coverage")
-    end
+-- add build modes
+add_rules("mode.release", "mode.debug", "mode.coverage", "mode.valgrind", "mode.asan", "mode.tsan")
+if is_mode("debug") then
+    add_defines("__tb_debug__")
 end
-
--- the release, profile mode
-if is_mode("release", "profile") then
-
-    -- the release mode
-    if is_mode("release") then
-        
-        -- set the symbols visibility: hidden
-        set_symbols("hidden")
-
-        -- strip all symbols
-        set_strip("all")
-
-    -- the profile mode
-    else
-    
-        -- enable the debug symbols
-        set_symbols("debug")
-
-        -- enable gprof
-        add_cxflags("-pg")
-        add_ldflags("-pg")
-    end
-
-    -- small or micro?
-    if has_config("small", "micro") then
-        set_optimize("smallest")
-    else
-        set_optimize("fastest")
-    end
-
-    -- disable stack protector for micro mode
-    if has_config("micro") then
-        add_cxflags("-fno-stack-protector")
-    end
+if is_mode("valgrind") then
+    add_defines("__tb_valgrind__")
+end
+if is_mode("asan") then
+    add_defines("__tb_sanitize_address__")
+end
+if is_mode("tsan") then
+    add_defines("__tb_sanitize_thread__")
 end
 
 -- small or micro?
 if has_config("small", "micro") then
-
-    -- add defines for small
     add_defines("__tb_small__")
-
-    -- add defines to config.h
     set_configvar("TB_CONFIG_SMALL", 1)
+    if is_mode("release", "profile") then
+        set_optimize("smallest")
+    end
+    add_cxflags("-fno-stack-protector")
 end
 
 -- for the windows platform (msvc)
