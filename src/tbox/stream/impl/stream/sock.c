@@ -747,6 +747,9 @@ tb_stream_ref_t tb_stream_init_sock()
     {
         // init sock type
         stream_sock->type = TB_SOCKET_TYPE_TCP;
+
+        // mark as owner of socket
+        stream_sock->owner = 1;
     }
 
     // ok?
@@ -776,8 +779,7 @@ tb_stream_ref_t tb_stream_init_from_sock(tb_char_t const* host, tb_uint16_t port
         tb_stream_sock_t* stream_sock = tb_stream_sock_cast(stream);
         tb_assert_and_check_break(stream_sock);
 
-        // mark as owner of socket
-        stream_sock->owner = 1;
+     
    
         // ok
         ok = tb_true;
