@@ -779,8 +779,6 @@ tb_stream_ref_t tb_stream_init_from_sock(tb_char_t const* host, tb_uint16_t port
         tb_stream_sock_t* stream_sock = tb_stream_sock_cast(stream);
         tb_assert_and_check_break(stream_sock);
 
-     
-   
         // ok
         ok = tb_true;
 
