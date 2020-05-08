@@ -335,8 +335,8 @@ function check_interfaces()
         end
     end
 
-    -- add the interfaces for freebsd
-    check_module_cfuncs("freebsd", {"sys/file.h", "fcntl.h"},        "flock")
+    -- add the interfaces for bsd
+    check_module_cfuncs("bsd", {"sys/file.h", "fcntl.h"},            "flock")
 
     -- add the interfaces for systemv
     check_module_cfuncs("systemv", {"sys/sem.h", "sys/ipc.h"},       "semget", "semtimedop")
