@@ -18,8 +18,8 @@
  * @file        prefix.h
  * @ingroup     platform
  */
-#ifndef TB_PLATFORM_FREEBSD_PREFIX_H
-#define TB_PLATFORM_FREEBSD_PREFIX_H
+#ifndef TB_PLATFORM_BSD_PREFIX_H
+#define TB_PLATFORM_BSD_PREFIX_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
