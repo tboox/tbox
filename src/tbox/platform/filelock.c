@@ -29,8 +29,8 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   include "windows/filelock.c"
-#elif defined(TB_CONFIG_FREEBSD_HAVE_FLOCK)
-#   include "freebsd/filelock.c"
+#elif defined(TB_CONFIG_BSD_HAVE_FLOCK)
+#   include "bsd/filelock.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_FCNTL)
 #   include "posix/filelock.c"
 #else
