@@ -88,3 +88,8 @@ target("demo")
     if is_plat("mingw", "msys", "cygwin") then
         add_ldflags("-static-libgcc", {force = true})
     end
+
+    -- link backtrace/execinfo for bsd
+    if is_plat("bsd") then
+        add_syslinks("execinfo")
+    end
