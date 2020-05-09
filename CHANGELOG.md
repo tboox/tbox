@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Support *BSD system, e.g. FreeBSD ..
+
 ## v1.6.5
 
 ### New features
@@ -197,6 +201,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* 支持*BSD系统，例如：FreeBSD
 
 ## v1.6.5
 

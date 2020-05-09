@@ -50,6 +50,7 @@ It supports the following platforms:
 - Linux
 - Android
 - iOS
+- *BSD
 
 And it provides many compiling options using [xmake](https://github.com/xmake-io/xmake):
 
