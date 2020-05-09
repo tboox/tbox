@@ -48,8 +48,8 @@
     && defined(TB_CONFIG_POSIX_HAVE_EPOLL_WAIT)
 #   include "linux/poller_epoll.c"
 #   define TB_POLLER_ENABLE_EPOLL
-#elif defined(TB_CONFIG_OS_MACOSX)
-#   include "mach/poller_kqueue.c"
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_BSD)
+#   include "bsd/poller_kqueue.c"
 #   define TB_POLLER_ENABLE_KQUEUE
 #elif defined(TB_CONFIG_POSIX_HAVE_POLL) && !defined(TB_CONFIG_MICRO_ENABLE) /* TODO remove vector for supporting the micro mode */
 #   include "posix/poller_poll.c"
