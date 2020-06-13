@@ -40,17 +40,47 @@ tb_size_t tb_cpu_count()
          *
          * @see https://stackoverflow.com/a/31209344/21475 and https://github.com/ninja-build/ninja/pull/1674
          */
-#ifdef ALL_PROCESSOR_GROUPS // the mingw toolchain maybe has not this defination 
-        if (tb_kernel32()->GetActiveProcessorCount)
+        if (tb_kernel32()->GetLogicalProcessorInformationEx)
+        {
+            DWORD len = 0;
+            tb_char_t buf[4096];
+            if (!tb_kernel32()->GetLogicalProcessorInformationEx(RelationProcessorCore, tb_null, &len) 
+                && GetLastError() == ERROR_INSUFFICIENT_BUFFER && len <= sizeof(buf))
+            {
+                // get cores
+                tb_size_t cores = 0;
+                if (tb_kernel32()->GetLogicalProcessorInformationEx(RelationProcessorCore, (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX)buf, &len)) 
+                {
+                    DWORD i = 0;
+                    while (i < len)
+                    {
+                        PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX info = (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX)(buf + i);
+                        if (info->Relationship == RelationProcessorCore && info->Processor.GroupCount == 1) 
+                        {
+                            for (KAFFINITY core_mask = info->Processor.GroupMask[0].Mask; core_mask; core_mask >>= 1) 
+                                cores += (core_mask & 1);
+                        }
+                        i += info->Size;
+                    }
+                    ncpu = cores? cores : 1;
+                }
+            }
+        }
+        
+#ifdef ALL_PROCESSOR_GROUPS
+        // the mingw toolchain maybe has not this defination 
+        if (ncpu == -1 && tb_kernel32()->GetActiveProcessorCount)
             ncpu = (tb_size_t)tb_kernel32()->GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
-        else
 #endif
+
+        if (ncpu == -1)
         {
             SYSTEM_INFO info;
             tb_memset(&info, 0, sizeof(SYSTEM_INFO));
             GetSystemInfo(&info);
             ncpu = (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
         }
+        if (ncpu == -1) ncpu = 1;
     }
     return ncpu;
 }
