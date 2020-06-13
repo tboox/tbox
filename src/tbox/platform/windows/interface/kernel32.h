@@ -112,8 +112,11 @@ typedef BOOL (WINAPI* tb_kernel32_TerminateJobObject_t)(HANDLE hJob, UINT uExitC
 // the AssignProcessToJobObject func type
 typedef BOOL (WINAPI* tb_kernel32_AssignProcessToJobObject_t)(HANDLE hJob, HANDLE hProcess);
 
-// the  SetInformationJobObject func type
+// the SetInformationJobObject func type
 typedef BOOL (WINAPI* tb_kernel32_SetInformationJobObject_t)(HANDLE hJob, JOBOBJECTINFOCLASS JobObjectInformationClass, LPVOID lpJobObjectInformation, DWORD cbJobObjectInformationLength);
+
+// the GetActiveProcessorCount func type
+typedef DWORD (WINAPI* tb_kernel32_GetActiveProcessorCount_t)(WORD GroupNumber);
 
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
@@ -177,6 +180,9 @@ typedef struct __tb_kernel32_t
 
     // SetInformationJobObject
     tb_kernel32_SetInformationJobObject_t               SetInformationJobObject;
+
+    // GetActiveProcessorCount
+    tb_kernel32_GetActiveProcessorCount_t               GetActiveProcessorCount;
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 

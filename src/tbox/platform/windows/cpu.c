@@ -24,6 +24,7 @@
  */
 #include "prefix.h"
 #include "../platform.h"
+#include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -34,15 +35,22 @@ tb_size_t tb_cpu_count()
     static tb_size_t ncpu = -1;
     if (ncpu == -1) 
     {
-        // clear the system info
-        SYSTEM_INFO info;
-        tb_memset(&info, 0, sizeof(SYSTEM_INFO));
-
-        // get the system info
-        GetSystemInfo(&info);
-        
-        // the cpu count
-        ncpu = (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
+        /* TODO need to use GetLogicalProcessorInformationEx to get real core count on
+         * machines with >64 cores. 
+         *
+         * @see https://stackoverflow.com/a/31209344/21475 and https://github.com/ninja-build/ninja/pull/1674
+         */
+#ifdef ALL_PROCESSOR_GROUPS // the mingw toolchain maybe has not this defination 
+        if (tb_kernel32()->GetActiveProcessorCount)
+            ncpu = (tb_size_t)tb_kernel32()->GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
+        else
+#endif
+        {
+            SYSTEM_INFO info;
+            tb_memset(&info, 0, sizeof(SYSTEM_INFO));
+            GetSystemInfo(&info);
+            ncpu = (tb_size_t)info.dwNumberOfProcessors? info.dwNumberOfProcessors : 1;
+        }
     }
     return ncpu;
 }

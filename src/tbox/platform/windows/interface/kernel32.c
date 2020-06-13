@@ -60,6 +60,7 @@ static tb_bool_t tb_kernel32_instance_init(tb_kernel32_ref_t kernel32)
     TB_INTERFACE_LOAD(kernel32, TerminateJobObject);
     TB_INTERFACE_LOAD(kernel32, AssignProcessToJobObject);
     TB_INTERFACE_LOAD(kernel32, SetInformationJobObject);
+    TB_INTERFACE_LOAD(kernel32, GetActiveProcessorCount);
 
     // ok
     return tb_true;
