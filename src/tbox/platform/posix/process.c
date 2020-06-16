@@ -302,6 +302,7 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
     return (tb_process_ref_t)process;
 }
 #endif
+#ifndef TB_CONFIG_POSIX_HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP
 static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
@@ -477,6 +478,7 @@ static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_
     // ok?
     return (tb_process_ref_t)process;
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
