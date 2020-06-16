@@ -226,13 +226,15 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
             }
 
             // change the current working directory for child process
+#ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP
             if (attr->curdir)
             {
-#ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP
                 tb_int_t result = posix_spawn_file_actions_addchdir_np(&process->spawn_action, attr->curdir);
                 tb_assertf_pass_and_check_break(!result, "cannot change directory to %s, error: %d", attr->curdir, result);
-#endif
             }
+#else
+            tb_assertf(attr->curdir, "posix_spawn do not suuport chdir!");
+#endif
 
             // suspend it first
             tb_int_t spawn_flags = 0;
