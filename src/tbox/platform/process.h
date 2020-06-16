@@ -139,6 +139,9 @@ typedef struct __tb_process_attr_t
      */
     tb_char_t const**       envp;
 
+    // the given current working directory for child process
+    tb_char_t const*        curdir;
+
     /// the user private data
     tb_cpointer_t           priv;
 

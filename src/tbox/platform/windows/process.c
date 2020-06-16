@@ -264,6 +264,14 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_size_t size = tb_atow(command, cmd, cmdn + 1);
         tb_assert_and_check_break(size != -1);
 
+        // init the current directory
+        tb_wchar_t curdir[TB_PATH_MAXN];
+        if (attr && attr->curdir)
+        {
+            tb_size_t size = tb_atow(curdir, attr->curdir, tb_arrayn(curdir));
+            tb_assert_and_check_break(size != -1);
+        }
+
         // reset size
         size = 0;
 
@@ -405,7 +413,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         sat.bInheritHandle          = bInheritHandle;
 
         // create process
-        if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
+        if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, attr && attr->curdir? curdir : tb_null, &process->si, &process->pi))
         {
             /* It maybe fails because inside some sessions all user processes belong to a system-created job object named like
              * "\Sessions\x\BaseNamedObjects\Winlogon Job x-xxxxxxxx" (including rdpinit.exe and rdpshell.exe processes), 
@@ -416,7 +424,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             if ((flags & CREATE_BREAKAWAY_FROM_JOB) && GetLastError() == ERROR_ACCESS_DENIED)
             {
                 flags &= ~CREATE_BREAKAWAY_FROM_JOB;
-                if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, tb_null, &process->si, &process->pi))
+                if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, attr && attr->curdir? curdir : tb_null, &process->si, &process->pi))
                     break;
             }
             else break;

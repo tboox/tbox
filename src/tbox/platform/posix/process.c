@@ -68,6 +68,9 @@ typedef struct __tb_process_t
     // is detached?
     tb_bool_t                   detached;
 
+    // use spawn?
+    tb_bool_t                   spawn;
+
     // the user private data
     tb_cpointer_t               priv;
 
@@ -162,12 +165,8 @@ tb_void_t tb_process_group_exit()
         g_processes_group = tb_null;
     }
 }
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * implementation
- */
-#if defined(TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP)
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
+#ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
+static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -185,6 +184,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         if (attr) process->priv = attr->priv;
 
         // init spawn attributes
+        process->spawn = tb_true;
         posix_spawnattr_init(&process->spawn_attr);
 
         // init spawn action
@@ -223,6 +223,15 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                 tb_int_t errfd = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->errpipe) : tb_file2fd(attr->errfile);
                 posix_spawn_file_actions_adddup2(&process->spawn_action, errfd, STDERR_FILENO);
                 posix_spawn_file_actions_addclose(&process->spawn_action, errfd);
+            }
+
+            // change the current working directory for child process
+            if (attr->curdir)
+            {
+#ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP
+                tb_int_t result = posix_spawn_file_actions_addchdir_np(&process->spawn_action, attr->curdir);
+                tb_assertf_pass_and_check_break(!result, "cannot change directory to %s, error: %d", attr->curdir, result);
+#endif
             }
 
             // suspend it first
@@ -290,8 +299,8 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     // ok?
     return (tb_process_ref_t)process;
 }
-#else
-tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
+#endif
+static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
 {
     // check
     tb_assert_and_check_return_val(pathname, tb_null);
@@ -379,6 +388,10 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
                     dup2(errfd, STDERR_FILENO);
                     close(errfd);
                 }
+
+                // change the current working directory for child process
+                if (attr->curdir && 0 != chdir(attr->curdir))
+                    _exit(-1);
             }
 
             // get environment 
@@ -462,7 +475,22 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
     // ok?
     return (tb_process_ref_t)process;
 }
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)
+{
+#ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
+#   ifndef TB_CONFIG_POSIX_HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP
+    if (attr && attr->curdir)
+        return tb_process_init_fork(pathname, argv, attr);
+#   endif
+    return tb_process_init_spawn(pathname, argv, attr);
+#else
+    return tb_process_init_fork(pathname, argv, attr);
 #endif
+}
 tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr)
 {
     // check
@@ -628,11 +656,14 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
 #endif
 
 #ifdef TB_CONFIG_POSIX_HAVE_POSIX_SPAWNP
-    // exit spawn attributes
-    posix_spawnattr_destroy(&process->spawn_attr);
+    if (process->spawn)
+    {
+        // exit spawn attributes
+        posix_spawnattr_destroy(&process->spawn_attr);
 
-    // exit spawn action 
-    posix_spawn_file_actions_destroy(&process->spawn_action);
+        // exit spawn action 
+        posix_spawn_file_actions_destroy(&process->spawn_action);
+    }
 #endif
 
     // exit it
