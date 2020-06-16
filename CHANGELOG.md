@@ -6,6 +6,10 @@
 
 * Support *BSD system, e.g. FreeBSD ..
 
+### Changes
+
+* Support to change the current directory for process
+
 ## v1.6.5
 
 ### New features
@@ -205,6 +209,10 @@
 ### 新特性
 
 * 支持*BSD系统，例如：FreeBSD
+
+### 改进
+
+* 创建进程支持修改处理当前工作目录
 
 ## v1.6.5
 
