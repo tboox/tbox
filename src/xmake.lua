@@ -250,42 +250,44 @@ function check_interfaces()
         "expf")
 
     -- add the interfaces for posix
-    check_module_cfuncs("posix", {"poll.h", "sys/socket.h"},         "poll")
-    check_module_cfuncs("posix", {"sys/select.h"},                   "select")
-    check_module_cfuncs("posix", "pthread.h",                        
-        "pthread_mutex_init",
-        "pthread_create", 
-        "pthread_setspecific", 
-        "pthread_getspecific",
-        "pthread_key_create",
-        "pthread_key_delete",
-        "pthread_setaffinity_np") -- need _GNU_SOURCE 
-    check_module_cfuncs("posix", {"sys/socket.h", "fcntl.h"},        "socket")
-    check_module_cfuncs("posix", "dirent.h",                         "opendir")
-    check_module_cfuncs("posix", "dlfcn.h",                          "dlopen")
-    check_module_cfuncs("posix", {"sys/stat.h", "fcntl.h"},          "open", "stat64")
-    check_module_cfuncs("posix", "unistd.h",                         "gethostname")
-    check_module_cfuncs("posix", "ifaddrs.h",                        "getifaddrs")
-    check_module_cfuncs("posix", "semaphore.h",                      "sem_init")
-    check_module_cfuncs("posix", "unistd.h",                         "getpagesize", "sysconf")
-    check_module_cfuncs("posix", "sched.h",                          "sched_yield", "sched_setaffinity") -- need _GNU_SOURCE 
-    check_module_cfuncs("posix", "regex.h",                          "regcomp", "regexec")
-    check_module_cfuncs("posix", "sys/uio.h",                        "readv", "writev", "preadv", "pwritev")
-    check_module_cfuncs("posix", "unistd.h",                         "pread64", "pwrite64")
-    check_module_cfuncs("posix", "unistd.h",                         "fdatasync")
-    check_module_cfuncs("posix", "copyfile.h",                       "copyfile")
-    check_module_cfuncs("posix", "sys/sendfile.h",                   "sendfile")
-    check_module_cfuncs("posix", "sys/epoll.h",                      "epoll_create", "epoll_wait")
-    check_module_cfuncs("posix", "spawn.h",                          "posix_spawnp", "posix_spawn_file_actions_addchdir_np")
-    check_module_cfuncs("posix", "unistd.h",                         "execvp", "execvpe", "fork", "vfork")
-    check_module_cfuncs("posix", "sys/wait.h",                       "waitpid")
-    check_module_cfuncs("posix", "unistd.h",                         "getdtablesize")
-    check_module_cfuncs("posix", "sys/resource.h",                   "getrlimit")
-    check_module_cfuncs("posix", "netdb.h",                          "getaddrinfo", "getnameinfo", "gethostbyname", "gethostbyaddr")
-    check_module_cfuncs("posix", "fcntl.h",                          "fcntl")
-    check_module_cfuncs("posix", "unistd.h",                         "pipe", "pipe2")
-    check_module_cfuncs("posix", "sys/stat.h",                       "mkfifo")
-    check_module_cfuncs("posix", "sys/mman.h",                       "mmap")
+    if not is_plat("windows") then
+        check_module_cfuncs("posix", {"poll.h", "sys/socket.h"},         "poll")
+        check_module_cfuncs("posix", {"sys/select.h"},                   "select")
+        check_module_cfuncs("posix", "pthread.h",                        
+            "pthread_mutex_init",
+            "pthread_create", 
+            "pthread_setspecific", 
+            "pthread_getspecific",
+            "pthread_key_create",
+            "pthread_key_delete",
+            "pthread_setaffinity_np") -- need _GNU_SOURCE 
+        check_module_cfuncs("posix", {"sys/socket.h", "fcntl.h"},        "socket")
+        check_module_cfuncs("posix", "dirent.h",                         "opendir")
+        check_module_cfuncs("posix", "dlfcn.h",                          "dlopen")
+        check_module_cfuncs("posix", {"sys/stat.h", "fcntl.h"},          "open", "stat64")
+        check_module_cfuncs("posix", "unistd.h",                         "gethostname")
+        check_module_cfuncs("posix", "ifaddrs.h",                        "getifaddrs")
+        check_module_cfuncs("posix", "semaphore.h",                      "sem_init")
+        check_module_cfuncs("posix", "unistd.h",                         "getpagesize", "sysconf")
+        check_module_cfuncs("posix", "sched.h",                          "sched_yield", "sched_setaffinity") -- need _GNU_SOURCE 
+        check_module_cfuncs("posix", "regex.h",                          "regcomp", "regexec")
+        check_module_cfuncs("posix", "sys/uio.h",                        "readv", "writev", "preadv", "pwritev")
+        check_module_cfuncs("posix", "unistd.h",                         "pread64", "pwrite64")
+        check_module_cfuncs("posix", "unistd.h",                         "fdatasync")
+        check_module_cfuncs("posix", "copyfile.h",                       "copyfile")
+        check_module_cfuncs("posix", "sys/sendfile.h",                   "sendfile")
+        check_module_cfuncs("posix", "sys/epoll.h",                      "epoll_create", "epoll_wait")
+        check_module_cfuncs("posix", "spawn.h",                          "posix_spawnp", "posix_spawn_file_actions_addchdir_np")
+        check_module_cfuncs("posix", "unistd.h",                         "execvp", "execvpe", "fork", "vfork")
+        check_module_cfuncs("posix", "sys/wait.h",                       "waitpid")
+        check_module_cfuncs("posix", "unistd.h",                         "getdtablesize")
+        check_module_cfuncs("posix", "sys/resource.h",                   "getrlimit")
+        check_module_cfuncs("posix", "netdb.h",                          "getaddrinfo", "getnameinfo", "gethostbyname", "gethostbyaddr")
+        check_module_cfuncs("posix", "fcntl.h",                          "fcntl")
+        check_module_cfuncs("posix", "unistd.h",                         "pipe", "pipe2")
+        check_module_cfuncs("posix", "sys/stat.h",                       "mkfifo")
+        check_module_cfuncs("posix", "sys/mman.h",                       "mmap")
+    end
 
     -- add the interfaces for windows/msvc
     if is_plat("windows") then
@@ -336,13 +338,17 @@ function check_interfaces()
     end
 
     -- add the interfaces for bsd
-    check_module_cfuncs("bsd", {"sys/file.h", "fcntl.h"},            "flock")
+    if not is_plat("windows") then
+        check_module_cfuncs("bsd", {"sys/file.h", "fcntl.h"}, "flock")
+    end
 
     -- add the interfaces for systemv
-    check_module_cfuncs("systemv", {"sys/sem.h", "sys/ipc.h"},       "semget", "semtimedop")
+    if not is_plat("windows") then
+        check_module_cfuncs("systemv", {"sys/sem.h", "sys/ipc.h"}, "semget", "semtimedop")
+    end
 
     -- add the interfaces for valgrind
-    check_module_cfuncs("valgrind", "valgrind/valgrind.h",           "VALGRIND_STACK_REGISTER(0, 0)")
+    check_module_cfuncs("valgrind", "valgrind/valgrind.h",  "VALGRIND_STACK_REGISTER(0, 0)")
 
     -- check __thread keyword
     configvar_check_csnippets("TB_CONFIG_KEYWORD_HAVE__thread", "__thread int a = 0;", {name = "keyword_thread", links = "pthread", languages = stdc})
