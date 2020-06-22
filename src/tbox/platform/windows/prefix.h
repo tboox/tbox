@@ -56,6 +56,30 @@ static __tb_inline__ tb_wchar_t const* tb_path_absolute_w(tb_char_t const* path,
     path = tb_path_absolute(path, data, TB_PATH_MAXN);
     tb_check_return_val(path, tb_null);
 
+    /* we need deal with files with a name longer than 259 characters
+     * @see https://stackoverflow.com/questions/5188527/how-to-deal-with-files-with-a-name-longer-than-259-characters
+     */
+    tb_size_t size = tb_strlen(path);
+    if (size >= MAX_PATH)
+    {
+        tb_char_t* e = data + size - 1;
+        if (e + 5 < data + sizeof(data))
+        {
+            e[5] = '\0';
+            while (e >= data)
+            {
+                e[4] = *e;
+                e--;
+            }
+            data[0] = '\\';
+            data[1] = '\\';
+            data[2] = '?';
+            data[3] = '\\';
+            path = data;
+        }
+        else return tb_null;
+    }
+
     // atow
     return tb_atow(full, path, maxn) != (tb_size_t)-1? full : tb_null;
 }
