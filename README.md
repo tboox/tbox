@@ -1,7 +1,7 @@
 <div align="center">
 
   <a href="https://tboox.io">
-    <img width="200" heigth="200" src="https://tboox.io/assets/img/logo_text.png">
+    <img width="160" heigth="160" src="https://tboox.io/assets/img/logo_text.png">
   </a>  
 
   <div>
@@ -43,14 +43,7 @@ TBOX is a glib-like cross-platform C library that is simple to use yet powerful 
 The project focuses on making C development easier and provides many modules (.e.g stream, coroutine, regex, container, algorithm ...), 
 so that any developer can quickly pick it up and enjoy the productivity boost when developing in C language.
 
-It supports the following platforms:
-
-- Windows
-- Macosx
-- Linux
-- Android
-- iOS
-- *BSD
+It supports the following platforms: Windows, Macosx, Linux, Android, iOS, *BSD and etc.
 
 And it provides many compiling options using [xmake](https://github.com/xmake-io/xmake):
 
@@ -59,12 +52,24 @@ And it provides many compiling options using [xmake](https://github.com/xmake-io
 * Small: Disable all extensional modules and enable space optimization.
 * Micro: compiling micro library (~64K) for the embed system.
 
-If you want to know more, please refer to:
+If you want to know more, please refer to: [Documents](https://tboox.io/#/getting_started), [Github](https://github.com/tboox/tbox) and [Gitee](https://gitee.com/tboox/tbox)
 
-* [HomePage](https://tboox.org)
-* [Documents](https://tboox.io/#/getting_started)
-* [Github](https://github.com/tboox/tbox)
-* [Gitee](https://gitee.com/tboox/tbox)
+## Supporting the project
+
+You can support the project by checking out our sponsor page. 🙏 
+It takes only one click:
+
+<a href="https://tracking.gitads.io/?repo=tbox">
+ <img src="https://images.gitads.io/tbox" alt="GitAds"/> 
+</a>
+
+<br><i>This advert was placed by <a href="https://tracking.gitads.io/?campaign=gitads&repo=tbox&redirect=gitads.io">GitAds</a> </i>
+
+### Sponsor
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. 🙏 [[Become a sponsor](https://tboox.io/#/about/sponsor)]
+
+<a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
 
 ## Features
 

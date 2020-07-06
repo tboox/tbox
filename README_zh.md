@@ -1,7 +1,7 @@
 <div align="center">
 
   <a href="https://tboox.io">
-    <img width="200" heigth="200" src="https://tboox.io/assets/img/logo_text.png">
+    <img width="160" heigth="160" src="https://tboox.io/assets/img/logo_text.png">
   </a>  
 
   <div>
@@ -47,14 +47,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 这个项目的目的，是为了使C开发更加的简单高效。
 
-目前支持的平台有：
-
-- Windows
-- Macosx
-- Linux
-- Android
-- iOS
-- *BSD
+目前支持的平台有：indows, Macosx, Linux, Android, iOS, *BSD等等。
 
 通过[xmake](https://github.com/xmake-io/xmake)支持各种编译模式：
 
@@ -63,12 +56,23 @@ TBOX是一个用c语言实现的跨平台开发库。
 * Small: 最小化编译，默认禁用所有扩展模块，启用编译器最小化优化
 * Micro: 针对嵌入式平台，仅仅编译tbox微内核，仅提供最基础的跨平台接口，生成库仅64K左右（内置轻量libc接口实现）
 
-如果你想了解更多，请参考：
+如果你想了解更多，请参考：[在线文档](https://tboox.io/#/zh-cn/getting_started), [Github](https://github.com/tboox/tbox)以及[Gitee](https://gitee.com/tboox/tbox)
 
-* [项目主页](https://tboox.org/cn)
-* [在线文档](https://tboox.io/#/zh-cn/getting_started)
-* [Github](https://github.com/tboox/tbox)
-* [Gitee](https://gitee.com/tboox/tbox)
+## 支持本项目
+
+你可以通过查看我们的赞助商页面来支持本项目，仅仅只需要点击🙏 ：
+
+<a href="https://tracking.gitads.io/?repo=tbox">
+ <img src="https://images.gitads.io/tbox" alt="GitAds"/> 
+</a>
+
+<br><i>This advert was placed by <a href="https://tracking.gitads.io/?campaign=gitads&repo=tbox&redirect=gitads.io">GitAds</a> </i>
+
+### 赞助支持
+
+通过成为赞助者来支持该项目。您的logo将显示在此处，并带有指向您网站的链接。🙏 [[成为赞助商](https://tboox.io/#/zh-cn/about/sponsor)]
+
+<a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
 
 ## 特性
 
