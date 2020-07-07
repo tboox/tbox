@@ -36,6 +36,20 @@
   <p>A glib-like cross-platform C library</p>
 </div>
 
+## Supporting the project
+
+tbox is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial. 🙏
+
+<a href="https://tracking.gitads.io/?repo=tbox">
+ <img src="https://images.gitads.io/tbox" alt="GitAds"/> 
+</a>
+
+### Sponsor
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. 🙏 [[Become a sponsor](https://tboox.io/#/about/sponsor)]
+
+<a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
+
 ## Introduction ([中文](/README_zh.md))
 
 TBOX is a glib-like cross-platform C library that is simple to use yet powerful in nature.
@@ -53,23 +67,6 @@ And it provides many compiling options using [xmake](https://github.com/xmake-io
 * Micro: compiling micro library (~64K) for the embed system.
 
 If you want to know more, please refer to: [Documents](https://tboox.io/#/getting_started), [Github](https://github.com/tboox/tbox) and [Gitee](https://gitee.com/tboox/tbox)
-
-## Supporting the project
-
-You can support the project by checking out our sponsor page. 🙏 
-It takes only one click:
-
-<a href="https://tracking.gitads.io/?repo=tbox">
- <img src="https://images.gitads.io/tbox" alt="GitAds"/> 
-</a>
-
-<br><i>This advert was placed by <a href="https://tracking.gitads.io/?campaign=gitads&repo=tbox&redirect=gitads.io">GitAds</a> </i>
-
-### Sponsor
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. 🙏 [[Become a sponsor](https://tboox.io/#/about/sponsor)]
-
-<a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
 
 ## Features
 
