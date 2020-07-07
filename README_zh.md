@@ -41,7 +41,7 @@
 
 ## 项目支持
 
-tbox由以下工具赞助； 请通过查看并注册免费试用来帮助支持我们。 🙏
+tbox由以下工具赞助，请通过查看并注册免费试用来帮助支持我们。🙏
 
 <a href="https://tracking.gitads.io/?repo=tbox">
  <img src="https://images.gitads.io/tbox" alt="GitAds"/> 
