@@ -61,7 +61,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 
 这个项目的目的，是为了使C开发更加的简单高效。
 
-目前支持的平台有：indows, Macosx, Linux, Android, iOS, *BSD等等。
+目前支持的平台有: Windows, Macosx, Linux, Android, iOS, *BSD等等。
 
 通过[xmake](https://github.com/xmake-io/xmake)支持各种编译模式：
 
