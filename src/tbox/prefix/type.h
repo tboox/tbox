@@ -134,6 +134,10 @@ typedef unsigned long               tb_ulong_t;
 #endif
 typedef tb_ulong_t                  tb_size_t;
 
+// integer pointer 
+typedef tb_long_t                   tb_ptrdiff_t;
+typedef tb_ulong_t                  tb_uintptr_t;
+
 // double
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 typedef float                       tb_float_t;
