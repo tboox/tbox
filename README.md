@@ -293,7 +293,7 @@ int main(int argc, char** argv)
 * Email：[waruqi@gmail.com](mailto:waruqi@gmail.com)
 * Homepage：[tboox.org](https://tboox.org)
 * Community：[/r/tboox on reddit](https://www.reddit.com/r/tboox/)
-* ChatRoom：[Char on telegram](https://t.me/tbooxorg), [Chat on gitter](https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+* ChatRoom：[Chat on telegram](https://t.me/tbooxorg), [Chat on gitter](https://gitter.im/tboox/tboox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 * QQ Group: 343118190(full), 662147501
 * Wechat Public: tboox-os
 
