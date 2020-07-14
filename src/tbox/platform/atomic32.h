@@ -31,7 +31,7 @@
 #elif defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/atomic32.h"
 #elif defined(TB_COMPILER_IS_GCC) \
-        && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) && __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+        && (defined(__ATOMIC_SEQ_CST) || defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4))
 #   include "compiler/gcc/atomic32.h"
 #endif
 #include "arch/atomic32.h"

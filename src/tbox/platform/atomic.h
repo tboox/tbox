@@ -28,8 +28,7 @@
 #include "prefix.h"
 #if __tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)
 #   include "libc/atomic.h"
-#elif defined(TB_COMPILER_IS_GCC) \
-        && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) && __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+#elif defined(TB_COMPILER_IS_GCC) && defined(__ATOMIC_SEQ_CST)
 #   include "compiler/gcc/atomic.h"
 #elif defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/atomic.h"
