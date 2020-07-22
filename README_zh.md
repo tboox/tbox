@@ -250,7 +250,7 @@ int main(int argc, char** argv)
     tb_trace_i("hello tbox");
 
     // init vector
-    tb_vector_ref_t vector = tb_vector_init(0, tb_element_cstr(tb_true));
+    tb_vector_ref_t vector = tb_vector_init(0, tb_element_str(tb_true));
     if (vector)
     {
         // insert item
