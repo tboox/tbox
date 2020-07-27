@@ -251,6 +251,39 @@
 #   define __tb_thread_local__                              __declspec(thread)
 #endif
 
+/* c function overloadable
+ *
+ * @code
+    static __tb_inline__ tb_void_t test(tb_int_t a) __tb_overloadable__
+    {
+        tb_trace_i("test1: %d", a);
+    }
+    static __tb_inline__ tb_void_t test(tb_int_t a, tb_int_t b) __tb_overloadable__
+    {
+        tb_trace_i("test2: %d %d", a, b);
+    }
+ * @endcode
+ *
+ * If the compiler does not support __tb_overloadable__, we can use the following code to implement function overload.
+ *
+ * @code
+    #define test_n(a, b, ...) test_impl(a, b)
+    #define test(a, args ...) test_n(a, ##args, 0, 0, 0)
+    static __tb_inline__ tb_void_t test_impl(tb_int_t a, tb_int_t b) 
+    {
+        tb_trace_i("test: %d %d", a, b);
+    }
+
+    test(1);
+    test(1, 2);
+ * @endcode
+ */
+#if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_CLANG)
+#   define __tb_overloadable__                              __attribute__((overloadable))
+#else
+#   define __tb_overloadable__
+#endif
+
 /*! the type reference keyword for defining tb_xxxx_ref_t
  *
  * typedef __tb_typeref__(xxxx);
