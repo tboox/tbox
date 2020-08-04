@@ -162,7 +162,7 @@ tb_bool_t tb_ipaddr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, tb_uint16
     tb_assert_and_check_return_val(ipaddr, tb_false);
 
     // save port
-    tb_ipaddr_port_set(ipaddr, port);
+    tb_ipaddr_port_set(ipaddr, family != TB_IPADDR_FAMILY_UNIX? port : 0);
 
     // save ip address and family
     return tb_ipaddr_ip_cstr_set(ipaddr, cstr, family);
@@ -687,15 +687,13 @@ tb_uint16_t tb_ipaddr_port(tb_ipaddr_ref_t ipaddr)
     // check
     tb_assert_and_check_return_val(ipaddr, 0);
 
-    // the port
-    return ipaddr->family == TB_IPADDR_FAMILY_UNIX ? 0 : ipaddr->port;
+    // get port
+    return ipaddr->port;
 }
 tb_void_t tb_ipaddr_port_set(tb_ipaddr_ref_t ipaddr, tb_uint16_t port)
 {
     // check
     tb_assert_and_check_return(ipaddr);
-
-    if (ipaddr->family == TB_IPADDR_FAMILY_UNIX) return;
 
     // set port
     ipaddr->port = port;
