@@ -38,14 +38,6 @@
 
 ## Supporting the project
 
-tbox is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial. 🙏
-
-<a href="https://tracking.gitads.io/?repo=tbox">
- <img src="https://images.gitads.io/tbox" alt="GitAds" width="650px"/> 
-</a>
-
-### Sponsor
-
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. 🙏 [[Become a sponsor](https://tboox.io/#/about/sponsor)]
 
 <a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
