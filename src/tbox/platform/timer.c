@@ -657,7 +657,7 @@ tb_void_t tb_timer_task_post_after(tb_timer_ref_t self, tb_hize_t after, tb_size
 tb_void_t tb_timer_task_exit(tb_timer_ref_t self, tb_timer_task_ref_t task)
 {
     // check
-    tb_timer_t*             timer = (tb_timer_t*)self;
+    tb_timer_t*        timer = (tb_timer_t*)self;
     tb_timer_task_t*   timer_task = (tb_timer_task_t*)task;
     tb_assert_and_check_return(timer && timer->pool && timer_task);
 
@@ -697,7 +697,8 @@ tb_void_t tb_timer_task_kill(tb_timer_ref_t self, tb_timer_task_ref_t task)
     // enter
     tb_spinlock_enter(&timer->lock);
 
-    // done
+    // do kill
+    tb_event_ref_t event = tb_null;
     do
     {
         // expired or removed?
@@ -722,8 +723,14 @@ tb_void_t tb_timer_task_kill(tb_timer_ref_t self, tb_timer_task_ref_t task)
         // re-add timer_task
         tb_heap_put(timer->heap, timer_task);
 
+        // the event
+        event = timer->event;
+
     } while (0);
 
     // leave
     tb_spinlock_leave(&timer->lock);
+
+    // post event to trigger this killed task
+    if (event) tb_event_post(event);
 }
