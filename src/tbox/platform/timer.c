@@ -153,7 +153,7 @@ static tb_handle_t tb_timer_instance_init(tb_cpointer_t* ppriv)
     do
     {
         // init timer
-        timer = tb_timer_init(0, tb_true);
+        timer = tb_timer_init(0, tb_false);
         tb_assert_and_check_break(timer);
 
         // init loop
