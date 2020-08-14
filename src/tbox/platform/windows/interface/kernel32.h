@@ -119,7 +119,9 @@ typedef BOOL (WINAPI* tb_kernel32_SetInformationJobObject_t)(HANDLE hJob, JOBOBJ
 typedef DWORD (WINAPI* tb_kernel32_GetActiveProcessorCount_t)(WORD GroupNumber);
 
 // the GetLogicalProcessorInformationEx func type
+#if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
 typedef BOOL (WINAPI* tb_kernel32_GetLogicalProcessorInformationEx_t)(LOGICAL_PROCESSOR_RELATIONSHIP RelationshipType, PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX Buffer, PDWORD ReturnedLength);
+#endif
 
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
@@ -188,7 +190,9 @@ typedef struct __tb_kernel32_t
     tb_kernel32_GetActiveProcessorCount_t               GetActiveProcessorCount;
 
     // GetLogicalProcessorInformationEx
+#if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
     tb_kernel32_GetLogicalProcessorInformationEx_t      GetLogicalProcessorInformationEx;
+#endif
 
 }tb_kernel32_t, *tb_kernel32_ref_t;
 

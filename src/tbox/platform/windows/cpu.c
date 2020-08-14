@@ -40,6 +40,7 @@ tb_size_t tb_cpu_count()
          *
          * @see https://stackoverflow.com/a/31209344/21475 and https://github.com/ninja-build/ninja/pull/1674
          */
+#if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
         if (tb_kernel32()->GetLogicalProcessorInformationEx)
         {
             DWORD len = 0;
@@ -66,6 +67,7 @@ tb_size_t tb_cpu_count()
                 }
             }
         }
+#endif
         
 #ifdef ALL_PROCESSOR_GROUPS
         // the mingw toolchain maybe has not this defination 
