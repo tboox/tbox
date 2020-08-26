@@ -95,6 +95,8 @@
 #   define TB_COMPILER_STRING                       "tiny c"
 #   if (__TINYC__ == 926)
 #       define TB_COMPILER_VERSION_STRING           "tiny c 0.9.26"
+#   elif (__TINYC__ == 927)
+#       define TB_COMPILER_VERSION_STRING           "tiny c 0.9.27"
 #   else
 #       error Unknown Tiny C Compiler Version
 #   endif

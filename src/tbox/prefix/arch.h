@@ -164,7 +164,7 @@
 #   if defined(TCC_TARGET_I386)
 #       define TB_ARCH_x86
 #       define TB_ARCH_STRING               "i386"
-#   elif defined(TCC_TARGET_X86_64)
+#   elif defined(__x86_64__) || defined(TCC_TARGET_X86_64)
 #       define TB_ARCH_x64
 #       define TB_ARCH_STRING               "x86_64"
 #   elif defined(TCC_TARGET_ARM)
