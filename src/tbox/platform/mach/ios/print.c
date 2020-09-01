@@ -26,7 +26,7 @@
 #include "../../thread.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <asl.h>
+#include <os/log.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -37,7 +37,7 @@ tb_void_t tb_print(tb_char_t const* string)
     tb_check_return(string);
 
     // print to the ios device log
-    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
+    os_log(OS_LOG_DEFAULT, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
 
     // print to the stdout
     fputs(string, stdout);
@@ -48,7 +48,7 @@ tb_void_t tb_printl(tb_char_t const* string)
     tb_check_return(string);
 
     // print to the ios device log
-    asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
+    os_log(OS_LOG_DEFAULT, "[%08x]: %s", (tb_uint32_t)tb_thread_self(), string);
 
     // print string to the stdout
     fputs(string, stdout);
