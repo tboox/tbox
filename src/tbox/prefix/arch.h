@@ -159,7 +159,23 @@
     || defined(_mips) \
     || defined(__mips__)
 #   define TB_ARCH_MIPS
-#   define TB_ARCH_STRING                   "mips"
+#   if defined(_MIPSEB)
+#       if (_MIPS_SIM==_ABIO32)
+#           define TB_ARCH_STRING           "mips"
+#       elif (_MIPS_SIM==_ABIN32)
+#           define TB_ARCH_STRING           "mipsin32"
+#       elif (_MIPS_SIM==_ABI64)
+#           define TB_ARCH_STRING           "mips64"
+#       endif
+#   elif defined(_MIPSEL)
+#       if (_MIPS_SIM==_ABIO32)
+#           define TB_ARCH_STRING           "mipsel"
+#       elif (_MIPS_SIM==_ABIN32)
+#           define TB_ARCH_STRING           "mipsin32el"
+#       elif (_MIPS_SIM==_ABI64)
+#           define TB_ARCH_STRING           "mips64el"
+#       endif
+#   endif
 #elif defined(TB_COMPILER_IS_TINYC)
 #   if defined(TCC_TARGET_I386)
 #       define TB_ARCH_x86
