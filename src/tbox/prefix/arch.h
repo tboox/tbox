@@ -163,7 +163,7 @@
 #       if (_MIPS_SIM==_ABIO32)
 #           define TB_ARCH_STRING           "mips"
 #       elif (_MIPS_SIM==_ABIN32)
-#           define TB_ARCH_STRING           "mipsin32"
+#           define TB_ARCH_STRING           "mipsn32"
 #       elif (_MIPS_SIM==_ABI64)
 #           define TB_ARCH_STRING           "mips64"
 #       endif
@@ -171,7 +171,7 @@
 #       if (_MIPS_SIM==_ABIO32)
 #           define TB_ARCH_STRING           "mipsel"
 #       elif (_MIPS_SIM==_ABIN32)
-#           define TB_ARCH_STRING           "mipsin32el"
+#           define TB_ARCH_STRING           "mipsn32el"
 #       elif (_MIPS_SIM==_ABI64)
 #           define TB_ARCH_STRING           "mips64el"
 #       endif
