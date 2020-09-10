@@ -160,19 +160,19 @@
     || defined(__mips__)
 #   define TB_ARCH_MIPS
 #   if defined(_MIPSEB)
-#       if (_MIPS_SIM==_ABIO32)
+#       if (_MIPS_SIM == _ABIO32)
 #           define TB_ARCH_STRING           "mips"
-#       elif (_MIPS_SIM==_ABIN32)
+#       elif (_MIPS_SIM == _ABIN32)
 #           define TB_ARCH_STRING           "mipsn32"
-#       elif (_MIPS_SIM==_ABI64)
+#       elif (_MIPS_SIM == _ABI64)
 #           define TB_ARCH_STRING           "mips64"
 #       endif
 #   elif defined(_MIPSEL)
-#       if (_MIPS_SIM==_ABIO32)
+#       if (_MIPS_SIM == _ABIO32)
 #           define TB_ARCH_STRING           "mipsel"
-#       elif (_MIPS_SIM==_ABIN32)
+#       elif (_MIPS_SIM == _ABIN32)
 #           define TB_ARCH_STRING           "mipsn32el"
-#       elif (_MIPS_SIM==_ABI64)
+#       elif (_MIPS_SIM == _ABI64)
 #           define TB_ARCH_STRING           "mips64el"
 #       endif
 #   endif
