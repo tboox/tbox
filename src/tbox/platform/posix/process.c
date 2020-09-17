@@ -233,7 +233,7 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
                 tb_assertf_pass_and_check_break(!result, "cannot change directory to %s, error: %d", attr->curdir, result);
             }
 #else
-            tb_assertf(attr->curdir, "posix_spawn do not suuport chdir!");
+            tb_assertf(!attr->curdir, "posix_spawn do not support chdir!");
 #endif
 
             // suspend it first
