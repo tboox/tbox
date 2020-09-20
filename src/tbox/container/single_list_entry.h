@@ -382,8 +382,8 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_safe
     // check
     tb_assert(list && list->size && prev);
 
-    // update last
-    if (prev->next == list->last) list->last = next;
+    // update last, prev -> last -> next (null)
+    if (prev->next == list->last) list->last = prev;
 
     // remove entries
     prev->next = next;
