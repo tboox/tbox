@@ -533,13 +533,13 @@ static __tb_inline__ tb_void_t              tb_list_entry_replace_last(tb_list_e
     tb_list_entry_replace(list, list->prev, entry);
 }
 
-/*! remove the entry safely
+/*! remove the entry (private interface)
  *
  * @param list                              the list
  * @param prev                              the prev entry
  * @param next                              the next entry
  */
-static __tb_inline__ tb_void_t              tb_list_entry_remove_safe(tb_list_entry_head_ref_t list, tb_list_entry_ref_t prev, tb_list_entry_ref_t next)
+static __tb_inline__ tb_void_t              tb_list_entry_remove_(tb_list_entry_head_ref_t list, tb_list_entry_ref_t prev, tb_list_entry_ref_t next)
 {
     // check
     tb_assert(list && list->size && prev && next);
@@ -566,7 +566,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove(tb_list_entry_h
     tb_assert(entry);
 
     // remove it
-    tb_list_entry_remove_safe(list, entry->prev, entry->next);
+    tb_list_entry_remove_(list, entry->prev, entry->next);
 }
 
 /*! remove the next entry
@@ -580,7 +580,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_next(tb_list_en
     tb_assert(prev && prev->next);
 
     // remove it
-    tb_list_entry_remove_safe(list, prev, prev->next->next);
+    tb_list_entry_remove_(list, prev, prev->next->next);
 }
 
 /*! remove the prev entry
@@ -594,7 +594,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_prev(tb_list_en
     tb_assert(next && next->prev);
 
     // remove it
-    tb_list_entry_remove_safe(list, next->prev->prev, next);
+    tb_list_entry_remove_(list, next->prev->prev, next);
 }
 
 /*! remove the head entry
@@ -607,7 +607,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_head(tb_list_en
     tb_assert(list && list->next);
 
     // remove it
-    tb_list_entry_remove_safe(list, (tb_list_entry_ref_t)list, list->next->next);
+    tb_list_entry_remove_(list, (tb_list_entry_ref_t)list, list->next->next);
 }
 
 /*! remove the last entry
@@ -620,7 +620,7 @@ static __tb_inline__ tb_void_t              tb_list_entry_remove_last(tb_list_en
     tb_assert(list && list->prev);
 
     // remove it
-    tb_list_entry_remove_safe(list, list->prev->prev, (tb_list_entry_ref_t)list);
+    tb_list_entry_remove_(list, list->prev->prev, (tb_list_entry_ref_t)list);
 }
 
 /*! moveto the next entry

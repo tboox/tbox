@@ -371,13 +371,13 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_replace_hea
     tb_single_list_entry_replace_next(list, (tb_single_list_entry_ref_t)list, entry);
 }
 
-/*! remove the entry safely
+/*! remove the entry (private interface)
  *
  * @param list                                  the list
  * @param prev                                  the prev entry
  * @param next                                  the next entry
  */
-static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_safe(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t prev, tb_single_list_entry_ref_t next)
+static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_(tb_single_list_entry_head_ref_t list, tb_single_list_entry_ref_t prev, tb_single_list_entry_ref_t next)
 {
     // check
     tb_assert(list && list->size && prev);
@@ -403,7 +403,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_next
     tb_assert(prev && prev->next);
 
     // remove it
-    tb_single_list_entry_remove_safe(list, prev, prev->next->next);
+    tb_single_list_entry_remove_(list, prev, prev->next->next);
 }
 
 /*! remove the head entry
@@ -416,7 +416,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_remove_head
     tb_assert(list->next);
 
     // remove it
-    tb_single_list_entry_remove_safe(list, (tb_single_list_entry_ref_t)list, list->next->next);
+    tb_single_list_entry_remove_(list, (tb_single_list_entry_ref_t)list, list->next->next);
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
