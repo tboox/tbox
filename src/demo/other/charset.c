@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
@@ -28,7 +28,7 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
                 // conv
                 osize = tb_charset_conv_data(tb_charset_type(argv[3]), tb_charset_type(argv[4]), idata, (tb_size_t)isize, odata, osize);
                 tb_trace_i("conv: %ld bytes", osize);
-                
+
                 // save
                 if (osize > 0) tb_stream_bwrit(ostream, odata, osize);
             }
@@ -37,7 +37,7 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
             if (idata) tb_free(idata);
             if (odata) tb_free(odata);
         }
-    
+
         // exit stream
         tb_stream_exit(istream);
         tb_stream_exit(ostream);

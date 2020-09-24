@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 
 #ifdef TB_CONFIG_LIBC_HAVE_STRCASESTR
@@ -50,15 +50,15 @@ tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
     __tb_register__ tb_char_t const* p = s2;
 
     // done
-    do 
+    do
     {
         if (!*p) return (tb_char_t* )s1;
-        if ((*p == *s)  || (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s)))) 
+        if ((*p == *s)  || (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s))))
         {
             ++p;
             ++s;
-        } 
-        else 
+        }
+        else
         {
             p = s2;
             if (!*s) return tb_null;

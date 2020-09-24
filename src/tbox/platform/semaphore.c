@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@
 #elif defined(TB_CONFIG_SYSTEMV_HAVE_SEMGET) \
     && defined(TB_CONFIG_SYSTEMV_HAVE_SEMTIMEDOP)
 #   include "systemv/semaphore.c"
-#else 
+#else
 tb_semaphore_ref_t tb_semaphore_init(tb_size_t value)
 {
     // make
@@ -92,14 +92,14 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t self, tb_long_t timeout)
     tb_long_t   r = 0;
     tb_hong_t   base = tb_cache_time_spak();
 
-    // wait 
+    // wait
     while (1)
     {
         // get post
         tb_long_t post = (tb_long_t)tb_atomic32_get(semaphore);
 
         // has signal?
-        if (post > 0) 
+        if (post > 0)
         {
             // semaphore--
             tb_atomic32_fetch_and_sub(semaphore, 1);

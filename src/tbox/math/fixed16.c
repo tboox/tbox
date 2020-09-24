@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -32,7 +32,7 @@
 
 #if 1
 static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[30] =
-{ 
+{
         0x20000000  // 45.000000
     ,   0x12e4051d  // 26.565051
     ,   0x9fb385b   // 14.036243
@@ -67,7 +67,7 @@ static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[30] =
 
 #else
 static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[16] =
-{ 
+{
         0x1fff9122  // 45.000000
     ,   0x12e3bf5e  // 26.565051
     ,   0x9fafb14   // 14.036243
@@ -94,7 +94,7 @@ static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[16] =
  */
 
 // |angle| < 90 degrees
-static tb_void_t tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t z0) 
+static tb_void_t tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t z0)
 {
     tb_int_t i = 0;
     tb_fixed16_t atan2i = 0;
@@ -105,7 +105,7 @@ static tb_void_t tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, 
     tb_fixed30_t yi = 0;
     tb_fixed16_t const* patan2i = tb_fixed16_cordic_atan2i_table;
 
-    do 
+    do
     {
         xi = x >> i;
         yi = y >> i;
@@ -120,13 +120,13 @@ static tb_void_t tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, 
         //tb_printf(",\t0x%x\t// %lf\n", atan2i, atan(1. / (1 << i)) * 180 / TB_DOUBLE_PI);
 #endif
 
-        if (z >= 0) 
+        if (z >= 0)
         {
             x -= yi;
             y += xi;
             z -= atan2i;
         }
-        else 
+        else
         {
             x += yi;
             y -= xi;
@@ -151,20 +151,20 @@ static tb_fixed16_t tb_fixed16_cordic_vector_atan2(tb_fixed16_t y0, tb_fixed16_t
     tb_fixed16_t yi = 0;
     tb_fixed16_t const* patan2i = tb_fixed16_cordic_atan2i_table;
 
-    do 
+    do
     {
         xi = x >> i;
         yi = y >> i;
 
         atan2i = *patan2i++;
 
-        if (y < 0) 
+        if (y < 0)
         {
             x -= yi;
             y += xi;
             z -= atan2i;
         }
-        else 
+        else
         {
             x += yi;
             y -= xi;
@@ -188,20 +188,20 @@ static tb_fixed16_t tb_fixed16_cordic_vector_asin(tb_fixed16_t m)
     tb_fixed16_t yi = 0;
     tb_fixed16_t const* patan2i = tb_fixed16_cordic_atan2i_table;
 
-    do 
+    do
     {
         xi = x >> i;
         yi = y >> i;
 
         atan2i = *patan2i++;
 
-        if (y < m) 
+        if (y < m)
         {
             x -= yi;
             y += xi;
             z -= atan2i;
         }
-        else 
+        else
         {
             x += yi;
             y -= xi;
@@ -234,10 +234,10 @@ tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
     // normalize
     tb_int32_t cl0 = (tb_int32_t)tb_bits_cl0_u32_be(x);
     x = x << cl0 >> 16;
- 
-    // compute 1 / x approximation (0.5 <= x < 1.0) 
+
+    // compute 1 / x approximation (0.5 <= x < 1.0)
     // (2.90625 (~2.914) - 2 * x) >> 1
-    tb_uint32_t r = 0x17400 - x;      
+    tb_uint32_t r = 0x17400 - x;
 
     // newton-raphson iteration:
     // x = r * (2 - x * r) = ((r / 2) * (1 - x * r / 2)) * 4
@@ -259,7 +259,7 @@ tb_void_t tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t*
      * 180: 0x80000000
      * 270: 0xc0000000
      */
-    tb_fixed16_t    ang = x * 0x28be; 
+    tb_fixed16_t    ang = x * 0x28be;
 
     /* quadrant
      *
@@ -278,7 +278,7 @@ tb_void_t tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t*
      */
     tb_int_t        quadrant = ang >> 30;
     quadrant++;
-    
+
     /* quadrant == 2, 3, |angle| < 90
      *
      * 100 => -100 + 180 => 80
@@ -288,15 +288,15 @@ tb_void_t tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t*
 
     // rotation
     tb_fixed16_cordic_rotation(&cos, &sin, ang);
-    
+
     // result
-    if (s) 
+    if (s)
     {
         // return sin
         *s = tb_fixed30_to_fixed16(sin);
     }
-    if (c) 
-    {   
+    if (c)
+    {
         // quadrant == 2, 3
         if (quadrant & 0x2) cos = -cos;
 
@@ -318,7 +318,7 @@ tb_fixed16_t tb_fixed16_atan2_int32(tb_fixed16_t y, tb_fixed16_t x)
     tb_fixed16_t z = tb_fixed16_cordic_vector_atan2(y, x);
 
     // for quadrant: 2, 3
-    if (xs) 
+    if (xs)
     {
         tb_int32_t zs = tb_int32_get_sign(z);
         if (y == 0) zs = 0;

@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the client type
 typedef struct __tb_demo_client_t
@@ -26,7 +26,7 @@ typedef struct __tb_demo_client_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref_t poller)
 {
     if (client)
@@ -47,7 +47,7 @@ static tb_long_t tb_demo_session_read(tb_demo_client_ref_t client)
     while (1)
     {
         tb_long_t real = tb_pipe_file_read(client->pipe, client->data, sizeof(client->data));
-        if (real > 0) 
+        if (real > 0)
         {
             client->size += real;
             client->wait = tb_false;
@@ -62,13 +62,13 @@ static tb_long_t tb_demo_session_read(tb_demo_client_ref_t client)
     tb_trace_d("[%p]: read %llu", client->pipe, client->size);
     return 0;
 }
-static tb_int_t tb_demo_session_writ(tb_cpointer_t priv) 
+static tb_int_t tb_demo_session_writ(tb_cpointer_t priv)
 {
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t)priv;
     tb_byte_t data[8192 * 16];
     tb_size_t count = 100;
     tb_hize_t total = 0;
-    while (count--) 
+    while (count--)
     {
         total += sizeof(data);
         tb_trace_d("[%p]: write %llu", pipe, total);
@@ -126,7 +126,7 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_r
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_poller_pipe_main(tb_int_t argc, tb_char_t** argv)
 {
     // start file client

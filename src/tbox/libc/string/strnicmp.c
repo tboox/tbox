@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #ifdef TB_CONFIG_LIBC_HAVE_STRNCASECMP
 static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
@@ -55,7 +55,7 @@ static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_s
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {

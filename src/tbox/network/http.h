@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -138,10 +138,10 @@ typedef enum __tb_http_option_e
 ,   TB_HTTP_OPTION_GET_HEAD             = TB_HTTP_OPTION_CODE_GET(6)
 ,   TB_HTTP_OPTION_GET_RANGE            = TB_HTTP_OPTION_CODE_GET(7)
 ,   TB_HTTP_OPTION_GET_METHOD           = TB_HTTP_OPTION_CODE_GET(8)
-,   TB_HTTP_OPTION_GET_VERSION          = TB_HTTP_OPTION_CODE_GET(9) 
+,   TB_HTTP_OPTION_GET_VERSION          = TB_HTTP_OPTION_CODE_GET(9)
 ,   TB_HTTP_OPTION_GET_TIMEOUT          = TB_HTTP_OPTION_CODE_GET(10)
 ,   TB_HTTP_OPTION_GET_COOKIES          = TB_HTTP_OPTION_CODE_GET(11)
-,   TB_HTTP_OPTION_GET_REDIRECT         = TB_HTTP_OPTION_CODE_GET(12) 
+,   TB_HTTP_OPTION_GET_REDIRECT         = TB_HTTP_OPTION_CODE_GET(12)
 ,   TB_HTTP_OPTION_GET_HEAD_FUNC        = TB_HTTP_OPTION_CODE_GET(13)
 ,   TB_HTTP_OPTION_GET_HEAD_PRIV        = TB_HTTP_OPTION_CODE_GET(14)
 ,   TB_HTTP_OPTION_GET_AUTO_UNZIP       = TB_HTTP_OPTION_CODE_GET(15)
@@ -312,28 +312,28 @@ typedef struct __tb_http_status_t
 
 /*! init http
  *
- * return               the http 
+ * return               the http
  */
 tb_http_ref_t           tb_http_init(tb_noarg_t);
 
 /*! exit http
  *
- * @param http          the http 
+ * @param http          the http
  */
 tb_void_t               tb_http_exit(tb_http_ref_t http);
 
 /*! kill http
  *
- * @param http          the http 
+ * @param http          the http
  */
 tb_void_t               tb_http_kill(tb_http_ref_t http);
 
-/*! wait the http 
+/*! wait the http
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aiop
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param http          the http 
+ * @param http          the http
  * @param events          the events
  * @param timeout       the timeout value, return immediately if 0, infinity if -1
  *
@@ -343,7 +343,7 @@ tb_long_t               tb_http_wait(tb_http_ref_t http, tb_size_t events, tb_lo
 
 /*! open the http
  *
- * @param http          the http 
+ * @param http          the http
  *
  * @return              tb_true or tb_false
  */
@@ -351,7 +351,7 @@ tb_bool_t               tb_http_open(tb_http_ref_t http);
 
 /*! close http
  *
- * @param http          the http 
+ * @param http          the http
  *
  * @return              tb_true or tb_false
  */
@@ -359,7 +359,7 @@ tb_bool_t               tb_http_close(tb_http_ref_t http);
 
 /*! seek http
  *
- * @param http          the http 
+ * @param http          the http
  * @param offset        the offset
  *
  * @return              tb_true or tb_false
@@ -368,7 +368,7 @@ tb_bool_t               tb_http_seek(tb_http_ref_t http, tb_hize_t offset);
 
 /*! read data, non-blocking
  *
- * @param http          the http 
+ * @param http          the http
  * @param data          the data
  * @param size          the size
  *
@@ -378,7 +378,7 @@ tb_long_t               tb_http_read(tb_http_ref_t http, tb_byte_t* data, tb_siz
 
 /*! read data, blocking
  *
- * @param http          the http 
+ * @param http          the http
  * @param data          the data
  * @param size          the size
  *
@@ -388,7 +388,7 @@ tb_bool_t               tb_http_bread(tb_http_ref_t http, tb_byte_t* data, tb_si
 
 /*! ctrl the http option
  *
- * @param http          the http 
+ * @param http          the http
  * @param option        the ctrl option
  *
  * @return              tb_true or tb_false
@@ -397,7 +397,7 @@ tb_bool_t               tb_http_ctrl(tb_http_ref_t http, tb_size_t option, ...);
 
 /*! the http status
  *
- * @param http          the http 
+ * @param http          the http
  *
  * @return              the http status
  */

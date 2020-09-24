@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! the global static allocator 
+/*! the global static allocator
  *
  * @note
  * this allocator may be called before tb_init()
@@ -44,7 +44,7 @@ __tb_extern_c_enter__
  * @param data          the allocator data
  * @param size          the allocator size
  *
- * @return              the allocator 
+ * @return              the allocator
  */
 tb_allocator_ref_t      tb_static_allocator(tb_byte_t* data, tb_size_t size);
 
@@ -54,24 +54,24 @@ tb_allocator_ref_t      tb_static_allocator(tb_byte_t* data, tb_size_t size);
  *
  *  -----------------------------------------------------
  * |                         data                        |
- *  ----------------------------------------------------- 
- *                             |           
- *  ----------------------------------------------------- 
+ *  -----------------------------------------------------
+ *                             |
+ *  -----------------------------------------------------
  * |                    static allocator                 |
- *  ----------------------------------------------------- 
+ *  -----------------------------------------------------
  *
  * </pre>
- * 
+ *
  * @param data          the allocator data
  * @param size          the allocator size
  *
- * @return              the allocator 
+ * @return              the allocator
  */
 tb_allocator_ref_t      tb_static_allocator_init(tb_byte_t* data, tb_size_t size);
 
 /*! exit the allocator
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  */
 tb_void_t               tb_static_allocator_exit(tb_allocator_ref_t allocator);
 

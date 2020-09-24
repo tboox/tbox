@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -154,7 +154,7 @@ tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_off
     list->copy = copy;
 
     // init operation
-    static tb_iterator_op_t op = 
+    static tb_iterator_op_t op =
     {
         tb_list_entry_itor_size
     ,   tb_list_entry_itor_head
@@ -168,7 +168,7 @@ tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_off
     ,   tb_list_entry_itor_remove
     ,   tb_list_entry_itor_nremove
     };
- 
+
     // init iterator
     list->itor.priv = tb_null;
     list->itor.step = entry_size;

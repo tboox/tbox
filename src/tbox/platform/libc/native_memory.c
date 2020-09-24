@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -47,7 +47,7 @@ tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 {
     // check
-    tb_check_return_val(size, tb_null); 
+    tb_check_return_val(size, tb_null);
 
     // malloc0 it
     return calloc(1, size);
@@ -55,7 +55,7 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_null); 
+    tb_check_return_val(item && size, tb_null);
 
     // nalloc it
     return malloc(item * size);
@@ -71,7 +71,7 @@ tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
     // no size? free it
-    if (!size) 
+    if (!size)
     {
         free(data);
         return tb_null;

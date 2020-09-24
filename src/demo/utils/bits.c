@@ -715,7 +715,7 @@ static tb_void_t tb_test_bits_fb1_u64_le(tb_uint64_t x)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1
@@ -728,7 +728,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("");
     tb_test_bits_ubits32(0x87654321);
     tb_test_bits_ubits32(0x12345678);
-    
+
     tb_trace_i("");
     tb_test_bits_sbits32(0x87654321);
     tb_test_bits_sbits32(0x12345678);

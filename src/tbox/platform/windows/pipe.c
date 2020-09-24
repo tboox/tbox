@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -65,7 +65,7 @@ typedef struct __tb_pipe_file_t
     tb_bool_t           connected;
 
     // the overlap
-    OVERLAPPED          overlap; 
+    OVERLAPPED          overlap;
 
 }tb_pipe_file_t;
 
@@ -102,7 +102,7 @@ static tb_long_t tb_pipe_file_connect_direct(tb_pipe_file_ref_t self)
     // connect pipe
     BOOL ok = ConnectNamedPipe(file->pipe, &file->overlap);
     if (ok) return 1;
-    else 
+    else
     {
         if (GetLastError() == ERROR_IO_PENDING)
         {
@@ -134,7 +134,7 @@ static tb_long_t tb_pipe_file_wait_direct(tb_pipe_file_ref_t self, tb_size_t eve
             file->connecting = tb_false;
         }
         break;
-    case WAIT_TIMEOUT: // timeout 
+    case WAIT_TIMEOUT: // timeout
         ok = 0;
         break;
     case WAIT_FAILED: // failed
@@ -158,7 +158,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
     // check
     tb_assert_and_check_return_val(name, tb_null);
     tb_assert_and_check_return_val(mode == TB_FILE_MODE_WO || mode == TB_FILE_MODE_RO, tb_null);
-    
+
     tb_bool_t       ok = tb_false;
     tb_pipe_file_t* file = tb_null;
     do
@@ -173,14 +173,14 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         tb_assert_and_check_break(pipename);
 
         // save the pipe name if be named pipe
-        if (!tb_strstr(name, TB_PIPE_ANONYMOUS_PREFIX)) 
+        if (!tb_strstr(name, TB_PIPE_ANONYMOUS_PREFIX))
         {
             file->name = tb_strdup(name);
             tb_assert_and_check_break(file->name);
         }
 
-        // set pipe handles are not inherited 
-        SECURITY_ATTRIBUTES sattr; 
+        // set pipe handles are not inherited
+        SECURITY_ATTRIBUTES sattr;
         sattr.nLength              = sizeof(SECURITY_ATTRIBUTES);
         sattr.bInheritHandle       = FALSE;
         sattr.lpSecurityDescriptor = tb_null;
@@ -206,7 +206,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
 
     } while (0);
 
-    // failed? 
+    // failed?
     if (!ok)
     {
         // exit the pipe file
@@ -262,7 +262,7 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
         tb_assert_and_check_break(pair[0]);
 
         // wait the connected result
-        do 
+        do
         {
             tb_long_t wait = tb_pipe_file_wait_direct(pair[1], TB_PIPE_EVENT_CONN, -1);
             tb_assert_and_check_break(wait > 0);
@@ -325,7 +325,7 @@ tb_bool_t tb_pipe_file_exit(tb_pipe_file_ref_t self)
     if (file->connected && file->pipe) DisconnectNamedPipe(file->pipe);
 
     // close pipe
-    if (file->pipe) 
+    if (file->pipe)
     {
         if (!CloseHandle(file->pipe) && GetLastError() != ERROR_INVALID_HANDLE)
             return tb_false;
@@ -375,9 +375,9 @@ tb_long_t tb_pipe_file_read(tb_pipe_file_ref_t self, tb_byte_t* data, tb_size_t 
     else
     {
         // pending?
-        if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+        if (!ok && (GetLastError() == ERROR_IO_PENDING))
             return 0;
-        else 
+        else
         {
             file->data = tb_null;
             file->real = 0;
@@ -420,9 +420,9 @@ tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t self, tb_byte_t const* data, tb_
     else
     {
         // pending?
-        if (!ok && (GetLastError() == ERROR_IO_PENDING)) 
+        if (!ok && (GetLastError() == ERROR_IO_PENDING))
             return 0;
-        else 
+        else
         {
             file->data = tb_null;
             file->real = 0;
@@ -435,7 +435,7 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t self, tb_size_t events, tb_long_t
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine
-    if (tb_coroutine_self()) 
+    if (tb_coroutine_self())
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_PIPE;

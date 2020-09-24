@@ -5,14 +5,14 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // port
 #define TB_DEMO_PORT        (9090)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the client type
 typedef struct __tb_demo_client_t
@@ -20,7 +20,7 @@ typedef struct __tb_demo_client_t
     // the socket
     tb_socket_ref_t     sock;
 
-    // the file 
+    // the file
     tb_file_ref_t       file;
 
     // the file size
@@ -36,14 +36,14 @@ typedef struct __tb_demo_client_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
+ */
 
 // the file path
 static tb_char_t    g_filepath[TB_PATH_MAXN];
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref_t poller)
 {
     if (client)
@@ -73,7 +73,7 @@ static tb_long_t tb_demo_session_send(tb_demo_client_ref_t client)
     while (offset < size)
     {
         tb_hong_t real = tb_socket_sendf(client->sock, client->file, offset, size - offset);
-        if (real > 0) 
+        if (real > 0)
         {
             offset += real;
             client->wait = tb_false;
@@ -121,7 +121,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_socket_ref_t s
 static tb_void_t tb_demo_poller_accept(tb_poller_ref_t poller, tb_socket_ref_t sock)
 {
     tb_socket_ref_t client = tb_null;
-    while ((client = tb_socket_accept(sock, tb_null))) 
+    while ((client = tb_socket_accept(sock, tb_null)))
         tb_demo_session_start(poller, client);
 }
 static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
@@ -145,7 +145,7 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_r
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_poller_server_main(tb_int_t argc, tb_char_t** argv)
 {
     // check

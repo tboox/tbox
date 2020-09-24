@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -102,7 +102,7 @@ typedef struct __tb_allocator_t
 
     /*! malloc data
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param size          the size
      *
      * @return              the data address
@@ -111,7 +111,7 @@ typedef struct __tb_allocator_t
 
     /*! realloc data
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param data          the data address
      * @param size          the data size
      *
@@ -121,7 +121,7 @@ typedef struct __tb_allocator_t
 
     /*! free data
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param data          the data address
      *
      * @return              tb_true or tb_false
@@ -130,7 +130,7 @@ typedef struct __tb_allocator_t
 
     /*! malloc large data
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param size          the size
      * @param real          the real allocated size >= size, optional
      *
@@ -140,7 +140,7 @@ typedef struct __tb_allocator_t
 
     /*! realloc large data
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param data          the data address
      * @param size          the data size
      * @param real          the real allocated size >= size, optional
@@ -151,7 +151,7 @@ typedef struct __tb_allocator_t
 
     /*! free large data
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param data          the data address
      *
      * @return              tb_true or tb_false
@@ -160,26 +160,26 @@ typedef struct __tb_allocator_t
 
     /*! clear allocator
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      */
     tb_void_t               (*clear)(struct __tb_allocator_t* allocator);
 
     /*! exit allocator
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      */
     tb_void_t               (*exit)(struct __tb_allocator_t* allocator);
 
 #ifdef __tb_debug__
     /*! dump allocator
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      */
     tb_void_t               (*dump)(struct __tb_allocator_t* allocator);
 
     /*! have this given data addess?
      *
-     * @param allocator     the allocator 
+     * @param allocator     the allocator
      * @param data          the data address
      *
      * @return              tb_true or tb_false
@@ -201,7 +201,7 @@ tb_allocator_ref_t      tb_allocator(tb_noarg_t);
 
 /*! the native allocator
  *
- * uses system memory directly 
+ * uses system memory directly
  *
  * @return              the allocator
  */
@@ -209,7 +209,7 @@ tb_allocator_ref_t      tb_allocator_native(tb_noarg_t);
 
 /*! the allocator type
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  *
  * @return              the allocator type
  */
@@ -217,17 +217,17 @@ tb_size_t               tb_allocator_type(tb_allocator_ref_t allocator);
 
 /*! malloc data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param size          the size
  *
  * @return              the data address
  */
 tb_pointer_t            tb_allocator_malloc_(tb_allocator_ref_t allocator, tb_size_t size __tb_debug_decl__);
 
-/*! malloc data and fill zero 
+/*! malloc data and fill zero
  *
- * @param allocator     the allocator 
- * @param size          the size 
+ * @param allocator     the allocator
+ * @param size          the size
  *
  * @return              the data address
  */
@@ -235,9 +235,9 @@ tb_pointer_t            tb_allocator_malloc0_(tb_allocator_ref_t allocator, tb_s
 
 /*! malloc data with the item count
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param item          the item count
- * @param size          the item size 
+ * @param size          the item size
  *
  * @return              the data address
  */
@@ -245,9 +245,9 @@ tb_pointer_t            tb_allocator_nalloc_(tb_allocator_ref_t allocator, tb_si
 
 /*! malloc data with the item count and fill zero
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param item          the item count
- * @param size          the item size 
+ * @param size          the item size
  *
  * @return              the data address
  */
@@ -255,7 +255,7 @@ tb_pointer_t            tb_allocator_nalloc0_(tb_allocator_ref_t allocator, tb_s
 
 /*! realloc data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  * @param size          the data size
  *
@@ -265,7 +265,7 @@ tb_pointer_t            tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_po
 
 /*! free data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  *
  * @return              tb_true or tb_false
@@ -274,7 +274,7 @@ tb_bool_t               tb_allocator_free_(tb_allocator_ref_t allocator, tb_poin
 
 /*! malloc large data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param size          the size
  * @param real          the real allocated size >= size, optional
  *
@@ -282,10 +282,10 @@ tb_bool_t               tb_allocator_free_(tb_allocator_ref_t allocator, tb_poin
  */
 tb_pointer_t            tb_allocator_large_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t* real __tb_debug_decl__);
 
-/*! malloc large data and fill zero 
+/*! malloc large data and fill zero
  *
- * @param allocator     the allocator 
- * @param size          the size 
+ * @param allocator     the allocator
+ * @param size          the size
  * @param real          the real allocated size >= size, optional
  *
  * @return              the data address
@@ -294,9 +294,9 @@ tb_pointer_t            tb_allocator_large_malloc0_(tb_allocator_ref_t allocator
 
 /*! malloc large data with the item count
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param item          the item count
- * @param size          the item size 
+ * @param size          the item size
  * @param real          the real allocated size >= item * size, optional
  *
  * @return              the data address
@@ -305,9 +305,9 @@ tb_pointer_t            tb_allocator_large_nalloc_(tb_allocator_ref_t allocator,
 
 /*! malloc large data with the item count and fill zero
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param item          the item count
- * @param size          the item size 
+ * @param size          the item size
  * @param real          the real allocated size >= item * size, optional
  *
  * @return              the data address
@@ -316,7 +316,7 @@ tb_pointer_t            tb_allocator_large_nalloc0_(tb_allocator_ref_t allocator
 
 /*! realloc large data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  * @param size          the data size
  * @param real          the real allocated size >= size, optional
@@ -327,7 +327,7 @@ tb_pointer_t            tb_allocator_large_ralloc_(tb_allocator_ref_t allocator,
 
 /*! free large data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  *
  * @return              tb_true or tb_false
@@ -336,7 +336,7 @@ tb_bool_t               tb_allocator_large_free_(tb_allocator_ref_t allocator, t
 
 /*! align malloc data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param size          the size
  * @param align         the alignment bytes
  *
@@ -344,10 +344,10 @@ tb_bool_t               tb_allocator_large_free_(tb_allocator_ref_t allocator, t
  */
 tb_pointer_t            tb_allocator_align_malloc_(tb_allocator_ref_t allocator, tb_size_t size, tb_size_t align __tb_debug_decl__);
 
-/*! align malloc data and fill zero 
+/*! align malloc data and fill zero
  *
- * @param allocator     the allocator 
- * @param size          the size 
+ * @param allocator     the allocator
+ * @param size          the size
  * @param align         the alignment bytes
  *
  * @return              the data address
@@ -356,9 +356,9 @@ tb_pointer_t            tb_allocator_align_malloc0_(tb_allocator_ref_t allocator
 
 /*! align malloc data with the item count
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param item          the item count
- * @param size          the item size 
+ * @param size          the item size
  * @param align         the alignment bytes
  *
  * @return              the data address
@@ -367,9 +367,9 @@ tb_pointer_t            tb_allocator_align_nalloc_(tb_allocator_ref_t allocator,
 
 /*! align malloc data with the item count and fill zero
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param item          the item count
- * @param size          the item size 
+ * @param size          the item size
  * @param align         the alignment bytes
  *
  * @return              the data address
@@ -378,7 +378,7 @@ tb_pointer_t            tb_allocator_align_nalloc0_(tb_allocator_ref_t allocator
 
 /*! align realloc data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  * @param size          the data size
  *
@@ -388,7 +388,7 @@ tb_pointer_t            tb_allocator_align_ralloc_(tb_allocator_ref_t allocator,
 
 /*! align free data
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  *
  * @return              tb_true or tb_false
@@ -397,26 +397,26 @@ tb_bool_t               tb_allocator_align_free_(tb_allocator_ref_t allocator, t
 
 /*! clear it
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  */
 tb_void_t               tb_allocator_clear(tb_allocator_ref_t allocator);
 
 /*! exit it
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  */
 tb_void_t               tb_allocator_exit(tb_allocator_ref_t allocator);
 
 #ifdef __tb_debug__
 /*! dump it
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  */
 tb_void_t               tb_allocator_dump(tb_allocator_ref_t allocator);
 
 /*! have this given data addess?
  *
- * @param allocator     the allocator 
+ * @param allocator     the allocator
  * @param data          the data address
  *
  * @return              tb_true or tb_false

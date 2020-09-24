@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -70,7 +70,7 @@ tb_lo_coroutine_t* tb_lo_coroutine_init(tb_lo_scheduler_ref_t scheduler, tb_lo_c
     if (!ok)
     {
         // exit it
-        if (coroutine) tb_lo_coroutine_exit(coroutine); 
+        if (coroutine) tb_lo_coroutine_exit(coroutine);
         coroutine = tb_null;
     }
 
@@ -117,7 +117,7 @@ tb_lo_scheduler_ref_t tb_lo_coroutine_scheduler_(tb_lo_coroutine_ref_t self)
     tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)self;
     tb_assert(coroutine);
 
-    // get scheduler 
+    // get scheduler
     return coroutine->scheduler;
 }
 tb_void_t tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t self, tb_long_t interval)
@@ -129,7 +129,7 @@ tb_void_t tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t self, tb_long_t interval)
     // get scheduler
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
     tb_assert(scheduler);
-    
+
     // init io scheduler first
     if (!tb_lo_scheduler_io_need(scheduler)) return ;
 
@@ -145,7 +145,7 @@ tb_bool_t tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t self, tb_poller_object_r
     // get scheduler
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
     tb_assert(scheduler);
-   
+
     // init io scheduler first
     if (!tb_lo_scheduler_io_need(scheduler)) return tb_false;
 
@@ -162,7 +162,7 @@ tb_bool_t tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t self, tb_poller_object
     // get scheduler
     tb_lo_scheduler_t* scheduler = (tb_lo_scheduler_t*)coroutine->scheduler;
     tb_assert(scheduler);
-   
+
     // init io scheduler first
     if (!tb_lo_scheduler_io_need(scheduler)) return tb_false;
 

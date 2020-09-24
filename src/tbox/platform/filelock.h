@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,11 +52,11 @@ typedef enum __tb_filelock_mode_e
  * interfaces
  */
 
-/*! init the file lock 
+/*! init the file lock
  *
  * @param file      the file reference
- * 
- * @return          the file lock 
+ *
+ * @return          the file lock
  */
 tb_filelock_ref_t   tb_filelock_init(tb_file_ref_t file);
 
@@ -64,19 +64,19 @@ tb_filelock_ref_t   tb_filelock_init(tb_file_ref_t file);
  *
  * @param path      the file path
  * @param mode      the file mode
- * 
- * @return          the file lock 
+ *
+ * @return          the file lock
  */
 tb_filelock_ref_t   tb_filelock_init_from_path(tb_char_t const* path, tb_size_t mode);
 
 /*! exit the file lock
- * 
+ *
  * @param lock      the file lock
  */
 tb_void_t           tb_filelock_exit(tb_filelock_ref_t lock);
 
 /*! enter the file lock (block)
- * 
+ *
  * @param lock      the file lock
  * @param mode      the lock mode
  *
@@ -85,7 +85,7 @@ tb_void_t           tb_filelock_exit(tb_filelock_ref_t lock);
 tb_bool_t           tb_filelock_enter(tb_filelock_ref_t lock, tb_size_t mode);
 
 /*! try to enter the file lock
- * 
+ *
  * @param lock      the file lock
  * @param mode      the lock mode
  *
@@ -94,7 +94,7 @@ tb_bool_t           tb_filelock_enter(tb_filelock_ref_t lock, tb_size_t mode);
 tb_bool_t           tb_filelock_enter_try(tb_filelock_ref_t lock, tb_size_t mode);
 
 /*! leave the file lock
- * 
+ *
  * @param lock      the file lock
  *
  * @return          tb_true or tb_false
@@ -106,5 +106,5 @@ tb_bool_t           tb_filelock_leave(tb_filelock_ref_t lock);
  */
 __tb_extern_c_leave__
 
-    
+
 #endif

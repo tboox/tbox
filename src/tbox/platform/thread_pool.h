@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -91,36 +91,36 @@ typedef struct __tb_thread_pool_task_t
 
 /*! the thread pool instance
  *
- * @return                  the thread pool 
+ * @return                  the thread pool
  */
 tb_thread_pool_ref_t        tb_thread_pool(tb_noarg_t);
 
 /*! init thread pool
  *
  * @param worker_maxn       the thread worker max count, using the default count
- * @param stack             the thread stack, using the default stack size if be zero 
+ * @param stack             the thread stack, using the default stack size if be zero
  *
- * @return                  the thread pool 
+ * @return                  the thread pool
  */
 tb_thread_pool_ref_t        tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack);
 
 /*! exit thread pool
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  *
  * @return                  tb_true or tb_false
  */
 tb_bool_t                   tb_thread_pool_exit(tb_thread_pool_ref_t pool);
 
-/*! kill thread pool, all workers and waiting tasks 
+/*! kill thread pool, all workers and waiting tasks
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  */
 tb_void_t                   tb_thread_pool_kill(tb_thread_pool_ref_t pool);
 
 /*! the current worker count
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  *
  * @return                  the current worker count
  */
@@ -146,7 +146,7 @@ tb_cpointer_t               tb_thread_pool_worker_getp(tb_thread_pool_worker_ref
 
 /*! the current waiting task count
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  *
  * @return                  the current task count
  */
@@ -154,7 +154,7 @@ tb_size_t                   tb_thread_pool_task_size(tb_thread_pool_ref_t pool);
 
 /*! post one task
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  * @param name              the task name, optional
  * @param done              the task done func
  * @param exit              the task exit func, optional
@@ -167,7 +167,7 @@ tb_bool_t                   tb_thread_pool_task_post(tb_thread_pool_ref_t pool, 
 
 /*! post task list
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  * @param list              the task list
  * @param size              the task count
  *
@@ -177,7 +177,7 @@ tb_size_t                   tb_thread_pool_task_post_list(tb_thread_pool_ref_t p
 
 /*! init one task
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  * @param name              the task name, optional
  * @param done              the task done func
  * @param exit              the task exit func, optional
@@ -190,21 +190,21 @@ tb_thread_pool_task_ref_t   tb_thread_pool_task_init(tb_thread_pool_ref_t pool, 
 
 /*! kill the waiting task
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  * @param task              the task handle
  */
 tb_void_t                   tb_thread_pool_task_kill(tb_thread_pool_ref_t pool, tb_thread_pool_task_ref_t task);
 
 /*! kill all waiting tasks
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  */
 tb_void_t                   tb_thread_pool_task_kill_all(tb_thread_pool_ref_t pool);
 
-/*! wait one task 
+/*! wait one task
  *
- * @param pool              the thread pool 
- * @param task              the thread pool task 
+ * @param pool              the thread pool
+ * @param task              the thread pool task
  * @param timeout           the timeout
  *
  * @return                  ok: 1, timeout: 0, error: -1
@@ -213,7 +213,7 @@ tb_long_t                   tb_thread_pool_task_wait(tb_thread_pool_ref_t pool, 
 
 /*! wait all waiting tasks
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  * @param timeout           the timeout
  *
  * @return                  ok: 1, timeout: 0, error: -1
@@ -222,15 +222,15 @@ tb_long_t                   tb_thread_pool_task_wait_all(tb_thread_pool_ref_t po
 
 /*! exit the task
  *
- * @param pool              the thread pool 
- * @param task              the thread pool task 
+ * @param pool              the thread pool
+ * @param task              the thread pool task
  */
 tb_void_t                   tb_thread_pool_task_exit(tb_thread_pool_ref_t pool, tb_thread_pool_task_ref_t task);
 
 #ifdef __tb_debug__
 /*! dump the thread pool
  *
- * @param pool              the thread pool 
+ * @param pool              the thread pool
  */
 tb_void_t                   tb_thread_pool_dump(tb_thread_pool_ref_t pool);
 #endif

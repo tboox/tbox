@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -71,7 +71,7 @@ tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_si
                 tb_trace_i("%s[%08p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
 #endif
             }
-        
+
             // exit symbols
             tb_backtrace_symbols_exit(symbols);
         }
@@ -85,7 +85,7 @@ tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_si
                 tb_trace_i("%s[%016p]", prefix? prefix : "", frames[i]);
 #else
                 tb_trace_i("%s[%08p]", prefix? prefix : "", frames[i]);
-#endif              
+#endif
             }
         }
     }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -51,7 +51,7 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
     // fd
     tb_long_t fd = tb_sock2fd(sock);
     tb_assert_and_check_return_val(fd >= 0, -1);
-    
+
     // init time
     struct timeval t = {0};
     if (timeout > 0)
@@ -81,7 +81,7 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
         FD_ZERO(pwfds);
         FD_SET(fd, pwfds);
     }
-   
+
     // select
 #ifdef TB_CONFIG_OS_WINDOWS
     tb_long_t r = tb_ws2_32()->select((tb_int_t)fd + 1, prfds, pwfds, tb_null, timeout >= 0? &t : tb_null);

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -57,7 +57,7 @@ typedef struct __tb_poller_epoll_t
 
     // the socket data
     tb_pollerdata_t           pollerdata;
-    
+
 }tb_poller_epoll_t, *tb_poller_epoll_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_poller_object_ref_
         e.events |= EPOLLRDHUP;
 #endif
     }
-#ifdef EPOLLONESHOT 
+#ifdef EPOLLONESHOT
     if (events & TB_POLLER_EVENT_ONESHOT) e.events |= EPOLLONESHOT;
 #else
     // oneshot is not supported now
@@ -155,7 +155,7 @@ static tb_bool_t tb_poller_epoll_insert(tb_poller_t* self, tb_poller_object_ref_
 
     // save fd
     e.data.fd = (tb_int_t)tb_ptr2fd(object->ref.ptr);
-    
+
     // bind the object type to the private data
     priv = tb_poller_priv_set_object_type(object, priv);
 
@@ -204,14 +204,14 @@ static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_poller_object_ref_
     struct epoll_event e = {0};
     if (events & TB_POLLER_EVENT_RECV) e.events |= EPOLLIN;
     if (events & TB_POLLER_EVENT_SEND) e.events |= EPOLLOUT;
-    if (events & TB_POLLER_EVENT_CLEAR) 
+    if (events & TB_POLLER_EVENT_CLEAR)
     {
         e.events |= EPOLLET;
 #ifdef EPOLLRDHUP
         e.events |= EPOLLRDHUP;
 #endif
     }
-#ifdef EPOLLONESHOT 
+#ifdef EPOLLONESHOT
     if (events & TB_POLLER_EVENT_ONESHOT) e.events |= EPOLLONESHOT;
 #else
     // oneshot is not supported now
@@ -220,7 +220,7 @@ static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_poller_object_ref_
 
     // save fd
     e.data.fd = (tb_int_t)tb_ptr2fd(object->ref.ptr);
-   
+
     // bind the object type to the private data
     priv = tb_poller_priv_set_object_type(object, priv);
 
@@ -229,7 +229,7 @@ static tb_bool_t tb_poller_epoll_modify(tb_poller_t* self, tb_poller_object_ref_
         tb_pollerdata_set(&poller->pollerdata, object, priv);
 
     // modify events
-    if (epoll_ctl(poller->epfd, EPOLL_CTL_MOD, e.data.fd, &e) < 0) 
+    if (epoll_ctl(poller->epfd, EPOLL_CTL_MOD, e.data.fd, &e) < 0)
     {
         // trace
         tb_trace_e("modify object(%p) events: %lu failed, errno: %d", object->ref.ptr, events, errno);
@@ -251,12 +251,12 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
         poller->events = tb_nalloc_type(poller->events_count, struct epoll_event);
         tb_assert_and_check_return_val(poller->events, -1);
     }
-    
+
     // wait events
     tb_long_t events_count = epoll_wait(poller->epfd, poller->events, poller->events_count, timeout);
 
     // timeout or interrupted?
-    if (!events_count || (events_count == -1 && errno == EINTR)) 
+    if (!events_count || (events_count == -1 && errno == EINTR))
         return 0;
 
     // check error?
@@ -275,12 +275,12 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
     }
     tb_assert(events_count <= poller->events_count);
 
-    // limit 
+    // limit
     events_count = tb_min(events_count, poller->maxn);
 
     // handle events
     tb_size_t           i = 0;
-    tb_size_t           wait = 0; 
+    tb_size_t           wait = 0;
     struct epoll_event* e = tb_null;
     tb_socket_ref_t     pair = poller->pair[1];
     tb_poller_object_t  object;
@@ -298,7 +298,7 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
         tb_assert(object.ref.ptr);
 
         // spank socket events?
-        if (object.ref.sock == pair && (epoll_events & EPOLLIN)) 
+        if (object.ref.sock == pair && (epoll_events & EPOLLIN))
         {
             // read spak
             tb_char_t spak = '\0';
@@ -312,11 +312,11 @@ static tb_long_t tb_poller_epoll_wait(tb_poller_t* self, tb_poller_event_func_t 
         }
         tb_check_continue(object.ref.sock != pair);
 
-        // init events 
+        // init events
         tb_size_t events = TB_POLLER_EVENT_NONE;
         if (epoll_events & EPOLLIN) events |= TB_POLLER_EVENT_RECV;
         if (epoll_events & EPOLLOUT) events |= TB_POLLER_EVENT_SEND;
-        if (epoll_events & (EPOLLHUP | EPOLLERR) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND))) 
+        if (epoll_events & (EPOLLHUP | EPOLLERR) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND)))
             events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
 #ifdef EPOLLRDHUP
@@ -360,7 +360,7 @@ tb_poller_t* tb_poller_epoll_init()
         poller->base.insert = tb_poller_epoll_insert;
         poller->base.remove = tb_poller_epoll_remove;
         poller->base.modify = tb_poller_epoll_modify;
-#ifdef EPOLLONESHOT 
+#ifdef EPOLLONESHOT
         poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR | TB_POLLER_EVENT_ONESHOT;
 #else
         poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_CLEAR;
@@ -384,7 +384,7 @@ tb_poller_t* tb_poller_epoll_init()
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_SOCK;
         object.ref.sock = poller->pair[1];
-        if (!tb_poller_epoll_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;  
+        if (!tb_poller_epoll_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;
 
         // ok
         ok = tb_true;

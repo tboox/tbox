@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -35,12 +35,12 @@ __tb_extern_c_enter__
  */
 
 /* init the large allocator and the allocated data will be aligned by the page size
- * 
+ *
  * @param data          the allocator data
  * @param size          the allocator size
  * @param pagesize      the pagesize
  *
- * @return              the allocator 
+ * @return              the allocator
  */
 tb_allocator_ref_t      tb_static_large_allocator_init(tb_byte_t* data, tb_size_t size, tb_size_t pagesize);
 

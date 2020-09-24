@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -64,13 +64,13 @@ tb_void_t tb_filter_clos(tb_filter_ref_t self)
 
     // clear eof
     filter->beof = tb_false;
-    
+
     // clear limit
     filter->limit = -1;
-    
+
     // clear offset
     filter->offset = 0;
-    
+
     // exit idata
     tb_buffer_clear(&filter->idata);
 
@@ -85,7 +85,7 @@ tb_void_t tb_filter_exit(tb_filter_ref_t self)
     // check
     tb_filter_t* filter = (tb_filter_t*)self;
     tb_assert_and_check_return(filter);
-    
+
     // exit it
     if (filter->exit) filter->exit(filter);
 
@@ -142,7 +142,7 @@ tb_long_t tb_filter_spak(tb_filter_ref_t self, tb_byte_t const* data, tb_size_t 
     if (data && size)
     {
         // append data to cache if have the cache data
-        if (idata && isize) 
+        if (idata && isize)
         {
             // trace
             tb_trace_d("[%p]: append idata: %lu", self, size);
@@ -184,13 +184,13 @@ tb_long_t tb_filter_spak(tb_filter_ref_t self, tb_byte_t const* data, tb_size_t 
         // exit pull
         if (odata) tb_queue_buffer_pull_exit(&filter->odata, osize > 0? osize : 0);
 
-        // enough? 
+        // enough?
         if (osize > 0)
         {
             // append to the cache if idata is not belong to the cache
             if (size && idata == data) tb_buffer_memncat(&filter->idata, data, size);
 
-            // return it directly 
+            // return it directly
             *pdata = odata;
             return osize;
         }
@@ -208,7 +208,7 @@ tb_long_t tb_filter_spak(tb_filter_ref_t self, tb_byte_t const* data, tb_size_t 
     // init stream
     tb_static_stream_t istream = {0};
     tb_static_stream_t ostream = {0};
-    if (idata && isize) 
+    if (idata && isize)
     {
         // @note istream maybe null for sync the end data
         if (!tb_static_stream_init(&istream, (tb_byte_t*)idata, isize)) return -1;
@@ -233,12 +233,12 @@ tb_long_t tb_filter_spak(tb_filter_ref_t self, tb_byte_t const* data, tb_size_t 
     // exit odata
     tb_queue_buffer_push_exit(&filter->odata, osize > 0? osize : 0);
 
-    // have the left idata? 
+    // have the left idata?
     tb_size_t left = tb_static_stream_left(&istream);
-    if (left) 
+    if (left)
     {
         // move to the cache head if idata is belong to the cache
-        if (idata != data) 
+        if (idata != data)
         {
             // trace
             tb_trace_d("[%p]: move to the cache head: %lu", self, left);
@@ -246,7 +246,7 @@ tb_long_t tb_filter_spak(tb_filter_ref_t self, tb_byte_t const* data, tb_size_t 
             tb_buffer_memnmov(&filter->idata, tb_static_stream_offset(&istream), left);
         }
         // append to the cache if idata is not belong to the cache
-        else 
+        else
         {
             // trace
             tb_trace_d("[%p]: append to the cache: %lu", self, left);
@@ -263,7 +263,7 @@ tb_long_t tb_filter_spak(tb_filter_ref_t self, tb_byte_t const* data, tb_size_t 
 
     // no sync? cache the output data
     if (!sync) osize = omaxn >= need? need : 0;
-    // sync and has data? return it directly 
+    // sync and has data? return it directly
     else if (omaxn) osize = tb_min(omaxn, need);
     // sync, no data or end?
 //  else osize = osize;

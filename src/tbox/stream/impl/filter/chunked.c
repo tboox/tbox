@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -114,7 +114,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_re
 
             // check
             tb_assert_and_check_return_val(ch, -1);
-        
+
             // append char to line
             if (ch != '\n') tb_string_chrcat(&cfilter->line, ch);
             // is line end?
@@ -132,7 +132,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_re
                 if (pb[pn - 1] == '\r') tb_string_strip(&cfilter->line, pn - 1);
 
                 // is chunked tail? only "\r\n"
-                if (!tb_string_size(&cfilter->line)) 
+                if (!tb_string_size(&cfilter->line))
                 {
                     // reset size
                     cfilter->read = 0;
@@ -165,7 +165,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_re
                         // is eof
                         filter->beof = tb_true;
 
-                        // continue to spak the end data 
+                        // continue to spak the end data
                         continue ;
                     }
 
@@ -181,7 +181,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_re
 
     // read chunked data
     tb_size_t size = tb_min3(ie - ip, oe - op, cfilter->size - cfilter->read);
-    if (size) 
+    if (size)
     {
         // copy data
         tb_memcpy((tb_byte_t*)op, ip, size);
@@ -248,7 +248,7 @@ tb_filter_ref_t tb_filter_init_from_chunked(tb_bool_t dechunked)
         filter = tb_malloc0_type(tb_filter_chunked_t);
         tb_assert_and_check_break(filter);
 
-        // init filter 
+        // init filter
         if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CHUNKED)) break;
         filter->base.spak = tb_filter_chunked_spak;
         filter->base.clos = tb_filter_chunked_clos;

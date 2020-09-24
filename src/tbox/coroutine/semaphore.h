@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,35 +46,35 @@ typedef __tb_typeref__(co_semaphore);
 /*! init semaphore
  *
  * @param value         the initial semaphore value
- * 
- * @return              the semaphore 
+ *
+ * @return              the semaphore
  */
 tb_co_semaphore_ref_t   tb_co_semaphore_init(tb_size_t value);
 
 /*! exit semaphore
- * 
+ *
  */
 tb_void_t               tb_co_semaphore_exit(tb_co_semaphore_ref_t semaphore);
 
 /*! post semaphore
- * 
- * @param semaphore     the semaphore 
+ *
+ * @param semaphore     the semaphore
  * @param post          the post semaphore value
  *
  */
 tb_void_t               tb_co_semaphore_post(tb_co_semaphore_ref_t semaphore, tb_size_t post);
 
 /*! the semaphore value
- * 
- * @param semaphore     the semaphore 
+ *
+ * @param semaphore     the semaphore
  *
  * @return              the semaphore value
  */
 tb_size_t               tb_co_semaphore_value(tb_co_semaphore_ref_t semaphore);
 
 /*! wait semaphore
- * 
- * @param semaphore     the semaphore 
+ *
+ * @param semaphore     the semaphore
  * @param timeout       the timeout
  *
  * @return              ok: 1, timeout: 0, fail: -1

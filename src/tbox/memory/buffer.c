@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-// the maximum grow size of value buffer 
+// the maximum grow size of value buffer
 #ifdef __tb_small__
 #   define TB_BUFFER_GROW_SIZE       (64)
 #else
@@ -78,7 +78,7 @@ tb_byte_t* tb_buffer_data(tb_buffer_ref_t buffer)
     return buffer->data;
 }
 tb_size_t tb_buffer_size(tb_buffer_ref_t buffer)
-{ 
+{
     // check
     tb_assert_and_check_return_val(buffer, 0);
 
@@ -177,7 +177,7 @@ tb_byte_t* tb_buffer_resize(tb_buffer_ref_t buffer, tb_size_t size)
         buffer->size = buff_size;
         buffer->maxn = buff_maxn;
 
-        // ok 
+        // ok
         ok = tb_true;
 
     } while (0);
@@ -204,7 +204,7 @@ tb_byte_t* tb_buffer_memnsetp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t b, 
 {
     // check
     tb_assert_and_check_return_val(buffer, tb_null);
-    
+
     // check
     tb_check_return_val(n, tb_buffer_data(buffer));
 
@@ -234,7 +234,7 @@ tb_byte_t* tb_buffer_memncpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t con
 {
     // check
     tb_assert_and_check_return_val(buffer && b, tb_null);
-    
+
     // check
     tb_check_return_val(n, tb_buffer_data(buffer));
 
@@ -270,7 +270,7 @@ tb_byte_t* tb_buffer_memnmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_size_t b, 
     tb_assert_and_check_return_val(buffer && (b + n) <= tb_buffer_size(buffer), tb_null);
 
     // clear?
-    if (b == tb_buffer_size(buffer)) 
+    if (b == tb_buffer_size(buffer))
     {
         tb_buffer_clear(buffer);
         return tb_buffer_data(buffer);
@@ -292,10 +292,10 @@ tb_byte_t* tb_buffer_memcat(tb_buffer_ref_t buffer, tb_buffer_ref_t b)
     return tb_buffer_memncat(buffer, tb_buffer_data(b), tb_buffer_size(b));
 }
 tb_byte_t* tb_buffer_memncat(tb_buffer_ref_t buffer, tb_byte_t const* b, tb_size_t n)
-{   
+{
     // check
     tb_assert_and_check_return_val(buffer && b, tb_null);
-    
+
     // check
     tb_check_return_val(n, tb_buffer_data(buffer));
 

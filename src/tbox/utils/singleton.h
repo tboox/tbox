@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -143,9 +143,9 @@ tb_void_t           tb_singleton_exit(tb_noarg_t);
 /*! the singleton instance
  *
  * @param type      the singleton type
- * @param init      the singleton init func 
- * @param exit      the singleton exit func 
- * @param kill      the singleton kill func 
+ * @param init      the singleton init func
+ * @param exit      the singleton exit func
+ * @param kill      the singleton kill func
  * @param priv      the private data
  *
  * @return          the singleton instance handle
@@ -157,7 +157,7 @@ tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func
  * @code
     static tb_bool_t tb_xxxx_instance_init(tb_handle_t instance, tb_cpointer_t priv)
     {
-        // init 
+        // init
         // ...
 
         // ok
@@ -180,7 +180,7 @@ tb_handle_t         tb_singleton_instance(tb_size_t type, tb_singleton_init_func
  *
  * @param binited   the singleton static instance is inited?
  * @param instance  the singleton static instance
- * @param init      the singleton static init func 
+ * @param init      the singleton static init func
  * @param priv      the private data
  *
  * @return          tb_true or tb_false

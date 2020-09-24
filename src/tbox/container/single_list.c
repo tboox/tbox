@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@
  */
 
 // the self grow
-#ifdef __tb_small__ 
+#ifdef __tb_small__
 #   define TB_SINGLE_LIST_GROW             (128)
 #else
 #   define TB_SINGLE_LIST_GROW             (256)
@@ -160,11 +160,11 @@ static tb_void_t tb_single_list_itor_nremove(tb_iterator_ref_t iterator, tb_size
     if (size > single_list_size) size = single_list_size;
 
     // remove the body items
-    if (prev) 
+    if (prev)
     {
         // done
         tb_bool_t end = tb_false;
-        while (size-- && !end) 
+        while (size-- && !end)
         {
             // end?
             end = (tb_iterator_next((tb_single_list_ref_t)iterator, prev) == next)? tb_true : tb_false;
@@ -174,7 +174,7 @@ static tb_void_t tb_single_list_itor_nremove(tb_iterator_ref_t iterator, tb_size
         }
     }
     // remove the head items
-    else 
+    else
     {
         while (size--) tb_single_list_remove_head((tb_single_list_ref_t)iterator);
     }
@@ -213,7 +213,7 @@ tb_single_list_ref_t tb_single_list_init(tb_size_t grow, tb_element_t element)
         list->element = element;
 
         // init operation
-        static tb_iterator_op_t op = 
+        static tb_iterator_op_t op =
         {
             tb_single_list_itor_size
         ,   tb_single_list_itor_head
@@ -262,7 +262,7 @@ tb_void_t tb_single_list_exit(tb_single_list_ref_t self)
     // check
     tb_single_list_t* list = (tb_single_list_t*)self;
     tb_assert_and_check_return(list);
-   
+
     // clear data
     tb_single_list_clear((tb_single_list_ref_t)list);
 
@@ -449,7 +449,7 @@ tb_void_t tb_single_list_dump(tb_single_list_ref_t self)
     tb_for_all (tb_pointer_t, data, self)
     {
         // trace
-        if (list->element.cstr) 
+        if (list->element.cstr)
         {
             tb_trace_i("    %s", list->element.cstr(&list->element, data, cstr, sizeof(cstr)));
         }

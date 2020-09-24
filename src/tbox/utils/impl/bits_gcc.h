@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-// swap 
+// swap
 #if TB_COMPILER_VERSION_BE(4, 3)
 #   define tb_bits_swap_u32(x)      __builtin_bswap32(x)
 #   define tb_bits_swap_u64(x)      __builtin_bswap64(x)
@@ -55,6 +55,6 @@
 #   define tb_bits_fb1_u64_le(x)    ((x)? (tb_size_t)__builtin_ffsll((tb_uint64_t)(x)) - 1 : 64)
 #endif
 
-#endif 
+#endif
 
 

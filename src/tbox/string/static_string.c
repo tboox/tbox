@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -116,12 +116,12 @@ tb_char_t const* tb_static_string_ltrim(tb_static_string_ref_t string)
     while (p < e && tb_isspace(*p)) p++;
 
     // strip it
-    if (p < e) 
+    if (p < e)
     {
         // move it if exists spaces
         if (p > s) tb_static_buffer_memmov(string, p - s);
     }
-    // clear it 
+    // clear it
     else tb_static_string_clear(string);
 
     // ok?
@@ -143,7 +143,7 @@ tb_char_t const* tb_static_string_rtrim(tb_static_string_ref_t string)
 
     // strip it
     if (e >= s) tb_static_string_strip(string, e - s + 1);
-    // clear it 
+    // clear it
     else tb_static_string_clear(string);
 
     // ok?
@@ -223,7 +223,7 @@ tb_long_t tb_static_string_cstrstr(tb_static_string_ref_t string, tb_size_t p, t
     return (q? q - s : -1);
 }
 tb_long_t tb_static_string_cstristr(tb_static_string_ref_t string, tb_size_t p, tb_char_t const* s2)
-{   
+{
     tb_char_t const*    s = tb_static_string_cstr(string);
     tb_size_t           n = tb_static_string_size(string);
     tb_assert_and_check_return_val(s && p < n, -1);
@@ -241,7 +241,7 @@ tb_long_t tb_static_string_strirstr(tb_static_string_ref_t string, tb_size_t p, 
     return tb_static_string_cstrirstr(string, p, tb_static_string_cstr(s));
 }
 tb_long_t tb_static_string_cstrrstr(tb_static_string_ref_t string, tb_size_t p, tb_char_t const* s2)
-{   
+{
     // check
     tb_char_t const*    s = tb_static_string_cstr(string);
     tb_size_t           n = tb_static_string_size(string);
@@ -270,7 +270,7 @@ tb_char_t const* tb_static_string_strcpy(tb_static_string_ref_t string, tb_stati
     // done
     tb_size_t n = tb_static_string_size(s);
     if (n) return tb_static_string_cstrncpy(string, tb_static_string_cstr(s), n);
-    else 
+    else
     {
         tb_static_string_clear(string);
         return tb_null;
@@ -304,7 +304,7 @@ tb_char_t const* tb_static_string_cstrfcpy(tb_static_string_ref_t string, tb_cha
     tb_size_t n = 0;
     tb_vsnprintf_format(p, TB_STATIC_STRING_FMTD_SIZE, fmt, &n);
     tb_assert_and_check_return_val(n, tb_null);
-    
+
     // done
     return tb_static_string_cstrncpy(string, p, n);
 }
@@ -312,7 +312,7 @@ tb_char_t const* tb_static_string_chrcat(tb_static_string_ref_t string, tb_char_
 {
     // check
     tb_assert_and_check_return_val(string, tb_null);
-    
+
     // done
     tb_char_t* p = (tb_char_t*)tb_static_buffer_memnsetp(string, tb_static_string_size(string), c, 2);
     if (p) p[tb_static_string_size(string)] = '\0';
@@ -360,7 +360,7 @@ tb_char_t const* tb_static_string_cstrfcat(tb_static_string_ref_t string, tb_cha
     tb_size_t n = 0;
     tb_vsnprintf_format(p, TB_STATIC_STRING_FMTD_SIZE, fmt, &n);
     tb_assert_and_check_return_val(n, tb_null);
-    
+
     // done
     return tb_static_string_cstrncat(string, p, n);
 }

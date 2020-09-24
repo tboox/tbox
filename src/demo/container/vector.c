@@ -67,7 +67,7 @@ static tb_size_t tb_vector_insert_head_test()
 
     // exit
     tb_vector_exit(vector);
-    
+
     return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_vector_insert_tail_test()
@@ -538,7 +538,7 @@ static tb_void_t tb_vector_int_test()
 
     tb_trace_i("=============================================================");
     tb_trace_i("insert:");
-    tb_vector_ninsert_head(vector, (tb_pointer_t)0xa, 10); 
+    tb_vector_ninsert_head(vector, (tb_pointer_t)0xa, 10);
     tb_vector_ninsert_tail(vector, (tb_pointer_t)0xf, 10);
     tb_vector_insert_prev(vector, 10, (tb_pointer_t)0);
     tb_vector_insert_prev(vector, 10, (tb_pointer_t)1);
@@ -596,7 +596,7 @@ static tb_void_t tb_vector_str_test()
 
     tb_trace_i("=============================================================");
     tb_trace_i("insert:");
-    tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
+    tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10);
     tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
     tb_vector_insert_prev(vector, 10, "0000000000");
     tb_vector_insert_prev(vector, 10, "1111111111");
@@ -660,7 +660,7 @@ static tb_void_t tb_vector_mem_test()
 
     tb_trace_i("=============================================================");
     tb_trace_i("insert:");
-    tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
+    tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10);
     tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
     tb_vector_insert_prev(vector, 10, "0000000000");
     tb_vector_insert_prev(vector, 10, "1111111111");
@@ -755,7 +755,7 @@ static tb_void_t tb_vector_test_itor_perf()
 
     // add items
     __tb_volatile__ tb_size_t n = 10000;
-    while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_value()); 
+    while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_value());
 
     // done
     tb_hong_t t = tb_mclock();
@@ -769,7 +769,7 @@ static tb_void_t tb_vector_test_itor_perf()
             // remove, hack: the itor of the same item is mutable
             tb_vector_remove(vector, itor);
 
-            // continue 
+            // continue
             continue ;
         }
         else
@@ -813,7 +813,7 @@ static tb_void_t tb_vector_test_walk_perf()
 
     // add items
     __tb_volatile__ tb_size_t n = 10000;
-    while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_value()); 
+    while (n--) tb_vector_insert_tail(vector, (tb_pointer_t)(tb_size_t)tb_random_value());
 
     // done
     tb_hong_t t = tb_mclock();

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -94,7 +94,7 @@ static tb_bool_t tb_oc_bplist_writer_func_number(tb_oc_bplist_writer_t* writer, 
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static __tb_inline__ tb_time_t tb_oc_bplist_writer_time_host2apple(tb_time_t time)
 {
@@ -124,7 +124,7 @@ static tb_bool_t tb_oc_bplist_writer_func_rdata(tb_oc_bplist_writer_t* writer, t
         tb_assert_and_check_return_val(object, tb_false);
 
         // write it
-        if (!tb_oc_bplist_writer_func_number(writer, object, item_size)) 
+        if (!tb_oc_bplist_writer_func_number(writer, object, item_size))
         {
             tb_object_exit(object);
             return tb_false;
@@ -133,7 +133,7 @@ static tb_bool_t tb_oc_bplist_writer_func_rdata(tb_oc_bplist_writer_t* writer, t
         // exit object
         tb_object_exit(object);
     }
-    
+
     // unicode? adjust size
     if (bype == TB_OBJECT_BPLIST_TYPE_UNICODE) size <<= 1;
 
@@ -191,7 +191,7 @@ static tb_bool_t tb_oc_bplist_writer_func_array(tb_oc_bplist_writer_t* writer, t
         tb_assert_and_check_return_val(osize, tb_false);
 
         // write it
-        if (!tb_oc_bplist_writer_func_number(writer, osize, item_size)) 
+        if (!tb_oc_bplist_writer_func_number(writer, osize, item_size))
         {
             tb_object_exit(osize);
             return tb_false;
@@ -243,9 +243,9 @@ static tb_bool_t tb_oc_bplist_writer_func_string(tb_oc_bplist_writer_t* writer, 
             ok = tb_true;
 
         } while (0);
-        
+
         // ok?
-        if (ok) 
+        if (ok)
         {
             // only ascii? write utf8
             if (osize == (size << 1)) ok = tb_oc_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, (tb_byte_t*)utf8, size, item_size);
@@ -363,7 +363,7 @@ static tb_bool_t tb_oc_bplist_writer_func_dictionary(tb_oc_bplist_writer_t* writ
         tb_assert_and_check_return_val(osize, tb_false);
 
         // write it
-        if (!tb_oc_bplist_writer_func_number(writer, osize, item_size)) 
+        if (!tb_oc_bplist_writer_func_number(writer, osize, item_size))
         {
             tb_object_exit(osize);
             return tb_false;
@@ -426,7 +426,7 @@ static tb_size_t tb_oc_bplist_writer_builder_addo(tb_object_ref_t object, tb_obj
     tb_size_t index = (tb_size_t)tb_hash_map_get(hash, object);
 
     // new object?
-    if (!index) 
+    if (!index)
     {
         // append object
         tb_oc_array_append(list, object);
@@ -458,7 +458,7 @@ static tb_void_t tb_oc_bplist_writer_builder_init(tb_object_ref_t object, tb_obj
             // make index tables
             tb_byte_t*  index_tables = tb_null;
             tb_size_t   size = tb_oc_array_size(object);
-            if (size) 
+            if (size)
             {
                 index_tables = (tb_byte_t*)tb_object_getp(object);
                 if (!index_tables)
@@ -476,7 +476,7 @@ static tb_void_t tb_oc_bplist_writer_builder_init(tb_object_ref_t object, tb_obj
             tb_for_all (tb_object_ref_t, item, tb_oc_array_itor(object))
             {
                 // build item
-                if (item) 
+                if (item)
                 {
                     // add item to builder
                     tb_size_t index = tb_oc_bplist_writer_builder_addo(item, list, hash);
@@ -496,7 +496,7 @@ static tb_void_t tb_oc_bplist_writer_builder_init(tb_object_ref_t object, tb_obj
             // make index tables
             tb_byte_t*  index_tables = tb_null;
             tb_size_t   size = tb_oc_dictionary_size(object);
-            if (size) 
+            if (size)
             {
                 index_tables = (tb_byte_t*)tb_object_getp(object);
                 if (!index_tables)
@@ -597,7 +597,7 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
     // check
     tb_assert_and_check_return_val(object && stream, -1);
 
-    // done 
+    // done
     tb_bool_t           ok                  = tb_false;
     tb_size_t           i                   = 0;
     tb_byte_t           pad[6]              = {0};
@@ -617,7 +617,7 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
         // init writer
         tb_oc_bplist_writer_t writer = {0};
         writer.stream = stream;
-        
+
         // init list
         list = tb_oc_array_init(TB_OBJECT_BPLIST_LIST_GROW, tb_true);
         tb_assert_and_check_break(list);
@@ -670,7 +670,7 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
                 tb_assert_and_check_continue(func);
 
                 // write object
-                if (!func(&writer, item, item_size)) 
+                if (!func(&writer, item, item_size))
                 {
                     failed = tb_true;
                     break;
@@ -716,7 +716,7 @@ static tb_long_t tb_oc_bplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
 
         // write pad, like apple?
         if (!tb_stream_bwrit(stream, pad, 6)) break;
-        
+
         // write tail
         if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)offset_size)) break;
         if (!tb_stream_bwrit_u8(stream, (tb_uint8_t)item_size)) break;
@@ -755,15 +755,15 @@ tb_oc_writer_t* tb_oc_bplist_writer()
 {
     // the writer
     static tb_oc_writer_t s_writer = {0};
-  
+
     // init writer
     s_writer.writ = tb_oc_bplist_writer_done;
- 
+
     // init hooker
     s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
-    // hook writer 
+    // hook writer
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_oc_bplist_writer_func_date);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_oc_bplist_writer_func_data);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_oc_bplist_writer_func_array);
@@ -779,7 +779,7 @@ tb_bool_t tb_oc_bplist_writer_hook(tb_size_t type, tb_oc_bplist_writer_func_t fu
 {
     // check
     tb_assert_and_check_return_val(func, tb_false);
- 
+
     // the writer
     tb_oc_writer_t* writer = tb_oc_writer_get(TB_OBJECT_FORMAT_BPLIST);
     tb_assert_and_check_return_val(writer && writer->hooker, tb_false);

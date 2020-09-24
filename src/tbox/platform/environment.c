@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -130,7 +130,7 @@ tb_size_t tb_environment_get(tb_char_t const* name, tb_char_t* values, tb_size_t
     // save result
     tb_size_t           size = tb_string_size(&valuestrs);
     tb_char_t const*    cstr = tb_string_cstr(&valuestrs);
-    if (size && cstr) 
+    if (size && cstr)
     {
         // copy it
         size = tb_strlcpy(values, cstr, maxn);
@@ -156,7 +156,7 @@ tb_bool_t tb_environment_set(tb_char_t const* name, tb_char_t const* values)
         // init filter
         tb_hash_set_ref_t filter = tb_hash_set_init(8, tb_element_str(tb_true));
 
-        // init environment 
+        // init environment
         tb_char_t               data[TB_PATH_MAXN];
         tb_environment_ref_t    environment = tb_environment_init();
         if (environment)
@@ -177,9 +177,9 @@ tb_bool_t tb_environment_set(tb_char_t const* name, tb_char_t const* values)
                     data[size] = '\0';
 
                     // have been not inserted?
-                    if (!filter || !tb_hash_set_get(filter, data)) 
+                    if (!filter || !tb_hash_set_get(filter, data))
                     {
-                        // append the environment 
+                        // append the environment
                         tb_environment_insert(environment, data, tb_false);
 
                         // save it to the filter
@@ -215,7 +215,7 @@ tb_bool_t tb_environment_set(tb_char_t const* name, tb_char_t const* values)
         tb_environment_ref_t environment = tb_environment_init();
         if (environment)
         {
-            // append the environment 
+            // append the environment
             tb_environment_insert(environment, values, tb_false);
 
             // set environment variables
@@ -242,7 +242,7 @@ tb_bool_t tb_environment_add(tb_char_t const* name, tb_char_t const* values, tb_
         // init filter
         tb_hash_set_ref_t filter = tb_hash_set_init(8, tb_element_str(tb_true));
 
-        // init environment 
+        // init environment
         tb_char_t               data[TB_PATH_MAXN];
         tb_environment_ref_t    environment = tb_environment_init();
         if (environment)
@@ -266,9 +266,9 @@ tb_bool_t tb_environment_add(tb_char_t const* name, tb_char_t const* values, tb_
                     data[size] = '\0';
 
                     // have been not inserted?
-                    if (!filter || !tb_hash_set_get(filter, data)) 
+                    if (!filter || !tb_hash_set_get(filter, data))
                     {
-                        // append the environment 
+                        // append the environment
                         tb_environment_insert(environment, data, to_head);
 
                         // save it to the filter
@@ -307,7 +307,7 @@ tb_bool_t tb_environment_add(tb_char_t const* name, tb_char_t const* values, tb_
             // load the previous values
             tb_environment_load(environment, name);
 
-            // append the environment 
+            // append the environment
             tb_environment_insert(environment, values, to_head);
 
             // set environment variables

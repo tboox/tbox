@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -26,13 +26,13 @@
 #include "string.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 
 tb_wchar_t* tb_wcsnrstr(tb_wchar_t const* s1, tb_size_t n, tb_wchar_t const* s2)
 {
     tb_assert_and_check_return_val(s1, tb_null);
-    
+
     tb_trace_noimpl();
     return tb_null;
 }

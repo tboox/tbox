@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,7 +46,7 @@ tb_context_ref_t tb_context_init(tb_byte_t* data, tb_size_t size)
     // get context
     tb_context_ref_t context = (tb_context_ref_t)data;
 
-    // init context 
+    // init context
     tb_memset(data, 0, context_size);
 
 #if defined(TB_CONFIG_POSIX_HAVE_GETCONTEXT) && \
@@ -78,7 +78,7 @@ tb_void_t tb_context_switch(tb_context_ref_t context)
     // check
     tb_assert(context);
 
-    // set it 
+    // set it
     setcontext((ucontext_t*)context);
 }
 tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_t stacksize, tb_context_func_t func, tb_cpointer_t priv)
@@ -120,7 +120,7 @@ tb_void_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new
     tb_assert(context && context_new);
 
     // swap it
-    if (getcontext((ucontext_t*)context) == 0) 
+    if (getcontext((ucontext_t*)context) == 0)
         setcontext((ucontext_t*)context_new);
 }
 #endif

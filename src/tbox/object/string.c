@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -72,7 +72,7 @@ static tb_object_ref_t tb_oc_string_copy(tb_object_ref_t object)
 static tb_void_t tb_oc_string_exit(tb_object_ref_t object)
 {
     tb_oc_string_t* string = tb_oc_string_cast(object);
-    if (string) 
+    if (string)
     {
         // exit the string
         tb_string_exit(&string->str);
@@ -84,7 +84,7 @@ static tb_void_t tb_oc_string_exit(tb_object_ref_t object)
 static tb_void_t tb_oc_string_clear(tb_object_ref_t object)
 {
     tb_oc_string_t* string = tb_oc_string_cast(object);
-    if (string) 
+    if (string)
     {
         // clear the string
         tb_string_clear(&string->str);
@@ -108,7 +108,7 @@ static tb_oc_string_t* tb_oc_string_init_base()
         string->base.copy   = tb_oc_string_copy;
         string->base.exit   = tb_oc_string_exit;
         string->base.clear  = tb_oc_string_clear;
-        
+
         // ok
         ok = tb_true;
 
@@ -212,7 +212,7 @@ tb_size_t tb_oc_string_cstr_set(tb_object_ref_t object, tb_char_t const* cstr)
 
     // copy string
     tb_string_cstrcpy(&string->str, cstr);
- 
+
     // ok?
     return tb_string_size(&string->str);
 }

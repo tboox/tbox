@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,15 +37,15 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! get the first dns address from the host name 
+/*! get the first dns address from the host name
  *
  * @code
- 
+
     // get the default address (ipv4)
     tb_ipaddr_t addr = {0};
     if (tb_addrinfo_addr("www.tboox.org", &addr))
         tb_trace_i("%{ipaddr}", &addr);
- 
+
     // get the ipv6 address by the hint info
     tb_ipaddr_t addr = {0};
     tb_ipaddr_family_set(&addr, TB_IPADDR_FAMILY_IPV6);
@@ -61,10 +61,10 @@ __tb_extern_c_enter__
  */
 tb_bool_t           tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr);
 
-/*! get the host name from the given address 
+/*! get the host name from the given address
  *
  * @code
- 
+
     // get the host name by address
     tb_ipaddr_t addr;
     tb_char_t   host[256];
@@ -77,7 +77,7 @@ tb_bool_t           tb_addrinfo_addr(tb_char_t const* name, tb_ipaddr_ref_t addr
  * @param name      the host name buffer
  * @param maxn      the host name buffer maxn
  *
- * @return          the host name or tb_null 
+ * @return          the host name or tb_null
  */
 tb_char_t const*    tb_addrinfo_name(tb_ipaddr_ref_t addr, tb_char_t* name, tb_size_t maxn);
 

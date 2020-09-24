@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,7 +52,7 @@ typedef struct __tb_circle_queue_t
 
     // the data
     tb_byte_t*              data;
-    
+
     // the head
     tb_size_t               head;
 
@@ -74,7 +74,7 @@ typedef struct __tb_circle_queue_t
  * private implementation
  */
 static tb_size_t tb_circle_queue_itor_size(tb_iterator_ref_t iterator)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)iterator;
     tb_assert_and_check_return_val(queue, 0);
@@ -180,7 +180,7 @@ tb_circle_queue_ref_t tb_circle_queue_init(tb_size_t maxn, tb_element_t element)
         queue->element   = element;
 
         // init operation
-        static tb_iterator_op_t op = 
+        static tb_iterator_op_t op =
         {
             tb_circle_queue_itor_size
         ,   tb_circle_queue_itor_head
@@ -221,11 +221,11 @@ tb_circle_queue_ref_t tb_circle_queue_init(tb_size_t maxn, tb_element_t element)
     return (tb_circle_queue_ref_t)queue;
 }
 tb_void_t tb_circle_queue_exit(tb_circle_queue_ref_t self)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return(queue);
-    
+
     // clear data
     tb_circle_queue_clear(self);
 
@@ -240,7 +240,7 @@ tb_void_t tb_circle_queue_clear(tb_circle_queue_ref_t self)
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return(queue);
-    
+
     // clear it
     while (!tb_circle_queue_null(self)) tb_circle_queue_pop(self);
     queue->head = 0;
@@ -248,7 +248,7 @@ tb_void_t tb_circle_queue_clear(tb_circle_queue_ref_t self)
     queue->size = 0;
 }
 tb_void_t tb_circle_queue_put(tb_circle_queue_ref_t self, tb_cpointer_t data)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return(queue && queue->size < queue->maxn);
@@ -259,7 +259,7 @@ tb_void_t tb_circle_queue_put(tb_circle_queue_ref_t self, tb_cpointer_t data)
     queue->size++;
 }
 tb_void_t tb_circle_queue_pop(tb_circle_queue_ref_t self)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return(queue && queue->size);
@@ -285,7 +285,7 @@ tb_pointer_t tb_circle_queue_last(tb_circle_queue_ref_t self)
     return tb_iterator_item((tb_iterator_ref_t)self, tb_iterator_last((tb_iterator_ref_t)self));
 }
 tb_size_t tb_circle_queue_size(tb_circle_queue_ref_t self)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return_val(queue, 0);
@@ -294,7 +294,7 @@ tb_size_t tb_circle_queue_size(tb_circle_queue_ref_t self)
     return queue->size;
 }
 tb_size_t tb_circle_queue_maxn(tb_circle_queue_ref_t self)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return_val(queue, 0);
@@ -303,7 +303,7 @@ tb_size_t tb_circle_queue_maxn(tb_circle_queue_ref_t self)
     return queue->maxn;
 }
 tb_bool_t tb_circle_queue_full(tb_circle_queue_ref_t self)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return_val(queue, tb_true);
@@ -312,7 +312,7 @@ tb_bool_t tb_circle_queue_full(tb_circle_queue_ref_t self)
     return (queue->size + 1) == queue->maxn;
 }
 tb_bool_t tb_circle_queue_null(tb_circle_queue_ref_t self)
-{   
+{
     // check
     tb_circle_queue_t* queue = (tb_circle_queue_t*)self;
     tb_assert_and_check_return_val(queue, tb_true);
@@ -335,7 +335,7 @@ tb_void_t tb_circle_queue_dump(tb_circle_queue_ref_t self)
     tb_for_all (tb_pointer_t, data, self)
     {
         // trace
-        if (queue->element.cstr) 
+        if (queue->element.cstr)
         {
             tb_trace_i("    %s", queue->element.cstr(&queue->element, data, cstr, sizeof(cstr)));
         }

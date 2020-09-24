@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,7 +33,7 @@ tb_double_t tb_expi(tb_long_t x)
     tb_assert(x >= -31 && x <= 31);
 
     // x = [-31, 31]
-    static tb_double_t table[47] = 
+    static tb_double_t table[47] =
     {
         // [-15, -1]
         0.000000

@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the lock type
 typedef struct __tb_demo_lo_lock_t
@@ -24,7 +24,7 @@ static tb_lo_lock_t     g_lock;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_lo_coroutine_lock_test_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -57,14 +57,14 @@ static tb_void_t tb_demo_lo_coroutine_lock_test_func(tb_lo_coroutine_ref_t corou
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_lock_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler
     tb_lo_scheduler_ref_t scheduler = tb_lo_scheduler_init();
     if (scheduler)
     {
-        // init lock     
+        // init lock
         tb_lo_lock_init(&g_lock);
 
         // start coroutines
@@ -81,7 +81,7 @@ tb_int_t tb_demo_lo_coroutine_lock_main(tb_int_t argc, tb_char_t** argv)
         // exit scheduler
         tb_lo_scheduler_exit(scheduler);
 
-        // exit lock     
+        // exit lock
         tb_lo_lock_exit(&g_lock);
     }
     return 0;

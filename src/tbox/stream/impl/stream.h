@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@
 
 // the stream type
 typedef struct __tb_stream_t
-{   
+{
     // the stream type
     tb_uint8_t          type;
 
@@ -79,7 +79,7 @@ typedef struct __tb_stream_t
     // the cache
     tb_queue_buffer_t   cache;
 
-    // wait 
+    // wait
     tb_long_t           (*wait)(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout);
 
     // open
@@ -100,7 +100,7 @@ typedef struct __tb_stream_t
     // sync
     tb_bool_t           (*sync)(tb_stream_ref_t stream, tb_bool_t bclosing);
 
-    // ctrl 
+    // ctrl
     tb_bool_t           (*ctrl)(tb_stream_ref_t stream, tb_size_t ctrl, tb_va_list_t args);
 
     // exit

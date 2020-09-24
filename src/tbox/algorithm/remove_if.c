@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -79,7 +79,7 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
         // done predicate
         ok = pred(iterator, tb_iterator_item(iterator, itor), value, &is_break);
 
-        // remove it? 
+        // remove it?
         if (ok)
         {
             // is the first removed item?
@@ -95,12 +95,12 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
             // update size
             size++;
         }
-       
+
         // the removed range have been passed or stop or end?
         if (!ok || next == tb_iterator_tail(iterator))
         {
             // need remove items?
-            if (need) 
+            if (need)
             {
                 // check
                 tb_assert(size);
@@ -144,7 +144,7 @@ tb_void_t tb_remove_if_until(tb_iterator_ref_t iterator, tb_predicate_break_ref_
             // break?
             tb_check_break(!is_break);
         }
-    
+
         // next
         prev = itor;
         itor = next;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -154,7 +154,7 @@ tb_iterator_ref_t tb_array_iterator_init_ptr(tb_array_iterator_ref_t iterator, t
     tb_assert(iterator && items && count);
 
     // init operation
-    static tb_iterator_op_t op = 
+    static tb_iterator_op_t op =
     {
         tb_array_iterator_ptr_size
     ,   tb_array_iterator_ptr_head
@@ -186,7 +186,7 @@ tb_iterator_ref_t tb_array_iterator_init_mem(tb_array_iterator_ref_t iterator, t
     tb_assert(iterator && items && count && size);
 
     // init operation
-    static tb_iterator_op_t op = 
+    static tb_iterator_op_t op =
     {
         tb_array_iterator_ptr_size
     ,   tb_array_iterator_ptr_head
@@ -218,7 +218,7 @@ tb_iterator_ref_t tb_array_iterator_init_str(tb_array_iterator_ref_t iterator, t
     tb_assert(iterator && items && count);
 
     // init operation
-    static tb_iterator_op_t op = 
+    static tb_iterator_op_t op =
     {
         tb_array_iterator_ptr_size
     ,   tb_array_iterator_ptr_head
@@ -250,7 +250,7 @@ tb_iterator_ref_t tb_array_iterator_init_istr(tb_array_iterator_ref_t iterator, 
     tb_assert(iterator && items && count);
 
     // init operation
-    static tb_iterator_op_t op = 
+    static tb_iterator_op_t op =
     {
         tb_array_iterator_ptr_size
     ,   tb_array_iterator_ptr_head
@@ -287,7 +287,7 @@ tb_iterator_ref_t tb_array_iterator_init_long(tb_array_iterator_ref_t iterator, 
     tb_assert(iterator && items && count);
 
     // init operation
-    static tb_iterator_op_t op = 
+    static tb_iterator_op_t op =
     {
         tb_array_iterator_ptr_size
     ,   tb_array_iterator_ptr_head

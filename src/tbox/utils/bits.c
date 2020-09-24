@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,11 +49,11 @@ tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
         return tb_bits_get_ubits32_impl(p, b, n);
 #elif defined(__tb_small__)
         tb_uint32_t x = 0;
-        tb_size_t   i = b; 
+        tb_size_t   i = b;
         tb_int_t    j = 24;
 
         b += n;
-        while (b > 7) 
+        while (b > 7)
         {
             x |= *p++ << (i + j);
             j -= 8;
@@ -61,7 +61,7 @@ tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
         }
         if (b > 0) x |= j < 0? (*p >> (8 - i)) : *p << (i + j);
         return (n < 32)? (x >> (32 - n)) : x;
-#else   
+#else
         tb_uint32_t x = 0;
         tb_size_t   i = b; b += n;
 
@@ -137,13 +137,13 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
     {
 #ifdef __tb_small__
         if (n < 32) x <<= (32 - n);
-        while (n--) 
+        while (n--)
         {
             *p &= ~(0x1 << (7 - b));
             *p |= ((x >> 31) << (7 - b));
 
             x <<= 1;
-            if (++b > 7) 
+            if (++b > 7)
             {
                 b = 0;
                 p++;
@@ -153,7 +153,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
         tb_uint32_t m = 0xffffffff;
         tb_size_t   i = b; b += n;
 
-        if (n < 32) 
+        if (n < 32)
         {
             x <<= (32 - n);
             m <<= (32 - n);
@@ -163,7 +163,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
             p[0] &= ~(m >> (24 + i));
             p[0] |= (x >> (24 + i));
             p[1] = (x >> (16 + i));
-            p[2] = (x >> (8 + i));  
+            p[2] = (x >> (8 + i));
             p[3] = (x >> i);
             p[4] = (x << (8 - i));
         }
@@ -174,11 +174,11 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
                 p[0] &= ~(m >> (24 + i));
                 p[0] |= (x >> (24 + i));
                 p[1] = (x >> (16 + i));
-                p[2] = (x >> (8 + i));  
+                p[2] = (x >> (8 + i));
                 p[3] = (x >> i);
             }
             else
-            {   
+            {
                 p[0] = x >> 24;
                 p[1] = x >> 16;
                 p[2] = x >> 8;
@@ -195,7 +195,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
                 p[2] = (x >> (8 + i));
             }
             else
-            {   
+            {
                 p[0] = x >> 24;
                 p[1] = x >> 16;
                 p[2] = x >> 8;
@@ -210,17 +210,17 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
                 p[1] = (x >> (16 + i));
             }
             else
-            {   
+            {
                 p[0] = x >> 24;
                 p[1] = x >> 16;
             }
         }
-        else 
+        else
         {
             if (i)
             {
                 p[0] &= ~(m >> (24 + i));
-                p[0] |= (x >> (24 + i));    
+                p[0] |= (x >> (24 + i));
             }
             else p[0] = x >> 24;
         }
@@ -260,11 +260,11 @@ tb_uint64_t tb_bits_get_ubits64(tb_byte_t const* p, tb_size_t b, tb_size_t n)
     else
     {
         tb_uint64_t x = 0;
-        tb_size_t   i = b; 
+        tb_size_t   i = b;
         tb_int_t    j = 56;
 
         b += n;
-        while (b > 7) 
+        while (b > 7)
         {
             x |= ((tb_uint64_t)*p++) << (i + j);
             j -= 8;

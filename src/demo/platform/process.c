@@ -5,10 +5,10 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
- */ 
+ */
 static tb_void_t tb_demo_process_test_run(tb_char_t** argv)
 {
-    // run 
+    // run
     tb_long_t ok = tb_process_run(argv[1], (tb_char_t const**)(argv + 1), tb_null);
     tb_process_run(argv[1], (tb_char_t const**)(argv + 1), tb_null);
 
@@ -41,7 +41,7 @@ static tb_void_t tb_demo_process_test_pipe(tb_char_t** argv)
                     read += real;
                     wait = tb_false;
                 }
-                else if (!real && !wait) 
+                else if (!real && !wait)
                 {
                     // wait pipe
                     tb_long_t ok = tb_pipe_file_wait(file[0], TB_PIPE_EVENT_READ, 1000);
@@ -110,7 +110,7 @@ static tb_void_t tb_demo_process_test_waitlist(tb_char_t** argv)
 
             // update processes
             tb_size_t count2 = 0;
-            for (i = 0; i < count1; i++) 
+            for (i = 0; i < count1; i++)
             {
                 if (processes1[i]) processes2[count2++] = processes1[i];
             }
@@ -127,14 +127,14 @@ static tb_void_t tb_demo_process_test_exit(tb_char_t** argv, tb_bool_t detach)
     if (detach) attr.flags |= TB_PROCESS_FLAG_DETACH;
     for (i = 0; i < 10; i++)
         tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
-    
+
     // we attempt to enter or do ctrl+c and see process list in process monitor
     tb_getchar();
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1

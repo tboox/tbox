@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/sched_affinity.c"
-#elif defined(TB_CONFIG_OS_MACOSX) 
+#elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/sched_affinity.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_SCHED_SETAFFINITY)
 #   include "posix/sched_affinity.c"

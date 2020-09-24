@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -109,7 +109,7 @@ tb_element_t tb_element_obj()
     element.nrepl  = element_str.nrepl;
     element.ncopy  = element_ptr.ncopy;
     element.size   = sizeof(tb_object_ref_t);
-    
+
     // ok?
     return element;
 }

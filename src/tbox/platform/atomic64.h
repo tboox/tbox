@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -137,7 +137,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* compare and set the 64bits value 
+/* compare and set the 64bits value
  *
  * @param a     pointer to the atomic object to test and modify
  * @param p     pointer to the value expected to be found in the atomic object

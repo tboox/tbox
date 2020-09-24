@@ -27,9 +27,9 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_network_url_main(tb_int_t argc, tb_char_t** argv)
-{   
+{
     tb_url_test_set("data://VGhlIFRyZWFzdXJlIEJveCBMaWJyYXJ5Cgo=");
     tb_url_test_set("file:///home/ruki/file.txt");
     tb_url_test_set("sock://localhost:8080");

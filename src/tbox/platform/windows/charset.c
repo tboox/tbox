@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -55,26 +55,26 @@ static tb_size_t tb_charset_conv_impl_char_cp_bytes(tb_byte_t const* idata, tb_s
     }
     else if (cp == 1200 || cp == 1201) // utf16le or utf16be
     {
-        // not enough? 
+        // not enough?
         tb_check_return_val(isize > 1, 0);
 
         // get the first character
         tb_uint32_t c = cp == 1200? tb_bits_get_u16_le(idata) : tb_bits_get_u16_be(idata);
-        if (c >= 0xd800 && c <= 0xdbff) 
+        if (c >= 0xd800 && c <= 0xdbff)
         {
-            // not enough? 
+            // not enough?
             tb_check_return_val(isize > 3, 0);
 
             // the next character
             tb_byte_t const* p = idata + 2;
             tb_uint32_t c2 = cp == 1200? tb_bits_get_u16_le(p) : tb_bits_get_u16_be(p);
             return (c2 >= 0xdc00 && c2 <= 0xdfff)? 4 : 2;
-        } 
+        }
         else return 2;
     }
     else if (cp == 12000 || cp == 12001) // utf32le or utf32be
         return isize >= 4? 4 : 0;
- 
+
     // copy input buffer for patching '\0'
     tb_byte_t ibuffer[5];
     tb_size_t ineed = tb_min(isize, 4);

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -65,9 +65,9 @@ static tb_int_t tb_socket_type(tb_size_t type)
     {
     case TB_SOCKET_TYPE_SOCK_STREAM:
         return SOCK_STREAM;
-    case TB_SOCKET_TYPE_SOCK_DGRAM: 
+    case TB_SOCKET_TYPE_SOCK_DGRAM:
         return SOCK_DGRAM;
-    case TB_SOCKET_TYPE_SOCK_RAW: 
+    case TB_SOCKET_TYPE_SOCK_RAW:
         return SOCK_RAW;
     }
 
@@ -82,9 +82,9 @@ static tb_int_t tb_socket_proto(tb_size_t type, tb_size_t family)
     {
     case TB_SOCKET_TYPE_IPPROTO_TCP:
         return IPPROTO_TCP;
-    case TB_SOCKET_TYPE_IPPROTO_UDP: 
+    case TB_SOCKET_TYPE_IPPROTO_UDP:
         return IPPROTO_UDP;
-    case TB_SOCKET_TYPE_IPPROTO_ICMP: 
+    case TB_SOCKET_TYPE_IPPROTO_ICMP:
         switch (family)
         {
         case TB_IPADDR_FAMILY_IPV4:
@@ -121,7 +121,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);
-    
+
     // done
     tb_socket_ref_t sock = tb_null;
     do
@@ -157,7 +157,7 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
     // check
     tb_assert_and_check_return_val(type && pair, tb_false);
 
-    // init socket type 
+    // init socket type
     tb_int_t t = tb_socket_type(type);
     tb_assert_and_check_return_val(t >= 0, tb_false);
 
@@ -202,7 +202,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             if (is_block) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
             else fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
-            // ok 
+            // ok
             ok = tb_true;
         }
         break;
@@ -240,7 +240,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             {
                 // save it
                 *penable = (tb_bool_t)enable;
-            
+
                 // ok
                 ok = tb_true;
             }
@@ -271,7 +271,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             {
                 // save it
                 *pbuff_size = real;
-            
+
                 // ok
                 ok = tb_true;
             }
@@ -302,7 +302,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             {
                 // save it
                 *pbuff_size = real;
-            
+
                 // ok
                 ok = tb_true;
             }
@@ -343,7 +343,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
         }
         break;
     }
-    
+
     // exit args
     tb_va_end(args);
 
@@ -390,7 +390,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 #ifdef SO_REUSEADDR
     {
         tb_int_t reuseaddr = 1;
-        if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+        if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0)
         {
             // trace
             tb_trace_e("reuseaddr: failed");
@@ -403,7 +403,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (tb_ipaddr_port(addr))
     {
         tb_int_t reuseport = 1;
-        if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+        if (setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0)
         {
             // trace
             tb_trace_e("reuseport: %u failed", tb_ipaddr_port(addr));
@@ -422,7 +422,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
         }
     }
 
-    // bind 
+    // bind
     return !bind(tb_sock2fd(sock), (struct sockaddr *)&d, n);
 }
 tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
@@ -438,7 +438,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     // check
     tb_assert_and_check_return_val(sock, tb_null);
 
-    // done  
+    // done
     struct sockaddr_storage d;
     socklen_t               n = sizeof(struct sockaddr_in);
     tb_long_t               fd = accept(tb_sock2fd(sock), (struct sockaddr *)&d, &n);
@@ -451,20 +451,20 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
     /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
      *
-     * 40ms is the tcp ack delay on linux, which indicates that you are likely 
-     * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+     * 40ms is the tcp ack delay on linux, which indicates that you are likely
+     * encountering a bad interaction between delayed acks and the nagle's algorithm.
      *
-     * the best way to address this is to send all of your data using a single call to 
-     * send() or sendmsg(), before waiting for a response. 
+     * the best way to address this is to send all of your data using a single call to
+     * send() or sendmsg(), before waiting for a response.
      *
-     * if that is not possible then certain tcp socket options including TCP_QUICKACK (on the receiving side), 
-     * TCP_CORK (sending side), and TCP_NODELAY (sending side) can help, 
-     * but can also hurt if used improperly.  
+     * if that is not possible then certain tcp socket options including TCP_QUICKACK (on the receiving side),
+     * TCP_CORK (sending side), and TCP_NODELAY (sending side) can help,
+     * but can also hurt if used improperly.
      *
-     * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
-     * whereas the other two must be set at the appropriate times during the life of the connection 
+     * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket,
+     * whereas the other two must be set at the appropriate times during the life of the connection
      * and can therefore be trickier to use.
-     * 
+     *
      * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
      */
     tb_int_t enable = 1;
@@ -472,7 +472,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
     // save address
     if (addr) tb_sockaddr_save(addr, &d);
-        
+
     // ok
     return tb_fd2sock(fd);
 }
@@ -516,7 +516,7 @@ tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
 
     // kill it
     tb_bool_t ok = !shutdown(tb_sock2fd(sock), how)? tb_true : tb_false;
- 
+
     // failed?
     if (!ok)
     {
@@ -550,7 +550,7 @@ tb_bool_t tb_socket_exit(tb_socket_ref_t sock)
 
     // close it
     tb_bool_t ok = !close(tb_sock2fd(sock));
-    
+
     // failed?
     if (!ok)
     {
@@ -671,7 +671,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
     tb_trace_d("urecv: %p %lu bytes => %ld bytes, errno: %d", sock, size, r, errno);
 
     // ok?
-    if (r >= 0) 
+    if (r >= 0)
     {
         // save address
         if (addr) tb_sockaddr_save(addr, &d);

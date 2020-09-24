@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,7 +49,7 @@ static tb_void_t tb_file_mkdir(tb_wchar_t const* path)
     tb_wchar_t const*   p = path;
     tb_wchar_t*         t = temp;
     tb_wchar_t const*   e = temp + TB_PATH_MAXN - 1;
-    for (; t < e && *p; t++) 
+    for (; t < e && *p; t++)
     {
         *t = *p;
         if (*p == L'\\' || *p == L'/')
@@ -98,7 +98,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     }
     // open and truncate an existing file
     else if (mode & TB_FILE_MODE_TRUNC) cflag |= TRUNCATE_EXISTING;
-    // open an existing file 
+    // open an existing file
     if (!cflag) cflag |= OPEN_EXISTING;
 
     // init attr
@@ -121,9 +121,9 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     {
         // seek to end
         tb_hize_t size = tb_file_size((tb_file_ref_t)file);
-        if (size) 
+        if (size)
         {
-            if (size != tb_file_seek((tb_file_ref_t)file, size, TB_FILE_SEEK_BEG)) 
+            if (size != tb_file_seek((tb_file_ref_t)file, size, TB_FILE_SEEK_BEG))
             {
                 tb_file_exit((tb_file_ref_t)file);
                 file = INVALID_HANDLE_VALUE;
@@ -462,7 +462,7 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 {
     // check
     tb_assert_and_check_return_val(path, tb_false);
-    
+
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
@@ -479,7 +479,7 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 {
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
-    
+
     // the full path
     tb_wchar_t full0[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full0, TB_PATH_MAXN)) return tb_false;

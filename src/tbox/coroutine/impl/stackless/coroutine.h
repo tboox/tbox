@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -85,7 +85,7 @@ typedef struct __tb_lo_coroutine_t
     tb_lo_scheduler_ref_t       scheduler;
 
     // the passed private data between resume() and suspend()
-    union 
+    union
     {
         // the arguments for wait()
         tb_lo_coroutine_rs_wait_t   wait;
@@ -98,18 +98,18 @@ typedef struct __tb_lo_coroutine_t
  * interfaces
  */
 
-/* init coroutine 
+/* init coroutine
  *
  * @param scheduler     the scheduler
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  * @param free          the user private data free function
  *
- * @return              the coroutine 
+ * @return              the coroutine
  */
 tb_lo_coroutine_t*      tb_lo_coroutine_init(tb_lo_scheduler_ref_t scheduler, tb_lo_coroutine_func_t func, tb_cpointer_t priv, tb_lo_coroutine_free_t free);
 
-/* reinit the given coroutine 
+/* reinit the given coroutine
  *
  * @param coroutine     the coroutine
  * @param func          the coroutine function

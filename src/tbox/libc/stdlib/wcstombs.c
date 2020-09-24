@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,7 +40,7 @@
 // select the implementation of wcstombs
 #ifdef TB_CONFIG_FORCE_UTF8
 #   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-#       define TB_WCSTOMBS_IMPL_CHARSET 
+#       define TB_WCSTOMBS_IMPL_CHARSET
 #   elif defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
 #       define TB_WCSTOMBS_IMPL_LIBC
 #   endif
@@ -48,7 +48,7 @@
 #   if defined(TB_CONFIG_LIBC_HAVE_WCSTOMBS)
 #       define TB_WCSTOMBS_IMPL_LIBC
 #   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-#       define TB_WCSTOMBS_IMPL_CHARSET 
+#       define TB_WCSTOMBS_IMPL_CHARSET
 #   endif
 #endif
 
@@ -81,9 +81,9 @@ inline static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2,
     // init
     tb_long_t r = 0;
     tb_size_t l = tb_wcslen(s2);
-    
+
     // atow
-    if (l) 
+    if (l)
     {
         tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UTF32 : TB_CHARSET_TYPE_UTF16;
         r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, (tb_byte_t const*)s2, l * sizeof(tb_wchar_t), (tb_byte_t*)s1, n);

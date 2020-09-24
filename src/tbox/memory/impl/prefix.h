@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,16 +49,16 @@ __tb_extern_c_enter__
 // the pool data empty magic number
 #define TB_POOL_DATA_EMPTY_MAGIC            (0xdeaf)
 
-// the pool data patch value 
+// the pool data patch value
 #define TB_POOL_DATA_PATCH                  (0xcc)
 
-// the pool data size maximum 
+// the pool data size maximum
 #define TB_POOL_DATA_SIZE_MAXN              (TB_MAXU32)
 
-// the pool data address alignment 
+// the pool data address alignment
 #define TB_POOL_DATA_ALIGN                  TB_CPU_BITBYTE
 
-// the pool data alignment keyword 
+// the pool data alignment keyword
 #define __tb_pool_data_aligned__            __tb_cpu_aligned__
 
 // the pool data head different size for computing the wasted space size
@@ -83,7 +83,7 @@ typedef __tb_pool_data_aligned__ struct __tb_pool_data_debug_head_t
     // the backtrace frames
     tb_pointer_t                backtrace[16];
 
-    // the line 
+    // the line
     tb_uint16_t                 line;
 
     /* the magic

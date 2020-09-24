@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@ typedef struct __tb_regex_t
     // the code
     regex_t             code;
 
-    // the results 
+    // the results
     tb_vector_ref_t     results;
 
     // the mode
@@ -100,7 +100,7 @@ tb_regex_ref_t tb_regex_init(tb_char_t const* pattern, tb_size_t mode)
         // save mode
         regex->mode = mode;
 
-        // ok 
+        // ok
         ok = tb_true;
 
     } while (0);
@@ -239,7 +239,7 @@ tb_long_t tb_regex_match(tb_regex_ref_t self, tb_char_t const* cstr, tb_size_t s
                 entry.size  = substr_length;
                 entry.start = substr_offset;
                 tb_assert_and_check_break(entry.cstr);
-                
+
                 // trace
                 tb_trace_d("    matched: [%lu, %lu]: %s", entry.start, entry.size, entry.cstr);
 
@@ -249,7 +249,7 @@ tb_long_t tb_regex_match(tb_regex_ref_t self, tb_char_t const* cstr, tb_size_t s
             tb_assert_and_check_break(i == count);
         }
 
-        // save length 
+        // save length
         if (plength) *plength = length;
 
         // ok
@@ -318,7 +318,7 @@ tb_char_t const* tb_regex_replace(tb_regex_ref_t self, tb_char_t const* cstr, tb
             if (subend < size) tb_memmov(regex->buffer_data + suboffset + replace_size, regex->buffer_data + subend, size - subend);
             tb_memcpy(regex->buffer_data + suboffset, replace_cstr, replace_size);
             regex->buffer_data[length] = '\0';
-           
+
             // trace
             tb_trace_d("replace: => %s", regex->buffer_data);
 
@@ -343,7 +343,7 @@ tb_char_t const* tb_regex_replace(tb_regex_ref_t self, tb_char_t const* cstr, tb
         // trace
         tb_trace_d("    replace: [%lu]: %s", length, regex->buffer_data);
 
-        // save length 
+        // save length
         if (plength) *plength = length;
 
         // ok

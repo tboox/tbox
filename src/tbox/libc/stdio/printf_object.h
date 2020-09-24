@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -80,7 +80,7 @@ typedef tb_long_t       (*tb_printf_object_func_t)(tb_cpointer_t object, tb_char
         // ok?
         return size;
     }
-    
+
     // register the "ipv4" printf object func
     tb_printf_object_register("ipv4", tb_printf_object_ipv4);
 

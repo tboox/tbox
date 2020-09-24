@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -67,19 +67,19 @@ typedef struct __tb_pollerdata_t
  */
 tb_void_t               tb_pollerdata_init(tb_pollerdata_ref_t pollerdata);
 
-/* exit poller data 
+/* exit poller data
  *
  * @param pollerdata    the pollerdata
  */
 tb_void_t               tb_pollerdata_exit(tb_pollerdata_ref_t pollerdata);
 
-/* clear poller data 
+/* clear poller data
  *
  * @param pollerdata    the pollerdata
  */
 tb_void_t               tb_pollerdata_clear(tb_pollerdata_ref_t pollerdata);
 
-/* set poller data 
+/* set poller data
  *
  * @param pollerdata    the pollerdata
  * @param object        the poller object
@@ -87,7 +87,7 @@ tb_void_t               tb_pollerdata_clear(tb_pollerdata_ref_t pollerdata);
  */
 tb_void_t               tb_pollerdata_set(tb_pollerdata_ref_t pollerdata, tb_poller_object_ref_t object, tb_cpointer_t priv);
 
-/* get poller data 
+/* get poller data
  *
  * @param pollerdata    the pollerdata
  * @param object        the poller object
@@ -96,7 +96,7 @@ tb_void_t               tb_pollerdata_set(tb_pollerdata_ref_t pollerdata, tb_pol
  */
 tb_cpointer_t           tb_pollerdata_get(tb_pollerdata_ref_t pollerdata, tb_poller_object_ref_t object);
 
-/* reset poller data 
+/* reset poller data
  *
  * @param pollerdata    the pollerdata
  * @param object        the poller object

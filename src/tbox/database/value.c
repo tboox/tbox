@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -362,7 +362,7 @@ tb_void_t tb_database_sql_value_set_int32(tb_database_sql_value_t* value, tb_int
     value->u.i32        = number;
 }
 tb_void_t tb_database_sql_value_set_int64(tb_database_sql_value_t* value, tb_int64_t number)
-{   
+{
     // check
     tb_assert_and_check_return(value);
 
@@ -398,7 +398,7 @@ tb_void_t tb_database_sql_value_set_uint32(tb_database_sql_value_t* value, tb_ui
     value->u.u32        = number;
 }
 tb_void_t tb_database_sql_value_set_uint64(tb_database_sql_value_t* value, tb_uint64_t number)
-{   
+{
     // check
     tb_assert_and_check_return(value);
 
@@ -417,7 +417,7 @@ tb_void_t tb_database_sql_value_set_float(tb_database_sql_value_t* value, tb_flo
     value->u.f          = number;
 }
 tb_void_t tb_database_sql_value_set_double(tb_database_sql_value_t* value, tb_double_t number)
-{   
+{
     // check
     tb_assert_and_check_return(value);
 
@@ -473,7 +473,7 @@ tb_void_t tb_database_sql_value_set_blob32(tb_database_sql_value_t* value, tb_by
     tb_hong_t stream_size = 0;
     if (stream)
     {
-        // must be opened 
+        // must be opened
         tb_assert_and_check_return(tb_stream_is_opened(stream));
 
         // the stream size

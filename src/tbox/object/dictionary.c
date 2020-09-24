@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -87,7 +87,7 @@ static tb_object_ref_t tb_oc_dictionary_copy(tb_object_ref_t object)
     // walk copy
     tb_for_all (tb_oc_dictionary_item_t*, item, tb_oc_dictionary_itor((tb_object_ref_t)dictionary))
     {
-        if (item && item->key) 
+        if (item && item->key)
         {
             // refn++
             if (item->val) tb_object_retain(item->val);
@@ -139,7 +139,7 @@ static tb_oc_dictionary_t* tb_oc_dictionary_init_base()
         dictionary->base.copy   = tb_oc_dictionary_copy;
         dictionary->base.exit   = tb_oc_dictionary_exit;
         dictionary->base.clear  = tb_oc_dictionary_clear;
-        
+
         // ok
         ok = tb_true;
 

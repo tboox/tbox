@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_lock_test_func(tb_cpointer_t priv)
 {
     // check
@@ -35,7 +35,7 @@ static tb_void_t tb_demo_coroutine_lock_test_func(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_lock_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler
@@ -45,7 +45,7 @@ tb_int_t tb_demo_coroutine_lock_main(tb_int_t argc, tb_char_t** argv)
         // init lock
         tb_co_lock_ref_t lock = tb_co_lock_init();
         tb_assert(lock);
-        
+
         // start coroutines
         tb_coroutine_start(scheduler, tb_demo_coroutine_lock_test_func, lock, 0);
         tb_coroutine_start(scheduler, tb_demo_coroutine_lock_test_func, lock, 0);

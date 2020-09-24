@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -42,7 +42,7 @@ __tb_extern_c_enter__
  *
  *  -------------------------      ------------------------
  * |       native memory     |    |         data           |
- *  -------------------------      ------------------------ 
+ *  -------------------------      ------------------------
  *              |                             |
  *  -------------------------      ------------------------
  * |  native large allocator |    | static large allocator |
@@ -50,14 +50,14 @@ __tb_extern_c_enter__
  *              |                             |
  *  ------------------------------------------------------
  * |                     large allocator                  |
- *  ------------------------------------------------------ 
+ *  ------------------------------------------------------
  *
  * </pre>
- * 
+ *
  * @param data          the data, uses the native memory if be null
  * @param size          the size
  *
- * @return              the allocator 
+ * @return              the allocator
  */
 tb_allocator_ref_t      tb_large_allocator_init(tb_byte_t* data, tb_size_t size);
 

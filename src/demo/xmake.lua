@@ -12,24 +12,24 @@ target("demo")
     add_defines("__tb_prefix__=\"demo\"")
 
     -- add the source files
-    add_files("demo.c") 
-    add_files("libc/*.c") 
-    add_files("libm/integer.c") 
-    add_files("math/random.c") 
-    add_files("utils/*.c|option.c") 
-    add_files("other/*.c|charset.c", "other/*.cpp") 
-    add_files("string/*.c") 
-    add_files("memory/**.c") 
-    add_files("platform/*.c|exception.c|context.c") 
-    add_files("container/*.c") 
-    add_files("algorithm/*.c") 
-    add_files("stream/stream.c") 
-    add_files("stream/stream/*.c") 
-    add_files("network/**.c") 
+    add_files("demo.c")
+    add_files("libc/*.c")
+    add_files("libm/integer.c")
+    add_files("math/random.c")
+    add_files("utils/*.c|option.c")
+    add_files("other/*.c|charset.c", "other/*.cpp")
+    add_files("string/*.c")
+    add_files("memory/**.c")
+    add_files("platform/*.c|exception.c|context.c")
+    add_files("container/*.c")
+    add_files("algorithm/*.c")
+    add_files("stream/stream.c")
+    add_files("stream/stream/*.c")
+    add_files("network/**.c")
 
     -- add the source files for the hash module
     if has_config("hash") then
-        add_files("hash/*.c") 
+        add_files("hash/*.c")
     end
 
     -- add the source files for the float type
@@ -41,13 +41,13 @@ target("demo")
 
     -- add the source files for the coroutine module
     if has_config("coroutine") then
-        add_files("coroutine/**.c") 
-        add_files("platform/context.c") 
+        add_files("coroutine/**.c")
+        add_files("platform/context.c")
     end
 
     -- add the source files for the exception module
     if has_config("exception") then
-        add_files("platform/exception.c") 
+        add_files("platform/exception.c")
     end
 
     -- add the source files for the xml module

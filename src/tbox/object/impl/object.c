@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -42,7 +42,7 @@ tb_bool_t tb_object_init_env()
     if (!tb_oc_reader_set(TB_OBJECT_FORMAT_BIN, tb_oc_bin_reader())) return tb_false;
     if (!tb_oc_reader_set(TB_OBJECT_FORMAT_JSON, tb_oc_json_reader())) return tb_false;
     if (!tb_oc_reader_set(TB_OBJECT_FORMAT_BPLIST, tb_oc_bplist_reader())) return tb_false;
- 
+
     // register writer
     if (!tb_oc_writer_set(TB_OBJECT_FORMAT_BIN, tb_oc_bin_writer())) return tb_false;
     if (!tb_oc_writer_set(TB_OBJECT_FORMAT_JSON, tb_oc_json_writer())) return tb_false;

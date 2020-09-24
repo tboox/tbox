@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -62,7 +62,7 @@ tb_void_t tb_oc_reader_remove(tb_size_t format)
         // exit hooker
         if (g_reader[format]->hooker) tb_hash_map_exit(g_reader[format]->hooker);
         g_reader[format]->hooker = tb_null;
-        
+
         // clear it
         g_reader[format] = tb_null;
     }
@@ -94,7 +94,7 @@ tb_object_ref_t tb_oc_reader_done(tb_stream_ref_t stream)
         {
             // the probe score
             tb_size_t score = reader->probe(stream);
-            if (score > m) 
+            if (score > m)
             {
                 m = score;
                 f = i;

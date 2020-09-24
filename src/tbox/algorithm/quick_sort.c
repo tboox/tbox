@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
  * implementation
  */
 tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
-{   
+{
     // check
     tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
     tb_check_return(head != tail);
@@ -52,10 +52,10 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
     tb_size_t r = tail - 1;
     while (r > l)
     {
-        // find: <= 
+        // find: <=
         for (; r != l; r--)
             if (comp(iterator, tb_iterator_item(iterator, r), key) < 0) break;
-        if (r != l) 
+        if (r != l)
         {
             tb_iterator_copy(iterator, l, tb_iterator_item(iterator, r));
             l++;
@@ -64,7 +64,7 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
         // find: =>
         for (; l != r; l++)
             if (comp(iterator, tb_iterator_item(iterator, l), key) > 0) break;
-        if (l != r) 
+        if (l != r)
         {
             tb_iterator_copy(iterator, r, tb_iterator_item(iterator, l));
             r--;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -66,7 +66,7 @@ static tb_long_t tb_filter_cache_spak(tb_filter_t* filter, tb_static_stream_ref_
     tb_byte_t*          oe = (tb_byte_t*)tb_static_stream_end(ostream);
     tb_byte_t*          ob = op;
 
-    // the need 
+    // the need
     tb_size_t           need = tb_min(ie - ip, oe - op);
 
     // copy data
@@ -99,7 +99,7 @@ tb_filter_ref_t tb_filter_init_from_cache(tb_size_t size)
         filter = tb_malloc0_type(tb_filter_cache_t);
         tb_assert_and_check_break(filter);
 
-        // init filter 
+        // init filter
         if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CACHE)) break;
         filter->base.spak = tb_filter_cache_spak;
 

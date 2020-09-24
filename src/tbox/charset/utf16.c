@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -45,7 +45,7 @@ tb_long_t tb_charset_utf16_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_
     p += 2;
 
     // large?
-    if (c >= 0xd800 && c <= 0xdbff) 
+    if (c >= 0xd800 && c <= 0xdbff)
     {
         // not enough? break it
         tb_check_return_val(n > 3, -1);
@@ -75,7 +75,7 @@ tb_long_t tb_charset_utf16_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_
     // init
     tb_size_t n = tb_static_stream_left(sstream);
 
-    if (ch <= 0x0000ffff) 
+    if (ch <= 0x0000ffff)
     {
         // not enough? break it
         tb_check_return_val(n > 1, -1);
@@ -105,7 +105,7 @@ tb_long_t tb_charset_utf16_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_
             tb_static_stream_writ_u16_be(sstream, (ch >> 10) + 0xd800);
             tb_static_stream_writ_u16_be(sstream, (ch & 0x3ff) + 0xdc00);
         }
-        else 
+        else
         {
             tb_static_stream_writ_u16_le(sstream, (ch >> 10) + 0xd800);
             tb_static_stream_writ_u16_le(sstream, (ch & 0x3ff) + 0xdc00);

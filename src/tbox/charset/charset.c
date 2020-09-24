@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -169,7 +169,7 @@ tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_static_stream
     tb_charset_ref_t to = tb_charset_find_by_type(ttype);
     tb_assert_and_check_return_val(fr && to && fr->get && fr->set, -1);
 
-    // no data? 
+    // no data?
     tb_check_return_val(tb_static_stream_left(fst), 0);
 
     // big endian?

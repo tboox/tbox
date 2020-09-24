@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@ tb_size_t tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
     static tb_char_t    ht[] = "0123456789ABCDEF";
 
     // done
-    while (ip < ie && op < oe) 
+    while (ip < ie && op < oe)
     {
         // character
         tb_byte_t c = *ip++;
@@ -47,16 +47,16 @@ tb_size_t tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
         // space?
         if (c == ' ') *op++ = '+';
         // %xx?
-        else if (   (c < '0' && c != '-' && c != '.') 
-                ||  (c < 'A' && c > '9') 
-                ||  (c > 'Z' && c < 'a' && c != '_') 
+        else if (   (c < '0' && c != '-' && c != '.')
+                ||  (c < 'A' && c > '9')
+                ||  (c > 'Z' && c < 'a' && c != '_')
                 ||  (c > 'z'))
         {
             op[0] = '%';
             op[1] = ht[c >> 4];
             op[2] = ht[c & 15];
             op += 3;
-        } 
+        }
         else *op++ = c;
     }
 
@@ -76,7 +76,7 @@ tb_size_t tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
 
     // done
     tb_char_t ch[3] = {0};
-    while (ip < ie && op < oe) 
+    while (ip < ie && op < oe)
     {
         // space?
         if (*ip == '+') *op = ' ';
@@ -111,22 +111,22 @@ tb_size_t tb_url_encode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
     static tb_char_t    ht[] = "0123456789ABCDEF";
 
     // done
-    while (ip < ie && op < oe) 
+    while (ip < ie && op < oe)
     {
         // character
         tb_byte_t c = *ip++;
 
         // %xx?
-        if (    (c < '0' && c != '-' && c != '.' && c != '&' && c != '!' && c != '#' && c != '$' && c != '\'' && c != '(' && c != ')' && c != '+' && c != ',' && c != '*' && c != '/') 
+        if (    (c < '0' && c != '-' && c != '.' && c != '&' && c != '!' && c != '#' && c != '$' && c != '\'' && c != '(' && c != ')' && c != '+' && c != ',' && c != '*' && c != '/')
             ||  (c < 'A' && c > '9' && c != '@' && c != '?' && c != '=' && c != ';' && c != ':')
-            ||  (c > 'Z' && c < 'a' && c != '_') 
+            ||  (c > 'Z' && c < 'a' && c != '_')
             ||  (c > 'z' && c != '~'))
         {
             op[0] = '%';
             op[1] = ht[c >> 4];
             op[2] = ht[c & 15];
             op += 3;
-        } 
+        }
         else *op++ = c;
     }
 
@@ -146,7 +146,7 @@ tb_size_t tb_url_decode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
 
     // done
     tb_char_t ch[3] = {0};
-    while (ip < ie && op < oe) 
+    while (ip < ie && op < oe)
     {
         // %xx?
         if (*ip == '%' && ip + 2 < ie && tb_isdigit16(ip[1]) && tb_isdigit16(ip[2]))
@@ -179,22 +179,22 @@ tb_size_t tb_url_encode_args(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, t
     static tb_char_t    ht[] = "0123456789ABCDEF";
 
     // done
-    while (ip < ie && op < oe) 
+    while (ip < ie && op < oe)
     {
         // character
         tb_byte_t c = *ip++;
 
         // %xx?
-        if (    (c < '0' && c != '-' && c != '.' && c != '!' && c != '(' && c != ')' && c != '*' && c != '\'') 
+        if (    (c < '0' && c != '-' && c != '.' && c != '!' && c != '(' && c != ')' && c != '*' && c != '\'')
             ||  (c < 'A' && c > '9')
-            ||  (c > 'Z' && c < 'a' && c != '_') 
+            ||  (c > 'Z' && c < 'a' && c != '_')
             ||  (c > 'z' && c != '~'))
         {
             op[0] = '%';
             op[1] = ht[c >> 4];
             op[2] = ht[c & 15];
             op += 3;
-        } 
+        }
         else *op++ = c;
     }
 

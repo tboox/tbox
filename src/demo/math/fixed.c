@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
-static tb_fixed_t tb_fixed_test_angle[360] = 
+ */
+static tb_fixed_t tb_fixed_test_angle[360] =
 {
     0x0
 ,   0x477
@@ -370,7 +370,7 @@ static tb_fixed_t tb_fixed_test_angle[360] =
 ,   0x64407
 };
 
-static tb_fixed_t tb_fixed_test_arc[5][5] = 
+static tb_fixed_t tb_fixed_test_arc[5][5] =
 {
     { 0x7fffffff,   0x0,        0x0,        0x0,        0x0}
 ,   {0x7fffffff,    0x10000,    0x8000,     0x5555,     0x4000}
@@ -380,7 +380,7 @@ static tb_fixed_t tb_fixed_test_arc[5][5] =
 
 };
 
-static tb_fixed_t tb_fixed_test_atan_a[] = 
+static tb_fixed_t tb_fixed_test_atan_a[] =
 {
     0xfff60000
 ,   0xfff63334
@@ -830,7 +830,7 @@ static tb_void_t tb_fixed_test_atan()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_math_fixed_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_fixed_test_constant();

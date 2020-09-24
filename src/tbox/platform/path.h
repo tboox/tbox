@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -44,12 +44,12 @@ __tb_extern_c_enter__
  */
 
 /*! translate the path to the native path
- * 
+ *
  * - transform the path separator
  * - remove the repeat path separator
  * - expand the user directory with the prefix: ~
  *
- * @param path          the path 
+ * @param path          the path
  * @param size          the path size, optional
  * @param maxn          the path maxn
  *
@@ -58,16 +58,16 @@ __tb_extern_c_enter__
 tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn);
 
 /*! the path is absolute?
- * 
- * @param path          the path 
+ *
+ * @param path          the path
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_path_is_absolute(tb_char_t const* path);
 
 /*! get the absolute path which relative to the current directory
- * 
- * @param path          the path 
+ *
+ * @param path          the path
  * @param data          the path data
  * @param maxn          the path maxn
  *
@@ -76,9 +76,9 @@ tb_bool_t               tb_path_is_absolute(tb_char_t const* path);
 tb_char_t const*        tb_path_absolute(tb_char_t const* path, tb_char_t* data, tb_size_t maxn);
 
 /*! get the absolute path which relative to the given root directory
- * 
- * @param root          the root path 
- * @param path          the path 
+ *
+ * @param root          the root path
+ * @param path          the path
  * @param data          the path data
  * @param maxn          the path maxn
  *
@@ -87,8 +87,8 @@ tb_char_t const*        tb_path_absolute(tb_char_t const* path, tb_char_t* data,
 tb_char_t const*        tb_path_absolute_to(tb_char_t const* root, tb_char_t const* path, tb_char_t* data, tb_size_t maxn);
 
 /*! get the path which relative to the current directory
- * 
- * @param path          the path 
+ *
+ * @param path          the path
  * @param data          the path data
  * @param maxn          the path maxn
  *
@@ -97,9 +97,9 @@ tb_char_t const*        tb_path_absolute_to(tb_char_t const* root, tb_char_t con
 tb_char_t const*        tb_path_relative(tb_char_t const* path, tb_char_t* data, tb_size_t maxn);
 
 /*! get the path which relative to the given root directory
- * 
- * @param root          the root path 
- * @param path          the path 
+ *
+ * @param root          the root path
+ * @param path          the path
  * @param data          the path data
  * @param maxn          the path maxn
  *

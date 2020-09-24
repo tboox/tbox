@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,7 +46,7 @@ typedef tb_iterator_ref_t tb_environment_ref_t;
 
 /*! init the environment variable
  *
- * @return              the environment variable 
+ * @return              the environment variable
  */
 tb_environment_ref_t    tb_environment_init(tb_noarg_t);
 
@@ -94,7 +94,7 @@ tb_size_t               tb_environment_size(tb_environment_ref_t environment);
  * @param environment   the environment variable
  * @param name          the variable name
  *
- * @return              the count of the variable value 
+ * @return              the count of the variable value
  */
 tb_size_t               tb_environment_load(tb_environment_ref_t environment, tb_char_t const* name);
 
@@ -172,7 +172,7 @@ tb_char_t const*        tb_environment_at(tb_environment_ref_t environment, tb_s
  */
 tb_bool_t               tb_environment_replace(tb_environment_ref_t environment, tb_char_t const* value);
 
-/*! set the environment variable 
+/*! set the environment variable
  *
  * @param environment   the environment variable
  * @param value         the variable value
@@ -191,10 +191,10 @@ tb_bool_t               tb_environment_insert(tb_environment_ref_t environment, 
 tb_void_t               tb_environment_dump(tb_environment_ref_t environment, tb_char_t const* name);
 #endif
 
-/*! get the first environment variable value 
+/*! get the first environment variable value
  *
  * @code
- 
+
     tb_char_t value[TB_PATH_MAXN];
     if (tb_environment_first("HOME", value, sizeof(value)))
     {
@@ -211,10 +211,10 @@ tb_void_t               tb_environment_dump(tb_environment_ref_t environment, tb
  */
 tb_size_t               tb_environment_first(tb_char_t const* name, tb_char_t* value, tb_size_t maxn);
 
-/*! get the environment variable values 
+/*! get the environment variable values
  *
  * @code
- 
+
     tb_char_t value[TB_PATH_MAXN];
     if (tb_environment_get("HOME", value, sizeof(value)))
     {
@@ -252,7 +252,7 @@ tb_bool_t               tb_environment_set(tb_char_t const* name, tb_char_t cons
  */
 tb_bool_t               tb_environment_add(tb_char_t const* name, tb_char_t const* values, tb_bool_t to_head);
 
-/*! remove the given environment variable 
+/*! remove the given environment variable
  *
  * @param name          the variable name
  *

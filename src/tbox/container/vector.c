@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -42,7 +42,7 @@
  */
 
 // the vector grow
-#ifdef __tb_small__ 
+#ifdef __tb_small__
 #   define TB_VECTOR_GROW             (128)
 #else
 #   define TB_VECTOR_GROW             (256)
@@ -142,7 +142,7 @@ static tb_pointer_t tb_vector_itor_item(tb_iterator_ref_t iterator, tb_size_t it
     // check
     tb_vector_t* vector = (tb_vector_t*)iterator;
     tb_assert_and_check_return_val(vector && itor < vector->size, tb_null);
-    
+
     // data
     return vector->element.data(&vector->element, vector->data + itor * iterator->step);
 }
@@ -207,7 +207,7 @@ tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_element_t element)
         tb_assert_and_check_break(vector->maxn < TB_VECTOR_MAXN);
 
         // init operation
-        static tb_iterator_op_t op = 
+        static tb_iterator_op_t op =
         {
             tb_vector_itor_size
         ,   tb_vector_itor_head
@@ -274,7 +274,7 @@ tb_void_t tb_vector_clear(tb_vector_ref_t self)
     if (vector->element.nfree)
         vector->element.nfree(&vector->element, vector->data, vector->size);
 
-    // reset size 
+    // reset size
     vector->size = 0;
 }
 tb_void_t tb_vector_copy(tb_vector_ref_t self, tb_vector_ref_t copy)
@@ -292,12 +292,12 @@ tb_void_t tb_vector_copy(tb_vector_ref_t self, tb_vector_ref_t copy)
     tb_assert_and_check_return(vector->itor.step == vector_copy->itor.step);
 
     // null? clear it
-    if (!vector_copy->size) 
+    if (!vector_copy->size)
     {
         tb_vector_clear(self);
         return ;
     }
-    
+
     // resize if small
     if (vector->size < vector_copy->size) tb_vector_resize(self, vector_copy->size);
     tb_assert_and_check_return(vector->data && vector_copy->data && vector->size >= vector_copy->size);
@@ -357,12 +357,12 @@ tb_bool_t tb_vector_resize(tb_vector_ref_t self, tb_size_t size)
     // check
     tb_vector_t* vector = (tb_vector_t*)self;
     tb_assert_and_check_return_val(vector, tb_false);
-    
+
     // free items if the vector is decreased
     if (size < vector->size)
     {
         // free data
-        if (vector->element.nfree) 
+        if (vector->element.nfree)
             vector->element.nfree(&vector->element, vector->data + size * vector->element.size, vector->size - size);
     }
 
@@ -400,7 +400,7 @@ tb_void_t tb_vector_insert_prev(tb_vector_ref_t self, tb_size_t itor, tb_cpointe
     tb_size_t osize = vector->size;
 
     // grow a item
-    if (!tb_vector_resize(self, osize + 1)) 
+    if (!tb_vector_resize(self, osize + 1))
     {
         tb_trace_d("vector resize: %u => %u failed", osize, osize + 1);
         return ;
@@ -434,7 +434,7 @@ tb_void_t tb_vector_ninsert_prev(tb_vector_ref_t self, tb_size_t itor, tb_cpoint
     tb_size_t osize = vector->size;
 
     // grow size
-    if (!tb_vector_resize(self, osize + size)) 
+    if (!tb_vector_resize(self, osize + size))
     {
         tb_trace_d("vector resize: %u => %u failed", osize, osize + 1);
         return ;
@@ -506,7 +506,7 @@ tb_void_t tb_vector_nreplace_last(tb_vector_ref_t self, tb_cpointer_t data, tb_s
     tb_vector_nreplace(self, size >= vector->size? 0 : vector->size - size, data, size);
 }
 tb_void_t tb_vector_remove(tb_vector_ref_t self, tb_size_t itor)
-{   
+{
     // check
     tb_vector_t* vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && itor < vector->size);
@@ -549,12 +549,12 @@ tb_void_t tb_vector_nremove(tb_vector_ref_t self, tb_size_t itor, tb_size_t size
     tb_assert_and_check_return(vector && size && itor < vector->size);
 
     // clear it
-    if (!itor && size >= vector->size) 
+    if (!itor && size >= vector->size)
     {
         tb_vector_clear(self);
         return ;
     }
-    
+
     // strip size
     if (itor + size > vector->size) size = vector->size - itor;
 
@@ -593,7 +593,7 @@ tb_void_t tb_vector_nremove_head(tb_vector_ref_t self, tb_size_t size)
     tb_vector_nremove(self, 0, size);
 }
 tb_void_t tb_vector_nremove_last(tb_vector_ref_t self, tb_size_t size)
-{   
+{
     // check
     tb_vector_t* vector = (tb_vector_t*)self;
     tb_assert_and_check_return(vector && size);
@@ -623,7 +623,7 @@ tb_void_t tb_vector_dump(tb_vector_ref_t self)
     tb_for_all (tb_pointer_t, data, self)
     {
         // trace
-        if (vector->element.cstr) 
+        if (vector->element.cstr)
         {
             tb_trace_i("    %s", vector->element.cstr(&vector->element, data, cstr, sizeof(cstr)));
         }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,7 +33,7 @@ tb_size_t tb_cpu_count()
 {
     // we will pre-initialize it in tb_platform_init()
     static tb_size_t ncpu = -1;
-    if (ncpu == -1) 
+    if (ncpu == -1)
     {
         tb_size_t count = sysconf(_SC_NPROCESSORS_ONLN);
         if (!count) count = sysconf(_SC_NPROCESSORS_CONF);

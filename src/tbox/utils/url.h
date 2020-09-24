@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -80,7 +80,7 @@ tb_size_t           tb_url_encode2(tb_char_t const* ib, tb_size_t in, tb_char_t*
  */
 tb_size_t           tb_url_decode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
 
-/*! encode the url arguments, not encode: -_.!~*'() 
+/*! encode the url arguments, not encode: -_.!~*'()
  *
  * @param ib        the input data
  * @param in        the input size

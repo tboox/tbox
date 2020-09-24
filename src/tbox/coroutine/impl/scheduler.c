@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -66,7 +66,7 @@ static tb_void_t tb_co_scheduler_make_ready(tb_co_scheduler_t* scheduler, tb_cor
     // check
     tb_assert(scheduler && coroutine);
 
-    // insert this coroutine to ready coroutines 
+    // insert this coroutine to ready coroutines
     if (__tb_unlikely__(tb_coroutine_is_original(scheduler->running)))
     {
         // .. last -> coroutine(inserted)
@@ -97,7 +97,7 @@ static __tb_inline__ tb_coroutine_t* tb_co_scheduler_next_ready(tb_co_scheduler_
     // check
     tb_assert(scheduler && scheduler->running && tb_list_entry_size(&scheduler->coroutines_ready));
 
-    // get the next entry 
+    // get the next entry
     tb_list_entry_ref_t entry_next = tb_list_entry_next((tb_list_entry_ref_t)scheduler->running);
     tb_assert(entry_next);
 
@@ -270,7 +270,7 @@ tb_pointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t
     // make the running coroutine as suspend
     tb_co_scheduler_make_suspend(scheduler, scheduler->running);
 
-    // switch to next coroutine 
+    // switch to next coroutine
     if (coroutine_next != scheduler->running) tb_co_scheduler_switch(scheduler, coroutine_next);
     // no more coroutine?
     else
@@ -278,7 +278,7 @@ tb_pointer_t tb_co_scheduler_suspend(tb_co_scheduler_t* scheduler, tb_cpointer_t
         // trace
         tb_trace_d("switch to original coroutine");
 
-        // switch to the original coroutine 
+        // switch to the original coroutine
         tb_co_scheduler_switch(scheduler, &scheduler->original);
     }
 
@@ -308,7 +308,7 @@ tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
     // make the running coroutine as dead
     tb_co_scheduler_make_dead(scheduler, scheduler->running);
 
-    // switch to next coroutine 
+    // switch to next coroutine
     if (coroutine_next != scheduler->running) tb_co_scheduler_switch(scheduler, coroutine_next);
     // no more coroutine?
     else
@@ -316,7 +316,7 @@ tb_void_t tb_co_scheduler_finish(tb_co_scheduler_t* scheduler)
         // trace
         tb_trace_d("switch to original coroutine");
 
-        // switch to the original coroutine 
+        // switch to the original coroutine
         tb_co_scheduler_switch(scheduler, &scheduler->original);
     }
 }
@@ -353,7 +353,7 @@ tb_void_t tb_co_scheduler_switch(tb_co_scheduler_t* scheduler, tb_coroutine_t* c
     // jump to the given coroutine
     tb_context_from_t from = tb_context_jump(coroutine->context, running);
 
-    // the from-coroutine 
+    // the from-coroutine
     tb_coroutine_t* coroutine_from = (tb_coroutine_t*)from.priv;
     tb_assert(coroutine_from && from.context);
 

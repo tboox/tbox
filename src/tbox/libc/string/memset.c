@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -41,7 +41,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
 static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
@@ -90,7 +90,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
     // no size?
     tb_check_return_val(n, s);
 
-    // must be aligned by 2-bytes 
+    // must be aligned by 2-bytes
     tb_assert(!(((tb_size_t)s) & 0x1));
 
     // init
@@ -166,10 +166,10 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
     // no size?
     tb_check_return_val(n, s);
 
-    // must be aligned by 4-bytes 
+    // must be aligned by 4-bytes
     tb_assert(!(((tb_size_t)s) & 0x3));
 
-    // init 
+    // init
     __tb_register__ tb_uint32_t* p = (tb_uint32_t*)s;
 
     // done
@@ -203,7 +203,7 @@ static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t 
     // no size?
     tb_check_return_val(n, s);
 
-    // must be aligned by 8-bytes 
+    // must be aligned by 8-bytes
     tb_assert(!(((tb_size_t)s) & 0x7));
 
     // init
@@ -231,7 +231,7 @@ static tb_pointer_t tb_memset_u64_impl(tb_pointer_t s, tb_uint64_t c, tb_size_t 
 }
 #endif
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_pointer_t tb_memset_(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 {

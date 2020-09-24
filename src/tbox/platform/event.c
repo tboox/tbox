@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -34,7 +34,7 @@
  */
 #if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/event.c"
-#else 
+#else
 tb_event_ref_t tb_event_init()
 {
     return (tb_event_ref_t)tb_semaphore_init(0);

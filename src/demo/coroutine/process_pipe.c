@@ -1,17 +1,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define COUNT   (50)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
- */ 
-static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv) 
+ */
+static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
 {
     // get arguments
     tb_char_t** argv = (tb_char_t**)priv;
@@ -45,7 +45,7 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
                     read += real;
                     wait = tb_false;
                 }
-                else if (!real && !wait) 
+                else if (!real && !wait)
                 {
                     // wait pipe
                     tb_long_t ok = tb_pipe_file_wait(file[0], TB_PIPE_EVENT_READ, 1000);
@@ -74,7 +74,7 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
         tb_pipe_file_exit(file[1]);
     }
 
-    // end        
+    // end
     tb_trace_i("[%lu]: end", id);
 }
 
@@ -84,7 +84,7 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
 tb_int_t tb_demo_coroutine_process_pipe_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
-    if (scheduler) 
+    if (scheduler)
     {
         // start coroutines
         tb_size_t count = COUNT;

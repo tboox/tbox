@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -41,7 +41,7 @@ tb_bool_t tb_http_status_init(tb_http_status_t* status)
     // init status using the default value
     status->version = 1;
 
-    // init content type 
+    // init content type
     if (!tb_string_init(&status->content_type)) return tb_false;
 
     // init location

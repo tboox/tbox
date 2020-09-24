@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -159,7 +159,7 @@ tb_long_t               tb_static_string_strrchr(tb_static_string_ref_t string, 
  */
 tb_long_t               tb_static_string_strirchr(tb_static_string_ref_t string, tb_size_t p, tb_char_t c);
 
-/*! find string position 
+/*! find string position
  *
  * @param string        the string
  * @param p             the start position
@@ -179,7 +179,7 @@ tb_long_t               tb_static_string_strstr(tb_static_string_ref_t string, t
  */
 tb_long_t               tb_static_string_stristr(tb_static_string_ref_t string, tb_size_t p, tb_static_string_ref_t s);
 
-/*! find c-string position 
+/*! find c-string position
  *
  * @param string        the string
  * @param p             the start position
@@ -199,7 +199,7 @@ tb_long_t               tb_static_string_cstrstr(tb_static_string_ref_t string, 
  */
 tb_long_t               tb_static_string_cstristr(tb_static_string_ref_t string, tb_size_t p, tb_char_t const* s);
 
-/*! reverse to find string position 
+/*! reverse to find string position
  *
  * @param string        the string
  * @param p             the start position
@@ -219,7 +219,7 @@ tb_long_t               tb_static_string_strrstr(tb_static_string_ref_t string, 
  */
 tb_long_t               tb_static_string_strirstr(tb_static_string_ref_t string, tb_size_t p, tb_static_string_ref_t s);
 
-/*! reverse to find c-string position 
+/*! reverse to find c-string position
  *
  * @param string        the string
  * @param p             the start position
@@ -270,7 +270,7 @@ tb_char_t const*        tb_static_string_cstrncpy(tb_static_string_ref_t string,
 /*! copy format c-string
  *
  * @param string        the string
- * @param fmt           the copied format c-string 
+ * @param fmt           the copied format c-string
  *
  * @return              the c-string
  */
@@ -323,7 +323,7 @@ tb_char_t const*        tb_static_string_cstrcat(tb_static_string_ref_t string, 
  */
 tb_char_t const*        tb_static_string_cstrncat(tb_static_string_ref_t string, tb_char_t const* s, tb_size_t n);
 
-/*! append format c-string 
+/*! append format c-string
  *
  * @param string        the string
  * @param fmt           the appended format c-string

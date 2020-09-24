@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -137,7 +137,7 @@ tb_long_t tb_thread_wait(tb_thread_ref_t self, tb_long_t timeout, tb_int_t* retv
         // join failed? detach it
         pthread_detach(thread->pthread);
         return -1;
-    
+
     }
 
     // join ok

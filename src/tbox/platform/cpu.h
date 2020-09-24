@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -48,7 +48,7 @@
 #   else
 #       define tb_cpu_pause()       do { YieldProcessor(); } while (0)
 #   endif
-#elif defined(TB_ASSEMBLER_IS_GAS) 
+#elif defined(TB_ASSEMBLER_IS_GAS)
 #   if defined(TB_COMPILER_IS_GCC) && defined(TB_ARCH_x86)
         // old "as" does not support "pause" opcode
 #       define tb_cpu_pause()       do { __tb_asm__ __tb_volatile__ (".byte 0xf3, 0x90"); } while (0)

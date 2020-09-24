@@ -5,12 +5,12 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define COUNT   (50)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the client type
 typedef struct __tb_demo_client_t
@@ -31,7 +31,7 @@ typedef struct __tb_demo_client_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_session_exit(tb_demo_client_ref_t client, tb_poller_ref_t poller)
 {
     if (client)
@@ -57,7 +57,7 @@ static tb_long_t tb_demo_session_read(tb_demo_client_ref_t client)
     while (1)
     {
         tb_long_t real = tb_pipe_file_read(client->pipe[0], client->data, sizeof(client->data));
-        if (real > 0) 
+        if (real > 0)
         {
             client->size += real;
             client->wait = tb_false;
@@ -135,7 +135,7 @@ static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_r
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_poller_process_main(tb_int_t argc, tb_char_t** argv)
 {
     // check

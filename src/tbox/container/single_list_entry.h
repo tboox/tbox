@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,12 +40,12 @@
  * @code
  *
     // the xxxx entry type
-    typedef struct __tb_xxxx_entry_t 
+    typedef struct __tb_xxxx_entry_t
     {
         // the list entry (be placed in header with zero offset)
         tb_single_list_entry_t  entry;
 
-        // .. 
+        // ..
 
     }tb_xxxx_entry_t;
  *
@@ -53,12 +53,12 @@
  */
 #define tb_single_list_entry0(entry)        (entry)
 
-/*! init the list entry 
+/*! init the list entry
  *
  * @code
  *
     // the xxxx entry type
-    typedef struct __tb_xxxx_entry_t 
+    typedef struct __tb_xxxx_entry_t
     {
         // the list entry
         tb_single_list_entry_t      entry;
@@ -96,13 +96,13 @@ __tb_extern_c_enter__
  */
 
 /*! the single-linked list entry type
- * 
+ *
  * <pre>
  * list: head => ... => last => null
  *
  * </pre>
  */
-typedef struct __tb_single_list_entry_t 
+typedef struct __tb_single_list_entry_t
 {
     /// the next entry
     struct __tb_single_list_entry_t*    next;
@@ -110,7 +110,7 @@ typedef struct __tb_single_list_entry_t
 }tb_single_list_entry_t, *tb_single_list_entry_ref_t;
 
 /// the single-linked list entry head type
-typedef struct __tb_single_list_entry_head_t 
+typedef struct __tb_single_list_entry_head_t
 {
     /// the next entry
     struct __tb_single_list_entry_t*    next;
@@ -121,7 +121,7 @@ typedef struct __tb_single_list_entry_head_t
     /// the list size
     tb_size_t                           size;
 
-    /// the iterator 
+    /// the iterator
     tb_iterator_t                       itor;
 
     /// the entry offset
@@ -147,8 +147,8 @@ tb_iterator_ref_t                               tb_single_list_entry_itor(tb_sin
 /*! init list
  *
  * @param list                                  the list
- * @param entry_offset                          the entry offset 
- * @param entry_size                            the entry size 
+ * @param entry_offset                          the entry offset
+ * @param entry_size                            the entry size
  * @param copy                                  the copy func of the entry for algorithm, .e.g sort
  */
 tb_void_t                                       tb_single_list_entry_init_(tb_single_list_entry_head_ref_t list, tb_size_t entry_offset, tb_size_t entry_size, tb_entry_copy_t copy);
@@ -156,7 +156,7 @@ tb_void_t                                       tb_single_list_entry_init_(tb_si
 /*! exit list
  *
  * @param list                                  the list
- */ 
+ */
 tb_void_t                                       tb_single_list_entry_exit(tb_single_list_entry_head_ref_t list);
 
 /*! clear list
@@ -181,7 +181,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_clear(tb_si
  * @return                                      the list entry count
  */
 static __tb_inline__ tb_size_t                  tb_single_list_entry_size(tb_single_list_entry_head_ref_t list)
-{ 
+{
     // check
     tb_assert(list);
 
@@ -226,7 +226,7 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_head(tb_sin
  * @return                                      the last entry
  */
 static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_last(tb_single_list_entry_head_ref_t list)
-{ 
+{
     // check
     tb_assert(list);
 
@@ -241,7 +241,7 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_last(tb_sin
  * @return                                      the tail entry
  */
 static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_tail(tb_single_list_entry_head_ref_t list)
-{ 
+{
     return tb_null;
 }
 
@@ -252,7 +252,7 @@ static __tb_inline__ tb_single_list_entry_ref_t tb_single_list_entry_tail(tb_sin
  * @return                                      tb_true or tb_false
  */
 static __tb_inline__ tb_bool_t                  tb_single_list_entry_is_null(tb_single_list_entry_head_ref_t list)
-{ 
+{
     // check
     tb_assert(list);
 
@@ -314,7 +314,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_next
     list->size++;
 }
 
-/*! insert entry to the head 
+/*! insert entry to the head
  *
  * @param list                                  the list
  * @param entry                                 the inserted list entry
@@ -325,7 +325,7 @@ static __tb_inline__ tb_void_t                  tb_single_list_entry_insert_head
     tb_single_list_entry_insert_next(list, (tb_single_list_entry_ref_t)list, entry);
 }
 
-/*! insert entry to the tail 
+/*! insert entry to the tail
  *
  * @param list                                  the list
  * @param entry                                 the inserted list entry

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     utils
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -89,12 +89,12 @@ tb_void_t tb_singleton_kill()
     tb_size_t i = TB_SINGLETON_TYPE_MAXN;
     while (i--)
     {
-        if (g_singletons[i].kill) 
+        if (g_singletons[i].kill)
         {
             // the instance
             tb_handle_t instance = (tb_handle_t)tb_atomic_get(&g_singletons[i].instance);
-            if (instance && instance != (tb_handle_t)1 && instance != (tb_handle_t)-1) 
-            {   
+            if (instance && instance != (tb_handle_t)1 && instance != (tb_handle_t)-1)
+            {
                 // trace
                 tb_trace_d("instance: kill: %lu: ..", i);
 
@@ -110,11 +110,11 @@ tb_void_t tb_singleton_exit()
     tb_size_t i = TB_SINGLETON_TYPE_MAXN;
     while (i--)
     {
-        if (g_singletons[i].exit) 
+        if (g_singletons[i].exit)
         {
             // the instance
             tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_set(&g_singletons[i].instance, 0);
-            if (instance && instance != (tb_handle_t)1 && instance != (tb_handle_t)-1) 
+            if (instance && instance != (tb_handle_t)1 && instance != (tb_handle_t)-1)
             {
                 // trace
                 tb_trace_d("instance: exit: %lu: ..", i);
@@ -124,7 +124,7 @@ tb_void_t tb_singleton_exit()
             }
         }
     }
- 
+
     // clear it
     tb_memset(&g_singletons, 0, sizeof(g_singletons));
 }
@@ -132,7 +132,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
 {
     // check, @note cannot use trace, assert and memory
     tb_check_return_val(type < TB_SINGLETON_TYPE_MAXN, tb_null);
-    
+
     // the instance
     tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_cmpset(&g_singletons[type].instance, 0, 1);
 
@@ -154,7 +154,7 @@ tb_handle_t tb_singleton_instance(tb_size_t type, tb_singleton_init_func_t init,
         g_singletons[type].exit = exit;
         g_singletons[type].kill = kill;
 
-        // register instance 
+        // register instance
         tb_atomic_set(&g_singletons[type].instance, instance? (tb_long_t)instance : (tb_long_t)-1);
     }
     // initing? wait it
@@ -193,7 +193,7 @@ tb_bool_t tb_singleton_static_init(tb_atomic32_t* binited, tb_handle_t instance,
         tb_check_return_val(init, tb_false);
 
         // init it
-        if (!init(instance, priv)) 
+        if (!init(instance, priv))
         {
             // failed
             tb_atomic32_set(binited, -1);

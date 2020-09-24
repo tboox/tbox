@@ -8,7 +8,7 @@
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *   claim that you wrote the original software. If you use this software
  *   in a product, an acknowledgment in the product documentation would be
@@ -65,12 +65,12 @@ tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t s
 #ifdef TB_CONFIG_PACKAGE_HAVE_ZLIB
     return adler32(seed, data, (tb_uint_t)size);
 #else
-    // split adler-32 into component sums 
+    // split adler-32 into component sums
     tb_uint32_t adler = seed;
     tb_size_t   sum2 = (adler >> 16) & 0xffff; adler &= 0xffff;
 
-    // in case user likes doing a byte at a time, keep it fast 
-    if (size == 1) 
+    // in case user likes doing a byte at a time, keep it fast
+    if (size == 1)
     {
         adler += data[0];
         if (adler >= BASE) adler -= BASE;
@@ -82,11 +82,11 @@ tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t s
         return (tb_uint32_t)(adler | (sum2 << 16));
     }
 
-    // initial adler-32 value (deferred check for size == 1 speed) 
+    // initial adler-32 value (deferred check for size == 1 speed)
     tb_check_return_val(data, 1);
 
-    // in case short lengths are provided, keep it somewhat fast 
-    if (size < 16) 
+    // in case short lengths are provided, keep it somewhat fast
+    if (size < 16)
     {
         // done
         while (size--)
@@ -96,25 +96,25 @@ tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t s
         }
         if (adler >= BASE) adler -= BASE;
 
-        // only added so many BASE's 
-        MOD28(sum2);            
+        // only added so many BASE's
+        MOD28(sum2);
 
         // ok?
         return (tb_uint32_t)(adler | (sum2 << 16));
     }
 
-    // do length NMAX blocks -- requires just one modulo operation 
+    // do length NMAX blocks -- requires just one modulo operation
     tb_size_t n;
     while (size >= NMAX)
     {
         size -= NMAX;
 
-        // NMAX is divisible by 16 
-        n = NMAX / 16;          
+        // NMAX is divisible by 16
+        n = NMAX / 16;
         do
         {
-            // 16 sums unrolled 
-            DO16(data);          
+            // 16 sums unrolled
+            DO16(data);
             data += 16;
 
         } while (--n);
@@ -123,10 +123,10 @@ tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t s
         MOD(sum2);
     }
 
-    // do remaining bytes (less than NMAX, still just one modulo) 
-    if (size) 
-    {                  
-        // avoid modulos if none remaining 
+    // do remaining bytes (less than NMAX, still just one modulo)
+    if (size)
+    {
+        // avoid modulos if none remaining
         while (size >= 16)
         {
             size -= 16;
@@ -142,7 +142,7 @@ tb_uint32_t tb_adler32_make(tb_byte_t const* data, tb_size_t size, tb_uint32_t s
         MOD(sum2);
     }
 
-    // return recombined sums 
+    // return recombined sums
     return (tb_uint32_t)(adler | (sum2 << 16));
 #endif
 }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -48,7 +48,7 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_
 {
     __tb_register__ tb_fixed16_t t;
     __tb_asm__ __tb_volatile__
-    ( 
+    (
         "smull  %0, %2, %1, %3          \n"     // r64 = (l, h) = x * y
         "mov    %0, %0, lsr #16         \n"     // to fixed16: r64 >>= 16
         "orr    %0, %0, %2, lsl #16     \n"     // x = l = (h << (32 - 16)) | (l >> 16);

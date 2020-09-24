@@ -27,7 +27,7 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_network_dns_main(tb_int_t argc, tb_char_t** argv)
 {
     // test the invalid host

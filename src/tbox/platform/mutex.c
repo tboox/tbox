@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -55,7 +55,7 @@ tb_bool_t tb_mutex_enter_without_profiler(tb_mutex_ref_t mutex)
     return tb_true;
 }
 tb_bool_t tb_mutex_entry_try_without_profiler(tb_mutex_ref_t mutex)
-{    
+{
     // check, @note we cannot use asset/trace because them will use mutex
     tb_check_return_val(mutex, tb_false);
 

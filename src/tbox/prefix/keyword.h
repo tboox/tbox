@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -269,7 +269,7 @@
  * @code
     #define test_n(a, b, ...) test_impl(a, b)
     #define test(a, args ...) test_n(a, ##args, 0, 0, 0)
-    static __tb_inline__ tb_void_t test_impl(tb_int_t a, tb_int_t b) 
+    static __tb_inline__ tb_void_t test_impl(tb_int_t a, tb_int_t b)
     {
         tb_trace_i("test: %d %d", a, b);
     }
@@ -294,17 +294,17 @@
  * @code
  *
    typedef struct{}*    tb_xxxx_ref_t;
-  
+
    typedef struct __tb_yyyy_t
    {
        tb_xxxx_ref_t    xxxx;
-  
+
    }__tb_yyyy_t;
 
  *
  *
  * @endcode
- * 
+ *
  */
 #define __tb_typeref__(object)                              struct __tb_##object##_dummy_t{tb_int_t dummy;} const* tb_##object##_ref_t
 

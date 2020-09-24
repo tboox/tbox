@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  */
 
 // the trace prefix
-#ifndef __tb_prefix__ 
+#ifndef __tb_prefix__
 #   define __tb_prefix__                                    tb_null
 #endif
 
@@ -64,12 +64,12 @@ __tb_extern_c_enter__
 #       define tb_tracef_assert_p(prefix, fmt, arg ...)     do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: " fmt " at %s(): %d, %s", ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
 #       define tb_tracef_warning_p(prefix, fmt, arg ...)    do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: " fmt " at %s(): %d, %s", ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
 #   else
-#       define tb_trace_error_p(prefix, fmt, arg ...)       
-#       define tb_trace_assert_p(prefix, fmt, arg ...)       
-#       define tb_trace_warning_p(prefix, fmt, arg ...)       
-#       define tb_tracef_error_p(prefix, fmt, arg ...)       
-#       define tb_tracef_assert_p(prefix, fmt, arg ...)       
-#       define tb_tracef_warning_p(prefix, fmt, arg ...)       
+#       define tb_trace_error_p(prefix, fmt, arg ...)
+#       define tb_trace_assert_p(prefix, fmt, arg ...)
+#       define tb_trace_warning_p(prefix, fmt, arg ...)
+#       define tb_tracef_error_p(prefix, fmt, arg ...)
+#       define tb_tracef_assert_p(prefix, fmt, arg ...)
+#       define tb_tracef_warning_p(prefix, fmt, arg ...)
 #   endif
 #elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 #   define tb_trace_p(prefix, fmt, ...)                     do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt __tb_newline__, __VA_ARGS__); } while (0)
@@ -82,12 +82,12 @@ __tb_extern_c_enter__
 #       define tb_tracef_assert_p(prefix, fmt, ...)         do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: at %s(): %d, %s: " fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
 #       define tb_tracef_warning_p(prefix, fmt, ...)        do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: at %s(): %d, %s: " fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
 #   else
-#       define tb_trace_error_p(prefix, fmt, ...)       
-#       define tb_trace_assert_p(prefix, fmt, ...)       
-#       define tb_trace_warning_p(prefix, fmt, ...)       
-#       define tb_tracef_error_p(prefix, fmt, ...)       
-#       define tb_tracef_assert_p(prefix, fmt, ...)       
-#       define tb_tracef_warning_p(prefix, fmt, ...)       
+#       define tb_trace_error_p(prefix, fmt, ...)
+#       define tb_trace_assert_p(prefix, fmt, ...)
+#       define tb_trace_warning_p(prefix, fmt, ...)
+#       define tb_tracef_error_p(prefix, fmt, ...)
+#       define tb_tracef_assert_p(prefix, fmt, ...)
+#       define tb_tracef_warning_p(prefix, fmt, ...)
 #   endif
 #else
 #   define tb_trace_p
@@ -131,7 +131,7 @@ __tb_extern_c_enter__
  * note: [module]: will be not output if TB_TRACE_MODULE_NAME is not defined
  *
  */
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__) 
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
 #   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
 #       define TB_TRACE_DEBUG
 #       define tb_trace_d(fmt, arg ...)                 tb_trace_p(__tb_prefix__, fmt, ## arg)
@@ -149,9 +149,9 @@ __tb_extern_c_enter__
 #   endif
 #else
 #   if defined(TB_COMPILER_IS_GCC) || (defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)) || defined(TB_COMPILER_IS_TINYC)
-#       define tb_trace_d(fmt, ...)         
-#       define tb_tracef_d(fmt, ...)            
-#       define tb_tracet_d(fmt, ...)            
+#       define tb_trace_d(fmt, ...)
+#       define tb_tracef_d(fmt, ...)
+#       define tb_tracet_d(fmt, ...)
 #   else
 #       define tb_trace_d
 #       define tb_tracef_d
@@ -240,39 +240,39 @@ __tb_extern_c_enter__
 #   undef tb_trace1_w
 #   define TB_TRACE_MODULE_DEBUG    (0)
 #   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
-#       define tb_trace_d(fmt, arg ...)                 
-#       define tb_trace_e(fmt, arg ...)                 
-#       define tb_trace_a(fmt, arg ...)                 
-#       define tb_trace_w(fmt, arg ...)                 
-#       define tb_tracef_d(fmt, arg ...)                
-#       define tb_tracef_e(fmt, arg ...)                
-#       define tb_tracef_a(fmt, arg ...)                
-#       define tb_tracef_w(fmt, arg ...)                
-#       define tb_tracet_d(fmt, arg ...)                
-#       define tb_tracet_e(fmt, arg ...)                
-#       define tb_tracet_a(fmt, arg ...)                
-#       define tb_tracet_w(fmt, arg ...)                
-#       define tb_trace1_d(fmt, arg ...)                
-#       define tb_trace1_e(fmt, arg ...)                
-#       define tb_trace1_a(fmt, arg ...)                
-#       define tb_trace1_w(fmt, arg ...)               
+#       define tb_trace_d(fmt, arg ...)
+#       define tb_trace_e(fmt, arg ...)
+#       define tb_trace_a(fmt, arg ...)
+#       define tb_trace_w(fmt, arg ...)
+#       define tb_tracef_d(fmt, arg ...)
+#       define tb_tracef_e(fmt, arg ...)
+#       define tb_tracef_a(fmt, arg ...)
+#       define tb_tracef_w(fmt, arg ...)
+#       define tb_tracet_d(fmt, arg ...)
+#       define tb_tracet_e(fmt, arg ...)
+#       define tb_tracet_a(fmt, arg ...)
+#       define tb_tracet_w(fmt, arg ...)
+#       define tb_trace1_d(fmt, arg ...)
+#       define tb_trace1_e(fmt, arg ...)
+#       define tb_trace1_a(fmt, arg ...)
+#       define tb_trace1_w(fmt, arg ...)
 #   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#       define tb_trace_d(fmt, ...)                     
-#       define tb_trace_e(fmt, ...)                     
-#       define tb_trace_a(fmt, ...)                     
-#       define tb_trace_w(fmt, ...)                     
-#       define tb_tracef_d(fmt, ...)                    
-#       define tb_tracef_e(fmt, ...)                    
-#       define tb_tracef_a(fmt, ...)                    
-#       define tb_tracef_w(fmt, ...)                    
-#       define tb_tracet_d(fmt, ...)                   
-#       define tb_tracet_e(fmt, ...)                    
-#       define tb_tracet_a(fmt, ...)                    
-#       define tb_tracet_w(fmt, ...)                  
-#       define tb_trace1_d(fmt, ...)                   
-#       define tb_trace1_e(fmt, ...)                    
-#       define tb_trace1_a(fmt, ...)                    
-#       define tb_trace1_w(fmt, ...)                     
+#       define tb_trace_d(fmt, ...)
+#       define tb_trace_e(fmt, ...)
+#       define tb_trace_a(fmt, ...)
+#       define tb_trace_w(fmt, ...)
+#       define tb_tracef_d(fmt, ...)
+#       define tb_tracef_e(fmt, ...)
+#       define tb_tracef_a(fmt, ...)
+#       define tb_tracef_w(fmt, ...)
+#       define tb_tracet_d(fmt, ...)
+#       define tb_tracet_e(fmt, ...)
+#       define tb_tracet_a(fmt, ...)
+#       define tb_tracet_w(fmt, ...)
+#       define tb_trace1_d(fmt, ...)
+#       define tb_trace1_e(fmt, ...)
+#       define tb_trace1_a(fmt, ...)
+#       define tb_trace1_w(fmt, ...)
 #   else
 #       define tb_trace_d
 #       define tb_trace_e

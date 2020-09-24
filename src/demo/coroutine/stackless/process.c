@@ -1,21 +1,21 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define COUNT   (50)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the process type
 typedef struct __tb_demo_lo_process_t
 {
-    // the process 
+    // the process
     tb_process_ref_t    proc;
 
     // the arguments
@@ -25,7 +25,7 @@ typedef struct __tb_demo_lo_process_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // get arguments
@@ -55,7 +55,7 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_process_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler

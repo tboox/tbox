@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,7 +46,7 @@ typedef struct __tb_stdfile_t
     // the file type
     tb_size_t           type;
 
-    // the input stream 
+    // the input stream
     tb_stream_ref_t     istream;
 
     // the input filter stream
@@ -114,13 +114,13 @@ static tb_long_t tb_stdfile_stream_read(tb_stream_ref_t self, tb_byte_t* data, t
 
         // read wide characters from console
         DWORD wreal = 0;
-        if (ReadConsoleW(stream->fp, (tb_wchar_t*)data, wsize, &wreal, tb_null)) 
+        if (ReadConsoleW(stream->fp, (tb_wchar_t*)data, wsize, &wreal, tb_null))
             read = wreal * sizeof(tb_wchar_t);
     }
     else
     {
         DWORD real = 0;
-        if (ReadFile(stream->fp, data, (DWORD)size, &real, tb_null)) 
+        if (ReadFile(stream->fp, data, (DWORD)size, &real, tb_null))
             read = (tb_long_t)real;
     }
     return read;
@@ -143,13 +143,13 @@ static tb_long_t tb_stdfile_stream_writ(tb_stream_ref_t self, tb_byte_t const* d
 
         // write wide characters to console
         DWORD wreal = 0;
-        if (WriteConsoleW(stream->fp, (tb_wchar_t const*)data, wsize, &wreal, tb_null)) 
+        if (WriteConsoleW(stream->fp, (tb_wchar_t const*)data, wsize, &wreal, tb_null))
             writ = wreal * sizeof(tb_wchar_t);
     }
     else
     {
         DWORD real = 0;
-        if (WriteFile(stream->fp, data, (DWORD)size, &real, tb_null)) 
+        if (WriteFile(stream->fp, data, (DWORD)size, &real, tb_null))
             writ = (tb_long_t)real;
     }
     return writ;
@@ -227,7 +227,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
 
         // init type
         file->type = type;
-        
+
         // init mutex
         file->mutex = tb_mutex_init();
         tb_assert_and_check_break(file->mutex);
@@ -276,7 +276,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
                 file->ofstream = tb_stream_init_filter_from_charset(file->ostream, encoding, TB_CHARSET_TYPE_UTF16 | TB_CHARSET_TYPE_LE);
                 tb_assert_and_check_break(file->ofstream);
             }
-            else 
+            else
             {
                 // redirect (console output cp)
                 file->ofstream = tb_stream_init_filter_from_charset(file->ostream, encoding, TB_CHARSET_TYPE_COCP);
@@ -296,7 +296,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
     } while (0);
 
     // failed? exit file
-    if (!ok) 
+    if (!ok)
     {
         if (file) tb_stdfile_exit((tb_stdfile_ref_t)file);
         file = tb_null;
@@ -380,7 +380,7 @@ tb_bool_t tb_stdfile_flush(tb_stdfile_ref_t self)
         ok = tb_stream_sync(stdfile->ofstream, tb_false);
 
     } while (0);
-    
+
     // leave mutex
     tb_mutex_leave(stdfile->mutex);
     return ok;
@@ -394,7 +394,7 @@ tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size
     tb_check_return_val(size, tb_true);
 
     tb_bool_t ok = tb_false;
-    if (tb_mutex_enter(stdfile->mutex)) 
+    if (tb_mutex_enter(stdfile->mutex))
     {
         ok = tb_stream_bread(stdfile->ifstream, data, size);
         tb_mutex_leave(stdfile->mutex);
@@ -464,7 +464,7 @@ tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_
         ok = tb_true;
 
     } while (0);
-    
+
     // leave mutex
     tb_mutex_leave(stdfile->mutex);
     return ok;
@@ -477,7 +477,7 @@ tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
     tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 
     tb_bool_t ok = tb_false;
-    if (tb_mutex_enter(stdfile->mutex)) 
+    if (tb_mutex_enter(stdfile->mutex))
     {
         tb_byte_t* data = tb_null;
         if (tb_stream_need(stdfile->ifstream, &data, 1) && data)

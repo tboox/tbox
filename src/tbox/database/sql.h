@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -65,7 +65,7 @@ typedef __tb_typeref__(database_sql_statement);
  *                                  "file:///home/file.sqlitedb"
  *                                  "C://home/file.sqlite3"
  *
- * @return                          the database 
+ * @return                          the database
  */
 tb_database_sql_ref_t               tb_database_sql_init(tb_char_t const* url);
 

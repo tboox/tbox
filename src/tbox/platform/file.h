@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -77,7 +77,7 @@ typedef enum __tb_file_type_t
 {
     TB_FILE_TYPE_NONE       = 0
 ,   TB_FILE_TYPE_DIRECTORY  = 1
-,   TB_FILE_TYPE_FILE       = 2 
+,   TB_FILE_TYPE_FILE       = 2
 ,   TB_FILE_TYPE_DOT        = 3
 ,   TB_FILE_TYPE_DOT2       = 4
 
@@ -105,25 +105,25 @@ typedef struct __tb_file_info_t
  */
 
 /*! init the file
- * 
+ *
  * @param path          the file path
  * @param mode          the file mode
  *
- * @return              the file 
+ * @return              the file
  */
 tb_file_ref_t           tb_file_init(tb_char_t const* path, tb_size_t mode);
 
 /*! exit the file
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_file_exit(tb_file_ref_t file);
 
 /*! read the file data
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param data          the data
  * @param size          the size
  *
@@ -132,8 +132,8 @@ tb_bool_t               tb_file_exit(tb_file_ref_t file);
 tb_long_t               tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size);
 
 /*! writ the file data
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param data          the data
  * @param size          the size
  *
@@ -142,8 +142,8 @@ tb_long_t               tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_siz
 tb_long_t               tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /*! pread the file data
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param data          the data
  * @param size          the size
  * @param offset        the offset, the file offset will not be changed
@@ -153,8 +153,8 @@ tb_long_t               tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, 
 tb_long_t               tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset);
 
 /*! pwrit the file data
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param data          the data
  * @param size          the size
  * @param offset        the offset, the file offset will not be changed
@@ -164,8 +164,8 @@ tb_long_t               tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_si
 tb_long_t               tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
 
 /*! readv the file data
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param list          the iovec list
  * @param size          the iovec size
  *
@@ -174,8 +174,8 @@ tb_long_t               tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data,
 tb_long_t               tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size);
 
 /*! writv the file data
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param list          the iovec list
  * @param size          the iovec size
  *
@@ -184,7 +184,7 @@ tb_long_t               tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list
 tb_long_t               tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size);
 
 /*! writf the file data
- * 
+ *
  * @param file          the file
  * @param ifile         the input file
  * @param offset        the input file offset, the file offset will not be changed
@@ -194,9 +194,9 @@ tb_long_t               tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list
  */
 tb_hong_t               tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size);
 
-/*! preadv the file data 
- * 
- * @param file          the file 
+/*! preadv the file data
+ *
+ * @param file          the file
  * @param list          the iovec list
  * @param size          the iovec size
  * @param offset        the offset, the file offset will not be changed
@@ -205,9 +205,9 @@ tb_hong_t               tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, t
  */
 tb_long_t               tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
 
-/*! pwritv the file data 
- * 
- * @param file          the file 
+/*! pwritv the file data
+ *
+ * @param file          the file
  * @param list          the iovec list
  * @param size          the iovec size
  * @param offset        the offset, the file offset will not be changed
@@ -217,8 +217,8 @@ tb_long_t               tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* lis
 tb_long_t               tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
 
 /*! seek the file offset
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param offset        the file offset
  * @param mode          the seek mode
  *
@@ -226,30 +226,30 @@ tb_long_t               tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* lis
  */
 tb_hong_t               tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode);
 
-/*! fsync the file 
- * 
- * @param file          the file 
+/*! fsync the file
+ *
+ * @param file          the file
  */
 tb_bool_t               tb_file_sync(tb_file_ref_t file);
 
 /*! the file size
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  *
  * @return              the file size
  */
 tb_hize_t               tb_file_size(tb_file_ref_t file);
 
 /*! the file offset
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  *
  * @return              the file offset or -1
  */
 tb_hong_t               tb_file_offset(tb_file_ref_t file);
 
 /*! the file info for file or directory
- * 
+ *
  * @param path          the file path
  * @param info          the file info
  *
@@ -258,7 +258,7 @@ tb_hong_t               tb_file_offset(tb_file_ref_t file);
 tb_bool_t               tb_file_info(tb_char_t const* path, tb_file_info_t* info);
 
 /*! copy the file
- * 
+ *
  * @param path          the file path
  * @param dest          the dest path
  *
@@ -267,7 +267,7 @@ tb_bool_t               tb_file_info(tb_char_t const* path, tb_file_info_t* info
 tb_bool_t               tb_file_copy(tb_char_t const* path, tb_char_t const* dest);
 
 /*! create the file
- * 
+ *
  * @param path          the file path
  *
  * @return              tb_true or tb_false
@@ -275,7 +275,7 @@ tb_bool_t               tb_file_copy(tb_char_t const* path, tb_char_t const* des
 tb_bool_t               tb_file_create(tb_char_t const* path);
 
 /*! remove the file
- * 
+ *
  * @param path          the file path
  *
  * @return              tb_true or tb_false
@@ -283,7 +283,7 @@ tb_bool_t               tb_file_create(tb_char_t const* path);
 tb_bool_t               tb_file_remove(tb_char_t const* path);
 
 /*! rename the file
- * 
+ *
  * @param path          the source file path
  * @param dest          the destination file path
  *
@@ -292,7 +292,7 @@ tb_bool_t               tb_file_remove(tb_char_t const* path);
 tb_bool_t               tb_file_rename(tb_char_t const* path, tb_char_t const* dest);
 
 /*! link the file
- * 
+ *
  * @param path          the source file path
  * @param dest          the destination file path
  *

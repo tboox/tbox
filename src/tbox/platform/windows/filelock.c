@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -95,7 +95,7 @@ tb_bool_t tb_filelock_enter(tb_filelock_ref_t self, tb_size_t mode)
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
     // init overlap
-    OVERLAPPED overlap; 
+    OVERLAPPED overlap;
     tb_memset(&overlap, 0, sizeof(overlap));
 
     // lock it
@@ -109,7 +109,7 @@ tb_bool_t tb_filelock_enter_try(tb_filelock_ref_t self, tb_size_t mode)
     tb_assert_and_check_return_val(lock && lock->file, tb_false);
 
     // init overlap
-    OVERLAPPED overlap; 
+    OVERLAPPED overlap;
     tb_memset(&overlap, 0, sizeof(overlap));
 
     // try to lock it

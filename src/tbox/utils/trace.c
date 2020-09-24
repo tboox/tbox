@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -62,7 +62,7 @@ static tb_bool_t        g_bref = tb_false;
 static tb_char_t        g_line[TB_TRACE_LINE_MAXN];
 
 // the lock
-static tb_mutex_t       g_lock_mutex; 
+static tb_mutex_t       g_lock_mutex;
 static tb_mutex_ref_t   g_lock = tb_null;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
 
         // print prefix to file
 #ifndef TB_CONFIG_MICRO_ENABLE
-        if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
+        if ((g_mode & TB_TRACE_MODE_FILE) && g_file)
         {
             // print time to file
             tb_tm_t lt = {0};
@@ -239,7 +239,7 @@ tb_void_t tb_trace_done_with_args(tb_char_t const* prefix, tb_char_t const* modu
 
         // print it to file
 #ifndef TB_CONFIG_MICRO_ENABLE
-        if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
+        if ((g_mode & TB_TRACE_MODE_FILE) && g_file)
         {
             // done
             tb_size_t size = p - g_line;
@@ -308,7 +308,7 @@ tb_void_t tb_trace_tail(tb_char_t const* format, ...)
 
         // print it to file
 #ifndef TB_CONFIG_MICRO_ENABLE
-        if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
+        if ((g_mode & TB_TRACE_MODE_FILE) && g_file)
         {
             // done
             tb_size_t size = p - g_line;

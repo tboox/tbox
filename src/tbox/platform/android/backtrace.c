@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -47,7 +47,7 @@ typedef struct __tb_backtrace_frame_t
     tb_size_t               absolute_pc;
 
     // top of stack for this frame
-    tb_size_t               stack_top; 
+    tb_size_t               stack_top;
 
     // size of this stack frame
     tb_size_t               stack_size;
@@ -63,18 +63,18 @@ typedef struct __tb_backtrace_symbol_t
     /* relative frame PC offset from the start of the library,
      * or the absolute PC if the library is unknown
      */
-    tb_size_t               relative_pc;      
+    tb_size_t               relative_pc;
 
     /* relative offset of the symbol from the start of the
-     * library or 0 if the library is unknown 
+     * library or 0 if the library is unknown
      */
-    tb_size_t               relative_symbol_addr; 
+    tb_size_t               relative_symbol_addr;
 
     // executable or library name, or NULL if unknown
     tb_char_t*              map_name;
 
     // symbol name, or NULL if unknown
-    tb_char_t*              symbol_name; 
+    tb_char_t*              symbol_name;
 
     // demangled symbol name, or NULL if unknown
     tb_char_t*              demangled_name;
@@ -84,7 +84,7 @@ typedef struct __tb_backtrace_symbol_t
 // the symbols type
 typedef struct __tb_backtrace_symbols_t
 {
-    // the symbols 
+    // the symbols
     tb_backtrace_symbol_t   symbols[64];
 
     // the info
@@ -96,10 +96,10 @@ typedef struct __tb_backtrace_symbols_t
 } tb_backtrace_symbols_t, *tb_backtrace_symbols_ref_t;
 
 // the unwind_backtrace function type
-typedef tb_long_t   (*tb_backtrace_unwind_backtrace_func_t)(tb_backtrace_frame_ref_t, tb_size_t, tb_size_t);  
+typedef tb_long_t   (*tb_backtrace_unwind_backtrace_func_t)(tb_backtrace_frame_ref_t, tb_size_t, tb_size_t);
 
 // the get_backtrace_symbols function type
-typedef tb_void_t   (*tb_backtrace_get_backtrace_symbols_func_t)(tb_backtrace_frame_ref_t, tb_size_t, tb_backtrace_symbol_ref_t);  
+typedef tb_void_t   (*tb_backtrace_get_backtrace_symbols_func_t)(tb_backtrace_frame_ref_t, tb_size_t, tb_backtrace_symbol_ref_t);
 
 // the free_backtrace_symbols function type
 typedef tb_void_t   (*tb_backtrace_free_backtrace_symbols_func_t)(tb_backtrace_symbol_ref_t, tb_size_t);
@@ -107,11 +107,11 @@ typedef tb_void_t   (*tb_backtrace_free_backtrace_symbols_func_t)(tb_backtrace_s
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
- 
-// the unwind_backtrace function 
+
+// the unwind_backtrace function
 static tb_backtrace_unwind_backtrace_func_t         g_unwind_backtrace = tb_null;
 
-// the get_backtrace_symbols function 
+// the get_backtrace_symbols function
 static tb_backtrace_get_backtrace_symbols_func_t    g_get_backtrace_symbols = tb_null;
 
 // the free_backtrace_symbols function
@@ -121,7 +121,7 @@ static tb_backtrace_free_backtrace_symbols_func_t   g_free_backtrace_symbols = t
  * private implementation
  */
 #if 0
-static _Unwind_Reason_Code tb_backtrace_unwind(struct _Unwind_Context* context, tb_pointer_t args) 
+static _Unwind_Reason_Code tb_backtrace_unwind(struct _Unwind_Context* context, tb_pointer_t args)
 {
     // check
     tb_value_ref_t info = (tb_value_ref_t)args;
@@ -147,7 +147,7 @@ static _Unwind_Reason_Code tb_backtrace_unwind(struct _Unwind_Context* context, 
     tb_trace_d("unwind: count: %ld, nframe_maxn: %lu, ip: %p", count, nframe_maxn, ip);
 
     // skip and save frame
-    if (ip) 
+    if (ip)
     {
         if (nskip > 0) nskip--;
         else
@@ -186,12 +186,12 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
         {
             // init dynamic
             tb_dynamic_ref_t dynamic = tb_dynamic_init("/system/lib/libcorkscrew.so");
-            tb_check_break(dynamic); 
-            
-            // get the unwind_backtrace function 
+            tb_check_break(dynamic);
+
+            // get the unwind_backtrace function
             g_unwind_backtrace = (tb_backtrace_unwind_backtrace_func_t)tb_dynamic_func(dynamic, "unwind_backtrace");
 
-            // get the get_backtrace_symbols function 
+            // get the get_backtrace_symbols function
             g_get_backtrace_symbols = (tb_backtrace_get_backtrace_symbols_func_t)tb_dynamic_func(dynamic, "get_backtrace_symbols");
 
             // get the free_backtrace_symbols function
@@ -205,7 +205,7 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 
 #if 1
         // unwind backtrace
-        count = g_unwind_backtrace((tb_backtrace_frame_ref_t)frames, nskip, nframe_maxn);  
+        count = g_unwind_backtrace((tb_backtrace_frame_ref_t)frames, nskip, nframe_maxn);
         tb_check_break_state(count >= 0, count, 0);
 #else
         // need add cxflags: -funwind-tables
@@ -262,19 +262,19 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
     tb_backtrace_symbol_ref_t symbol = &symbols->symbols[iframe];
 
     // get map name
-    tb_char_t const* map_name = symbol->map_name? symbol->map_name : "<unknown>";  
+    tb_char_t const* map_name = symbol->map_name? symbol->map_name : "<unknown>";
 
     // get symbol name
-    tb_char_t const* symbol_name = symbol->demangled_name? symbol->demangled_name : symbol->symbol_name;  
+    tb_char_t const* symbol_name = symbol->demangled_name? symbol->demangled_name : symbol->symbol_name;
 
     // make symbol info
     tb_long_t info_size = 0;
-    if (symbol_name) 
-    {  
+    if (symbol_name)
+    {
         // the pc offset relative symbol
-        tb_size_t relative_symbol_pc_offset = symbol->relative_pc - symbol->relative_symbol_addr;  
-        if (relative_symbol_pc_offset) 
-        {  
+        tb_size_t relative_symbol_pc_offset = symbol->relative_pc - symbol->relative_symbol_addr;
+        if (relative_symbol_pc_offset)
+        {
             // make it
             info_size = tb_snprintf(    symbols->info
                                     ,   sizeof(symbols->info)
@@ -284,10 +284,10 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
                                     ,   map_name
                                     ,   symbol->relative_pc
                                     ,   symbol_name
-                                    ,   relative_symbol_pc_offset);  
+                                    ,   relative_symbol_pc_offset);
         }
-        else 
-        {  
+        else
+        {
             // make it
             info_size = tb_snprintf(    symbols->info
                                     ,   sizeof(symbols->info)
@@ -296,11 +296,11 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
                                     ,   iframe
                                     ,   map_name
                                     ,   symbol->relative_pc
-                                    ,   symbol_name);  
-        }  
-    } 
+                                    ,   symbol_name);
+        }
+    }
     else
-    {  
+    {
         // make it
         info_size = tb_snprintf(    symbols->info
                                 ,   sizeof(symbols->info)
@@ -308,8 +308,8 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
                                 ,   symbol->relative_pc
                                 ,   iframe
                                 ,   map_name
-                                ,   symbol->relative_pc);     
-    }  
+                                ,   symbol->relative_pc);
+    }
 
     // end
     if (info_size >= 0 && info_size < sizeof(symbols->info))
@@ -331,7 +331,7 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
     // make symbol info
     Dl_info     info;
     tb_long_t   info_size = 0;
-    if (dladdr((tb_pointer_t)addr, &info) && info.dli_sname) 
+    if (dladdr((tb_pointer_t)addr, &info) && info.dli_sname)
     {
         // make it
         info_size = tb_snprintf(    symbols->info
@@ -342,10 +342,10 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
                                 ,   ""
                                 ,   addr
                                 ,   info.dli_sname
-                                ,   0);  
+                                ,   0);
     }
     else
-    {  
+    {
         // make it
         info_size = tb_snprintf(    symbols->info
                                 ,   sizeof(symbols->info)
@@ -353,8 +353,8 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
                                 ,   addr
                                 ,   iframe
                                 ,   ""
-                                ,   addr);     
-    }  
+                                ,   addr);
+    }
 
     // end
     if (info_size >= 0 && info_size < sizeof(symbols->info))

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 #ifdef TB_CONFIG_LIBC_HAVE_WCSNCPY
 tb_wchar_t* tb_wcsncpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
@@ -43,13 +43,13 @@ tb_wchar_t* tb_wcsncpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
     // check
     tb_assert_and_check_return_val(s1 && s2, s1);
 
-    // no size or same? 
+    // no size or same?
     tb_check_return_val(n && s1 != s2, s1);
 
     // copy
 #if 0
     tb_wchar_t* s = s1;
-    while (n) 
+    while (n)
     {
         if (*s = *s2) s2++;
         ++s;

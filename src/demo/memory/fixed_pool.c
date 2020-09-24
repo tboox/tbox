@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * demo
- */ 
+ */
 tb_void_t tb_demo_fixed_pool_leak(tb_noarg_t);
 tb_void_t tb_demo_fixed_pool_leak()
 {
@@ -20,11 +20,11 @@ tb_void_t tb_demo_fixed_pool_leak()
         // make data0
         tb_pointer_t data0 = tb_fixed_pool_malloc(pool);
         tb_assert_and_check_break(data0);
-    
+
         // make data1
         tb_pointer_t data1 = tb_fixed_pool_malloc(pool);
         tb_assert_and_check_break(data1);
-    
+
 #ifdef __tb_debug__
         // dump pool
         tb_fixed_pool_dump(pool);
@@ -49,11 +49,11 @@ tb_void_t tb_demo_fixed_pool_free2()
         // make data
         tb_pointer_t data = tb_fixed_pool_malloc(pool);
         tb_assert_and_check_break(data);
-    
+
         // exit data
         tb_fixed_pool_free(pool, data);
         tb_fixed_pool_free(pool, data);
-     
+
 #ifdef __tb_debug__
         // dump pool
         tb_fixed_pool_dump(pool);
@@ -77,13 +77,13 @@ tb_void_t tb_demo_fixed_pool_underflow()
         // make data
         tb_pointer_t data = tb_fixed_pool_malloc(pool);
         tb_assert_and_check_break(data);
-        
+
         // done underflow
         tb_memset(data, 0, sizeof(tb_size_t) + 1);
 
         // exit data
         tb_fixed_pool_free(pool, data);
- 
+
 #ifdef __tb_debug__
         // dump pool
         tb_fixed_pool_dump(pool);
@@ -107,14 +107,14 @@ tb_void_t tb_demo_fixed_pool_underflow2()
         // make data
         tb_pointer_t data = tb_fixed_pool_malloc(pool);
         tb_assert_and_check_break(data);
-    
+
         // done underflow
         tb_memset(data, 0, sizeof(tb_size_t) + 1);
 
         // make data2
         data = tb_fixed_pool_malloc(pool);
         tb_assert_and_check_break(data);
- 
+
 #ifdef __tb_debug__
         // dump pool
         tb_fixed_pool_dump(pool);
@@ -140,7 +140,7 @@ tb_void_t tb_demo_fixed_pool_perf(tb_size_t item_size)
         tb_pointer_t*   list = (tb_pointer_t*)calloc(maxn, sizeof(tb_pointer_t));
         tb_assert_and_check_break(list);
 
-        // done 
+        // done
         __tb_volatile__ tb_size_t indx = 0;
         __tb_volatile__ tb_hong_t time = tb_mclock();
         __tb_volatile__ tb_size_t rand = 0xbeaf;
@@ -158,7 +158,7 @@ tb_void_t tb_demo_fixed_pool_perf(tb_size_t item_size)
             if (size > 5 && indx)
             {
                 size -= 5;
-                while (size--) 
+                while (size--)
                 {
                     // the free index
                     tb_size_t free_indx = rand % indx;
@@ -190,7 +190,7 @@ tb_void_t tb_demo_fixed_pool_perf(tb_size_t item_size)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_memory_fixed_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1

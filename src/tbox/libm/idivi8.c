@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,7 +33,7 @@ tb_uint32_t tb_idivi8(tb_uint32_t x, tb_uint8_t y)
     /* x * inverse[y] >> 32 == x / y for all 0 <= x <= 16909558 && 2 <= y <= 256 for x > 16909558
      * is an overestimate by less than 1 part in 1 << 24
      */
-    static tb_uint32_t const inverse[257] = 
+    static tb_uint32_t const inverse[257] =
     {
             0,              4294967295U,    2147483648U,    1431655766,     1073741824,     858993460,      715827883,      613566757
     ,       536870912,      477218589,      429496730,      390451573,      357913942,      330382100,      306783379,      286331154

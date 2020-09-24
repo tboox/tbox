@@ -231,7 +231,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
             tb_trace_i("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
         }
     }
-    
+
     // exit ping
     tb_free(ping);
     return tb_true;
@@ -273,7 +273,7 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
             }
         }
     }
-    
+
     // exit ping
     tb_free(ping);
     return tb_true;
@@ -405,7 +405,7 @@ static tb_void_t tb_whois_test_walk_num_6()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_network_whois_main(tb_int_t argc, tb_char_t** argv)
 {
 #if TB_WHOIS_TEST_HOST_WALK
@@ -420,8 +420,8 @@ tb_int_t tb_demo_network_whois_main(tb_int_t argc, tb_char_t** argv)
     tb_whois_test_walk_num_4();
     tb_whois_test_walk_num_5();
     tb_whois_test_walk_num_6();
-    tb_whois_test_walk_ping_2(argv[1]); 
-    tb_whois_test_walk_ping_3(argv[1]); 
+    tb_whois_test_walk_ping_2(argv[1]);
+    tb_whois_test_walk_ping_3(argv[1]);
 #else
     tb_whois_test_done(argv[1]);
 #endif

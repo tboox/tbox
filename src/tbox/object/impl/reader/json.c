@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -56,7 +56,7 @@ static tb_object_ref_t tb_oc_json_reader_func_null(tb_oc_json_reader_t* reader, 
     tb_char_t           buff[256];
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
-    // done 
+    // done
     tb_object_ref_t null = tb_null;
     do
     {
@@ -65,11 +65,11 @@ static tb_object_ref_t tb_oc_json_reader_func_null(tb_oc_json_reader_t* reader, 
 
         // walk
         tb_bool_t failed = tb_false;
-        while (!failed && tb_stream_left(reader->stream)) 
+        while (!failed && tb_stream_left(reader->stream))
         {
             // need one character
             tb_byte_t* p = tb_null;
-            if (!tb_stream_need(reader->stream, &p, 1) && p) 
+            if (!tb_stream_need(reader->stream, &p, 1) && p)
             {
                 failed = tb_true;
                 break;
@@ -118,7 +118,7 @@ static tb_object_ref_t tb_oc_json_reader_func_array(tb_oc_json_reader_t* reader,
     // done
     tb_char_t ch;
     tb_bool_t ok = tb_true;
-    while (ok && tb_stream_left(reader->stream)) 
+    while (ok && tb_stream_left(reader->stream))
     {
         // read one character
         if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
@@ -163,7 +163,7 @@ static tb_object_ref_t tb_oc_json_reader_func_string(tb_oc_json_reader_t* reader
 
     // walk
     tb_char_t ch;
-    while (tb_stream_left(reader->stream)) 
+    while (tb_stream_left(reader->stream))
     {
         // read one character
         if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
@@ -248,11 +248,11 @@ static tb_object_ref_t tb_oc_json_reader_func_number(tb_oc_json_reader_t* reader
         tb_bool_t bs = (type == '-')? tb_true : tb_false;
         tb_bool_t bf = (type == '.')? tb_true : tb_false;
         tb_bool_t failed = tb_false;
-        while (!failed && tb_stream_left(reader->stream)) 
+        while (!failed && tb_stream_left(reader->stream))
         {
             // need one character
             tb_byte_t* p = tb_null;
-            if (!tb_stream_need(reader->stream, &p, 1) && p) 
+            if (!tb_stream_need(reader->stream, &p, 1) && p)
             {
                 failed = tb_true;
                 break;
@@ -263,14 +263,14 @@ static tb_object_ref_t tb_oc_json_reader_func_number(tb_oc_json_reader_t* reader
 
             // is float?
             if (!bf && ch == '.') bf = tb_true;
-            else if (bf && ch == '.') 
+            else if (bf && ch == '.')
             {
                 failed = tb_true;
                 break;
             }
 
             // append character
-            if (tb_isdigit10(ch) || ch == '.' || ch == 'e' || ch == 'E' || ch == '-' || ch == '+') 
+            if (tb_isdigit10(ch) || ch == '.' || ch == 'e' || ch == 'E' || ch == '-' || ch == '+')
                 tb_static_string_chrcat(&data, ch);
             else break;
 
@@ -287,13 +287,13 @@ static tb_object_ref_t tb_oc_json_reader_func_number(tb_oc_json_reader_t* reader
         // trace
         tb_trace_d("number: %s", tb_static_string_cstr(&data));
 
-        // init number 
+        // init number
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         if (bf) number = tb_oc_number_init_from_float(tb_stof(tb_static_string_cstr(&data)));
 #else
         if (bf) tb_trace_noimpl();
 #endif
-        else if (bs) 
+        else if (bs)
         {
             tb_sint64_t value = tb_stoi64(tb_static_string_cstr(&data));
             tb_size_t   bytes = tb_object_need_bytes(-value);
@@ -305,9 +305,9 @@ static tb_object_ref_t tb_oc_json_reader_func_number(tb_oc_json_reader_t* reader
             case 8: number = tb_oc_number_init_from_sint64((tb_sint64_t)value); break;
             default: break;
             }
-            
+
         }
-        else 
+        else
         {
             tb_uint64_t value = tb_stou64(tb_static_string_cstr(&data));
             tb_size_t   bytes = tb_object_need_bytes(value);
@@ -339,7 +339,7 @@ static tb_object_ref_t tb_oc_json_reader_func_boolean(tb_oc_json_reader_t* reade
     tb_char_t           buff[256];
     if (!tb_static_string_init(&data, buff, 256)) return tb_null;
 
-    // done 
+    // done
     tb_object_ref_t boolean = tb_null;
     do
     {
@@ -348,7 +348,7 @@ static tb_object_ref_t tb_oc_json_reader_func_boolean(tb_oc_json_reader_t* reade
 
         // walk
         tb_bool_t failed = tb_false;
-        while (!failed && tb_stream_left(reader->stream)) 
+        while (!failed && tb_stream_left(reader->stream))
         {
             // need one character
             tb_byte_t* p = tb_null;
@@ -410,7 +410,7 @@ static tb_object_ref_t tb_oc_json_reader_func_dictionary(tb_oc_json_reader_t* re
     tb_bool_t ok = tb_true;
     tb_bool_t bkey = tb_false;
     tb_size_t bstr = 0;
-    while (ok && tb_stream_left(reader->stream)) 
+    while (ok && tb_stream_left(reader->stream))
     {
         // read one character
         if (!tb_stream_bread_s8(reader->stream, (tb_sint8_t*)&ch)) break;
@@ -480,7 +480,7 @@ static tb_object_ref_t tb_oc_json_reader_done(tb_stream_ref_t stream)
 
     // skip spaces
     tb_char_t type = '\0';
-    while (tb_stream_left(stream)) 
+    while (tb_stream_left(stream))
     {
         if (!tb_stream_bread_s8(stream, (tb_sint8_t*)&type)) break;
         if (!tb_isspace(type)) break;
@@ -511,12 +511,12 @@ static tb_size_t tb_oc_json_reader_probe(tb_stream_ref_t stream)
     tb_byte_t*  e = p + 5;
     for (; p < e && *p; p++)
     {
-        if (*p == '{' || *p == '[') 
+        if (*p == '{' || *p == '[')
         {
             s = 50;
             break;
         }
-        else if (!tb_isgraph(*p)) 
+        else if (!tb_isgraph(*p))
         {
             s = 0;
             break;
@@ -543,7 +543,7 @@ tb_oc_reader_t* tb_oc_json_reader()
     s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint8(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
-    // hook reader 
+    // hook reader
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'n', tb_oc_json_reader_func_null);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'N', tb_oc_json_reader_func_null);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)'[', tb_oc_json_reader_func_array);
@@ -596,7 +596,7 @@ tb_oc_json_reader_func_t tb_oc_json_reader_func(tb_char_t type)
     // the reader
     tb_oc_reader_t* reader = tb_oc_reader_get(TB_OBJECT_FORMAT_JSON);
     tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
- 
+
     // the func
     return (tb_oc_json_reader_func_t)tb_hash_map_get(reader->hooker, (tb_pointer_t)(tb_size_t)type);
 }

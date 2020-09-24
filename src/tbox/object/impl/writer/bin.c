@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -67,7 +67,7 @@ static tb_bool_t tb_oc_bin_writer_func_data(tb_oc_bin_writer_t* writer, tb_objec
     // empty?
     tb_check_return_val(size, tb_true);
 
-    // check 
+    // check
     tb_assert_and_check_return_val(data, tb_false);
 
     // make the encoder data
@@ -377,15 +377,15 @@ tb_oc_writer_t* tb_oc_bin_writer()
 {
     // the writer
     static tb_oc_writer_t s_writer = {0};
-  
+
     // init writer
     s_writer.writ = tb_oc_bin_writer_done;
- 
+
     // init hooker
     s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
-    // hook writer 
+    // hook writer
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_oc_bin_writer_func_null);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_oc_bin_writer_func_date);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_oc_bin_writer_func_data);
@@ -402,7 +402,7 @@ tb_bool_t tb_oc_bin_writer_hook(tb_size_t type, tb_oc_bin_writer_func_t func)
 {
     // check
     tb_assert_and_check_return_val(func, tb_false);
- 
+
     // the writer
     tb_oc_writer_t* writer = tb_oc_writer_get(TB_OBJECT_FORMAT_BIN);
     tb_assert_and_check_return_val(writer && writer->hooker, tb_false);

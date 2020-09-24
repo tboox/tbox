@@ -5,7 +5,7 @@
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
  * callback
- */ 
+ */
 #if 1
 static tb_bool_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
@@ -28,21 +28,21 @@ static tb_bool_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
             , mtime.minute
             , mtime.second);
 
-    // continue 
+    // continue
     return tb_true;
 }
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 0
     // home
     tb_char_t home[TB_PATH_MAXN] = {0};
     if (tb_directory_home(home, sizeof(home))) tb_trace_i("home: %s", home);
-    
+
     // current
     tb_char_t current[TB_PATH_MAXN] = {0};
     if (tb_directory_current(current, sizeof(current))) tb_trace_i("current: %s", current);

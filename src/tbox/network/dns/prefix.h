@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,10 +40,10 @@
 // the protocol port
 #define TB_DNS_HOST_PORT            (53)
 
-// the name maximum size 
+// the name maximum size
 #define TB_DNS_NAME_MAXN            (256)
 
-// the rpkt maximum size 
+// the rpkt maximum size
 #define TB_DNS_RPKT_MAXN            (TB_DNS_HEADER_SIZE + TB_DNS_NAME_MAXN + 256)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ typedef struct __tb_dns_answer_t
 static __tb_inline__ tb_char_t const* tb_dns_encode_name(tb_char_t* name)
 {
     tb_assert_and_check_return_val(name && name[0] == '.', tb_null);
-    
+
     // encode
     tb_byte_t   n = 0;
     tb_char_t*  b = name;
@@ -148,7 +148,7 @@ static __tb_inline__ tb_char_t const* tb_dns_decode_name_impl(tb_char_t const* s
             pos <<= 8;
             pos |= *p++;
             tb_dns_decode_name_impl(sb, se, sb + pos, &q);
-            break; 
+            break;
         }
         // is ascii? 00xxxxxx
         else

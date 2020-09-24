@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,7 +52,7 @@ typedef tb_bool_t       (*tb_directory_walk_func_t)(tb_char_t const* path, tb_fi
  */
 
 /*! create the directory
- * 
+ *
  * @param path          the directory path
  *
  * @return              tb_true or tb_false
@@ -60,7 +60,7 @@ typedef tb_bool_t       (*tb_directory_walk_func_t)(tb_char_t const* path, tb_fi
 tb_bool_t               tb_directory_create(tb_char_t const* path);
 
 /*! remove the directory
- * 
+ *
  * @param path          the directory path
  *
  * @return              tb_true or tb_false
@@ -68,7 +68,7 @@ tb_bool_t               tb_directory_create(tb_char_t const* path);
 tb_bool_t               tb_directory_remove(tb_char_t const* path);
 
 /*! the home directory
- * 
+ *
  * @param path          the directory path data
  * @param maxn          the directory path maxn
  *
@@ -77,7 +77,7 @@ tb_bool_t               tb_directory_remove(tb_char_t const* path);
 tb_size_t               tb_directory_home(tb_char_t* path, tb_size_t maxn);
 
 /*! the current directory
- * 
+ *
  * @param path          the directory path data
  * @param maxn          the directory path maxn
  *
@@ -86,15 +86,15 @@ tb_size_t               tb_directory_home(tb_char_t* path, tb_size_t maxn);
 tb_size_t               tb_directory_current(tb_char_t* path, tb_size_t maxn);
 
 /*! set the current directory
- * 
- * @param path          the directory path 
+ *
+ * @param path          the directory path
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_directory_current_set(tb_char_t const* path);
 
 /*! the temporary directory
- * 
+ *
  * @param path          the directory path data
  * @param maxn          the directory path maxn
  *
@@ -109,12 +109,12 @@ tb_size_t               tb_directory_temporary(tb_char_t* path, tb_size_t maxn);
  * @param prefix        is prefix recursion? directory is the first item
  * @param func          the callback func
  * @param priv          the callback priv
- * 
+ *
  */
 tb_void_t               tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv);
 
 /*! copy directory
- * 
+ *
  * @param path          the directory path
  * @param dest          the directory dest
  *

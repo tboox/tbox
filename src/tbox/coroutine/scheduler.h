@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,9 +43,9 @@ typedef __tb_typeref__(co_scheduler);
  * interfaces
  */
 
-/*! init scheduler 
+/*! init scheduler
  *
- * @return              the scheduler 
+ * @return              the scheduler
  */
 tb_co_scheduler_ref_t   tb_co_scheduler_init(tb_noarg_t);
 
@@ -55,7 +55,7 @@ tb_co_scheduler_ref_t   tb_co_scheduler_init(tb_noarg_t);
  */
 tb_void_t               tb_co_scheduler_exit(tb_co_scheduler_ref_t scheduler);
 
-/* kill the scheduler 
+/* kill the scheduler
  *
  * @param scheduler     the scheduler
  */
@@ -64,7 +64,7 @@ tb_void_t               tb_co_scheduler_kill(tb_co_scheduler_ref_t scheduler);
 /*! run the scheduler loop
  *
  * @param schedule      the scheduler
- * @param exclusive     enable exclusive mode, we need ensure only one loop() be called at the same time, 
+ * @param exclusive     enable exclusive mode, we need ensure only one loop() be called at the same time,
  *                      but it will be faster using thr global scheduler instead of TLS storage
  */
 tb_void_t               tb_co_scheduler_loop(tb_co_scheduler_ref_t schedule, tb_bool_t exclusive);

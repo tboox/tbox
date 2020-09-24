@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -56,7 +56,7 @@ static tb_char_t* tb_environment_get_impl(tb_char_t const* name, tb_size_t* psiz
 
         // get it
         size = (tb_size_t)tb_kernel32()->GetEnvironmentVariableW(name_w, value_w, (DWORD)maxn);
-        if (!size) 
+        if (!size)
         {
             // error?
             if (ERROR_ENVVAR_NOT_FOUND == GetLastError())
@@ -69,7 +69,7 @@ static tb_char_t* tb_environment_get_impl(tb_char_t const* name, tb_size_t* psiz
         }
         else if (size > maxn)
         {
-            // grow space 
+            // grow space
             value_w = (tb_wchar_t*)tb_ralloc(value_w, sizeof(tb_wchar_t) * (size + 1));
             tb_assert_and_check_break(value_w);
 
@@ -175,7 +175,7 @@ tb_size_t tb_environment_load(tb_environment_ref_t environment, tb_char_t const*
 
     // init value string
     tb_string_t value;
-    if (tb_string_init(&value)) 
+    if (tb_string_init(&value))
     {
         // done
         tb_char_t const*    p = values;
@@ -187,13 +187,13 @@ tb_size_t tb_environment_load(tb_environment_ref_t environment, tb_char_t const*
 
             // make value
             if (c != ';' && c) tb_string_chrcat(&value, c);
-            else 
+            else
             {
                 // save value to environment
-                if (tb_string_size(&value)) 
+                if (tb_string_size(&value))
                     tb_vector_insert_tail(environment, tb_string_cstr(&value));
 
-                // clear value 
+                // clear value
                 tb_string_clear(&value);
 
                 // end?

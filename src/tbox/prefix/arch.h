@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -135,7 +135,7 @@
 #       define TB_ARCH_ARM_v8
 #       define TB_ARCH_ARM64
 #       define TB_ARCH_STRING               "arm64-v8a"
-#   else 
+#   else
 #       error unknown arm arch version
 #   endif
 #   if !defined(TB_ARCH_ARM64) && (defined(__arm64) || defined(__arm64__) || (defined(__aarch64__) && __aarch64__))
@@ -154,7 +154,7 @@
 #   if defined(__ARM_NEON__)
 #       define TB_ARCH_ARM_NEON
 #       define TB_ARCH_STRING_3             "_neon"
-#   endif 
+#   endif
 #elif defined(mips) \
     || defined(_mips) \
     || defined(__mips__)

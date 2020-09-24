@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -229,7 +229,7 @@ tb_float_t          tb_oc_number_float(tb_object_ref_t number);
 tb_double_t         tb_oc_number_double(tb_object_ref_t number);
 #endif
 
-/*! set the uint8 value 
+/*! set the uint8 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -238,7 +238,7 @@ tb_double_t         tb_oc_number_double(tb_object_ref_t number);
  */
 tb_bool_t           tb_oc_number_uint8_set(tb_object_ref_t number, tb_uint8_t value);
 
-/*! set the sint8 value 
+/*! set the sint8 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -247,7 +247,7 @@ tb_bool_t           tb_oc_number_uint8_set(tb_object_ref_t number, tb_uint8_t va
  */
 tb_bool_t           tb_oc_number_sint8_set(tb_object_ref_t number, tb_sint8_t value);
 
-/*! set the uint16 value 
+/*! set the uint16 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -256,7 +256,7 @@ tb_bool_t           tb_oc_number_sint8_set(tb_object_ref_t number, tb_sint8_t va
  */
 tb_bool_t           tb_oc_number_uint16_set(tb_object_ref_t number, tb_uint16_t value);
 
-/*! set the sint16 value 
+/*! set the sint16 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -265,7 +265,7 @@ tb_bool_t           tb_oc_number_uint16_set(tb_object_ref_t number, tb_uint16_t 
  */
 tb_bool_t           tb_oc_number_sint16_set(tb_object_ref_t number, tb_sint16_t value);
 
-/*! set the uint32 value 
+/*! set the uint32 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -274,7 +274,7 @@ tb_bool_t           tb_oc_number_sint16_set(tb_object_ref_t number, tb_sint16_t 
  */
 tb_bool_t           tb_oc_number_uint32_set(tb_object_ref_t number, tb_uint32_t value);
 
-/*! set the sint32 value 
+/*! set the sint32 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -283,7 +283,7 @@ tb_bool_t           tb_oc_number_uint32_set(tb_object_ref_t number, tb_uint32_t 
  */
 tb_bool_t           tb_oc_number_sint32_set(tb_object_ref_t number, tb_sint32_t value);
 
-/*! set the uint64 value 
+/*! set the uint64 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -292,7 +292,7 @@ tb_bool_t           tb_oc_number_sint32_set(tb_object_ref_t number, tb_sint32_t 
  */
 tb_bool_t           tb_oc_number_uint64_set(tb_object_ref_t number, tb_uint64_t value);
 
-/*! set the sint64 value 
+/*! set the sint64 value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -302,7 +302,7 @@ tb_bool_t           tb_oc_number_uint64_set(tb_object_ref_t number, tb_uint64_t 
 tb_bool_t           tb_oc_number_sint64_set(tb_object_ref_t number, tb_sint64_t value);
 
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-/*! set the float value 
+/*! set the float value
  *
  * @param number    the object pointer
  * @param value     the number value
@@ -311,7 +311,7 @@ tb_bool_t           tb_oc_number_sint64_set(tb_object_ref_t number, tb_sint64_t 
  */
 tb_bool_t           tb_oc_number_float_set(tb_object_ref_t number, tb_float_t value);
 
-/*! set the double value 
+/*! set the double value
  *
  * @param number    the object pointer
  * @param value     the number value

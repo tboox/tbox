@@ -26,7 +26,7 @@ static tb_size_t tb_stack_put_and_pop_test()
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
-    for (i = 0; i < n; i++) 
+    for (i = 0; i < n; i++)
     {
         tb_stack_pop(stack);
         tb_stack_put(stack, (tb_pointer_t)0xf);

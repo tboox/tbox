@@ -22,7 +22,7 @@ static tb_void_t tb_test_heap_min_func()
 
     // make heap
     tb_size_t i = 0;
-    for (i = 0; i < 100; i++) 
+    for (i = 0; i < 100; i++)
     {
         // the value
         tb_uint32_t val = (tb_uint32_t)tb_random_range(0, 50);
@@ -38,7 +38,7 @@ static tb_void_t tb_test_heap_min_func()
     tb_random_reset(tb_true);
 
     // remove some values
-    for (i = 0; i < 100; i++) 
+    for (i = 0; i < 100; i++)
     {
         // the value
         tb_uint32_t val = (tb_uint32_t)tb_random_range(0, 50);
@@ -52,7 +52,7 @@ static tb_void_t tb_test_heap_min_func()
     }
 
     // append heap
-    for (i = 0; i < 30; i++) 
+    for (i = 0; i < 30; i++)
     {
         // the value
         tb_uint32_t val = (tb_uint32_t)tb_random_range(0, 50);
@@ -65,7 +65,7 @@ static tb_void_t tb_test_heap_min_func()
     tb_trace_i("");
 
     // dump heap
-    while (tb_heap_size(heap)) 
+    while (tb_heap_size(heap))
     {
         // put it
         tb_uint32_t val = (tb_uint32_t)(tb_size_t)tb_heap_top(heap);
@@ -97,7 +97,7 @@ static tb_void_t tb_test_heap_min_perf()
     __tb_volatile__ tb_size_t n = 100000;
     __tb_volatile__ tb_size_t p; tb_used(&p);
     for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_random_range(0, 50));
-    for (i = 0; tb_heap_size(heap); i++) 
+    for (i = 0; tb_heap_size(heap); i++)
     {
         // get the top value
         tb_size_t v = (tb_size_t)tb_heap_top(heap);
@@ -135,7 +135,7 @@ static tb_void_t tb_test_heap_max_func()
 
     // make heap
     tb_size_t i = 0;
-    for (i = 0; i < 100; i++) 
+    for (i = 0; i < 100; i++)
     {
         // the value
         tb_uint32_t val = (tb_uint32_t)tb_random_range(0, 50);
@@ -148,7 +148,7 @@ static tb_void_t tb_test_heap_max_func()
     }
 
     // remove some values
-    for (i = 0; i < 100; i++) 
+    for (i = 0; i < 100; i++)
     {
         // the value
         tb_uint32_t val = (tb_uint32_t)tb_random_range(0, 50);
@@ -162,7 +162,7 @@ static tb_void_t tb_test_heap_max_func()
     }
 
     // append heap
-    for (i = 0; i < 30; i++) 
+    for (i = 0; i < 30; i++)
     {
         // the value
         tb_uint32_t val = (tb_uint32_t)tb_random_range(0, 50);
@@ -175,7 +175,7 @@ static tb_void_t tb_test_heap_max_func()
     tb_trace_i("");
 
     // dump heap
-    while (tb_heap_size(heap)) 
+    while (tb_heap_size(heap))
     {
         // put it
         tb_uint32_t val = (tb_uint32_t)(tb_size_t)tb_heap_top(heap);
@@ -207,7 +207,7 @@ static tb_void_t tb_test_heap_max_perf()
     __tb_volatile__ tb_size_t n = 100000;
     __tb_volatile__ tb_size_t p; tb_used(&p);
     for (i = 0; i < n; i++) tb_heap_put(heap, (tb_pointer_t)(tb_size_t)tb_random_range(0, 50));
-    for (i = 0; tb_heap_size(heap); i++) 
+    for (i = 0; tb_heap_size(heap); i++)
     {
         // get the top value
         tb_size_t v = (tb_size_t)tb_heap_top(heap);

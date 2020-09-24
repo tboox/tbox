@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +10,7 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
 {
     // self
     tb_size_t self = tb_thread_self();
-    
+
     // trace
     tb_trace_i("thread[%lx: %zu]: init", self, priv);
 
@@ -19,20 +19,20 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
 
     // get cpu core
     tb_cpuset_t cpuset;
-    TB_CPUSET_ZERO(&cpuset); 
+    TB_CPUSET_ZERO(&cpuset);
     if (tb_thread_getaffinity(tb_null, &cpuset))
     {
         tb_size_t i;
-        for (i = 0; i < TB_CPUSET_SIZE; i++) 
+        for (i = 0; i < TB_CPUSET_SIZE; i++)
         {
-            if (TB_CPUSET_ISSET(i, &cpuset)) 
+            if (TB_CPUSET_ISSET(i, &cpuset))
                 tb_trace_i("thread[%lx: %zu]: get cpu core: %d", self, priv, i);
         }
     }
 
     // reset thread affinity
     tb_size_t cpu = tb_min(1, tb_cpu_count() - 1);
-    TB_CPUSET_ZERO(&cpuset); 
+    TB_CPUSET_ZERO(&cpuset);
     TB_CPUSET_SET(cpu, &cpuset);
     if (!tb_thread_setaffinity(tb_null, &cpuset))
     {
@@ -40,18 +40,18 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
     }
 
     // get cpu core again
-    TB_CPUSET_ZERO(&cpuset); 
+    TB_CPUSET_ZERO(&cpuset);
     if (tb_thread_getaffinity(tb_null, &cpuset))
     {
         tb_size_t i;
-        for (i = 0; i < TB_CPUSET_SIZE; i++) 
+        for (i = 0; i < TB_CPUSET_SIZE; i++)
         {
-            if (TB_CPUSET_ISSET(i, &cpuset)) 
+            if (TB_CPUSET_ISSET(i, &cpuset))
                 tb_trace_i("thread[%lx: %zu]: get cpu core again: %d", self, priv, i);
         }
     }
 
-    // exit 
+    // exit
     tb_thread_return(-1);
 
     // trace
@@ -63,7 +63,7 @@ static tb_int_t tb_demo_thread_func(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_thread_main(tb_int_t argc, tb_char_t** argv)
 {
     // get cpu count
@@ -81,7 +81,7 @@ tb_int_t tb_demo_platform_thread_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(threads[i]);
 
         // set thread affinity
-        TB_CPUSET_ZERO(&cpuset); 
+        TB_CPUSET_ZERO(&cpuset);
         TB_CPUSET_SET(i, &cpuset);
         if (!tb_thread_setaffinity(threads[i], &cpuset))
         {
@@ -102,7 +102,7 @@ tb_int_t tb_demo_platform_thread_main(tb_int_t argc, tb_char_t** argv)
                 // trace
                 tb_trace_i("wait: %zu ok, retval: %d", i, retval);
             }
-        
+
             // exit thread
             tb_thread_exit(thread);
         }

@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // port
 #define TB_DEMO_PORT        (9090)
@@ -15,7 +15,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the client type
 typedef struct __tb_demo_lo_client_t
@@ -56,7 +56,7 @@ typedef struct __tb_demo_lo_listen_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -74,7 +74,7 @@ static tb_void_t tb_demo_lo_coroutine_client(tb_lo_coroutine_ref_t coroutine, tb
             client->real = tb_socket_recv(client->sock, (tb_byte_t*)client->data + client->read, client->size - client->read);
 
             // has data?
-            if (client->real > 0) 
+            if (client->real > 0)
             {
                 client->read += client->real;
                 client->wait = 0;
@@ -153,7 +153,7 @@ static tb_void_t tb_demo_lo_coroutine_listen(tb_lo_coroutine_ref_t coroutine, tb
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_echo_server_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler

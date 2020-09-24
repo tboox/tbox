@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 tb_int_t tb_demo_stream_charset_main(tb_int_t argc, tb_char_t** argv)
 {
@@ -23,7 +23,7 @@ tb_int_t tb_demo_stream_charset_main(tb_int_t argc, tb_char_t** argv)
     tb_stream_ref_t fstream = tb_stream_init_filter_from_charset(iostream, tb_charset_type(argv[3]), tb_charset_type(argv[4]));
 
     // done
-    if (istream && ostream && fstream) 
+    if (istream && ostream && fstream)
     {
         // save it
         tb_hong_t save = 0;

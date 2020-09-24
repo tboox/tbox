@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -59,7 +59,7 @@ typedef enum __tb_xml_node_type_t
 
 }tb_xml_node_type_t;
 
-/// the xml node 
+/// the xml node
 typedef struct __tb_xml_node_t
 {
     /// the node type
@@ -132,8 +132,8 @@ typedef struct __tb_xml_comment_t
 /*! the xml attribute type
  *
  * <pre>
- * inherit node, 
- * but since they are not actually child nodes of the element they describe, 
+ * inherit node,
+ * but since they are not actually child nodes of the element they describe,
  * the DOM does not consider them part of the document tree.
  * </pre>
  */
@@ -144,7 +144,7 @@ typedef struct __tb_xml_attribute_t
 
 }tb_xml_attribute_t;
 
-/// the xml document type 
+/// the xml document type
 typedef struct __tb_xml_document_t
 {
     /// the node base
@@ -153,7 +153,7 @@ typedef struct __tb_xml_document_t
     /// the version
     tb_string_t                 version;
 
-    /// the charset 
+    /// the charset
     tb_string_t                 charset;
 
 }tb_xml_document_t;
@@ -164,7 +164,7 @@ typedef struct __tb_xml_document_type_t
     /// the node base
     tb_xml_node_t               base;
 
-    /// the type 
+    /// the type
     tb_string_t                 type;
 
 }tb_xml_document_type_t;
@@ -183,28 +183,28 @@ typedef tb_xml_node_t*          tb_xml_node_ref_t;
  */
 tb_xml_node_ref_t   tb_xml_node_init_element(tb_char_t const* name);
 
-/*! init text node 
+/*! init text node
  *
  * @param data      the element text
  * @return          the element node
  */
 tb_xml_node_ref_t   tb_xml_node_init_text(tb_char_t const* data);
 
-/*! init cdata node 
+/*! init cdata node
  *
  * @param cdata     the element cdata
  * @return          the element node
  */
 tb_xml_node_ref_t   tb_xml_node_init_cdata(tb_char_t const* cdata);
 
-/*! init comment node 
+/*! init comment node
  *
  * @param comment   the element comment
  * @return          the element node
  */
 tb_xml_node_ref_t   tb_xml_node_init_comment(tb_char_t const* comment);
 
-/*! init attribute node 
+/*! init attribute node
  *
  * @param name      the attribute name
  * @param data      the attribute data
@@ -212,7 +212,7 @@ tb_xml_node_ref_t   tb_xml_node_init_comment(tb_char_t const* comment);
  */
 tb_xml_node_ref_t   tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const* data);
 
-/*! init document node 
+/*! init document node
  *
  * @param version   the xml version
  * @param encoding  the xml encoding
@@ -220,14 +220,14 @@ tb_xml_node_ref_t   tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t 
  */
 tb_xml_node_ref_t   tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* encoding);
 
-/*! init document type node 
+/*! init document type node
  *
  * @param type      the document type
  * @return          the element node
  */
 tb_xml_node_ref_t   tb_xml_node_init_document_type(tb_char_t const* type);
 
-/*! exit the xml node 
+/*! exit the xml node
  *
  * @param node      the element node
  */

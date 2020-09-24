@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -25,7 +25,7 @@
  */
 #define TB_TRACE_MODULE_NAME        "oc_boolean"
 #define TB_TRACE_MODULE_DEBUG       (0)
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -71,9 +71,9 @@ static tb_object_ref_t tb_oc_boolean_copy(tb_object_ref_t object)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-  
+
 // true
-static tb_oc_boolean_t const g_boolean_true = 
+static tb_oc_boolean_t const g_boolean_true =
 {
     {
         TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
@@ -89,7 +89,7 @@ static tb_oc_boolean_t const g_boolean_true =
 };
 
 // false
-static tb_oc_boolean_t const g_boolean_false = 
+static tb_oc_boolean_t const g_boolean_false =
 {
     {
         TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON

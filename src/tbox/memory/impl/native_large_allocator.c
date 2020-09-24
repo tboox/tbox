@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -129,7 +129,7 @@ static tb_void_t tb_native_large_allocator_check_data(tb_native_large_allocator_
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!ok) 
+    if (!ok)
     {
         // dump data
         tb_pool_data_dump(data, tb_true, "[native_large_allocator]: [error]: ");
@@ -200,7 +200,7 @@ static tb_pointer_t tb_native_large_allocator_malloc(tb_allocator_ref_t self, tb
     tb_native_large_allocator_ref_t allocator = (tb_native_large_allocator_ref_t)self;
     tb_assert_and_check_return_val(allocator, tb_null);
 
-    // done 
+    // done
 #ifdef __tb_debug__
     tb_size_t                       patch = 1; // patch 0xcc
 #else
@@ -297,7 +297,7 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
     tb_native_large_allocator_ref_t allocator = (tb_native_large_allocator_ref_t)self;
     tb_assert_and_check_return_val(allocator, tb_null);
 
-    // done 
+    // done
 #ifdef __tb_debug__
     tb_size_t                       patch = 1; // patch 0xcc
 #else
@@ -331,13 +331,13 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
 
         // check the next data
         tb_native_large_allocator_check_next(allocator, data_head);
- 
+
         // update the real size
         allocator->real_size -= base_head->size;
 
         // update the occupied size
         allocator->occupied_size -= base_head->size;
- 
+
         // update the total size
         allocator->total_size -= base_head->size;
 
@@ -364,7 +364,7 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
                 }
             }
         }
-        else 
+        else
         {
             if (base_head->size < TB_VIRTUAL_MEMORY_DATA_MINN)
                 data = (tb_byte_t*)tb_native_memory_ralloc(data_head, need);
@@ -404,7 +404,7 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
         // update backtrace
         tb_pool_data_save_backtrace(&base_head->debug, 5);
 
-        // make the dirty data 
+        // make the dirty data
         if (size > prev_size) tb_memset_(data_real + prev_size, TB_POOL_DATA_PATCH, size - prev_size);
 
         // patch 0xcc for checking underflow
@@ -492,7 +492,7 @@ static tb_bool_t tb_native_large_allocator_free(tb_allocator_ref_t self, tb_poin
 
         // update the total size
         allocator->total_size    -= base_head->size;
-   
+
         // update the free count
         allocator->free_count++;
 #endif

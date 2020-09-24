@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -66,7 +66,7 @@ typedef struct __tb_dns_looker_t
 
     // the request and response packet
     tb_static_buffer_t      rpkt;
-    
+
     // the size for recv and send packet
     tb_size_t               size;
 
@@ -103,7 +103,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 {
     // check
     tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_REQT), 1);
-    
+
     // format it first if the request is null
     if (!tb_static_buffer_size(&looker->rpkt))
     {
@@ -134,10 +134,10 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
          * tb_uint16_t cd     :1;       // checking disabled
          * tb_uint16_t rcode  :4;       // response code
          *
-         * this is a query 
-         * this is a standard query 
-         * not authoritive answer 
-         * not truncated 
+         * this is a query
+         * this is a standard query
+         * not authoritive answer
+         * not truncated
          * recursion desired
          *
          * recursion not available! hey we dont have it (lol)
@@ -167,7 +167,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
          * tb_uint16_t resource;        // number of resource entries
          *
          */
-        tb_static_stream_writ_u16_be(&stream, 1); 
+        tb_static_stream_writ_u16_be(&stream, 1);
         tb_static_stream_writ_u16_be(&stream, 0);
         tb_static_stream_writ_u16_be(&stream, 0);
         tb_static_stream_writ_u16_be(&stream, 0);
@@ -234,7 +234,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
         tb_long_t writ = tb_socket_usend(looker->sock, addr, data + looker->size, size - looker->size);
         tb_assert_and_check_return_val(writ >= 0, -1);
 
-        // no data? 
+        // no data?
         if (!writ)
         {
             // abort?
@@ -345,7 +345,7 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipaddr_ref_
             tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 
             // save the first ip
-            if (!found) 
+            if (!found)
             {
                 // save it
                 if (addr)
@@ -485,19 +485,19 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipaddr_ref_t add
         tb_long_t read = tb_socket_urecv(looker->sock, tb_null, data + size, maxn - size);
         tb_assert_and_check_return_val(read >= 0, -1);
 
-        // no data? 
+        // no data?
         if (!read)
         {
             // end? read x, read 0
             tb_check_break(!tb_static_buffer_size(&looker->rpkt));
-    
+
             // abort? read 0, read 0
             tb_check_return_val(!looker->tryn, -1);
-            
+
             // tryn++
             looker->tryn++;
 
-            // continue 
+            // continue
             return 0;
         }
         else looker->tryn = 0;
@@ -595,14 +595,14 @@ tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t self, tb_ipaddr_ref_t addr)
     tb_dns_looker_t* looker = (tb_dns_looker_t*)self;
     tb_assert_and_check_return_val(looker && addr, -1);
 
-    // init 
+    // init
     tb_long_t r = -1;
     do
     {
         // request
         r = tb_dns_looker_reqt(looker);
         tb_check_break(r > 0);
-            
+
         // response
         r = tb_dns_looker_resp(looker, addr);
         tb_check_break(r > 0);
@@ -626,7 +626,7 @@ tb_long_t tb_dns_looker_spak(tb_dns_looker_ref_t self, tb_ipaddr_ref_t addr)
             looker->size = 0;
             tb_static_buffer_clear(&looker->rpkt);
 
-            // continue 
+            // continue
             r = 0;
         }
     }

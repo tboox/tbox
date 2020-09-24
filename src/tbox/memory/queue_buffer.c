@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -35,7 +35,7 @@ tb_bool_t tb_queue_buffer_init(tb_queue_buffer_ref_t buffer, tb_size_t maxn)
     // check
     tb_assert_and_check_return_val(buffer, tb_false);
 
-    // init 
+    // init
     buffer->data = tb_null;
     buffer->head = tb_null;
     buffer->size = 0;
@@ -287,7 +287,7 @@ tb_byte_t* tb_queue_buffer_push_init(tb_queue_buffer_ref_t buffer, tb_size_t* si
         buffer->data = tb_malloc_bytes(buffer->maxn);
         tb_assert_and_check_return_val(buffer->data, tb_null);
 
-        // init 
+        // init
         buffer->head = buffer->data;
         buffer->size = 0;
     }
@@ -297,7 +297,7 @@ tb_byte_t* tb_queue_buffer_push_init(tb_queue_buffer_ref_t buffer, tb_size_t* si
     tb_size_t left = buffer->maxn - buffer->size;
     tb_check_return_val(left, tb_null);
 
-    // move data to head first, make sure there is enough write space 
+    // move data to head first, make sure there is enough write space
     if (buffer->head != buffer->data)
     {
         if (buffer->size) tb_memmov(buffer->data, buffer->head, buffer->size);

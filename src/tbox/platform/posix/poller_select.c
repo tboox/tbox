@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -53,7 +53,7 @@ typedef struct __tb_poller_select_data_t
     // the fd
     tb_long_t               fd;
 
-    // the user private data 
+    // the user private data
     tb_cpointer_t           priv;
 
     // the socket events
@@ -86,7 +86,7 @@ typedef struct __tb_poller_select_t
 
     /* the user private data list
      *
-     * do not use hash_map because it is too heavy in micro mode 
+     * do not use hash_map because it is too heavy in micro mode
      */
     tb_poller_select_data_ref_t    list;
 
@@ -117,7 +117,7 @@ static tb_void_t tb_poller_select_list_set(tb_poller_select_ref_t poller, tb_lon
     for (i = 0; i < n; i++) if (fd <= poller->list[i].fd) break;
 
     // update the private data
-    if (i < n && fd == poller->list[i].fd) 
+    if (i < n && fd == poller->list[i].fd)
     {
         poller->list[i].priv   = priv;
         poller->list[i].events = events;
@@ -372,7 +372,7 @@ static tb_long_t tb_poller_select_wait(tb_poller_t* self, tb_poller_event_func_t
             // exists events?
             if (events)
             {
-                // oneshot? 
+                // oneshot?
                 if (poller->list[i].events & TB_POLLER_EVENT_ONESHOT)
                     events |= TB_POLLER_EVENT_ONESHOT;
 
@@ -387,7 +387,7 @@ static tb_long_t tb_poller_select_wait(tb_poller_t* self, tb_poller_event_func_t
                 wait++;
             }
         }
-                
+
         // call events function
         tb_size_t eventi;
         tb_poller_object_t object;
@@ -450,7 +450,7 @@ tb_poller_t* tb_poller_select_init()
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_SOCK;
         object.ref.sock = poller->pair[1];
-        if (!tb_poller_select_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;  
+        if (!tb_poller_select_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;
 
         // ok
         ok = tb_true;

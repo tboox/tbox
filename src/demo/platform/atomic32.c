@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_test_atomic32_get()
 {
     tb_trace_i("atomic32_get(): test ..");
@@ -110,7 +110,7 @@ static tb_void_t tb_test_atomic32_fetch_and_or()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_atomic32_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_test_atomic32_get();

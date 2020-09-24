@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -61,7 +61,7 @@ tb_object_ref_t     tb_oc_data_init_from_data(tb_pointer_t data, tb_size_t size)
  */
 tb_object_ref_t     tb_oc_data_init_from_buffer(tb_buffer_ref_t buffer);
 
-/*! get the data 
+/*! get the data
  *
  * @param data      the data object
  *
@@ -69,7 +69,7 @@ tb_object_ref_t     tb_oc_data_init_from_buffer(tb_buffer_ref_t buffer);
  */
 tb_pointer_t        tb_oc_data_getp(tb_object_ref_t data);
 
-/*! set the data 
+/*! set the data
  *
  * @param data      the data object
  * @param addr      the data address

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -26,7 +26,7 @@
 #include "string.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 
 tb_char_t* tb_strdup(tb_char_t const* s)
@@ -34,7 +34,7 @@ tb_char_t* tb_strdup(tb_char_t const* s)
     // check
     tb_assert_and_check_return_val(s, tb_null);
 
-    // make 
+    // make
     __tb_register__ tb_size_t   n = tb_strlen(s);
     __tb_register__ tb_char_t*  p = tb_malloc_cstr(n + 1);
     tb_assert_and_check_return_val(p, tb_null);

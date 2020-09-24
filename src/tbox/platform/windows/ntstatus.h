@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -281,7 +281,7 @@
 
 static __tb_inline__ tb_size_t tb_ntstatus_to_winerror(tb_size_t status)
 {
-    switch (status) 
+    switch (status)
     {
     case STATUS_SUCCESS:
         return ERROR_SUCCESS;
@@ -389,8 +389,8 @@ static __tb_inline__ tb_size_t tb_ntstatus_to_winerror(tb_size_t status)
         return WSAEACCES;
 
     default:
-        if (    (status & (FACILITY_NTWIN32 << 16)) == (FACILITY_NTWIN32 << 16) 
-            &&  (status & (ERROR_SEVERITY_ERROR | ERROR_SEVERITY_WARNING))) 
+        if (    (status & (FACILITY_NTWIN32 << 16)) == (FACILITY_NTWIN32 << 16)
+            &&  (status & (ERROR_SEVERITY_ERROR | ERROR_SEVERITY_WARNING)))
         {
             return (tb_size_t) (status & 0xffff);
         }

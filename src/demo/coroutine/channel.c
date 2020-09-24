@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_channel_test_send(tb_cpointer_t priv)
 {
     // check
@@ -27,7 +27,7 @@ static tb_void_t tb_demo_coroutine_channel_test_send(tb_cpointer_t priv)
 
         // send data
         tb_co_channel_send(channel, (tb_cpointer_t)count);
- 
+
         // trace
         tb_trace_i("[coroutine: %p]: send: %lu ok", tb_coroutine_self(), count);
     }
@@ -46,7 +46,7 @@ static tb_void_t tb_demo_coroutine_channel_test_recv(tb_cpointer_t priv)
 
         // recv
         tb_size_t data = (tb_size_t)tb_co_channel_recv(channel);
- 
+
         // trace
         tb_trace_i("[coroutine: %p]: recv: %lu ok", tb_coroutine_self(), data);
     }
@@ -75,7 +75,7 @@ static tb_void_t tb_demo_coroutine_channel_test(tb_size_t size)
         // run scheduler
         tb_co_scheduler_loop(scheduler, tb_true);
 
-        // exit channel 
+        // exit channel
         tb_co_channel_exit(channel);
 
         // exit scheduler
@@ -126,7 +126,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
         // computing time
         tb_hong_t duration = tb_mclock() - startime;
 
-        // exit channel 
+        // exit channel
         tb_co_channel_exit(channel);
 
         // trace
@@ -139,7 +139,7 @@ static tb_void_t tb_demo_coroutine_channel_perf(tb_size_t size)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_channel_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_demo_coroutine_channel_test(0);

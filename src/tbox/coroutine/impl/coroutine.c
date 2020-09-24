@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -51,7 +51,7 @@
  */
 static tb_void_t tb_coroutine_entry(tb_context_from_t from)
 {
-    // get the from-coroutine 
+    // get the from-coroutine
     tb_coroutine_t* coroutine_from = (tb_coroutine_t*)from.priv;
     tb_assert(coroutine_from && from.context);
 
@@ -109,9 +109,9 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
 
         /* make coroutine
          *
-         * TODO: 
+         * TODO:
          *
-         * - segment stack 
+         * - segment stack
          *
          *  -----------------------------------------------
          * | coroutine | guard | ... stacksize ... | guard |
@@ -140,7 +140,7 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
         tb_assert_and_check_break(coroutine->context);
 
 #if defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
-        // register valgrind stack 
+        // register valgrind stack
         coroutine->valgrind_stack_id = VALGRIND_STACK_REGISTER(coroutine->stackbase - stacksize, coroutine->stackbase);
 #endif
 
@@ -158,7 +158,7 @@ tb_coroutine_t* tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_
     if (!ok)
     {
         // exit it
-        if (coroutine) tb_coroutine_exit(coroutine); 
+        if (coroutine) tb_coroutine_exit(coroutine);
         coroutine = tb_null;
     }
 
@@ -189,7 +189,7 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
 #endif
 
 #if defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
-        // deregister valgrind stack 
+        // deregister valgrind stack
         VALGRIND_STACK_DEREGISTER(coroutine->valgrind_stack_id);
 #endif
 
@@ -216,7 +216,7 @@ tb_coroutine_t* tb_coroutine_reinit(tb_coroutine_t* coroutine, tb_coroutine_func
         tb_assert_and_check_break(coroutine->context);
 
 #if defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
-        // re-register valgrind stack 
+        // re-register valgrind stack
         coroutine->valgrind_stack_id = VALGRIND_STACK_REGISTER(coroutine->stackbase - stacksize, coroutine->stackbase);
 #endif
 
@@ -248,7 +248,7 @@ tb_void_t tb_coroutine_exit(tb_coroutine_t* coroutine)
 #endif
 
 #if defined(__tb_valgrind__) && defined(TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER)
-    // deregister valgrind stack 
+    // deregister valgrind stack
     VALGRIND_STACK_DEREGISTER(coroutine->valgrind_stack_id);
 #endif
 

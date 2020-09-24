@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@ tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 
     // get port
     mach_port_name_t port;
-    if (pid) 
+    if (pid)
     {
         if (task_for_pid(mach_task_self(), (tb_int_t)pid, &port) != KERN_SUCCESS)
         {
@@ -67,20 +67,20 @@ tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     tb_size_t i;
     thread_t thread_self = mach_thread_self();
     mach_port_deallocate(mach_task_self(), thread_self);
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self) 
+        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self)
             thread_suspend(threads[i]);
     }
 
     // set affinity for all threads
     tb_size_t ok = tb_true;
     thread_affinity_policy_data_t policy;
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL) 
+        if (threads[i] != MACH_PORT_NULL)
         {
-            // TODO only set the first thread successfully now. 
+            // TODO only set the first thread successfully now.
             policy.affinity_tag = core;
             if (thread_policy_set(threads[i], THREAD_AFFINITY_POLICY, (thread_policy_t)&policy, THREAD_AFFINITY_POLICY_COUNT) != KERN_SUCCESS)
                 ok = tb_false;
@@ -88,16 +88,16 @@ tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     }
 
     // resume threads
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self) 
+        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self)
             thread_suspend(threads[i]);
     }
 
     // free threads
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL) 
+        if (threads[i] != MACH_PORT_NULL)
             mach_port_deallocate(port, threads[i]);
     }
     mach_vm_deallocate(port, (mach_vm_address_t)threads, thread_count * sizeof(*threads));
@@ -110,7 +110,7 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 
     // get port
     mach_port_name_t port;
-    if (pid) 
+    if (pid)
     {
         if (task_for_pid(mach_task_self(), (tb_int_t)pid, &port) != KERN_SUCCESS)
         {
@@ -134,18 +134,18 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     tb_size_t i;
     thread_t thread_self = mach_thread_self();
     mach_port_deallocate(mach_task_self(), thread_self);
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self) 
+        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self)
             thread_suspend(threads[i]);
     }
 
     // set affinity for all threads
     tb_size_t ok = tb_true;
     TB_CPUSET_ZERO(cpuset);
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL) 
+        if (threads[i] != MACH_PORT_NULL)
         {
             boolean_t get_default = tb_false;
             mach_msg_type_number_t count = THREAD_AFFINITY_POLICY_COUNT;
@@ -160,16 +160,16 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     }
 
     // resume threads
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self) 
+        if (threads[i] != MACH_PORT_NULL && threads[i] != thread_self)
             thread_suspend(threads[i]);
     }
 
     // free threads
-    for (i = 0; i < thread_count; i++) 
+    for (i = 0; i < thread_count; i++)
     {
-        if (threads[i] != MACH_PORT_NULL) 
+        if (threads[i] != MACH_PORT_NULL)
             mach_port_deallocate(port, threads[i]);
     }
     mach_vm_deallocate(port, (mach_vm_address_t)threads, thread_count * sizeof(*threads));

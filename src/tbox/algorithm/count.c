@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -32,7 +32,7 @@
 tb_size_t tb_count(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t value)
 {
     return tb_count_if(iterator, head, tail, tb_predicate_eq, value);
-} 
+}
 tb_size_t tb_count_all(tb_iterator_ref_t iterator, tb_cpointer_t value)
 {
     return tb_count_all_if(iterator, tb_predicate_eq, value);

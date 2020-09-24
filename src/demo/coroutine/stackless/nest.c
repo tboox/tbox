@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the nest type
 typedef struct __tb_demo_lo_nest_t
@@ -23,7 +23,7 @@ typedef struct __tb_demo_lo_nest_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 #if 0
 static tb_void_t tb_demo_lo_coroutine_nest_next(tb_lo_coroutine_ref_t coroutine, tb_demo_lo_nest_ref_t nest)
 {
@@ -89,7 +89,7 @@ static tb_void_t tb_demo_lo_coroutine_nest_func(tb_lo_coroutine_ref_t coroutine,
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_nest_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler

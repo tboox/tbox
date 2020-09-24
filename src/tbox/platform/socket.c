@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -180,7 +180,7 @@ tb_long_t tb_socket_wait(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeo
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine
-    if (tb_coroutine_self()) 
+    if (tb_coroutine_self())
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_SOCK;
@@ -202,7 +202,7 @@ tb_bool_t tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_size_t size)
         tb_long_t real = tb_socket_recv(sock, data + recv, size - recv);
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             recv += real;
             wait = 0;
@@ -230,7 +230,7 @@ tb_bool_t tb_socket_bsend(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t
         tb_long_t real = tb_socket_send(sock, data + send, size - send);
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             send += real;
             wait = 0;

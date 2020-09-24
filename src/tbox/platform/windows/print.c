@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,12 +29,12 @@
  * implementation
  */
 
-/* 
+/*
  *@note
  *
- * fputs(string, stdout) exists compatibility issue when vs2008 => vs2015 
+ * fputs(string, stdout) exists compatibility issue when vs2008 => vs2015
  *
- * error: ___iob_func undefined in vs2015 
+ * error: ___iob_func undefined in vs2015
  */
 tb_void_t tb_print(tb_char_t const* string)
 {
@@ -82,10 +82,10 @@ tb_void_t tb_print(tb_char_t const* string)
 }
 tb_void_t tb_printl(tb_char_t const* string)
 {
-    // print string 
+    // print string
     tb_print(string);
 
-    // print newline 
+    // print newline
     tb_print(__tb_newline__);
 }
 tb_void_t tb_print_sync()

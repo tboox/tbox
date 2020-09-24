@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -48,16 +48,16 @@ __tb_extern_c_enter__
 
 /*! the bloom filter type
  *
- * A Bloom filter is a space-efficient probabilistic data structure, 
- * conceived by Burton Howard Bloom in 1970, that is used to test whether an element is a member of a set. 
- * False positive matches are possible, but false negatives are not; 
- * i.e. a query returns either "possibly in set" or "definitely not in set". 
- * Elements can be added to the set, but not removed (though this can be addressed with a "counting" filter). 
+ * A Bloom filter is a space-efficient probabilistic data structure,
+ * conceived by Burton Howard Bloom in 1970, that is used to test whether an element is a member of a set.
+ * False positive matches are possible, but false negatives are not;
+ * i.e. a query returns either "possibly in set" or "definitely not in set".
+ * Elements can be added to the set, but not removed (though this can be addressed with a "counting" filter).
  * The more elements that are added to the set, the larger the probability of false positives.
  *
- * Assume that a hash function selects each array position with equal probability. 
- * If m is the number of bits in the array, and k is the number of hash functions, 
- * then the probability that a certain bit is not set to 1 by a certain hash function 
+ * Assume that a hash function selects each array position with equal probability.
+ * If m is the number of bits in the array, and k is the number of hash functions,
+ * then the probability that a certain bit is not set to 1 by a certain hash function
  * during the insertion of an element is then
  * 1 - 1 / m
  *
@@ -72,7 +72,7 @@ __tb_extern_c_enter__
  *
  * Now test membership of an element that is not in the set.
  * Each of the k array positions computed by the hash functions is 1 with a probability as above.
- * The probability of all of them being 1, 
+ * The probability of all of them being 1,
  * which would cause the algorithm to erroneously claim that the element is in the set, is often given as
  * p = (1 - ((1 - 1/ m) ^ kn))^k ~= (1 - e^(-kn/m))^k
  *
@@ -82,8 +82,8 @@ __tb_extern_c_enter__
  * which gives
  * 2 ^ -k ~= 0.6185 ^ (m / n)
  *
- * The required number of bits m, given n (the number of inserted elements) 
- * and a desired false positive probability p (and assuming the optimal value of k is used) 
+ * The required number of bits m, given n (the number of inserted elements)
+ * and a desired false positive probability p (and assuming the optimal value of k is used)
  * can be computed by substituting the optimal value of k in the probability expression above:
  * p = (1 - e ^-(m/nln2)n/m))^(m/nln2)
  *
@@ -102,10 +102,10 @@ __tb_extern_c_enter__
  * => e^(-k/s) = 1 - e^((lnp) / k) = 1 - (e^lnp)^(1/k) = 1 - p^(1/k)
  * => -k/s = ln(1 - p^(1/k))
  * => s = -k / ln(1 - p^(1/k)) and define c = p^(1/k)
- * => s = -k / ln(1 - c)) and ln(1 + x) ~= x - 0.5x^2 while x < 1 
+ * => s = -k / ln(1 - c)) and ln(1 + x) ~= x - 0.5x^2 while x < 1
  * => s ~= -k / (-c-0.5c^2) = 2k / (2c + c * c)
  *
- * so 
+ * so
  * c = p^(1/k)
  * s = m / n = 2k / (2c + c * c)
  */
@@ -120,7 +120,7 @@ typedef enum __tb_bloom_filter_probability_e
 ,   TB_BLOOM_FILTER_PROBABILITY_0_0001      = 13 ///!< 1 / 2^13 = 0.0001220703125 ~= 0.0001
 ,   TB_BLOOM_FILTER_PROBABILITY_0_00001     = 16 ///!< 1 / 2^16 = 0.0000152587890625 ~= 0.00001
 ,   TB_BLOOM_FILTER_PROBABILITY_0_000001    = 20 ///!< 1 / 2^20 = 0.00000095367431640625 ~= 0.000001
-        
+
 }tb_bloom_filter_probability_e;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ typedef enum __tb_bloom_filter_probability_e
 
 /*! init bloom filter
  *
- * @note not supports iterator 
+ * @note not supports iterator
  *
  * @param probability   the probability of false positives
  * @param hash_count    the hash count: < 16
@@ -152,7 +152,7 @@ tb_void_t               tb_bloom_filter_exit(tb_bloom_filter_ref_t bloom_filter)
  */
 tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_ref_t bloom_filter);
 
-/*! set data to the bloom filter 
+/*! set data to the bloom filter
  *
  * @code
  * if (tb_bloom_filter_set(filter, data))
@@ -168,13 +168,13 @@ tb_void_t               tb_bloom_filter_clear(tb_bloom_filter_ref_t bloom_filter
  * @endcode
  *
  * @param bloom_filter  the bloom filter
- * @param data          the item data 
+ * @param data          the item data
  *
  * @return              return tb_false if the data have been existed, otherwise set it and return tb_true
  */
 tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_ref_t bloom_filter, tb_cpointer_t data);
 
-/*! get data to the bloom filter 
+/*! get data to the bloom filter
  *
  * @code
  * if (tb_bloom_filter_get(filter, data))
@@ -190,7 +190,7 @@ tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_ref_t bloom_filter, 
  * @endcode
  *
  * @param bloom_filter  the bloom filter
- * @param data          the item data 
+ * @param data          the item data
  *
  * @return              return tb_true if the data exists, otherwise return tb_false
  */

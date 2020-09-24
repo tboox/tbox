@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCAT
 tb_wchar_t* tb_wcscat(tb_wchar_t* s1, tb_wchar_t const* s2)

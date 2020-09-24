@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_test_writ()
 {
     tb_trace_i("=================== test stdfile writ ===================");
@@ -77,7 +77,7 @@ static tb_void_t tb_test_peek()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_stdfile_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_test_writ();

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,7 +49,7 @@ tb_void_t tb_remove_first_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred
             tb_iterator_remove(iterator, itor);
             break;
         }
-    
+
         // next
         itor = tb_iterator_next(iterator, itor);
     }

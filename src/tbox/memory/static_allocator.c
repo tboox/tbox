@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,7 +40,7 @@ static tb_handle_t tb_static_allocator_instance_init(tb_cpointer_t* ppriv)
     tb_byte_t*      data = (tb_byte_t*)tuple[0].ptr;
     tb_size_t       size = tuple[1].ul;
     tb_assert_and_check_return_val(data && size, tb_null);
-    
+
     // ok?
     return (tb_handle_t)tb_static_allocator_init(data, size);
 }

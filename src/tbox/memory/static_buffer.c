@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-// the maximum grow size of value buffer 
+// the maximum grow size of value buffer
 #ifdef __tb_small__
 #   define TB_STATIC_BUFFER_GROW_SIZE       (64)
 #else
@@ -44,8 +44,8 @@ tb_bool_t tb_static_buffer_init(tb_static_buffer_ref_t buffer, tb_byte_t* data, 
 {
     // check
     tb_assert_and_check_return_val(buffer, tb_false);
-    
-    // init 
+
+    // init
     buffer->size = 0;
     buffer->data = data;
     buffer->maxn = maxn;
@@ -122,7 +122,7 @@ tb_byte_t* tb_static_buffer_memnsetp(tb_static_buffer_ref_t buffer, tb_size_t p,
 {
     // check
     tb_assert_and_check_return_val(buffer, tb_null);
-    
+
     // check
     tb_check_return_val(n, tb_static_buffer_data(buffer));
 
@@ -152,7 +152,7 @@ tb_byte_t* tb_static_buffer_memncpyp(tb_static_buffer_ref_t buffer, tb_size_t p,
 {
     // check
     tb_assert_and_check_return_val(buffer && b, tb_null);
-    
+
     // check
     tb_check_return_val(n, tb_static_buffer_data(buffer));
 
@@ -188,7 +188,7 @@ tb_byte_t* tb_static_buffer_memnmovp(tb_static_buffer_ref_t buffer, tb_size_t p,
     tb_assert_and_check_return_val(buffer && (b + n) <= tb_static_buffer_size(buffer), tb_null);
 
     // clear?
-    if (b == tb_static_buffer_size(buffer)) 
+    if (b == tb_static_buffer_size(buffer))
     {
         tb_static_buffer_clear(buffer);
         return tb_static_buffer_data(buffer);
@@ -212,10 +212,10 @@ tb_byte_t* tb_static_buffer_memcat(tb_static_buffer_ref_t buffer, tb_static_buff
     return tb_static_buffer_memncat(buffer, tb_static_buffer_data(b), tb_static_buffer_size(b));
 }
 tb_byte_t* tb_static_buffer_memncat(tb_static_buffer_ref_t buffer, tb_byte_t const* b, tb_size_t n)
-{   
+{
     // check
     tb_assert_and_check_return_val(buffer && b, tb_null);
-    
+
     // check
     tb_check_return_val(n, tb_static_buffer_data(buffer));
 

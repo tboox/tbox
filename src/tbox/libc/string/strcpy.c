@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #if defined(TB_CONFIG_LIBC_HAVE_STRCPY)
 static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
@@ -59,7 +59,7 @@ static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 #elif defined(__tb_small__)
     while ((*s++ = *s2++)) ;
 #else
-    while (1) 
+    while (1)
     {
         if (!(s1[0] = s2[0])) break;
         if (!(s1[1] = s2[1])) break;
@@ -75,17 +75,17 @@ static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 {
     // check
 #ifdef __tb_debug__
     {
-        // overflow dst? 
+        // overflow dst?
         tb_size_t n2 = tb_strlen(s2);
 
-        // strcpy overflow? 
+        // strcpy overflow?
         tb_size_t n1 = tb_pool_data_size(s1);
         if (n1 && n2 + 1 > n1)
         {

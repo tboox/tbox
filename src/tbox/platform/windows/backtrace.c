@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -31,7 +31,7 @@
  * macros
  */
 #define TB_MAX_SYM_NAME             (2000)
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -67,7 +67,7 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* fra
 
     // done symbol
     if (!tb_dbghelp()->SymFromAddr(GetCurrentProcess(), (DWORD64)(tb_size_t)(frames[iframe]), 0, symbol)) return tb_null;
-    
+
     // the symbol name
     return symbol->Name;
 }

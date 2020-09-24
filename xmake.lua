@@ -48,7 +48,7 @@ if has_config("small", "micro") then
 end
 
 -- for the windows platform (msvc)
-if is_plat("windows") then 
+if is_plat("windows") then
 
     -- add some defines only for windows
     add_defines("NOCRYPT", "NOGDI")
@@ -57,34 +57,34 @@ if is_plat("windows") then
     if is_mode("release") then
 
         -- link libcmt.lib
-        add_cxflags("-MT") 
+        add_cxflags("-MT")
 
     -- the debug mode
     elseif is_mode("debug") then
 
         -- enable some checkers
-        add_cxflags("-Gs", "-RTC1") 
+        add_cxflags("-Gs", "-RTC1")
 
         -- link libcmtd.lib
-        add_cxflags("-MTd") 
+        add_cxflags("-MTd")
     end
 
     -- no msvcrt.lib
     add_ldflags("-nodefaultlib:msvcrt.lib")
-    add_syslinks("ws2_32") 
+    add_syslinks("ws2_32")
 
 elseif is_plat("android") then
-    add_syslinks("m", "c") 
+    add_syslinks("m", "c")
 elseif is_plat("mingw", "msys", "cygwin") then
     add_syslinks("ws2_32", "pthread", "m")
-else 
-    add_syslinks("pthread", "dl", "m", "c") 
+else
+    add_syslinks("pthread", "dl", "m", "c")
 end
 
--- enable backtrace symbols for linux 
+-- enable backtrace symbols for linux
 if is_plat("linux") and is_mode("debug") then
     add_ldflags("-rdynamic")
 end
 
 -- include project sources
-includes("src") 
+includes("src")

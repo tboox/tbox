@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLEN
@@ -49,7 +49,7 @@ tb_size_t tb_wcslen(tb_wchar_t const* s)
     while (*p) p++;
     return (p - s);
 #else
-    while (1) 
+    while (1)
     {
         if (!p[0]) return (p - s + 0);
         if (!p[1]) return (p - s + 1);

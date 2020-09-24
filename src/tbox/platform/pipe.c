@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -83,7 +83,7 @@ tb_bool_t tb_pipe_file_bread(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t
         tb_long_t real = tb_pipe_file_read(file, data + read, tb_min(size - read, 8192));
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             read += real;
             wait = 0;
@@ -111,7 +111,7 @@ tb_bool_t tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_
         tb_long_t real = tb_pipe_file_write(file, data + writ, tb_min(size - writ, 8192));
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             writ += real;
             wait = 0;

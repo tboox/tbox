@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -54,7 +54,7 @@ typedef __tb_cacheline_aligned__ struct __tb_atomic64_lock_t
  */
 
 // the locks
-static tb_atomic64_lock_t   g_locks[TB_ATOMIC64_LOCK_MAXN] = 
+static tb_atomic64_lock_t   g_locks[TB_ATOMIC64_LOCK_MAXN] =
 {
     {TB_SPINLOCK_INIT, {0}}
 };
@@ -96,7 +96,7 @@ tb_bool_t tb_atomic64_compare_and_swap_explicit_generic(tb_atomic64_t* a, tb_int
     // set value
     tb_bool_t ok = tb_false;
     tb_atomic64_t o = *a;
-    if (o == *p) 
+    if (o == *p)
     {
         *a = v;
         ok = tb_true;

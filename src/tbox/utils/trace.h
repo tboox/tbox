@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -50,13 +50,13 @@ typedef enum __tb_trace_mode_e
  * interfaces
  */
 
-/*! init trace 
+/*! init trace
  *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_trace_init(tb_noarg_t);
 
-/*! exit trace 
+/*! exit trace
  */
 tb_void_t           tb_trace_exit(tb_noarg_t);
 
@@ -80,7 +80,7 @@ tb_bool_t           tb_trace_mode_set(tb_size_t mode);
  */
 tb_file_ref_t       tb_trace_file(tb_noarg_t);
 
-/*! set the trace file 
+/*! set the trace file
  *
  * @param file      the trace file handle
  *

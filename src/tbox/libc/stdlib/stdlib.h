@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -103,7 +103,7 @@ __tb_extern_c_enter__
 /*! convert the binary string to uint64
  *
  * <pre>
- * .e.g 
+ * .e.g
  *
  * "1001" => 9
  * "0b1001" => 9
@@ -118,7 +118,7 @@ tb_uint64_t         tb_s2tou64(tb_char_t const* s);
 /*! convert the octal string to uint64
  *
  * <pre>
- * .e.g 
+ * .e.g
  *
  * "11" => 9
  * "011" => 9
@@ -144,7 +144,7 @@ tb_uint64_t         tb_s10tou64(tb_char_t const* s);
  *
  * <pre>
  * .e.g
- * 
+ *
  * "9" => 9
  * "0x9" => 9
  * </pre>
@@ -158,7 +158,7 @@ tb_uint64_t         tb_s16tou64(tb_char_t const* s);
 /*! auto convert string to uint64
  *
  * <pre>
- * .e.g 
+ * .e.g
  *
  * "0b1001" => 9
  * "011"    => 9
@@ -185,7 +185,7 @@ tb_uint64_t         tb_sbtou64(tb_char_t const* s, tb_int_t base);
 /*! convert the binary string to double
  *
  * <pre>
- * .e.g 
+ * .e.g
  *
  * "1001" => 9
  * "0b1001" => 9
@@ -200,7 +200,7 @@ tb_double_t         tb_s2tod(tb_char_t const* s);
 /*! convert the binary string to double
  *
  * <pre>
- * .e.g 
+ * .e.g
  *
  * "11" => 9
  * "011" => 9
@@ -226,7 +226,7 @@ tb_double_t         tb_s10tod(tb_char_t const* s);
  *
  * <pre>
  * .e.g
- * 
+ *
  * "9" => 9
  * "0x9" => 9
  * </pre>
@@ -240,7 +240,7 @@ tb_double_t         tb_s16tod(tb_char_t const* s);
 /*! auto convert string to double
  *
  * <pre>
- * .e.g 
+ * .e.g
  *
  * "0b1001" => 9
  * "011"    => 9

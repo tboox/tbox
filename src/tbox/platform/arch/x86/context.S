@@ -56,8 +56,8 @@
  *             --------------------------------------------------------------------------------
  * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   | context |  priv  |  padding  |
  *             --------------------------------------------------------------------------------
- *            0         4         8         12        16        20        24    arguments 
- *                                                              |         
+ *            0         4         8         12        16        20        24    arguments
+ *                                                              |
  *                                                              | 16-align for macosx
  *                                                              |
  *                                                   esp when jump to function
@@ -80,7 +80,7 @@ function(tb_context_make)
     // 16-align of the stack top address for macosx
     andl $-16, %eax
 
-    // reserve space for context-data on context-stack 
+    // reserve space for context-data on context-stack
     leal -20(%eax), %eax
 
     /* context.ebx = func
@@ -94,7 +94,7 @@ function(tb_context_make)
     call 1f
 1:  popl %ecx
     addl $__entry - 1b, %ecx
-    movl %ecx, 16(%eax) 
+    movl %ecx, 16(%eax)
 
     /* context.ebp = the address of label __end
      *
@@ -103,13 +103,13 @@ function(tb_context_make)
     call 2f
 2:  popl %ecx
     addl $__end - 2b, %ecx
-    movl %ecx, 12(%eax) 
+    movl %ecx, 12(%eax)
 
     // return the context pointer
     ret
 
 __entry:
-    
+
     // pass old-arguments(context: eax, priv: edx) to the context function
     movl %eax, (%esp)
     movl %edx, 0x4(%esp)
@@ -123,9 +123,9 @@ __entry:
      *                  |
      *                  |        old-context
      *              ----|------------------------------------
-     * context: .. | retval | context |   priv   |  padding  |  
+     * context: .. | retval | context |   priv   |  padding  |
      *              -----------------------------------------
-     *             0        4     arguments 
+     *             0        4     arguments
      *             |        |
      *            esp    16-align
      *           (now)
@@ -155,10 +155,10 @@ endfunc
 function(tb_context_jump)
 
     // save registers and construct the current context
-    pushl %ebp 
-    pushl %ebx 
-    pushl %esi 
-    pushl %edi 
+    pushl %ebp
+    pushl %ebx
+    pushl %esi
+    pushl %edi
 
     // save the old context(esp) to eax
     movl %esp, %eax
@@ -173,7 +173,7 @@ function(tb_context_jump)
     movl %ecx, %esp
 
     // restore registers of the new context
-    popl %edi 
+    popl %edi
     popl %esi
     popl %ebx
     popl %ebp
@@ -181,7 +181,7 @@ function(tb_context_jump)
     // restore the return or function address(ecx)
     popl %ecx
 
-    // return from-context(context: eax, priv: edx) from jump 
+    // return from-context(context: eax, priv: edx) from jump
     // ...
 
     /* jump to the return or function address(eip)
@@ -191,8 +191,8 @@ function(tb_context_jump)
      *              --------------------------------
      * context: .. | context |   priv   |  padding  |
      *              --------------------------------
-     *             0         4    arguments 
-     *             |         
+     *             0         4    arguments
+     *             |
      *            esp  16-align for macosx
      *           (now)
      */
@@ -215,7 +215,7 @@ endfunc
  *             -----------------------------------------------------------------------------------------
  * context:   |   edi   |   esi   |   ebx   |   ebp   |   eip   | retval | context |  priv  |  padding  |
  *             -----------------------------------------------------------------------------------------
- *            0         4         8         12        16        20        24    arguments 
+ *            0         4         8         12        16        20        24    arguments
  *                                                              |         |
  *                                                              |      16-align
  *                                                              |
@@ -239,7 +239,7 @@ function(tb_context_make)
     // 16-align of the stack top address for macosx
     andl $-16, %eax
 
-    // reserve space for context-data on context-stack 
+    // reserve space for context-data on context-stack
     leal -24(%eax), %eax
 
     /* context.ebx = func
@@ -253,13 +253,13 @@ function(tb_context_make)
      *
      * it will write context.edi and context.esi (unused) when jump to a new context function entry first
      */
-    movl %eax, 20(%eax) 
+    movl %eax, 20(%eax)
 
     // context.eip = the address of label __entry
     call 1f
 1:  popl %ecx
     addl $__entry - 1b, %ecx
-    movl %ecx, 16(%eax) 
+    movl %ecx, 16(%eax)
 
     /* context.ebp = the address of label __end
      *
@@ -268,22 +268,22 @@ function(tb_context_make)
     call 2f
 2:  popl %ecx
     addl $__end - 2b, %ecx
-    movl %ecx, 12(%eax) 
+    movl %ecx, 12(%eax)
 
     // return the context pointer
     ret
 
 __entry:
-    
+
     /* pass arguments(context: eax, priv: edx) to the context function
      *
      *              patch __end
      *                  |
      *                  |        old-context
      *              ----|------------------------------------
-     * context: .. | retval | context |   priv   |  padding  |  
+     * context: .. | retval | context |   priv   |  padding  |
      *              -----------------------------------------
-     *             0        4     arguments 
+     *             0        4     arguments
      *             |        |
      *            esp    16-align
      *           (now)
@@ -317,9 +317,9 @@ endfunc
  *
  * @code
  *
- * subl $4, %esp  <---- padding (need ret $4) 
+ * subl $4, %esp  <---- padding (need ret $4)
  * pushl priv
- * pushl context 
+ * pushl context
  * pushl retval
  * call tb_context_jump
  * addl $12, %esp
@@ -338,10 +338,10 @@ endfunc
 function(tb_context_jump)
 
     // save registers and construct the current context
-    pushl %ebp 
-    pushl %ebx 
-    pushl %esi 
-    pushl %edi 
+    pushl %ebp
+    pushl %ebx
+    pushl %esi
+    pushl %edi
 
     // save the old context(esp) to eax
     movl %esp, %eax
@@ -356,12 +356,12 @@ function(tb_context_jump)
     movl %ecx, %esp
 
     // restore registers of the new context
-    popl %edi 
+    popl %edi
     popl %esi
     popl %ebx
     popl %ebp
 
-    /* return from-context(retval: [to_esp + 4](context: eax, priv: edx)) from jump 
+    /* return from-context(retval: [to_esp + 4](context: eax, priv: edx)) from jump
      *
      * it will write context.edi and context.esi (unused) when jump to a new context function entry first
      */
@@ -375,9 +375,9 @@ function(tb_context_jump)
      *
      *                           old-context
      *              ---------------------------------------------------
-     * context: .. |   eip   | retval | context |   priv   |  padding  |  
+     * context: .. |   eip   | retval | context |   priv   |  padding  |
      *              ---------------------------------------------------
-     *             0         4        8     arguments 
+     *             0         4        8     arguments
      *             |                  |
      *            esp              16-align
      *           (now)

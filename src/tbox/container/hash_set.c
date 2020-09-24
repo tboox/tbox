@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -50,7 +50,7 @@ static tb_pointer_t tb_hash_set_itor_item(tb_iterator_ref_t iterator, tb_size_t 
 
     // get the item of the hash map
     tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)func(iterator, itor);
-    
+
     // get the item of the hash set
     return item? item->name : tb_null;
 }

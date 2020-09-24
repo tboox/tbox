@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,7 +37,7 @@
  * globals
  */
 
-// the self scheduler local 
+// the self scheduler local
 #ifndef __tb_thread_local__
 static tb_thread_local_t                        g_scheduler_self = TB_THREAD_LOCAL_INIT;
 #endif
@@ -137,13 +137,13 @@ tb_void_t tb_co_scheduler_exit(tb_co_scheduler_ref_t self)
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_ready));
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_suspend));
 
-    // free all dead coroutines 
+    // free all dead coroutines
     tb_co_scheduler_free(&scheduler->coroutines_dead);
 
-    // free all ready coroutines 
+    // free all ready coroutines
     tb_co_scheduler_free(&scheduler->coroutines_ready);
 
-    // free all suspend coroutines 
+    // free all suspend coroutines
     tb_co_scheduler_free(&scheduler->coroutines_suspend);
 
     // exit dead coroutines
@@ -185,7 +185,7 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
     {
         // init self scheduler local
         if (!tb_thread_local_init(&g_scheduler_self, tb_null)) return ;
-     
+
         // update and overide the current scheduler
         tb_thread_local_set(&g_scheduler_self, self);
     }
@@ -197,7 +197,7 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
 #endif
 
     // schedule all ready coroutines
-    while (tb_list_entry_size(&scheduler->coroutines_ready)) 
+    while (tb_list_entry_size(&scheduler->coroutines_ready))
     {
         // check
         tb_assert(tb_coroutine_is_original(scheduler->running));
@@ -206,7 +206,7 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
         tb_list_entry_ref_t entry = tb_list_entry_head(&scheduler->coroutines_ready);
         tb_assert(entry);
 
-        // switch to the next coroutine 
+        // switch to the next coroutine
         tb_co_scheduler_switch(scheduler, (tb_coroutine_t*)tb_list_entry0(entry));
 
         // trace
@@ -215,7 +215,7 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
 
     // stop it
     scheduler->stopped = tb_true;
- 
+
 #ifdef __tb_thread_local__
     g_scheduler_self_ex = tb_null;
 #else
@@ -229,7 +229,7 @@ tb_void_t tb_co_scheduler_loop(tb_co_scheduler_ref_t self, tb_bool_t exclusive)
 #endif
 }
 tb_co_scheduler_ref_t tb_co_scheduler_self()
-{ 
+{
     // get self scheduler on the current thread
 #ifdef __tb_thread_local__
     return (tb_co_scheduler_ref_t)g_scheduler_self_ex;

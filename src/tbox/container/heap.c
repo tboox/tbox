@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@
  */
 
 // the self grow
-#ifdef __tb_small__ 
+#ifdef __tb_small__
 #   define TB_HEAP_GROW             (128)
 #else
 #   define TB_HEAP_GROW             (256)
@@ -104,7 +104,7 @@ static tb_void_t tb_heap_check(tb_heap_t* heap)
 
     // done
     for (; parent < tail; parent++)
-    {   
+    {
         // the left child node
         tb_size_t lchild = (parent << 1) + 1;
         tb_check_break(lchild < tail);
@@ -113,7 +113,7 @@ static tb_void_t tb_heap_check(tb_heap_t* heap)
         tb_pointer_t parent_data = heap->element.data(&heap->element, data + parent * step);
 
         // check?
-        if (heap->element.comp(&heap->element, heap->element.data(&heap->element, data + lchild * step), parent_data) < 0) 
+        if (heap->element.comp(&heap->element, heap->element.data(&heap->element, data + lchild * step), parent_data) < 0)
         {
             // dump self
             tb_heap_dump((tb_heap_ref_t)heap);
@@ -127,7 +127,7 @@ static tb_void_t tb_heap_check(tb_heap_t* heap)
         tb_check_break(rchild < tail);
 
         // check?
-        if (heap->element.comp(&heap->element, heap->element.data(&heap->element, data + rchild * step), parent_data) < 0) 
+        if (heap->element.comp(&heap->element, heap->element.data(&heap->element, data + rchild * step), parent_data) < 0)
         {
             // dump self
             tb_heap_dump((tb_heap_ref_t)heap);
@@ -143,7 +143,7 @@ static tb_void_t tb_heap_check(tb_heap_t* heap)
  * <pre>
  *
  * before:
- * 
+ *
  *                                          1(head)
  *                               -------------------------
  *                              |                         |
@@ -151,8 +151,8 @@ static tb_void_t tb_heap_check(tb_heap_t* heap)
  *                        --------------             -------------
  *                       |              |           |             |
  *                       6(parent)      9           7             8
- *                   ---------       
- *                  |         |     
+ *                   ---------
+ *                  |         |
  *                  10      5(hole) <------ data
  * after:
  *
@@ -163,8 +163,8 @@ static tb_void_t tb_heap_check(tb_heap_t* heap)
  *                        --------------             -------------
  *                       |              |           |             |
  *         data -------> 5(hole)        9           7             8
- *                   ---------       
- *                  |         |     
+ *                   ---------
+ *                  |         |
  *                  10        6
  * </pre>
  */
@@ -214,7 +214,7 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_t* heap, tb_size_t hole, tb_cpointe
 /*! shift down the self
  *
  * <pre>
- * 
+ *
  * before:
  *                                          1(head)
  *                               -------------------------
@@ -224,8 +224,8 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_t* heap, tb_size_t hole, tb_cpointe
  *                       |              |           |             |
  *            lchild --> 6(smaller)     7           7             8
  *                   ---------     ------
- *                  |         |   |          
- *                 11        16  10          
+ *                  |         |   |
+ *                 11        16  10
  *
  *
  * move hole:
@@ -236,9 +236,9 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_t* heap, tb_size_t hole, tb_cpointe
  *                        --------------             -------------
  *                       |              |           |             |
  *                     (hole)           7           7             8
- *                   ---------      -----                                                   
- *                  |         |    |                                                  
- *      lchild --> 11(smaller)16  10                                                   
+ *                   ---------      -----
+ *                  |         |    |
+ *      lchild --> 11(smaller)16  10
  *
  * 11 >= data: 9? break it
  *
@@ -250,10 +250,10 @@ static tb_pointer_t tb_heap_shift_up(tb_heap_t* heap, tb_size_t hole, tb_cpointe
  *                        --------------             -------------
  *                       |              |           |             |
  *    data ------------> 9              7           7             8
- *                   ---------       ---                                                   
- *                  |         |     |                                                        
+ *                   ---------       ---
+ *                  |         |     |
  *                 11        16    10
- * 
+ *
  * </pre>
  */
 static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpointer_t data)
@@ -279,10 +279,10 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpoin
     case sizeof(tb_size_t):
         {
             for (; lchild < tail; lchild = head + (((lchild - head) << 1) + step))
-            {   
+            {
                 // the smaller child node
                 data_lchild = func_data(&heap->element, lchild);
-                if (lchild + step < tail && func_comp(&heap->element, data_lchild, (data_rchild = func_data(&heap->element, lchild + step))) > 0) 
+                if (lchild + step < tail && func_comp(&heap->element, data_lchild, (data_rchild = func_data(&heap->element, lchild + step))) > 0)
                 {
                     lchild += step;
                     data_lchild = data_rchild;
@@ -294,7 +294,7 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpoin
                 // the smaller child node => hole
                 *((tb_size_t*)phole) = *((tb_size_t*)lchild);
 
-                // move the hole down to it's smaller child node 
+                // move the hole down to it's smaller child node
                 phole = lchild;
             }
         }
@@ -302,10 +302,10 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpoin
     default:
         {
             for (; lchild < tail; lchild = head + (((lchild - head) << 1) + step))
-            {   
+            {
                 // the smaller child node
                 data_lchild = func_data(&heap->element, lchild);
-                if (lchild + step < tail && func_comp(&heap->element, data_lchild, (data_rchild = func_data(&heap->element, lchild + step))) > 0) 
+                if (lchild + step < tail && func_comp(&heap->element, data_lchild, (data_rchild = func_data(&heap->element, lchild + step))) > 0)
                 {
                     lchild += step;
                     data_lchild = data_rchild;
@@ -317,7 +317,7 @@ static tb_pointer_t tb_heap_shift_down(tb_heap_t* heap, tb_size_t hole, tb_cpoin
                 // the smaller child node => hole
                 tb_memcpy(phole, lchild, step);
 
-                // move the hole down to it's smaller child node 
+                // move the hole down to it's smaller child node
                 phole = lchild;
             }
         }
@@ -388,7 +388,7 @@ static tb_pointer_t tb_heap_itor_item(tb_iterator_ref_t iterator, tb_size_t itor
     // check
     tb_heap_t* heap = (tb_heap_t*)iterator;
     tb_assert_and_check_return_val(heap && itor < heap->size, tb_null);
-    
+
     // data
     return heap->element.data(&heap->element, heap->data + itor * iterator->step);
 }
@@ -437,14 +437,14 @@ static tb_void_t tb_heap_itor_remove(tb_iterator_ref_t iterator, tb_size_t itor)
         tb_pointer_t data_last = heap->element.data(&heap->element, last);
         tb_pointer_t data_parent = heap->element.data(&heap->element, parent);
 
-        /* we might need to shift it upward if it is less than its parent, 
-         * or downward if it is greater than one or both its children. 
+        /* we might need to shift it upward if it is less than its parent,
+         * or downward if it is greater than one or both its children.
          *
-         * since the children are known to be less than the parent, 
+         * since the children are known to be less than the parent,
          * it can't need to shift both up and down.
          */
         tb_pointer_t hole = tb_null;
-        if (itor && heap->element.comp(&heap->element, data_parent, data_last) > 0) 
+        if (itor && heap->element.comp(&heap->element, data_parent, data_last) > 0)
         {
             // shift up the self from the given hole
             hole = tb_heap_shift_up(heap, itor, data_last);
@@ -494,7 +494,7 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
         tb_assert_and_check_break(heap->maxn < TB_HEAP_MAXN);
 
         // init operation
-        static tb_iterator_op_t op = 
+        static tb_iterator_op_t op =
         {
             tb_heap_itor_size
         ,   tb_heap_itor_head
@@ -552,7 +552,7 @@ tb_void_t tb_heap_exit(tb_heap_ref_t self)
     tb_free(heap);
 }
 tb_void_t tb_heap_clear(tb_heap_ref_t self)
-{   
+{
     // check
     tb_heap_t* heap = (tb_heap_t*)self;
     tb_assert_and_check_return(heap);
@@ -561,7 +561,7 @@ tb_void_t tb_heap_clear(tb_heap_ref_t self)
     if (heap->element.nfree)
         heap->element.nfree(&heap->element, heap->data, heap->size);
 
-    // reset size 
+    // reset size
     heap->size = 0;
 }
 tb_size_t tb_heap_size(tb_heap_ref_t self)
@@ -615,11 +615,11 @@ tb_void_t tb_heap_put(tb_heap_ref_t self, tb_cpointer_t data)
 
     // check
     tb_assert_and_check_return(heap->size < heap->maxn);
-    
+
     // shift up the self from the tail hole
     tb_pointer_t hole = tb_heap_shift_up(heap, heap->size, data);
     tb_assert(hole);
-        
+
     // save data to the hole
     if (hole) heap->element.dupl(&heap->element, hole, data);
 
@@ -640,7 +640,7 @@ tb_void_t tb_heap_pop(tb_heap_ref_t self)
     // free the top item first
     if (heap->element.free) heap->element.free(&heap->element, heap->data);
 
-    // the last item is not in top 
+    // the last item is not in top
     if (heap->size > 1)
     {
         // check the element function
@@ -650,7 +650,7 @@ tb_void_t tb_heap_pop(tb_heap_ref_t self)
         tb_size_t step = heap->element.size;
         tb_assert(step);
 
-        // the last 
+        // the last
         tb_pointer_t last = heap->data + (heap->size - 1) * step;
 
         // shift down the self from the top hole
@@ -688,7 +688,7 @@ tb_void_t tb_heap_dump(tb_heap_ref_t self)
     tb_for_all (tb_pointer_t, data, self)
     {
         // trace
-        if (heap->element.cstr) 
+        if (heap->element.cstr)
         {
 #if TB_HEAP_CHECK_ENABLE
             tb_trace_i("    [%lu]: %s", data_itor, heap->element.cstr(&heap->element, data, cstr, sizeof(cstr)));

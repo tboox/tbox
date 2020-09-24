@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -67,7 +67,7 @@ static __tb_inline__ tb_bool_t tb_option_is_integer(tb_char_t const* data)
 {
     // check
     tb_assert_and_check_return_val(data, tb_false);
-    
+
     // init
     tb_char_t const* p = data;
 
@@ -85,7 +85,7 @@ static __tb_inline__ tb_bool_t tb_option_is_float(tb_char_t const* data)
 {
     // check
     tb_assert_and_check_return_val(data, tb_false);
-    
+
     // init
     tb_char_t const* p = data;
 
@@ -112,14 +112,14 @@ static __tb_inline__ tb_option_item_t const* tb_option_item_find(tb_option_item_
         case TB_OPTION_MODE_KEY_VAL:
             {
                 // find lname
-                if (item->lname && lname && !tb_strcmp(lname, item->lname)) 
+                if (item->lname && lname && !tb_strcmp(lname, item->lname))
                 {
                     ok = tb_true;
                     break;
                 }
 
                 // find sname
-                if (item->sname && sname && (sname == item->sname) && (sname != '-')) 
+                if (item->sname && sname && (sname == item->sname) && (sname != '-'))
                 {
                     ok = tb_true;
                     break;
@@ -275,7 +275,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
             {
                 tb_char_t* k = key;
                 tb_char_t* e = key + 511;
-                for (p += 2; *p && *p != '=' && k < e; p++, k++) *k = *p; 
+                for (p += 2; *p && *p != '=' && k < e; p++, k++) *k = *p;
             }
 
             // the val
@@ -333,7 +333,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                     if (object)
                     {
                         tb_oc_dictionary_insert(impl->list, key, object);
-                        if (tb_isalpha(find->sname)) 
+                        if (tb_isalpha(find->sname))
                         {
                             tb_char_t ch[2] = {0};
                             ch[0] = find->sname;
@@ -376,7 +376,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
             {
                 tb_char_t* k = key;
                 tb_char_t* e = key + 511;
-                for (p += 1; *p && *p != '=' && k < e; p++, k++) *k = *p; 
+                for (p += 1; *p && *p != '=' && k < e; p++, k++) *k = *p;
             }
 
             // the val
@@ -440,7 +440,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
                         object = tb_oc_boolean_init(tb_true);
                     }
 
-                    // add the value object 
+                    // add the value object
                     if (object)
                     {
                         tb_oc_dictionary_insert(impl->list, key, object);
@@ -483,7 +483,7 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
             // trace
             tb_trace_d("[val]: %s", p);
 
-            // find the value item 
+            // find the value item
             while (item && item->mode != TB_OPTION_MODE_VAL && item->mode != TB_OPTION_MODE_END && item->mode != TB_OPTION_MODE_MORE)
                 item++;
 
@@ -571,7 +571,7 @@ tb_void_t tb_option_dump(tb_option_ref_t option)
     tb_option_impl_t* impl = (tb_option_impl_t*)option;
     tb_assert_and_check_return(impl && impl->list);
 
-    // dump 
+    // dump
     tb_object_dump(impl->list, TB_OBJECT_FORMAT_JSON);
 }
 tb_void_t tb_option_help(tb_option_ref_t option)
@@ -625,7 +625,7 @@ tb_void_t tb_option_help(tb_option_ref_t option)
     tb_printf("\n\n");
 
     // dump help
-    if (tb_string_size(&impl->help)) 
+    if (tb_string_size(&impl->help))
         tb_printf("[help]:  %s\n\n", tb_string_cstr(&impl->help));
 
     // dump options head
@@ -650,7 +650,7 @@ tb_void_t tb_option_help(tb_option_ref_t option)
                     spaces -= 2;
 
                     // dump long name
-                    if (item->lname) 
+                    if (item->lname)
                     {
                         tb_printf(", --%s", item->lname);
                         spaces -= 4;
@@ -658,7 +658,7 @@ tb_void_t tb_option_help(tb_option_ref_t option)
                     }
                 }
                 // dump long name
-                else if (item->lname) 
+                else if (item->lname)
                 {
                     tb_printf("    --%s", item->lname);
                     spaces -= 6;
@@ -688,7 +688,7 @@ tb_void_t tb_option_help(tb_option_ref_t option)
                 }
 
                 // dump help
-                if (item->help) 
+                if (item->help)
                 {
                     tb_char_t           line[8192] = {0};
                     tb_char_t const*    pb = item->help;
@@ -712,7 +712,7 @@ tb_void_t tb_option_help(tb_option_ref_t option)
                             spaces = 32;
 
                             // next or end?
-                            if (*pb) 
+                            if (*pb)
                             {
                                 // dump new line
                                 tb_printf("\n");
@@ -762,14 +762,14 @@ tb_void_t tb_option_help(tb_option_ref_t option)
                 tb_printf("  "); spaces -= 3;
 
                 // dump long name
-                if (item->lname) 
+                if (item->lname)
                 {
                     tb_printf("%s", item->lname);
                     if (tb_strlen(item->lname) <= spaces) spaces -= tb_strlen(item->lname);
                 }
 
                 // dump help
-                if (item->help) 
+                if (item->help)
                 {
                     tb_char_t           line[8192] = {0};
                     tb_char_t const*    pb = item->help;
@@ -793,7 +793,7 @@ tb_void_t tb_option_help(tb_option_ref_t option)
                             spaces = 32;
 
                             // next or end?
-                            if (*pb) 
+                            if (*pb)
                             {
                                 // dump new line
                                 tb_printf("\n");

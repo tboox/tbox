@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -82,7 +82,7 @@ typedef tb_pointer_t                tb_handle_t;
 
 // no argument
 #ifdef __cplusplus
-#   define tb_noarg_t               
+#   define tb_noarg_t
 #else
 #   define tb_noarg_t               tb_void_t
 #endif
@@ -111,7 +111,7 @@ typedef tb_int32_t                  tb_wchar_t;
 typedef __int64                     tb_int64_t;
 typedef unsigned __int64            tb_uint64_t;
 #elif (defined(__LONG_WIDTH__) && __LONG_WIDTH__ == 8) || \
-        (defined(__SIZEOF_LONG__) && __SIZEOF_LONG__ == 8) 
+        (defined(__SIZEOF_LONG__) && __SIZEOF_LONG__ == 8)
 typedef signed long                 tb_int64_t;
 typedef unsigned long               tb_uint64_t;
 #else
@@ -134,7 +134,7 @@ typedef unsigned long               tb_ulong_t;
 #endif
 typedef tb_ulong_t                  tb_size_t;
 
-// integer pointer 
+// integer pointer
 typedef tb_long_t                   tb_ptrdiff_t;
 typedef tb_ulong_t                  tb_uintptr_t;
 
@@ -158,7 +158,7 @@ typedef __tb_volatile__  __tb_aligned__(4) tb_int32_t   tb_atomic32_t;
 #endif
 
 /// the atomic64 type, need be aligned for arm, ..
-#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)) 
+#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__))
 typedef __tb_volatile__ _Atomic tb_int64_t              tb_atomic64_t;
 #else
 typedef __tb_volatile__ __tb_aligned__(8) tb_int64_t    tb_atomic64_t;
@@ -172,7 +172,7 @@ typedef tb_atomic32_t                                   tb_atomic_t;
 #endif
 
 /// the atomic flag type
-#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__)) 
+#if (__tb_has_feature__(c_atomic) && !defined(__STDC_NO_ATOMICS__))
 typedef __tb_volatile__ atomic_flag                     tb_atomic_flag_t;
 #elif (defined(TB_COMPILER_IS_GCC) && defined(__ATOMIC_SEQ_CST)) || \
         (defined(TB_CONFIG_OS_WINDOWS) && defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDEXCHANGE8) && defined(TB_CONFIG_WINDOWS_HAVE__INTERLOCKEDOR8))
@@ -254,7 +254,7 @@ typedef struct __tb_version_t
     /// the major
     tb_byte_t                       major;
 
-    /// the minor 
+    /// the minor
     tb_byte_t                       minor;
 
     /// the alter

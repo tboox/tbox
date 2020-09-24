@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -133,7 +133,7 @@ static __tb_inline__ tb_bool_t tb_atomic32_compare_and_swap_explicit_generic(tb_
     // no safe
 
     tb_atomic32_t o = *a;
-    if (o == *p) 
+    if (o == *p)
     {
         *a = v;
         return tb_true;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,7 +49,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
     union semun opts;
     opts.val = init;
 #else
-    union semun_u 
+    union semun_u
     {
         tb_int_t            val;
         struct semid_ds*    buf;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -63,7 +63,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
         impl = tb_malloc0_type(tb_semaphore_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init semaphore 
+        // init semaphore
         impl->semaphore = CreateSemaphoreA(tb_null, (DWORD)init, TB_SEMAPHORE_VALUE_MAXN, tb_null);
         tb_assert_and_check_break(impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE);
 
@@ -89,7 +89,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {
     tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
-    if (semaphore) 
+    if (semaphore)
     {
         // exit semaphore
         if (impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE) CloseHandle(impl->semaphore);
@@ -104,13 +104,13 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
     // check
     tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     tb_assert_and_check_return_val(semaphore && impl->semaphore && impl->semaphore != INVALID_HANDLE_VALUE && post, tb_false);
-    
+
     // += post
     tb_atomic32_fetch_and_add(&impl->value, (tb_int32_t)post);
-    
+
     // post
     LONG prev = 0;
-    if (!ReleaseSemaphore(impl->semaphore, (LONG)post, &prev) && prev >= 0) 
+    if (!ReleaseSemaphore(impl->semaphore, (LONG)post, &prev) && prev >= 0)
     {
         // restore
         tb_atomic32_fetch_and_sub(&impl->value, (tb_int32_t)post);
@@ -119,10 +119,10 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
 
     // check
     tb_assert_and_check_return_val(prev + post <= TB_SEMAPHORE_VALUE_MAXN, tb_false);
-    
+
     // save value
     tb_atomic32_set(&impl->value, (tb_int32_t)(prev + post));
-    
+
     // ok
     return tb_true;
 }
@@ -153,10 +153,10 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 
     // check value
     tb_assert_and_check_return_val((tb_long_t)tb_atomic32_get(&impl->value) > 0, -1);
-    
+
     // value--
     tb_atomic32_fetch_and_sub(&impl->value, 1);
-    
+
     // ok
     return 1;
 }

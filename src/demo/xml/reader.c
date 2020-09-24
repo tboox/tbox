@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 {
     // init reader
@@ -25,18 +25,18 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
             {
                 switch (event)
                 {
-                case TB_XML_READER_EVENT_DOCUMENT: 
+                case TB_XML_READER_EVENT_DOCUMENT:
                     {
                         tb_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n"
                             , tb_xml_reader_version(reader), tb_xml_reader_charset(reader));
                     }
                     break;
-                case TB_XML_READER_EVENT_DOCUMENT_TYPE: 
+                case TB_XML_READER_EVENT_DOCUMENT_TYPE:
                     {
                         tb_printf("<!DOCTYPE>\n");
                     }
                     break;
-                case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+                case TB_XML_READER_EVENT_ELEMENT_EMPTY:
                     {
                         tb_char_t const*    name = tb_xml_reader_element(reader);
                         tb_xml_node_ref_t   attr = tb_xml_reader_attributes(reader);
@@ -52,10 +52,10 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                         }
                     }
                     break;
-                case TB_XML_READER_EVENT_ELEMENT_BEG: 
+                case TB_XML_READER_EVENT_ELEMENT_BEG:
                     {
                         tb_char_t const*    name = tb_xml_reader_element(reader);
-                        tb_xml_node_ref_t   attr = tb_xml_reader_attributes(reader);    
+                        tb_xml_node_ref_t   attr = tb_xml_reader_attributes(reader);
                         tb_size_t           t = tb_xml_reader_level(reader) - 1;
                         while (t--) tb_printf("\t");
                         if (!attr) tb_printf("<%s>\n", name);
@@ -68,14 +68,14 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                         }
                     }
                     break;
-                case TB_XML_READER_EVENT_ELEMENT_END: 
+                case TB_XML_READER_EVENT_ELEMENT_END:
                     {
                         tb_size_t t = tb_xml_reader_level(reader);
                         while (t--) tb_printf("\t");
                         tb_printf("</%s>\n", tb_xml_reader_element(reader));
                     }
                     break;
-                case TB_XML_READER_EVENT_TEXT: 
+                case TB_XML_READER_EVENT_TEXT:
                     {
                         tb_size_t t = tb_xml_reader_level(reader);
                         while (t--) tb_printf("\t");
@@ -83,7 +83,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                         tb_printf("\n");
                     }
                     break;
-                case TB_XML_READER_EVENT_CDATA: 
+                case TB_XML_READER_EVENT_CDATA:
                     {
                         tb_size_t t = tb_xml_reader_level(reader);
                         while (t--) tb_printf("\t");
@@ -91,7 +91,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
                         tb_printf("\n");
                     }
                     break;
-                case TB_XML_READER_EVENT_COMMENT: 
+                case TB_XML_READER_EVENT_COMMENT:
                     {
                         tb_size_t t = tb_xml_reader_level(reader);
                         while (t--) tb_printf("\t");
@@ -108,7 +108,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
         // exit reader
         tb_xml_reader_exit(reader);
     }
-    
+
     return 0;
 }
 

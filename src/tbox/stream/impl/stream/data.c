@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -73,7 +73,7 @@ static tb_bool_t tb_stream_data_clos(tb_stream_ref_t stream)
     // check
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
     tb_assert_and_check_return_val(stream_data, tb_false);
-    
+
     // clear head
     stream_data->head = tb_null;
 
@@ -85,7 +85,7 @@ static tb_void_t tb_stream_data_exit(tb_stream_ref_t stream)
     // check
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
     tb_assert_and_check_return(stream_data);
-    
+
     // clear head
     stream_data->head = tb_null;
 
@@ -150,7 +150,7 @@ static tb_bool_t tb_stream_data_seek(tb_stream_ref_t stream, tb_hize_t offset)
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
     tb_assert_and_check_return_val(stream_data && offset <= stream_data->size, tb_false);
 
-    // seek 
+    // seek
     stream_data->head = stream_data->data + offset;
 
     // ok
@@ -162,7 +162,7 @@ static tb_long_t tb_stream_data_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
     tb_assert_and_check_return_val(stream_data, -1);
 
-    // wait 
+    // wait
     tb_long_t events = 0;
     if (stream_data->head < stream_data->data + stream_data->size)
     {
@@ -192,7 +192,7 @@ static tb_bool_t tb_stream_data_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // get size
             *psize = stream_data->size;
             return tb_true;
-        }   
+        }
     case TB_STREAM_CTRL_DATA_SET_DATA:
         {
             // exit data first if exists
@@ -215,8 +215,8 @@ static tb_bool_t tb_stream_data_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
 
             // set url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-            tb_assert_and_check_return_val(url, tb_false); 
-            
+            tb_assert_and_check_return_val(url, tb_false);
+
             // the url size
             tb_size_t url_size = tb_strlen(url);
             tb_assert_and_check_return_val(url_size > 7, tb_false);
@@ -227,7 +227,7 @@ static tb_bool_t tb_stream_data_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
 
             // make data
             tb_size_t   maxn = base64_size;
-            tb_byte_t*  data = tb_malloc_bytes(maxn); 
+            tb_byte_t*  data = tb_malloc_bytes(maxn);
             tb_assert_and_check_return_val(data, tb_false);
 
             // decode base64 data
@@ -294,7 +294,7 @@ tb_stream_ref_t tb_stream_init_from_data(tb_byte_t const* data, tb_size_t size)
 
     } while (0);
 
-    // failed? 
+    // failed?
     if (!ok)
     {
         // exit it

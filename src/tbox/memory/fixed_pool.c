@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -142,7 +142,7 @@ static tb_void_t tb_fixed_pool_slot_exit(tb_fixed_pool_t* pool, tb_fixed_pool_sl
     tb_size_t itor = tb_binary_find_all(iterator, (tb_cpointer_t)slot);
     tb_assert(itor != tb_iterator_tail(iterator) && itor < pool->slot_count && pool->slot_list[itor]);
     tb_check_return(itor != tb_iterator_tail(iterator) && itor < pool->slot_count && pool->slot_list[itor]);
-    
+
     // remove the slot
     if (itor + 1 < pool->slot_count) tb_memmov_(pool->slot_list + itor, pool->slot_list + itor + 1, (pool->slot_count - itor - 1) * sizeof(tb_fixed_pool_slot_t*));
 
@@ -183,7 +183,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_init(tb_fixed_pool_t* pool)
 
         // init slot
         slot->size = real_space;
-        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), pool->item_size, pool->for_small); 
+        slot->pool = tb_static_fixed_pool_init((tb_byte_t*)&slot[1], real_space - sizeof(tb_fixed_pool_slot_t), pool->item_size, pool->for_small);
         tb_assert_and_check_break(slot->pool);
 
         // no list?
@@ -262,7 +262,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_t* pool, tb_p
             slot = pool->current_slot;
             break;
         }
-            
+
         // find the slot from the partial slots
         tb_for_all_if(tb_fixed_pool_slot_t*, partial_slot, tb_list_entry_itor(&pool->partial_slots), partial_slot)
         {
@@ -273,7 +273,7 @@ static tb_fixed_pool_slot_t* tb_fixed_pool_slot_find(tb_fixed_pool_t* pool, tb_p
                 break;
             }
         }
-        
+
         // no found?
         tb_check_break(!slot);
 
@@ -435,7 +435,7 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t self)
     // exit items
     if (pool->func_exit) tb_fixed_pool_walk(self, tb_fixed_pool_item_exit, (tb_pointer_t)pool);
 
-    // exit the partial slots 
+    // exit the partial slots
     tb_iterator_ref_t partial_iterator = tb_list_entry_itor(&pool->partial_slots);
     if (partial_iterator)
     {
@@ -461,7 +461,7 @@ tb_void_t tb_fixed_pool_clear(tb_fixed_pool_ref_t self)
         }
     }
 
-    // exit the full slots 
+    // exit the full slots
     tb_iterator_ref_t full_iterator = tb_list_entry_itor(&pool->full_slots);
     if (full_iterator)
     {
@@ -545,7 +545,7 @@ tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t self __tb_debug_decl__)
         // make data from the current slot
         data = tb_static_fixed_pool_malloc(pool->current_slot->pool __tb_debug_args__);
         tb_assert_and_check_break(data);
-        
+
         // done init
         if (pool->func_init && !pool->func_init(data, pool->func_priv)) break;
 
@@ -561,7 +561,7 @@ tb_pointer_t tb_fixed_pool_malloc_(tb_fixed_pool_ref_t self __tb_debug_decl__)
     if (!ok)
     {
         // exit data
-        if (data && pool->current_slot && pool->current_slot->pool) 
+        if (data && pool->current_slot && pool->current_slot->pool)
             tb_static_fixed_pool_free(pool->current_slot->pool, data __tb_debug_args__);
         data = tb_null;
     }
@@ -589,7 +589,7 @@ tb_pointer_t tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t self __tb_debug_decl__)
     return data;
 }
 tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
-{ 
+{
     // check
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool, tb_false);
@@ -601,7 +601,7 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t self, tb_pointer_t data __tb_d
         // check
         tb_assertf_pass_and_check_break(pool->item_count, "double free data: %p", data);
 
-        // find the slot 
+        // find the slot
         tb_fixed_pool_slot_t* slot = tb_fixed_pool_slot_find(pool, data);
         tb_assertf_pass_and_check_break(slot, "the data: %p not belong to pool: %p", data, self);
         tb_assert_pass_and_check_break(slot->pool);
@@ -634,7 +634,7 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t self, tb_pointer_t data __tb_d
 
         // update the item count
         pool->item_count--;
- 
+
         // ok
         ok = tb_true;
 
@@ -642,7 +642,7 @@ tb_bool_t tb_fixed_pool_free_(tb_fixed_pool_ref_t self, tb_pointer_t data __tb_d
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!ok) 
+    if (!ok)
     {
         // trace
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
@@ -690,7 +690,7 @@ tb_void_t tb_fixed_pool_walk(tb_fixed_pool_ref_t self, tb_fixed_pool_item_walk_f
 }
 #ifdef __tb_debug__
 tb_void_t tb_fixed_pool_dump(tb_fixed_pool_ref_t self)
-{ 
+{
     // check
     tb_fixed_pool_t* pool = (tb_fixed_pool_t*)self;
     tb_assert_and_check_return(pool);

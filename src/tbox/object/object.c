@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -110,7 +110,7 @@ tb_size_t tb_object_type(tb_object_ref_t object)
     return object->type;
 }
 tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
-{   
+{
     // check
     tb_assert_and_check_return_val(object, tb_null);
 
@@ -126,7 +126,7 @@ tb_object_ref_t tb_object_data(tb_object_ref_t object, tb_size_t format)
 
         // writ object to data
         tb_long_t size = tb_object_writ_to_data(object, data, maxn, format);
-    
+
         // ok? make the data object
         if (size >= 0) odata = tb_oc_data_init_from_data(data, size);
         // failed? grow it
@@ -170,7 +170,7 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
                 tb_char_t   key[4096] = {0};
                 tb_char_t*  kb = key;
                 tb_char_t*  ke = key + 4095;
-                for (; p < e && kb < ke && *p && (*p != '.' && *p != '[' && *p != ']'); p++, kb++) 
+                for (; p < e && kb < ke && *p && (*p != '.' && *p != '[' && *p != ']'); p++, kb++)
                 {
                     if (*p == '\\') p++;
                     *kb = *p;
@@ -178,7 +178,7 @@ tb_object_ref_t tb_object_seek(tb_object_ref_t object, tb_char_t const* path, tb
 
                 // trace
                 tb_trace_d("key: %s", key);
-            
+
                 // the value
                 object = tb_oc_dictionary_value(object, key);
             }
@@ -241,7 +241,7 @@ tb_object_ref_t tb_object_dump(tb_object_ref_t object, tb_size_t format)
     tb_object_ref_t odata = tb_object_data(object, format);
     if (odata)
     {
-        // the data and size 
+        // the data and size
         tb_byte_t const*    data = (tb_byte_t const*)tb_oc_data_getp(odata);
         tb_size_t           size = tb_oc_data_size(odata);
         if (data && size)

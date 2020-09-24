@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -159,7 +159,7 @@ tb_void_t tb_printf_object_dump(tb_noarg_t)
     // done
     tb_size_t i = 0;
     tb_size_t n = g_size;
-    for (i = 0; i < n; i++) 
+    for (i = 0; i < n; i++)
     {
         // trace
         tb_trace_i("format: %s", g_list[i].name);

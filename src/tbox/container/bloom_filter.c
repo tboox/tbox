@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -105,7 +105,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
     tb_bloom_filter_t*  filter = tb_null;
     do
     {
-        // check 
+        // check
         tb_assert_and_check_break(probability && probability < 32);
 #ifdef __tb_small__
         tb_assert_and_check_break(hash_count && hash_count < 4);
@@ -120,7 +120,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         // make filter
         filter = tb_malloc0_type(tb_bloom_filter_t);
         tb_assert_and_check_break(filter);
-    
+
         // init filter
         filter->element     = element;
         filter->maxn        = item_maxn;
@@ -183,7 +183,7 @@ tb_bloom_filter_ref_t tb_bloom_filter_init(tb_size_t probability, tb_size_t hash
         // m = (s * n) >> 16
         tb_size_t m = tb_fixed_mul(s_scale[hash_count - 1][probability], item_maxn);
 #endif
-        
+
         // init size
         filter->size = tb_align8(m) >> 3;
         tb_assert_and_check_break(filter->size);
@@ -256,8 +256,8 @@ tb_bool_t tb_bloom_filter_set(tb_bloom_filter_ref_t self, tb_cpointer_t data)
         tb_size_t index = filter->element.hash(&filter->element, data, filter->mask, i);
         if (index >= (filter->size << 3)) index %= (filter->size << 3);
 
-        // not exists? 
-        if (!tb_bloom_filter_bset(filter->data, index)) 
+        // not exists?
+        if (!tb_bloom_filter_bset(filter->data, index))
         {
             // set it
             tb_bloom_filter_set1(filter->data, index);

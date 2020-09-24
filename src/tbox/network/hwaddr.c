@@ -11,11 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        hwaddr.c 
+ * @file        hwaddr.c
  * @ingroup     network
  *
  */
@@ -107,7 +107,7 @@ tb_bool_t tb_hwaddr_cstr_set(tb_hwaddr_ref_t hwaddr, tb_char_t const* cstr)
                 v = (v << 4) + (c - 'a') + 10;
             else if (c > ('A' - 1) && c < ('F' + 1))
                 v = (v << 4) + (c - 'A') + 10;
-            else 
+            else
             {
                 // abort
                 tb_assert(0);
@@ -127,7 +127,7 @@ tb_bool_t tb_hwaddr_cstr_set(tb_hwaddr_ref_t hwaddr, tb_char_t const* cstr)
             v = 0;
         }
         // failed?
-        else 
+        else
         {
             ok = tb_false;
             break;

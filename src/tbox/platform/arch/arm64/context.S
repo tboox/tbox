@@ -46,15 +46,15 @@
  *             ---------------------------------------------------------------------
  * context:   |   x19   |   x20   |   x21   |   x22   |   x23   |   x24   |   x25   |
  *             ---------------------------------------------------------------------
- *            0         8         16        24        32        40        48                     
- *                           
- *                                                                         
- *                                                     __end     func      
+ *            0         8         16        24        32        40        48
+ *
+ *
+ *                                                     __end     func
  *             ---------------------------------------------------------------------
  *            |   x26   |   x27   |   x28   |   fp    |   lr    |   pc    | padding |
  *             ---------------------------------------------------------------------
- *            56        64        72        80        88        96        |                 
- *                                                                        |                  
+ *            56        64        72        80        88        96        |
+ *                                                                        |
  *                                                                    16-align
  *
  *
@@ -69,7 +69,7 @@ function tb_context_make, export=1
     // save the stack top to x0
     add x0, x0, x1
 
-    // 16-align of the stack top address 
+    // 16-align of the stack top address
     and x0, x0, ~0xf
 
     /* reserve space for context-data on context-stack
@@ -170,7 +170,7 @@ function tb_context_jump, export=1
 
     /* pass old-context(context: x0, priv: x1) arguments to the context function
      *
-     * and return from-context: retval(context: x0, priv: x1) from jump 
+     * and return from-context: retval(context: x0, priv: x1) from jump
      */
     mov x0, x4
 

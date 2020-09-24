@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -68,23 +68,23 @@ typedef struct __tb_hash_map_item_t
  *                 0        1        3       ...     ...                n       n + 1
  * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
  *                         |
- *                       -----    
- * item_list:           |     |       key:0                                      
- *                       -----   
- *                      |     |       key:1                                              
+ *                       -----
+ * item_list:           |     |       key:0
+ *                       -----
+ *                      |     |       key:1
  *                       -----               <= insert by binary search algorithm
- *                      |     |       key:2                                               
- *                       -----  
- *                      |     |       key:3                                               
- *                       -----   
- *                      |     |       key:4                                               
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *                      |     |                                              
- *                       -----  
+ *                      |     |       key:2
+ *                       -----
+ *                      |     |       key:3
+ *                       -----
+ *                      |     |       key:4
+ *                       -----
+ *                      |     |
+ *                       -----
+ *                      |     |
+ *                       -----
+ *                      |     |
+ *                       -----
  *
  * </pre>
  *
@@ -120,7 +120,7 @@ tb_void_t               tb_hash_map_clear(tb_hash_map_ref_t hash_map);
 
 /*! get item data from name
  *
- * @note 
+ * @note
  * the return value may be zero if the item type is integer
  * so we need call tb_hash_map_find for judging whether to get value successfully
  *

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -51,17 +51,17 @@ tb_void_t           tb_dns_server_dump(tb_noarg_t);
 /// sort the server list by the response speed
 tb_void_t           tb_dns_server_sort(tb_noarg_t);
 
-/*! get the server 
+/*! get the server
  *
- * @param addr      the server address list, addr[0] is the fastest 
+ * @param addr      the server address list, addr[0] is the fastest
  *
  * @return          the server size
  */
 tb_size_t           tb_dns_server_get(tb_ipaddr_t addr[2]);
 
-/*! add the server 
+/*! add the server
  *
- * @param addr      the server address 
+ * @param addr      the server address
  */
 tb_void_t           tb_dns_server_add(tb_char_t const* addr);
 

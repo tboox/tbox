@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -55,10 +55,10 @@ static tb_bool_t tb_thread_local_free(tb_iterator_ref_t iterator, tb_pointer_t i
 {
     // the local
     tb_thread_local_ref_t local = (tb_thread_local_ref_t)item;
-    if (local) 
-    { 
+    if (local)
+    {
         // free the thread local data
-        if (local->free && tb_thread_local_has(local)) 
+        if (local->free && tb_thread_local_has(local))
         {
             // free it
             local->free(tb_thread_local_get(local));

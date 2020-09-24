@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -93,7 +93,7 @@ tb_char_t const*    tb_hwaddr_cstr(tb_hwaddr_ref_t hwaddr, tb_char_t* data, tb_s
 /*! set the hwaddr from string
  *
  * @param hwaddr    the hwaddr
- * @param cstr      the hwaddr string 
+ * @param cstr      the hwaddr string
  *
  * @return          tb_true or tb_false
  */

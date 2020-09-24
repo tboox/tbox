@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -72,7 +72,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_uint32_t const g_sha_k256[64] = 
+static tb_uint32_t const g_sha_k256[64] =
 {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
     0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -97,7 +97,7 @@ static tb_uint32_t const g_sha_k256[64] =
  */
 static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_byte_t const buffer[64])
 {
-    // init 
+    // init
     tb_uint32_t block[80];
     tb_uint32_t a = state[0];
     tb_uint32_t b = state[1];
@@ -117,12 +117,12 @@ static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_byte_t const buf
         block[i] = t;
         t += e + TB_SHA_ROL(a, 5);
 
-        if (i < 40) 
+        if (i < 40)
         {
             if (i < 20) t += ((b & (c ^ d)) ^ d) + 0x5a827999;
             else t += ( b ^ c ^ d) + 0x6ED9EBA1;
-        } 
-        else 
+        }
+        else
         {
             if (i < 60) t += (((b | c) & d) | (b & c)) + 0x8f1bbcdc;
             else t += ( b ^ c ^ d) + 0xca62c1d6;
@@ -205,7 +205,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t* state, tb_byte_t const buffe
     // done
     tb_uint32_t T2;
     tb_size_t   i = 0;
-    for (i = 0; i < 64; i++) 
+    for (i = 0; i < 64; i++)
     {
         if (i < 16) T1 = TB_SHA_BLK0(i);
         else T1 = TB_SHA_BLK_(i);
@@ -226,7 +226,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t* state, tb_byte_t const buffe
 
     // done
     tb_size_t   i = 0;
-    for (i = 0; i < 16; ) 
+    for (i = 0; i < 16; )
     {
         TB_SHA_ROUND256_0_TO_15(a, b, c, d, e, f, g, h);
         TB_SHA_ROUND256_0_TO_15(h, a, b, c, d, e, f, g);
@@ -238,7 +238,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t* state, tb_byte_t const buffe
         TB_SHA_ROUND256_0_TO_15(b, c, d, e, f, g, h, a);
     }
 
-    for ( ; i < 64; ) 
+    for ( ; i < 64; )
     {
         TB_SHA_ROUND256_16_TO_63(a, b, c, d, e, f, g, h);
         TB_SHA_ROUND256_16_TO_63(h, a, b, c, d, e, f, g);
@@ -274,7 +274,7 @@ tb_void_t tb_sha_init(tb_sha_t* sha, tb_size_t mode)
 
     // done
     sha->digest_len = (mode >> 5) & 0xff;
-    switch (mode) 
+    switch (mode)
     {
     case TB_SHA_MODE_SHA1_160:
         sha->state[0] = 0x67452301;
@@ -295,7 +295,7 @@ tb_void_t tb_sha_init(tb_sha_t* sha, tb_size_t mode)
         sha->state[7] = 0xbefa4fa4;
         sha->transform = tb_sha_transform_sha2;
         break;
-    case TB_SHA_MODE_SHA2_256: 
+    case TB_SHA_MODE_SHA2_256:
         sha->state[0] = 0x6a09e667;
         sha->state[1] = 0xbb67ae85;
         sha->state[2] = 0x3c6ef372;
@@ -320,7 +320,7 @@ tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
     // the count
     tb_hize_t count = tb_bits_be_to_ne_u64(sha->count << 3);
 
-    // spak 
+    // spak
     tb_sha_spak(sha, (tb_byte_t const*)"\200", 1);
     while ((sha->count & 63) != 56) tb_sha_spak(sha, (tb_byte_t const*)"", 1);
     tb_sha_spak(sha, (tb_byte_t*)&count, 8);
@@ -343,10 +343,10 @@ tb_void_t tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
     // done
     tb_uint32_t i;
 #ifdef __tb_small__
-    for (i = 0; i < size; i++) 
+    for (i = 0; i < size; i++)
     {
         sha->buffer[j++] = data[i];
-        if (64 == j) 
+        if (64 == j)
         {
             sha->transform(sha->state, sha->buffer);
             j = 0;
@@ -360,7 +360,7 @@ tb_void_t tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
         for (; i + 63 < size; i += 64)
             sha->transform(sha->state, &data[i]);
         j = 0;
-    } 
+    }
     else i = 0;
     tb_memcpy(&sha->buffer[j], &data[i], size - i);
 #endif
@@ -370,7 +370,7 @@ tb_size_t tb_sha_make(tb_size_t mode, tb_byte_t const* ib, tb_size_t in, tb_byte
     // check
     tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);
 
-    // init 
+    // init
     tb_sha_t sha;
     tb_sha_init(&sha, mode);
 

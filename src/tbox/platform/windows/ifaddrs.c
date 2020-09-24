@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -50,7 +50,7 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
     PIP_ADAPTER_INFO adapter_info = tb_null;
     do
     {
-        // make the adapter info 
+        // make the adapter info
         adapter_info = tb_malloc0_type(IP_ADAPTER_INFO);
         tb_assert_and_check_break(adapter_info);
 
@@ -65,8 +65,8 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
             // reclear it
             tb_memset(adapter_info, 0, size);
         }
-    
-        // get the adapter info 
+
+        // get the adapter info
         if (tb_iphlpapi()->GetAdaptersInfo(adapter_info, &size) != NO_ERROR) break;
 
         // done
@@ -166,7 +166,7 @@ static tb_void_t tb_ifaddrs_interface_load6(tb_list_ref_t interfaces)
             // reclear it
             tb_memset(addresses, 0, size);
         }
-     
+
         // get the addresses
         if (tb_iphlpapi()->GetAdaptersAddresses(AF_INET6, GAA_FLAG_SKIP_DNS_SERVER, tb_null, addresses, &size) != NO_ERROR) break;
 
@@ -265,14 +265,14 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     tb_assert_and_check_return_val(interfaces, tb_null);
 
     // uses the cached interfaces?
-    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
+    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces);
 
     // clear interfaces first
     tb_list_clear(interfaces);
 
     // attempt to load interfaces for ipv6 first
     if (tb_iphlpapi()->GetAdaptersAddresses) tb_ifaddrs_interface_load6(interfaces);
-    // load interfaces only for ipv4 
+    // load interfaces only for ipv4
     if (tb_iphlpapi()->GetAdaptersInfo) tb_ifaddrs_interface_load4(interfaces);
 
     // ok?

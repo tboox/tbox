@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,11 +40,11 @@
         .arch armv7-a
 #elif defined(TB_ARCH_ARM_v7)
         .arch armv7
-#elif defined(TB_ARCH_ARM_v6) 
+#elif defined(TB_ARCH_ARM_v6)
         .arch armv6
-#elif defined(TB_ARCH_ARM_v5te) 
+#elif defined(TB_ARCH_ARM_v5te)
         .arch armv5te
-#elif defined(TB_ARCH_ARM_v5) 
+#elif defined(TB_ARCH_ARM_v5)
         .arch armv5
 #endif
 
@@ -69,7 +69,7 @@
  * eabi
  */
 #if defined(TB_ARCH_ELF) && defined(TB_ARCH_ARM) && !defined(TB_ARCH_ARM64)
-        .eabi_attribute 25, 1 
+        .eabi_attribute 25, 1
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@
  */
 
 /*! function
- * 
+ *
  * @code
     function func_xxxx, export=1
         ...
@@ -105,7 +105,7 @@ ELF     .hidden \name
 .endm
 
 /*! label
- * 
+ *
  * @code
     label name
         ...

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -61,12 +61,12 @@ static tb_bool_t tb_oc_xplist_writer_func_date(tb_oc_xplist_writer_t* writer, tb
                                 ,   date.minute
                                 ,   date.second) < 0) return tb_false;
         }
-                    
+
         // write end
         if (tb_stream_printf(writer->stream, "</date>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
-    else 
+    else
     {
         // write
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
@@ -92,7 +92,7 @@ static tb_bool_t tb_oc_xplist_writer_func_data(tb_oc_xplist_writer_t* writer, tb
 
         // decode base64 data
         tb_byte_t const*    ib = (tb_byte_t const*)tb_oc_data_getp(object);
-        tb_size_t           in = tb_oc_data_size(object); 
+        tb_size_t           in = tb_oc_data_size(object);
         tb_size_t           on = in << 1;
         tb_char_t*          ob = tb_malloc0_cstr(on);
         tb_assert_and_check_return_val(ob && on, tb_false);
@@ -116,13 +116,13 @@ static tb_bool_t tb_oc_xplist_writer_func_data(tb_oc_xplist_writer_t* writer, tb
 
         // free it
         tb_free(ob);
-                    
+
         // write end
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "</data>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
-    else 
+    else
     {
         // write
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
@@ -170,7 +170,7 @@ static tb_bool_t tb_oc_xplist_writer_func_array(tb_oc_xplist_writer_t* writer, t
         if (tb_stream_printf(writer->stream, "</array>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
-    else 
+    else
     {
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<array/>") < 0) return tb_false;
@@ -315,7 +315,7 @@ static tb_bool_t tb_oc_xplist_writer_func_dictionary(tb_oc_xplist_writer_t* writ
         if (tb_stream_printf(writer->stream, "</dict>") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
-    else 
+    else
     {
         if (!tb_oc_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
         if (tb_stream_printf(writer->stream, "<dict/>") < 0) return tb_false;
@@ -329,8 +329,8 @@ static tb_long_t tb_oc_xplist_writer_done(tb_stream_ref_t stream, tb_object_ref_
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
- 
-    // init writer 
+
+    // init writer
     tb_oc_xplist_writer_t writer = {0};
     writer.stream   = stream;
     writer.deflate  = deflate;
@@ -374,15 +374,15 @@ tb_oc_writer_t* tb_oc_xplist_writer()
 {
     // the writer
     static tb_oc_writer_t s_writer = {0};
-  
+
     // init writer
     s_writer.writ = tb_oc_xplist_writer_done;
- 
+
     // init hooker
     s_writer.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_writer.hooker, tb_null);
 
-    // hook writer 
+    // hook writer
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_oc_xplist_writer_func_date);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_oc_xplist_writer_func_data);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_ARRAY, tb_oc_xplist_writer_func_array);
@@ -398,7 +398,7 @@ tb_bool_t tb_oc_xplist_writer_hook(tb_size_t type, tb_oc_xplist_writer_func_t fu
 {
     // check
     tb_assert_and_check_return_val(func, tb_false);
- 
+
     // the writer
     tb_oc_writer_t* writer = tb_oc_writer_get(TB_OBJECT_FORMAT_XPLIST);
     tb_assert_and_check_return_val(writer && writer->hooker, tb_false);

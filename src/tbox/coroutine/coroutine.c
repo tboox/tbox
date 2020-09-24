@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -56,7 +56,7 @@ tb_pointer_t tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpointer_t pri
 {
     // get current scheduler
     tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
-        
+
     // resume the given coroutine
     return scheduler? tb_co_scheduler_resume(scheduler, (tb_coroutine_t*)coroutine, priv) : tb_null;
 }

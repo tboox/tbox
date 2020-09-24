@@ -1,21 +1,21 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define COUNT   (50)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the process type
 typedef struct __tb_demo_lo_process_t
 {
-    // the process 
+    // the process
     tb_process_ref_t    proc;
 
     // the arguments
@@ -41,7 +41,7 @@ typedef struct __tb_demo_lo_process_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // get arguments
@@ -69,7 +69,7 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
                         process->read += process->real;
                         process->wait = tb_false;
                     }
-                    else if (!process->real && !process->wait) 
+                    else if (!process->real && !process->wait)
                     {
                         // wait pipe
                         tb_lo_coroutine_wait_pipe(process->file[0], TB_PIPE_EVENT_READ, 1000);
@@ -101,7 +101,7 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_process_pipe_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler

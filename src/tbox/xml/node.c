@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@ tb_xml_node_ref_t tb_xml_node_init_element(tb_char_t const* name)
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_element_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_ELEMENT;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -58,7 +58,7 @@ tb_xml_node_ref_t tb_xml_node_init_text(tb_char_t const* data)
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_text_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_TEXT;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -74,7 +74,7 @@ tb_xml_node_ref_t tb_xml_node_init_cdata(tb_char_t const* cdata)
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_cdata_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_CDATA;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -90,7 +90,7 @@ tb_xml_node_ref_t tb_xml_node_init_comment(tb_char_t const* comment)
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_comment_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_COMMENT;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -106,7 +106,7 @@ tb_xml_node_ref_t tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t co
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_attribute_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_ATTRIBUTE;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -122,7 +122,7 @@ tb_xml_node_ref_t tb_xml_node_init_document(tb_char_t const* version, tb_char_t 
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_document_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_DOCUMENT;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -141,7 +141,7 @@ tb_xml_node_ref_t tb_xml_node_init_document_type(tb_char_t const* type)
     tb_xml_node_ref_t node = (tb_xml_node_ref_t)tb_malloc0_type(tb_xml_document_type_t);
     tb_assert_and_check_return_val(node, tb_null);
 
-    // init 
+    // init
     node->type = TB_XML_NODE_TYPE_DOCUMENT_TYPE;
     tb_string_init(&node->name);
     tb_string_init(&node->data);
@@ -180,7 +180,7 @@ tb_void_t tb_xml_node_exit(tb_xml_node_ref_t node)
             {
                 // save
                 save = next->next;
-                
+
                 // exit
                 tb_xml_node_exit(next);
 
@@ -198,7 +198,7 @@ tb_void_t tb_xml_node_exit(tb_xml_node_ref_t node)
             {
                 // save
                 save = next->next;
-                
+
                 // exit
                 tb_xml_node_exit(next);
 
@@ -281,7 +281,7 @@ tb_void_t tb_xml_node_append_chead(tb_xml_node_ref_t node, tb_xml_node_ref_t chi
     child->parent = node;
 
     // append
-    if (node->chead) 
+    if (node->chead)
     {
         child->next = node->chead;
         node->chead = child;
@@ -304,7 +304,7 @@ tb_void_t tb_xml_node_append_ctail(tb_xml_node_ref_t node, tb_xml_node_ref_t chi
     child->next = tb_null;
 
     // append
-    if (node->ctail) 
+    if (node->ctail)
     {
         node->ctail->next = child;
         node->ctail = child;
@@ -326,7 +326,7 @@ tb_void_t tb_xml_node_remove_chead(tb_xml_node_ref_t node)
     tb_check_return(node->chead);
 
     // remove
-    if (node->chead != node->ctail) 
+    if (node->chead != node->ctail)
     {
         // save
         tb_xml_node_ref_t save = node->chead;
@@ -369,7 +369,7 @@ tb_void_t tb_xml_node_append_ahead(tb_xml_node_ref_t node, tb_xml_node_ref_t att
     attribute->parent = node;
 
     // append
-    if (node->ahead) 
+    if (node->ahead)
     {
         attribute->next = node->ahead;
         node->ahead = attribute;
@@ -392,7 +392,7 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_ref_t node, tb_xml_node_ref_t att
     attribute->next = tb_null;
 
     // append
-    if (node->atail) 
+    if (node->atail)
     {
         node->atail->next = attribute;
         node->atail = attribute;
@@ -442,7 +442,7 @@ tb_xml_node_ref_t tb_xml_node_goto(tb_xml_node_ref_t node, tb_char_t const* path
                 else if (m < n)
                 {
                     // skip this node
-                    tb_char_t const* q = p + m; 
+                    tb_char_t const* q = p + m;
 
                     // is root?
                     if (*q == '/')

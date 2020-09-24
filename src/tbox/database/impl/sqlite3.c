@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -193,9 +193,9 @@ static tb_size_t tb_database_sqlite3_result_row_iterator_next(tb_iterator_ref_t 
         tb_int_t ok = sqlite3_step(result->statement);
 
         // end?
-        if (ok != SQLITE_ROW) 
+        if (ok != SQLITE_ROW)
         {
-            // reset it 
+            // reset it
             if (SQLITE_OK != sqlite3_reset(result->statement))
             {
                 // the sqlite
@@ -368,10 +368,10 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_sql_impl_t* database)
         if (!tb_database_sqlite3_library_load()) break;
 
         // open database
-        if (SQLITE_OK != sqlite3_open_v2(path, &sqlite->database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, tb_null) || !sqlite->database) 
+        if (SQLITE_OK != sqlite3_open_v2(path, &sqlite->database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, tb_null) || !sqlite->database)
         {
             // error
-            if (sqlite->database) 
+            if (sqlite->database)
             {
                 // save state
                 sqlite->base.state = tb_database_sqlite3_state_from_errno(sqlite3_errcode(sqlite->database));
@@ -398,7 +398,7 @@ static tb_void_t tb_database_sqlite3_clos(tb_database_sql_impl_t* database)
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
     tb_assert_and_check_return(sqlite);
-    
+
     // exit result first if exists
     if (sqlite->result.result) sqlite3_free_table(sqlite->result.result);
     sqlite->result.result = tb_null;
@@ -551,9 +551,9 @@ static tb_bool_t tb_database_sqlite3_done(tb_database_sql_impl_t* database, tb_c
 
         // ok
         ok = tb_true;
-    
+
     } while (0);
-    
+
     // ok?
     return ok;
 }
@@ -652,7 +652,7 @@ static tb_bool_t tb_database_sqlite3_statement_done(tb_database_sql_impl_t* data
         }
         else
         {
-            // reset it 
+            // reset it
             if (SQLITE_OK != sqlite3_reset((sqlite3_stmt*)statement))
             {
                 // save state
@@ -691,7 +691,7 @@ static tb_bool_t tb_database_sqlite3_statement_bind(tb_database_sql_impl_t* data
     // the param count
     tb_size_t param_count = (tb_size_t)sqlite3_bind_parameter_count((sqlite3_stmt*)statement);
     tb_assert_and_check_return_val(size == param_count, tb_false);
-   
+
     // walk
     tb_size_t i = 0;
     for (i = 0; i < size; i++)
@@ -878,7 +878,7 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
         sqlite->base.statement_bind = tb_database_sqlite3_statement_bind;
 
         // init row operation
-        static tb_iterator_op_t row_op = 
+        static tb_iterator_op_t row_op =
         {
             tb_database_sqlite3_result_row_iterator_size
         ,   tb_database_sqlite3_result_row_iterator_head
@@ -894,7 +894,7 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
         };
 
         // init col operation
-        static tb_iterator_op_t col_op = 
+        static tb_iterator_op_t col_op =
         {
             tb_database_sqlite3_result_col_iterator_size
         ,   tb_database_sqlite3_result_col_iterator_head
@@ -936,7 +936,7 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
     } while (0);
 
     // failed?
-    if (!ok) 
+    if (!ok)
     {
         // exit database
         if (sqlite) tb_database_sqlite3_exit((tb_database_sql_impl_t*)sqlite);

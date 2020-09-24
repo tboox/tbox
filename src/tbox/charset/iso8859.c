@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -47,7 +47,7 @@ tb_long_t tb_charset_iso8859_set(tb_static_stream_ref_t sstream, tb_bool_t be, t
 tb_long_t tb_charset_iso8859_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t ch)
 {
     if (ch <= 0xa0) tb_static_stream_writ_u8(sstream, (tb_uint8_t)ch);
-    else 
+    else
     {
         // @note: need lookup characters table
         tb_trace_d("iso8859: unknown character: %x", ch);

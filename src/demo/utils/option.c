@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
-static tb_option_item_t g_options[] = 
+ */
+static tb_option_item_t g_options[] =
 {
     {   '-'
     ,   "demo"
@@ -34,7 +34,7 @@ static tb_option_item_t g_options[] =
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
 {
     // init option
@@ -97,7 +97,7 @@ tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
             }
         }
         else tb_option_help(option);
-    
+
         // exit option
         tb_option_exit(option);
     }

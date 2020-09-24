@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,20 +39,20 @@ __tb_extern_c_enter__
 /*! init semaphore
  *
  * @param value     the initial semaphore value
- * 
- * @return          the semaphore 
+ *
+ * @return          the semaphore
  */
 tb_semaphore_ref_t  tb_semaphore_init(tb_size_t value);
 
 /*! exit semaphore
- * 
+ *
  * @param semaphore the semaphore
  */
 tb_void_t           tb_semaphore_exit(tb_semaphore_ref_t semaphore);
 
 /*! post semaphore
- * 
- * @param semaphore the semaphore 
+ *
+ * @param semaphore the semaphore
  * @param post      the post semaphore value
  *
  * @return          tb_true or tb_false
@@ -60,16 +60,16 @@ tb_void_t           tb_semaphore_exit(tb_semaphore_ref_t semaphore);
 tb_bool_t           tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post);
 
 /*! the semaphore value
- * 
- * @param semaphore the semaphore 
+ *
+ * @param semaphore the semaphore
  *
  * @return          >= 0: the semaphore value, -1: failed
  */
 tb_long_t           tb_semaphore_value(tb_semaphore_ref_t semaphore);
 
 /*! wait semaphore
- * 
- * @param semaphore the semaphore 
+ *
+ * @param semaphore the semaphore
  * @param timeout   the timeout
  *
  * @return          ok: 1, timeout or interrupted: 0, fail: -1
@@ -81,5 +81,5 @@ tb_long_t           tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t ti
  */
 __tb_extern_c_leave__
 
-    
+
 #endif

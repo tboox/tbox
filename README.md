@@ -2,7 +2,7 @@
 
   <a href="https://tboox.io">
     <img width="160" heigth="160" src="https://tboox.io/assets/img/logo_text.png">
-  </a>  
+  </a>
 
   <div>
     <a href="https://github.com/tboox/tbox/actions?query=workflow%3Abuild">
@@ -46,7 +46,7 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 TBOX is a glib-like cross-platform C library that is simple to use yet powerful in nature.
 
-The project focuses on making C development easier and provides many modules (.e.g stream, coroutine, regex, container, algorithm ...), 
+The project focuses on making C development easier and provides many modules (.e.g stream, coroutine, regex, container, algorithm ...),
 so that any developer can quickly pick it up and enjoy the productivity boost when developing in C language.
 
 It supports the following platforms: Windows, Macosx, Linux, Android, iOS, *BSD and etc.
@@ -70,7 +70,7 @@ If you want to know more, please refer to: [Documents](https://tboox.io/#/gettin
 - Implements the static buffer stream for parsing data
 - Supports coroutine and implements asynchronous operation
 
-#### The coroutine library 
+#### The coroutine library
 
 - Provides high-performance coroutine switch
 - Supports arm, arm64, x86, x86_64 ..
@@ -128,7 +128,7 @@ If you want to know more, please refer to: [Documents](https://tboox.io/#/gettin
 
 - Implements timer, fast and low precision timer
 - Implements atomic and atomic64 operation
-- Implements spinlock, mutex, event, semaphore, thread and thread pool 
+- Implements spinlock, mutex, event, semaphore, thread and thread pool
 - Implements file, socket operation
 - Implements poller using epoll, poll, select, kqueue ...
 - Implements switch context interfaces for coroutine
@@ -158,7 +158,7 @@ If you want to know more, please refer to: [Documents](https://tboox.io/#/gettin
 
 - Implements lightweight libc library interfaces, the interface name contains `tb_xxx` prefix for avoiding conflict
 - Implements strixxx strrxxx wcsixxx wcsrxxx interface extension
-- Optimizes some frequently-used interface, .e.g. memset, memcpy, strcpy ... 
+- Optimizes some frequently-used interface, .e.g. memset, memcpy, strcpy ...
 - Implements `memset_u16`, `memset_u32`, `memset_u64` extension interfaces
 
 #### The libm library
@@ -199,12 +199,12 @@ $ xmake
 
 # build for the mingw platform
 $ cd ./tbox
-$ xmake f -p mingw --sdk=/home/mingwsdk 
+$ xmake f -p mingw --sdk=/home/mingwsdk
 $ xmake
 
 # build for the iphoneos platform
 $ cd ./tbox
-$ xmake f -p iphoneos 
+$ xmake f -p iphoneos
 $ xmake
 
 # build for the android platform
@@ -217,7 +217,7 @@ $ cd ./tbox
 $ xmake f -p linux --sdk=/home/sdk # --bin=/home/sdk/bin
 $ xmake
 ```
-    
+
 ## Example
 
 ```c
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
         tb_stream_exit(stream);
     }
 
-    // wait 
+    // wait
     tb_getchar();
 
     // exit tbox

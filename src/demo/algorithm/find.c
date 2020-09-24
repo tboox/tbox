@@ -14,7 +14,7 @@ static tb_void_t tb_find_int_test()
     // init data
     tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
-    
+
     // init iterator
     tb_array_iterator_t array_iterator;
     tb_iterator_ref_t   iterator = tb_array_iterator_init_long(&array_iterator, data, n);
@@ -45,7 +45,7 @@ static tb_void_t tb_find_int_test_binary()
     // init data
     tb_long_t* data = (tb_long_t*)tb_nalloc0(n, sizeof(tb_long_t));
     tb_assert_and_check_return(data);
-    
+
     // init iterator
     tb_array_iterator_t array_iterator;
     tb_iterator_ref_t   iterator = tb_array_iterator_init_long(&array_iterator, data, n);
@@ -83,10 +83,10 @@ static tb_void_t tb_find_str_test()
 
     // make
     tb_char_t s[256] = {0};
-    for (i = 0; i < n; i++) 
+    for (i = 0; i < n; i++)
     {
-        tb_long_t r = tb_snprintf(s, 256, "%04lu", i); 
-        s[r] = '\0'; 
+        tb_long_t r = tb_snprintf(s, 256, "%04lu", i);
+        s[r] = '\0';
         data[i] = tb_strdup(s);
     }
 
@@ -121,10 +121,10 @@ static tb_void_t tb_find_str_test_binary()
 
     // make
     tb_char_t s[256] = {0};
-    for (i = 0; i < n; i++) 
+    for (i = 0; i < n; i++)
     {
-        tb_long_t r = tb_snprintf(s, 256, "%04lu", i); 
-        s[r] = '\0'; 
+        tb_long_t r = tb_snprintf(s, 256, "%04lu", i);
+        s[r] = '\0';
         data[i] = tb_strdup(s);
     }
 

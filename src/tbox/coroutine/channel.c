@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,7 +46,7 @@ typedef struct __tb_co_channel_queue_t
 {
     // the data
     tb_cpointer_t*                  data;
-    
+
     // the head
     tb_size_t                       head;
 
@@ -73,10 +73,10 @@ typedef struct __tb_co_channel_t
     // the user private data
     tb_cpointer_t                   priv;
 
-    // the waiting send coroutines 
+    // the waiting send coroutines
     tb_single_list_entry_head_t     waiting_send;
 
-    // the waiting recv coroutines 
+    // the waiting recv coroutines
     tb_single_list_entry_head_t     waiting_recv;
 
 }tb_co_channel_t;
@@ -121,7 +121,7 @@ static tb_void_t tb_co_channel_recv_resume(tb_co_channel_t* channel)
     // check
     tb_assert(channel);
 
-    // resume the first waiting recv coroutine 
+    // resume the first waiting recv coroutine
     if (tb_single_list_entry_size(&channel->waiting_recv))
     {
         // get the next entry from head
@@ -134,7 +134,7 @@ static tb_void_t tb_co_channel_recv_resume(tb_co_channel_t* channel)
         // get the waiting recv coroutine
         tb_coroutine_ref_t waiting = (tb_coroutine_ref_t)tb_single_list_entry(&channel->waiting_recv, entry);
 
-        // resume this coroutine 
+        // resume this coroutine
         tb_coroutine_resume(waiting, tb_null);
     }
 }
@@ -143,7 +143,7 @@ static tb_void_t tb_co_channel_send_suspend(tb_co_channel_t* channel, tb_cpointe
     // check
     tb_assert(channel);
 
-    // get the running coroutine 
+    // get the running coroutine
     tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
     tb_assert(running);
 
@@ -158,7 +158,7 @@ static tb_void_t tb_co_channel_recv_suspend(tb_co_channel_t* channel)
     // check
     tb_assert(channel);
 
-    // get the running coroutine 
+    // get the running coroutine
     tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
     tb_assert(running);
 
@@ -201,13 +201,13 @@ static tb_void_t tb_co_channel_send_buffer(tb_co_channel_t* channel, tb_cpointer
 
             // wait send
             tb_co_channel_send_suspend(channel, tb_null);
- 
+
             // trace
             tb_trace_d("send[%p]: wait ok", tb_coroutine_self());
         }
 
     } while (1);
- 
+
     // trace
     tb_trace_d("send[%p]: ok", tb_coroutine_self());
 }
@@ -253,7 +253,7 @@ static tb_pointer_t tb_co_channel_recv_buffer(tb_co_channel_t* channel)
         }
 
     } while (1);
- 
+
     // trace
     tb_trace_d("recv[%p]: ok", tb_coroutine_self());
 
@@ -319,7 +319,7 @@ static tb_void_t tb_co_channel_send_buffer0(tb_co_channel_t* channel, tb_cpointe
     // check
     tb_assert(channel);
 
-    // resume one waiting recv coroutine 
+    // resume one waiting recv coroutine
     tb_co_channel_recv_resume(channel);
 
     // send data and wait it

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -63,12 +63,12 @@ static tb_long_t tb_zip_gzip_spak_deflate(tb_zip_ref_t zip, tb_static_stream_ref
     gzip->zstream.next_out = (Bytef*)op;
     gzip->zstream.avail_out = (uInt)(oe - op);
 
-    // deflate 
+    // deflate
     tb_int_t r = deflate(&gzip->zstream, sync > 0? Z_SYNC_FLUSH : (sync < 0? Z_FINISH : Z_NO_FLUSH));
     tb_assertf_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1, "sync: %ld, error: %d", sync, r);
     tb_trace_d("deflate: %u => %u, sync: %ld", (tb_size_t)(ie - ip), (tb_size_t)((tb_byte_t*)gzip->zstream.next_out - op), sync);
 
-    // update 
+    // update
     ist->p = (tb_byte_t*)gzip->zstream.next_in;
     ost->p = (tb_byte_t*)gzip->zstream.next_out;
 
@@ -101,12 +101,12 @@ static tb_long_t tb_zip_gzip_spak_inflate(tb_zip_ref_t zip, tb_static_stream_ref
     gzip->zstream.next_out = (Bytef*)op;
     gzip->zstream.avail_out = (uInt)(oe - op);
 
-    // inflate 
+    // inflate
     tb_int_t r = inflate(&gzip->zstream, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
     tb_assertf_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1, "sync: %ld, error: %d", sync, r);
     tb_trace_d("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)gzip->zstream.next_out - op, sync);
 
-    // update 
+    // update
     ist->p = (tb_byte_t*)gzip->zstream.next_in;
     ost->p = (tb_byte_t*)gzip->zstream.next_out;
 
@@ -121,7 +121,7 @@ static tb_long_t tb_zip_gzip_spak_inflate(tb_zip_ref_t zip, tb_static_stream_ref
  * interfaces
  */
 tb_zip_ref_t tb_zip_gzip_init(tb_size_t action)
-{   
+{
     // done
     tb_bool_t       ok = tb_false;
     tb_zip_gzip_t*  zip = tb_null;
@@ -130,7 +130,7 @@ tb_zip_ref_t tb_zip_gzip_init(tb_size_t action)
         // make zip
         zip = tb_malloc0_type(tb_zip_gzip_t);
         tb_assert_and_check_break(zip);
-        
+
         // init algo
         zip->base.algo = TB_ZIP_ALGO_GZIP;
 

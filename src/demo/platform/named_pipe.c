@@ -10,7 +10,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_named_pipe_main(tb_int_t argc, tb_char_t** argv)
 {
     // init buffer
@@ -30,7 +30,7 @@ tb_int_t tb_demo_platform_named_pipe_main(tb_int_t argc, tb_char_t** argv)
 
             // connect pipe first
             tb_long_t connected = -1;
-            while (!(connected = tb_pipe_file_connect(pipe))) 
+            while (!(connected = tb_pipe_file_connect(pipe)))
             {
                 tb_long_t wait = tb_pipe_file_wait(pipe, TB_PIPE_EVENT_CONN, -1);
                 tb_assert_and_check_break(wait > 0);

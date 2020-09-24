@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,7 +46,7 @@ static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
  */
 tb_void_t tb_random_linear_seed(tb_size_t seed)
 {
-    // enter 
+    // enter
     tb_spinlock_enter(&g_lock);
 
     // update value
@@ -57,13 +57,13 @@ tb_void_t tb_random_linear_seed(tb_size_t seed)
 }
 tb_long_t tb_random_linear_value()
 {
-    // enter 
+    // enter
     tb_spinlock_enter(&g_lock);
 
     // generate the next value
     g_value = (g_value * 10807 + 1) & 0xffffffff;
 
-    // leave 
+    // leave
     tb_spinlock_leave(&g_lock);
 
     // ok

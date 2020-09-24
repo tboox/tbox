@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,25 +33,25 @@
 /*!architecture
  *
  *
- * <pre>   
- *                               
+ * <pre>
+ *
  *                                - data
  *                               |
  *  stream ---------------------  - file
  *     |                         |
- *     |                          - sock 
+ *     |                          - sock
  *     |                         |
  *     |                          - http
  *     |           - charset
  *     |          |
- *     - filter - |- chunked 
- *                |        
+ *     - filter - |- chunked
+ *                |
  *                |- cache
  *                |
  *                 - zip
- *                      
- *                                                            
- * url: 
+ *
+ *
+ * url:
  * data://base64
  * file://path or unix path: e.g. /root/xxxx/file
  * sock://host:port?tcp=
@@ -159,7 +159,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init stream 
+/*! init stream
  *
  * @param type          the stream type
  * @param type_size     the stream type size
@@ -176,7 +176,7 @@ __tb_extern_c_enter__
  * @param kill          the stream impl func: kill, optional
  *
  * @return              the stream
- * 
+ *
  * @code
     // the custom xxxx stream type
     typedef struct __tb_stream_xxxx_impl_t
@@ -242,31 +242,31 @@ tb_stream_ref_t         tb_stream_init(     tb_size_t type
                                         ,   tb_bool_t (*sync)(tb_stream_ref_t stream, tb_bool_t bclosing)
                                         ,   tb_void_t (*kill)(tb_stream_ref_t stream));
 
-/*! init data stream 
+/*! init data stream
  *
  * @return              the stream
  */
 tb_stream_ref_t         tb_stream_init_data(tb_noarg_t);
 
-/*! init file stream 
+/*! init file stream
  *
  * @return              the stream
  */
 tb_stream_ref_t         tb_stream_init_file(tb_noarg_t);
 
-/*! init sock stream 
+/*! init sock stream
  *
  * @return              the stream
  */
 tb_stream_ref_t         tb_stream_init_sock(tb_noarg_t);
 
-/*! init http stream 
+/*! init http stream
  *
  * @return              the stream
  */
 tb_stream_ref_t         tb_stream_init_http(tb_noarg_t);
 
-/*! init filter stream 
+/*! init filter stream
  *
  * @return              the stream
  */
@@ -342,7 +342,7 @@ tb_stream_ref_t         tb_stream_init_from_sock(tb_char_t const* host, tb_uint1
 
 /*! init stream from sock reference
  *
- * @param sock          the socket 
+ * @param sock          the socket
  * @param type          the socket type, tcp or udp
  * @param bssl          enable ssl?
  *
@@ -407,12 +407,12 @@ tb_stream_ref_t         tb_stream_init_filter_from_charset(tb_stream_ref_t strea
  */
 tb_stream_ref_t         tb_stream_init_filter_from_chunked(tb_stream_ref_t stream, tb_bool_t dechunked);
 
-/*! wait stream 
+/*! wait stream
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aiop
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param stream        the stream 
+ * @param stream        the stream
  * @param wait          the wait type
  * @param timeout       the timeout value, return immediately if 0, infinity if -1
  *
@@ -451,7 +451,7 @@ tb_size_t               tb_stream_type(tb_stream_ref_t stream);
  */
 tb_hong_t               tb_stream_size(tb_stream_ref_t stream);
 
-/*! the stream left size and not seeking it 
+/*! the stream left size and not seeking it
  *
  * @param stream        the stream
  *
@@ -469,7 +469,7 @@ tb_bool_t               tb_stream_beof(tb_stream_ref_t stream);
 
 /*! the stream offset
  *
- * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
+ * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, ..
  * the offset is calculated from the last read/writ and not seeking it if size == -1, .e.g: sock, filter, ..
  *
  * @param stream        the stream
@@ -560,7 +560,7 @@ tb_bool_t               tb_stream_open(tb_stream_ref_t stream);
 tb_bool_t               tb_stream_clos(tb_stream_ref_t stream);
 
 /*! read data, non-blocking
- * 
+ *
  * @code
 
     tb_long_t read = 0;
@@ -568,7 +568,7 @@ tb_bool_t               tb_stream_clos(tb_stream_ref_t stream);
     while (!tb_stream_beof(stream))
     {
         // read data
-        tb_long_t real = tb_stream_read(stream, data, sizeof(data));    
+        tb_long_t real = tb_stream_read(stream, data, sizeof(data));
 
         // ok?
         if (real > 0) read += real;
@@ -607,12 +607,12 @@ tb_long_t               tb_stream_read(tb_stream_ref_t stream, tb_byte_t* data, 
 tb_long_t               tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
 
 /*! block read
- * 
+ *
  * @code
  *
     // get stream size
     //
-    // @note 
+    // @note
     // size may be < -1 for the http(chunked)/filter/.. stream
     // we need call tb_stream_read for reading data if size < 0
     //
@@ -664,7 +664,7 @@ tb_bool_t               tb_stream_sync(tb_stream_ref_t stream, tb_bool_t bclosin
  * @note it will not update offset, if you want to use block mode, please use tb_stream_peek()
  *
  * @code
- 
+
     // need 16-bytes data
     tb_byte_t* data = tb_null;
     if (tb_stream_need(stream, &data, 16))
@@ -693,10 +693,10 @@ tb_bool_t               tb_stream_need(tb_stream_ref_t stream, tb_byte_t** data,
     while (!tb_stream_beof(stream))
     {
         // peek data
-        tb_long_t real = tb_stream_peek(stream, &data, TB_STREAM_BLOCK_MAXN);    
+        tb_long_t real = tb_stream_peek(stream, &data, TB_STREAM_BLOCK_MAXN);
 
         // ok?
-        if (real > 0) 
+        if (real > 0)
         {
             // TODO data
             // ...
@@ -755,7 +755,7 @@ tb_bool_t               tb_stream_skip(tb_stream_ref_t stream, tb_hize_t size);
  */
 tb_long_t               tb_stream_printf(tb_stream_ref_t stream, tb_char_t const* fmt, ...);
 
-/*! block read line 
+/*! block read line
  *
  * @code
  *
@@ -778,7 +778,7 @@ tb_long_t               tb_stream_printf(tb_stream_ref_t stream, tb_char_t const
  */
 tb_long_t               tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_t size);
 
-/*! block writ line 
+/*! block writ line
  *
  * @param stream        the stream
  * @param data          the data
@@ -788,7 +788,7 @@ tb_long_t               tb_stream_bread_line(tb_stream_ref_t stream, tb_char_t* 
  */
 tb_long_t               tb_stream_bwrit_line(tb_stream_ref_t stream, tb_char_t* data, tb_size_t size);
 
-/*! block read all data 
+/*! block read all data
  *
  * @code
  *
@@ -809,14 +809,14 @@ tb_long_t               tb_stream_bwrit_line(tb_stream_ref_t stream, tb_char_t* 
         // exit cstr
         tb_free(cstr);
     }
-  
+
  * @endcode
  *
  * @param stream        the stream
  * @param is_cstr       will append '\0' if be c-string
  * @param psize         the size pointer, optional
  *
- * @return              the data 
+ * @return              the data
  */
 tb_byte_t*              tb_stream_bread_all(tb_stream_ref_t stream, tb_bool_t is_cstr, tb_size_t* psize);
 

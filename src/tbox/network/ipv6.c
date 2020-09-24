@@ -11,11 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        ipv6.c 
+ * @file        ipv6.c
  * @ingroup     network
  *
  */
@@ -207,7 +207,7 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
                 v = (v << 4) + (c - 'a') + 10;
             else if (c > ('A' - 1) && c < ('F' + 1))
                 v = (v << 4) + (c - 'A') + 10;
-            else 
+            else
             {
                 // abort
                 tb_assert(0);
@@ -273,15 +273,15 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
             // is scope id?
             if (tb_isdigit(*p))
             {
-                // save the scope id 
+                // save the scope id
                 temp.scope_id = tb_atoi(p);
- 
+
                 // trace
                 tb_trace_d("scope_id: %u", temp.scope_id);
             }
 #ifndef TB_CONFIG_MICRO_ENABLE
             // is interface name?
-            else 
+            else
             {
                 // trace
                 tb_trace_d("name: %s", p);
@@ -296,19 +296,19 @@ tb_bool_t tb_ipv6_cstr_set(tb_ipv6_ref_t ipv6, tb_char_t const* cstr)
                     // save the scope id
                     temp.scope_id = ipaddr.u.ipv6.scope_id;
                 }
-                // clear the scope id 
+                // clear the scope id
                 else temp.scope_id = 0;
             }
 #else
-            // clear the scope id 
+            // clear the scope id
             else temp.scope_id = 0;
 #endif
 
-            // end    
+            // end
             break;
         }
         // failed?
-        else 
+        else
         {
             ok = tb_false;
             break;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@
  * globals
  */
 
-// the allocator 
+// the allocator
 __tb_extern_c__ tb_allocator_ref_t  g_allocator = tb_null;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ tb_pointer_t tb_allocator_ralloc_(tb_allocator_ref_t allocator, tb_pointer_t dat
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!data_new) 
+    if (!data_new)
     {
         // trace
         tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
@@ -180,7 +180,7 @@ tb_bool_t tb_allocator_free_(tb_allocator_ref_t allocator, tb_pointer_t data __t
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!ok) 
+    if (!ok)
     {
         // trace
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
@@ -292,7 +292,7 @@ tb_pointer_t tb_allocator_large_ralloc_(tb_allocator_ref_t allocator, tb_pointer
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!data_new) 
+    if (!data_new)
     {
         // trace
         tb_trace_e("ralloc(%p, %lu) failed! at %s(): %lu, %s", data, size, func_, line_, file_);
@@ -334,7 +334,7 @@ tb_bool_t tb_allocator_large_free_(tb_allocator_ref_t allocator, tb_pointer_t da
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!ok) 
+    if (!ok)
     {
         // trace
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
@@ -416,7 +416,7 @@ tb_pointer_t tb_allocator_align_ralloc_(tb_allocator_ref_t allocator, tb_pointer
     tb_byte_t diff = 0;
     if (data)
     {
-        // check address 
+        // check address
         tb_assertf(!((tb_size_t)data & (align - 1)), "invalid address %p", data);
         tb_check_return_val(!((tb_size_t)data & (align - 1)), tb_null);
 
@@ -516,7 +516,7 @@ tb_bool_t tb_allocator_have(tb_allocator_ref_t allocator, tb_cpointer_t data)
     tb_assert_and_check_return_val(allocator, tb_false);
 
     /* have it?
-     * 
+     *
      * @note cannot use locker and ensure thread safe
      */
     return allocator->have? allocator->have(allocator, data) : tb_false;

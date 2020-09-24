@@ -8,7 +8,7 @@
  */
 typedef struct __tb_demo_context_t
 {
-    // verbose 
+    // verbose
     tb_bool_t           verbose;
 
 }tb_demo_context_t;
@@ -42,7 +42,7 @@ static tb_bool_t tb_demo_stream_save_func(tb_size_t state, tb_hize_t offset, tb_
     tb_assert_and_check_return_val(context, tb_false);
 
     // print verbose info
-    if (context->verbose) 
+    if (context->verbose)
     {
         // percent
         tb_size_t percent = 0;
@@ -59,8 +59,8 @@ static tb_bool_t tb_demo_stream_save_func(tb_size_t state, tb_hize_t offset, tb_
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
-static tb_option_item_t g_options[] = 
+ */
+static tb_option_item_t g_options[] =
 {
     {'-',   "gzip",         TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "enable gzip"               }
 ,   {'-',   "no-verbose",   TB_OPTION_MODE_KEY,         TB_OPTION_TYPE_BOOL,        "disable verbose info"      }
@@ -80,7 +80,7 @@ static tb_option_item_t g_options[] =
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 {
     // done
@@ -93,23 +93,23 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
         // init option
         option = tb_option_init("stream", "the stream demo", g_options);
         tb_assert_and_check_break(option);
-    
+
         // done option
         if (tb_option_done(option, argc - 1, &argv[1]))
         {
             // debug & verbose
             tb_bool_t debug = tb_option_find(option, "debug");
             tb_bool_t verbose = tb_option_find(option, "no-verbose")? tb_false : tb_true;
-        
+
             // done url
-            if (tb_option_find(option, "url")) 
+            if (tb_option_find(option, "url"))
             {
                 // init istream
                 istream = tb_stream_init_from_url(tb_option_item_cstr(option, "url"));
                 tb_assert_and_check_break(istream);
-    
+
                 // ctrl http
-                if (tb_stream_type(istream) == TB_STREAM_TYPE_HTTP) 
+                if (tb_stream_type(istream) == TB_STREAM_TYPE_HTTP)
                 {
                     // enable gzip?
                     if (tb_option_find(option, "gzip"))
@@ -142,7 +142,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                             if (k)
                             {
                                 if (*p != ':' && !tb_isspace(*p)) tb_string_chrcat(&key, *p++);
-                                else if (*p == ':') 
+                                else if (*p == ':')
                                 {
                                     // skip ':'
                                     p++;
@@ -191,7 +191,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                             if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_string_cstr(&key), tb_string_cstr(&val))) break;
                         }
 
-                        // exit 
+                        // exit
                         tb_string_exit(&key);
                         tb_string_exit(&val);
                     }
@@ -253,7 +253,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                 if (verbose) tb_printf("open: %s: ..\n", tb_option_item_cstr(option, "url"));
 
                 // open istream
-                if (!tb_stream_open(istream)) 
+                if (!tb_stream_open(istream))
                 {
                     // print verbose info
                     if (verbose) tb_printf("open: %s\n", tb_state_cstr(tb_stream_state(istream)));
@@ -275,7 +275,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                     // print verbose info
                     if (verbose) tb_printf("save: %s\n", path);
                 }
-                else 
+                else
                 {
                     // the name
                     tb_char_t const* name = tb_strrchr(tb_option_item_cstr(option, "url"), '/');
@@ -303,7 +303,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
 
                 // save it
                 tb_hong_t           save = 0;
-                tb_demo_context_t   context = {0}; 
+                tb_demo_context_t   context = {0};
                 context.verbose     = verbose;
                 if ((save = tb_transfer(istream, ostream, limitrate, tb_demo_stream_save_func, &context)) < 0) break;
             }
@@ -368,7 +368,7 @@ tb_int_t tb_demo_stream_main(tb_int_t argc, tb_char_t** argv)
                 // save writ
                 writ += real;
             }
-            else if (!real) 
+            else if (!real)
             {
                 // wait
                 tb_long_t wait = tb_stream_wait(istream, TB_STREAM_WAIT_READ, tb_stream_timeout(istream));

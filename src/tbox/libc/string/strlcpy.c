@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros 
+ * macros
  */
 
 /* suppress warning as error for clang compiler temporarily:
@@ -52,7 +52,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #if defined(TB_CONFIG_LIBC_HAVE_STRLCPY)
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
@@ -68,7 +68,7 @@ static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n
  *
  * - at most n - 1 characters will be copied.
  * - always null terminates (unless n == 0).
- * 
+ *
  * returns strlen(s2); if retval >= n, truncation occurred.
  */
 static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
@@ -81,20 +81,20 @@ static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n
     tb_char_t const*    s = s2;
     tb_size_t           m = n;
 
-    // copy as many bytes as will fit 
+    // copy as many bytes as will fit
     if (m != 0 && --m != 0)
     {
-        do 
+        do
         {
             if ((*d++ = *s++) == 0) break;
 
         } while (--m != 0);
     }
 
-    // not enough room in dst, add null and traverse rest of src 
+    // not enough room in dst, add null and traverse rest of src
     if (m == 0)
     {
-        if (n != 0) *d = '\0';      
+        if (n != 0) *d = '\0';
         while (*s++) ;
     }
 
@@ -104,17 +104,17 @@ static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_size_t tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
     // check
 #ifdef __tb_debug__
     {
-        // overflow dst? 
+        // overflow dst?
         tb_size_t n2 = tb_strlen(s2);
 
-        // strlcpy overflow? 
+        // strlcpy overflow?
         tb_size_t n1 = tb_pool_data_size(s1);
         if (n1 && tb_min(n2 + 1, n) > n1)
         {

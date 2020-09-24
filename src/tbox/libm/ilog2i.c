@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,7 +33,7 @@
 tb_uint32_t tb_ilog2i(tb_uint32_t x)
 {
 #if 0
-    static tb_uint32_t table[32] = 
+    static tb_uint32_t table[32] =
     {
         1           // 0
     ,   2           // 1
@@ -100,7 +100,7 @@ tb_uint32_t tb_ilog2i(tb_uint32_t x)
         n += 16;
     }
 
-    if (x & 0xff00) 
+    if (x & 0xff00)
     {
         x >>= 8;
         n += 8;

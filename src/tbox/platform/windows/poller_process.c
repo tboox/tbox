@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -72,10 +72,10 @@ typedef struct __tb_poller_process_t
     // the waited processes data
     tb_vector_ref_t         processes_data;
 
-    // the processes status 
+    // the processes status
     tb_vector_ref_t         processes_status;
 
-    // the copied processes status 
+    // the copied processes status
     tb_vector_ref_t         processes_status_copied;
 
     // is stopped?
@@ -87,7 +87,7 @@ typedef struct __tb_poller_process_t
     // the lock
     tb_spinlock_t           lock;
 
-}tb_poller_process_t; 
+}tb_poller_process_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -168,7 +168,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
             if (proc_handle != poller->semaphore)
             {
                 exitcode = 0;
-                proc_status.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;  
+                proc_status.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;
                 proc_status.process = procdata[index].process;
                 proc_status.priv    = procdata[index].priv;
                 tb_assert(proc_status.process);
@@ -209,7 +209,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 
                     // get process status
                     exitcode = 0;
-                    proc_status.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;  
+                    proc_status.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;
                     proc_status.process = procdata[index].process;
                     proc_status.priv    = procdata[index].priv;
                     tb_assert(proc_status.process);
@@ -269,7 +269,7 @@ static tb_void_t tb_poller_process_kill(tb_poller_process_ref_t self)
 
     // trace
     tb_trace_d("process: kill ..");
-    
+
     // stop thread and post it
     if (!tb_atomic32_fetch_and_set(&poller->is_stopped, 1))
         ReleaseSemaphore(poller->semaphore, 1, tb_null);
@@ -377,7 +377,7 @@ static tb_void_t tb_poller_process_spak(tb_poller_process_ref_t self)
 
     // trace
     tb_trace_d("process: spak ..");
-    
+
     // post it
     ReleaseSemaphore(poller->semaphore, 1, tb_null);
 }
@@ -488,7 +488,7 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     // trace
     tb_trace_d("process: poll %lu", tb_vector_size(poller->processes_status_copied));
 
-    // poll all waited processes status 
+    // poll all waited processes status
     tb_long_t     wait = 0;
     tb_poller_object_t object;
     object.type = TB_POLLER_OBJECT_PROC;

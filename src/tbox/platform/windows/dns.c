@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,7 +37,7 @@ tb_bool_t tb_dns_init_env()
     FIXED_INFO*             info = tb_null;
     ULONG                   size = 0;
     tb_size_t               count = 0;
-    do 
+    do
     {
         // init func
         tb_iphlpapi_GetNetworkParams_t pGetNetworkParams = tb_iphlpapi()->GetNetworkParams;
@@ -49,13 +49,13 @@ tb_bool_t tb_dns_init_env()
 
         // get the info size
         size = sizeof(FIXED_INFO);
-        if (pGetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW) 
+        if (pGetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW)
         {
             // grow info
             info = (FIXED_INFO *)tb_ralloc(info, size);
             tb_assert_and_check_break(info);
         }
-        
+
         // get the info
         if (pGetNetworkParams(info, &size) != NO_ERROR) break;
 
@@ -70,11 +70,11 @@ tb_bool_t tb_dns_init_env()
 
         // walk dns address
         IP_ADDR_STRING* addr = info->DnsServerList.Next;
-        for (; addr; addr = addr->Next) 
+        for (; addr; addr = addr->Next)
         {
             // trace
             tb_trace_d("server: %s", addr->IpAddress.String);
-            
+
             // add the dns address
             tb_dns_server_add(addr->IpAddress.String);
             count++;

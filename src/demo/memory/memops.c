@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 #include <string.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * check
- */ 
+ */
 static tb_bool_t check_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
 {
     tb_uint8_t* p = (tb_uint8_t*)dst;
@@ -58,10 +58,10 @@ static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_memory_memops_main(tb_int_t argc, tb_char_t** argv)
 {
-    // init 
+    // init
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_hong_t dt = 0;
 

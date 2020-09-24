@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
 #if !defined(TB_ARCH_x86) && \
     !defined(TB_ARCH_x64) && \
     !defined(TB_ARCH_ARM) && \
-    !defined(TB_ARCH_MIPS) 
+    !defined(TB_ARCH_MIPS)
 tb_context_ref_t tb_context_make(tb_byte_t* stackdata, tb_size_t stacksize, tb_context_func_t func)
 {
     tb_trace_noimpl();

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -47,7 +47,7 @@ static tb_bool_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
             RemoveDirectoryW(temp);
     }
 
-    // continue 
+    // continue
     return tb_true;
 }
 static tb_bool_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
@@ -78,7 +78,7 @@ static tb_bool_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
             tb_directory_remove(dpath);
     }
 
-    // copy 
+    // copy
     switch (info->type)
     {
     case TB_FILE_TYPE_FILE:
@@ -108,7 +108,7 @@ static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
     tb_char_t           temp_a[4096] = {0};
     tb_swprintf(temp_w, 4095, L"%s%s*.*", path, path[last] == L'\\'? L"" : L"\\");
 
-    // done 
+    // done
     tb_bool_t           ok = tb_true;
     WIN32_FIND_DATAW    find = {0};
     HANDLE              directory = INVALID_HANDLE_VALUE;
@@ -139,7 +139,7 @@ static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
                     // walk to the next directory
                     if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) ok = tb_directory_walk_impl(temp_w, recursion > 0? recursion - 1 : recursion, prefix, func, priv);
                     tb_check_break(ok);
-    
+
                     // do callback
                     if (!prefix) ok = func(temp_a, &info, priv);
                     tb_check_break(ok);
@@ -177,7 +177,7 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
         tb_wchar_t const*   p = full;
         tb_wchar_t*         t = temp;
         tb_wchar_t const*   e = temp + TB_PATH_MAXN - 1;
-        for (; t < e && *p; t++) 
+        for (; t < e && *p; t++)
         {
             *t = *p;
             if (*p == L'\\' || *p == L'/')
@@ -232,7 +232,7 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
         if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x1c /* CSIDL_LOCAL_APPDATA */, &pidl)) break;
         tb_check_break(pidl);
 
-        // get the home directory   
+        // get the home directory
         if (!tb_shell32()->SHGetPathFromIDListW(pidl, home)) break;
 
         // ok
@@ -296,7 +296,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_
 
     // walk it directly if rootdir is relative path
     tb_file_info_t info = {0};
-    if (!tb_path_is_absolute(path) && tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
+    if (!tb_path_is_absolute(path) && tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
     {
         tb_wchar_t path_w[TB_PATH_MAXN];
         if (tb_atow(path_w, path, tb_arrayn(path_w)) != -1)
@@ -333,7 +333,7 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_bool_t ok = tuple[2].b;
 
     // copy empty directory?
-    if (ok && !tb_file_info(dest, tb_null)) 
+    if (ok && !tb_file_info(dest, tb_null))
         return tb_directory_create(dest);
 
     // ok?

@@ -6,12 +6,12 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // port
 #define TB_DEMO_PORT        (9090)
@@ -21,7 +21,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
 {
     // get arguments
@@ -50,7 +50,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
             // read data
             tb_long_t real = tb_stream_read(stream, data, TB_STREAM_BLOCK_MAXN);
             if (real > 0) read += real;
-            else if (!real) 
+            else if (!real)
             {
                 // wait
                 tb_long_t wait = tb_stream_wait(stream, TB_STREAM_WAIT_READ, tb_stream_timeout(stream));
@@ -81,7 +81,7 @@ static tb_void_t tb_demo_coroutine_pull(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_stream_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
@@ -100,8 +100,8 @@ tb_int_t tb_demo_coroutine_stream_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start file
-        tb_size_t i = 0; 
-        for (i = 0; i < count; i++) 
+        tb_size_t i = 0;
+        for (i = 0; i < count; i++)
         {
             tb_size_t idx = i << 1;
             args[idx + 0].cstr = url;

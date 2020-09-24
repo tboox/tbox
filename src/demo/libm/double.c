@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
-static tb_double_t tb_double_test_angle[360] = 
+ */
+static tb_double_t tb_double_test_angle[360] =
 {
     0.000000
 ,   0.017453
@@ -371,7 +371,7 @@ static tb_double_t tb_double_test_angle[360] =
 
 };
 
-static tb_double_t tb_double_test_arc[5][4] = 
+static tb_double_t tb_double_test_arc[5][4] =
 {
     {0.000000, 0.000000, 0.000000, 0.000000}
 ,   {1.000000, 0.500000, 0.333333, 0.250000}
@@ -381,7 +381,7 @@ static tb_double_t tb_double_test_arc[5][4] =
 
 };
 
-static tb_double_t tb_double_test_atan_a[] = 
+static tb_double_t tb_double_test_atan_a[] =
 {
     -10.000000
 ,   -9.800000
@@ -488,7 +488,7 @@ static tb_double_t tb_double_test_atan_a[] =
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
- */ 
+ */
 static tb_void_t tb_double_test_constant()
 {
     tb_printf("[double]: max = %lf\n", TB_MAF);
@@ -797,7 +797,7 @@ static tb_void_t tb_double_test_atan()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_libm_double_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_double_test_constant();

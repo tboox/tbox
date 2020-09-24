@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -25,7 +25,7 @@
  */
 #define TB_TRACE_MODULE_NAME        "oc_array"
 #define TB_TRACE_MODULE_DEBUG       (0)
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -122,7 +122,7 @@ static tb_oc_array_t* tb_oc_array_init_base()
         array->base.copy    = tb_oc_array_copy;
         array->base.exit    = tb_oc_array_exit;
         array->base.clear   = tb_oc_array_clear;
-        
+
         // ok
         ok = tb_true;
 
@@ -168,7 +168,7 @@ tb_object_ref_t tb_oc_array_init(tb_size_t grow, tb_bool_t incr)
         ok = tb_true;
 
     } while (0);
-    
+
     // failed
     if (!ok)
     {

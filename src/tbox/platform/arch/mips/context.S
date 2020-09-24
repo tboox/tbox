@@ -52,17 +52,17 @@
  *             ------------------------------------------------
  * context:   |  s0  |  s1  |  s2  |  s3  |  s4  |  s5  |  s6  |
  *             ------------------------------------------------
- *            0      4      8      12     16     20     24                               
- *                          
+ *            0      4      8      12     16     20     24
+ *
  *                                ------------------------------------
  *                               |                                   \|/
- *                               |       __end  func             retval(from)          function arguments        
+ *                               |       __end  func             retval(from)          function arguments
  *             -----------------------------------------------------------------------------------------------------
  *            |  s7  |  fp  |  retval  |  ra  |  pc  |  gp  | context |  priv  | padding |   (a0-a3)    |  padding  |
  *             -----------------------------------------------------------------------------------------------------
- *            28     32     36         40     44     48     52        56       60        64          
- *                                                                                       |(16-align)                                 
- *                                                                                       |                               
+ *            28     32     36         40     44     48     52        56       60        64
+ *                                                                                       |(16-align)
+ *                                                                                       |
  *                                                                             sp when jump to function
  *
  *
@@ -85,7 +85,7 @@ function tb_context_make, export=1
     // reserve space for arguments(a0-a3) of context-function
     addiu $v0, $v0, -32
 
-    // 16-align of the stack top address 
+    // 16-align of the stack top address
     move $v1, $v0
     li $v0, -16
     and $v0, $v1, $v0
@@ -114,7 +114,7 @@ function tb_context_make, export=1
     sw $t9, 40($v0)
 
     // return pointer to context-data
-    jr $ra 
+    jr $ra
 
 __end:
 
@@ -144,15 +144,15 @@ function tb_context_jump, export=1
 
     // save registers and construct the current context
     sw $s0, ($sp)
-    sw $s1, 4($sp) 
-    sw $s2, 8($sp) 
+    sw $s1, 4($sp)
+    sw $s2, 8($sp)
     sw $s3, 12($sp)
-    sw $s4, 16($sp) 
+    sw $s4, 16($sp)
     sw $s5, 20($sp)
-    sw $s6, 24($sp) 
+    sw $s6, 24($sp)
     sw $s7, 28($sp)
     sw $fp, 32($sp)
-    sw $a0, 36($sp)     // save retval 
+    sw $a0, 36($sp)     // save retval
     sw $ra, 40($sp)
     sw $ra, 44($sp)     // save ra as pc
     sw $gp, 48($sp)     // save gp
@@ -164,12 +164,12 @@ function tb_context_jump, export=1
     move $sp, $a1
 
     // restore registers of the new context
-    lw $s0, ($sp) 
+    lw $s0, ($sp)
     lw $s1, 4($sp)
     lw $s2, 8($sp)
     lw $s3, 12($sp)
     lw $s4, 16($sp)
-    lw $s5, 20($sp) 
+    lw $s5, 20($sp)
     lw $s6, 24($sp)
     lw $s7, 28($sp)
     lw $fp, 32($sp)
@@ -181,19 +181,19 @@ function tb_context_jump, export=1
     // restore stack space
     addiu $sp, $sp, 64
 
-    // return from-context(context: a0, priv: a1) from jump 
+    // return from-context(context: a0, priv: a1) from jump
     sw $a0, ($t0)
     sw $a2, 4($t0)
 
     // pass old-context(context: a0, priv: a1) arguments to the context function
-    move $a1, $a2 
+    move $a1, $a2
 
     /* jump to the return or entry address(pc)
      *
      *             ----------------------
      * context:   |   args   |  padding  |
      *             ----------------------
-     *            0  
+     *            0
      *            |
      *            sp
      */

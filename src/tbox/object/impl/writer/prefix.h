@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,7 +33,7 @@
 static __tb_inline__ tb_bool_t tb_oc_writer_spaces(tb_stream_ref_t stream, tb_bool_t deflate, tb_size_t tab, tb_size_t width)
 {
     // write tab
-    if (!deflate) 
+    if (!deflate)
     {
         tb_size_t spaces = tab * width;
         while (spaces--) if (tb_stream_printf(stream, " ") < 0) return tb_false;
@@ -71,7 +71,7 @@ static __tb_inline__ tb_bool_t tb_oc_writer_bin_type_size(tb_stream_ref_t stream
     }
     tb_assert_and_check_return_val(sizef, tb_false);
 
-    // write flag 
+    // write flag
     tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xc? (tb_uint8_t)size : (tb_uint8_t)sizef);
     if (!tb_stream_bwrit_u8(stream, flag)) return tb_false;
 

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,19 +38,19 @@ __tb_extern_c_enter__
 
 /*! init mutex
  *
- * @return          the mutex 
+ * @return          the mutex
  */
 tb_mutex_ref_t      tb_mutex_init(tb_noarg_t);
 
 /* exit mutex
  *
- * @param mutex     the mutex 
+ * @param mutex     the mutex
  */
 tb_void_t           tb_mutex_exit(tb_mutex_ref_t mutex);
 
 /* enter mutex
  *
- * @param mutex     the mutex 
+ * @param mutex     the mutex
  *
  * @return          tb_true or tb_false
  */
@@ -58,7 +58,7 @@ tb_bool_t           tb_mutex_enter(tb_mutex_ref_t mutex);
 
 /* try to enter mutex
  *
- * @param mutex     the mutex 
+ * @param mutex     the mutex
  *
  * @return          tb_true or tb_false
  */
@@ -66,7 +66,7 @@ tb_bool_t           tb_mutex_enter_try(tb_mutex_ref_t mutex);
 
 /* leave mutex
  *
- * @param mutex     the mutex 
+ * @param mutex     the mutex
  *
  * @return          tb_true or tb_false
  */

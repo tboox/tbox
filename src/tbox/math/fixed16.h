@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -84,10 +84,10 @@ __tb_extern_c_enter__
 
 // avg
 #define tb_fixed16_avg(x, y)                (((x) + (y)) >> 1)
-   
+
 // nearly equal?
 #define tb_fixed16_near_eq(x, y)            (tb_fixed16_abs((x) - (y)) <= TB_FIXED16_NEAR0)
-   
+
 // mul
 #ifndef tb_fixed16_mul
 #   ifdef __tb_debug__
@@ -105,7 +105,7 @@ __tb_extern_c_enter__
 #       define tb_fixed16_div(x, y)         ((tb_fixed16_t)((((tb_hong_t)(x)) << 16) / (y)))
 #   endif
 #endif
-    
+
 // imul
 #ifndef tb_fixed16_imul
 #   ifdef __tb_debug__
@@ -146,7 +146,7 @@ __tb_extern_c_enter__
 #ifndef tb_fixed16_lsh
 #   define tb_fixed16_lsh(x, y)             ((x) << (y))
 #endif
-    
+
 // rsh
 #ifndef tb_fixed16_rsh
 #   define tb_fixed16_rsh(x, y)             ((x) >> (y))

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -63,7 +63,7 @@
             if (item##_iterator && item##_head != item##_tail) \
                 for (   item##_itor = tb_iterator_prev(item##_iterator, item##_tail); \
                         item##_itor != item##_tail && ((item = (type)tb_iterator_item(item##_iterator, item##_itor)), item##_itor = item##_itor != item##_head? item##_itor : item##_tail, 1); \
-                        item##_itor = item##_itor != item##_tail? tb_iterator_prev(item##_iterator, item##_itor) : item##_tail) 
+                        item##_itor = item##_itor != item##_tail? tb_iterator_prev(item##_iterator, item##_itor) : item##_tail)
 
 /*! for all items using iterator
  *

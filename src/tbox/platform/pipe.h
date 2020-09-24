@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -54,14 +54,14 @@ typedef enum __tb_event_event_e
  * interfaces
  */
 
-/*! init the file of named pipe 
+/*! init the file of named pipe
  *
  * @note the pipe files will be inherited in child process and it will be blocked.
  *
  * @param name          the pipe name
  * @param mode          the file mode, only support TB_FILE_MODE_RO/TB_FILE_MODE_WO
  * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
- * 
+ *
  * @return              the pipe file
  */
 tb_pipe_file_ref_t      tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_size_t buffer_size);
@@ -70,15 +70,15 @@ tb_pipe_file_ref_t      tb_pipe_file_init(tb_char_t const* name, tb_size_t mode,
  *
  * @note the pipe files will be inherited in child process.
  *
- * @param pair          the pipe file pair, read: pair[0], write: pair[1] 
+ * @param pair          the pipe file pair, read: pair[0], write: pair[1]
  * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
- * 
+ *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size);
 
 /*! exit the pipe file
- * 
+ *
  * @param file          the pipe file
  *
  * @return              tb_true or tb_false
@@ -94,8 +94,8 @@ tb_bool_t               tb_pipe_file_exit(tb_pipe_file_ref_t file);
 tb_long_t               tb_pipe_file_connect(tb_pipe_file_ref_t file);
 
 /*! read the pipe file data (non-block)
- * 
- * @param file          the pipe file 
+ *
+ * @param file          the pipe file
  * @param data          the data
  * @param size          the size
  *
@@ -104,8 +104,8 @@ tb_long_t               tb_pipe_file_connect(tb_pipe_file_ref_t file);
 tb_long_t               tb_pipe_file_read(tb_pipe_file_ref_t file, tb_byte_t* data, tb_size_t size);
 
 /*! writ the pipe file data (non-block)
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  * @param data          the data
  * @param size          the size
  *
@@ -117,7 +117,7 @@ tb_long_t               tb_pipe_file_write(tb_pipe_file_ref_t file, tb_byte_t co
  *
  * @note it still don't support waiting in the coroutine.
  *
- * @param file          the file 
+ * @param file          the file
  * @param events        the pipe file events
  * @param timeout       the timeout, infinity: -1
  *
@@ -127,7 +127,7 @@ tb_long_t               tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t eve
 
 /*! read the pipe file data for tcp with block mode
  *
- * @param file          the pipe file 
+ * @param file          the pipe file
  * @param data          the data
  * @param size          the size
  *
@@ -137,7 +137,7 @@ tb_bool_t               tb_pipe_file_bread(tb_pipe_file_ref_t file, tb_byte_t* d
 
 /*! writ the pipe file data for tcp with block mode
  *
- * @param file          the pipe file 
+ * @param file          the pipe file
  * @param data          the data
  * @param size          the size
  *
@@ -150,5 +150,5 @@ tb_bool_t               tb_pipe_file_bwrit(tb_pipe_file_ref_t file, tb_byte_t co
  */
 __tb_extern_c_leave__
 
-    
+
 #endif

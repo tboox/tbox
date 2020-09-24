@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_semaphore_wait_func(tb_cpointer_t priv)
 {
     // check
@@ -18,7 +18,7 @@ static tb_void_t tb_demo_coroutine_semaphore_wait_func(tb_cpointer_t priv)
         // wait it
         tb_long_t ok = tb_co_semaphore_wait(semaphore, -1);
         tb_assert_and_check_break(ok > 0);
- 
+
         // trace
         tb_trace_i("[coroutine: %p]: wait ok", tb_coroutine_self());
     }
@@ -37,7 +37,7 @@ static tb_void_t tb_demo_coroutine_semaphore_post_func(tb_cpointer_t priv)
 
         // post it
         tb_co_semaphore_post(semaphore, 2);
- 
+
         // wait some time
         tb_msleep(1000);
     }
@@ -45,7 +45,7 @@ static tb_void_t tb_demo_coroutine_semaphore_post_func(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_semaphore_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler
@@ -66,7 +66,7 @@ tb_int_t tb_demo_coroutine_semaphore_main(tb_int_t argc, tb_char_t** argv)
         // run scheduler
         tb_co_scheduler_loop(scheduler, tb_true);
 
-        // exit semaphore 
+        // exit semaphore
         tb_co_semaphore_exit(semaphore);
 
         // exit scheduler

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -45,7 +45,7 @@ static tb_size_t tb_strnlen_impl(tb_char_t const* s, tb_size_t n)
     (
         "   movl    %1, %0\n"
         "   decl    %0\n"
-        "1:\n"  
+        "1:\n"
         "   incl    %0\n"
         "   test    %2, %2\n"
         "   je      2f\n"

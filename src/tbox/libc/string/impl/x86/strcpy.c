@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -70,7 +70,7 @@ static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 
 
         : "=&S" (esi), "=&D" (edi)
-        : "0" (s2), "1" (s1) 
+        : "0" (s2), "1" (s1)
         : "memory", "eax", "edx"
     );
     return s1;

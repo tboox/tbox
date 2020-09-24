@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,7 +52,7 @@ typedef struct _tb_OVERLAPPED_ENTRY_t
 
 }tb_OVERLAPPED_ENTRY_t, *tb_LPOVERLAPPED_ENTRY_t;
 
-// the GetQueuedCompletionStatusEx func type 
+// the GetQueuedCompletionStatusEx func type
 typedef BOOL (WINAPI* tb_kernel32_GetQueuedCompletionStatusEx_t)(HANDLE CompletionPort, tb_LPOVERLAPPED_ENTRY_t lpCompletionPortEntries, ULONG ulCount, PULONG ulNumEntriesRemoved, DWORD dwMilliseconds, BOOL fAlertable);
 
 // the CancelIoEx func type
@@ -208,13 +208,13 @@ tb_kernel32_ref_t   tb_kernel32(tb_noarg_t);
 
 /* has SetFileCompletionNotificationModes?
  *
- * Verifies that SetFileCompletionNotificationModes Windows API is present on the system 
- * and is safe to use. 
+ * Verifies that SetFileCompletionNotificationModes Windows API is present on the system
+ * and is safe to use.
  *
- * We can uses the SetFileCompletionNotificationModes Windows API to skip calling GetQueuedCompletionStatus 
- * if an IO operation completes synchronously. 
+ * We can uses the SetFileCompletionNotificationModes Windows API to skip calling GetQueuedCompletionStatus
+ * if an IO operation completes synchronously.
  *
- * There is a known bug where SetFileCompletionNotificationModes crashes on some systems 
+ * There is a known bug where SetFileCompletionNotificationModes crashes on some systems
  * (see https://support.microsoft.com/kb/2568167 for details).
  *
  * It's not safe to skip completion notifications for UDP:

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -412,7 +412,7 @@ __tb_extern_c_enter__
 #define tb_bits_ne_to_le_u64(x)         tb_bits_le_to_ne_u64(x)
 
 // cl0, count leading bit 0
-#ifndef tb_bits_cl0_u32_be 
+#ifndef tb_bits_cl0_u32_be
 #   define tb_bits_cl0_u32_be(x)        tb_bits_cl0_u32_be_inline(x)
 #endif
 #ifndef tb_bits_cl0_u32_le
@@ -426,7 +426,7 @@ __tb_extern_c_enter__
 #endif
 
 // cl1, count leading bit 1
-#ifndef tb_bits_cl1_u32_be 
+#ifndef tb_bits_cl1_u32_be
 #   define tb_bits_cl1_u32_be(x)        tb_bits_cl0_u32_be(~(tb_uint32_t)(x))
 #endif
 #ifndef tb_bits_cl1_u32_le
@@ -456,17 +456,17 @@ __tb_extern_c_enter__
 #endif
 
 /* fb0, find the first bit 0
- * 
+ *
  * find bit zero by little endian, fb0(...11101101) == 1
  * find bit zero by big endian, fb0(...11101101) == 27
  */
-#ifndef tb_bits_fb0_u32_be 
+#ifndef tb_bits_fb0_u32_be
 #   define tb_bits_fb0_u32_be(x)        ((x)? tb_bits_cl0_u32_be(~(tb_uint32_t)(x)) : 0)
 #endif
 #ifndef tb_bits_fb0_u32_le
 #   define tb_bits_fb0_u32_le(x)        ((x)? tb_bits_cl0_u32_le(~(tb_uint32_t)(x)) : 0)
 #endif
-#ifndef tb_bits_fb0_u64_be 
+#ifndef tb_bits_fb0_u64_be
 #   define tb_bits_fb0_u64_be(x)        ((x)? tb_bits_cl0_u64_be(~(tb_uint64_t)(x)) : 0)
 #endif
 #ifndef tb_bits_fb0_u64_le
@@ -474,13 +474,13 @@ __tb_extern_c_enter__
 #endif
 
 // fb1, find the first bit 1
-#ifndef tb_bits_fb1_u32_be 
+#ifndef tb_bits_fb1_u32_be
 #   define tb_bits_fb1_u32_be(x)        ((x)? tb_bits_cl0_u32_be(x) : 32)
 #endif
 #ifndef tb_bits_fb1_u32_le
 #   define tb_bits_fb1_u32_le(x)        ((x)? tb_bits_cl0_u32_le(x) : 32)
 #endif
-#ifndef tb_bits_fb1_u64_be 
+#ifndef tb_bits_fb1_u64_be
 #   define tb_bits_fb1_u64_be(x)        ((x)? tb_bits_cl0_u64_be(x) : 64)
 #endif
 #ifndef tb_bits_fb1_u64_le
@@ -593,43 +593,43 @@ tb_sint64_t     tb_bits_get_sbits64(tb_byte_t const* p, tb_size_t b, tb_size_t n
 static __tb_inline__ tb_void_t tb_bits_set_u16_le_inline(tb_byte_t* p, tb_uint16_t x)
 {
     p[0] = (tb_byte_t)x;
-    p[1] = (tb_byte_t)(x >> 8); 
+    p[1] = (tb_byte_t)(x >> 8);
 }
 static __tb_inline__ tb_void_t tb_bits_set_u16_be_inline(tb_byte_t* p, tb_uint16_t x)
 {
-    p[0] = (tb_byte_t)(x >> 8); 
+    p[0] = (tb_byte_t)(x >> 8);
     p[1] = (tb_byte_t)x;
 }
 static __tb_inline__ tb_void_t tb_bits_set_u24_le_inline(tb_byte_t* p, tb_uint32_t x)
-{ 
+{
     p[0] = (tb_byte_t)x;
-    p[1] = (tb_byte_t)(x >> 8); 
+    p[1] = (tb_byte_t)(x >> 8);
     p[2] = (tb_byte_t)(x >> 16);
 }
 static __tb_inline__ tb_void_t tb_bits_set_u24_be_inline(tb_byte_t* p, tb_uint32_t x)
 {
-    p[0] = (tb_byte_t)(x >> 16); 
-    p[1] = (tb_byte_t)(x >> 8); 
+    p[0] = (tb_byte_t)(x >> 16);
+    p[1] = (tb_byte_t)(x >> 8);
     p[2] = (tb_byte_t)x;
 }
 static __tb_inline__ tb_void_t tb_bits_set_u32_le_inline(tb_byte_t* p, tb_uint32_t x)
-{ 
+{
     p[0] = (tb_byte_t)x;
-    p[1] = (tb_byte_t)(x >> 8); 
+    p[1] = (tb_byte_t)(x >> 8);
     p[2] = (tb_byte_t)(x >> 16);
     p[3] = (tb_byte_t)(x >> 24);
 }
 static __tb_inline__ tb_void_t tb_bits_set_u32_be_inline(tb_byte_t* p, tb_uint32_t x)
 {
-    p[0] = (tb_byte_t)(x >> 24); 
-    p[1] = (tb_byte_t)(x >> 16); 
-    p[2] = (tb_byte_t)(x >> 8); 
+    p[0] = (tb_byte_t)(x >> 24);
+    p[1] = (tb_byte_t)(x >> 16);
+    p[2] = (tb_byte_t)(x >> 8);
     p[3] = (tb_byte_t)x;
 }
 static __tb_inline__ tb_void_t tb_bits_set_u64_le_inline(tb_byte_t* p, tb_uint64_t x)
-{ 
+{
     p[0] = (tb_byte_t)x;
-    p[1] = (tb_byte_t)(x >> 8); 
+    p[1] = (tb_byte_t)(x >> 8);
     p[2] = (tb_byte_t)(x >> 16);
     p[3] = (tb_byte_t)(x >> 24);
     p[4] = (tb_byte_t)(x >> 32);
@@ -639,13 +639,13 @@ static __tb_inline__ tb_void_t tb_bits_set_u64_le_inline(tb_byte_t* p, tb_uint64
 }
 static __tb_inline__ tb_void_t tb_bits_set_u64_be_inline(tb_byte_t* p, tb_uint64_t x)
 {
-    p[0] = (tb_byte_t)(x >> 56); 
-    p[1] = (tb_byte_t)(x >> 48); 
-    p[2] = (tb_byte_t)(x >> 40); 
-    p[3] = (tb_byte_t)(x >> 32); 
-    p[4] = (tb_byte_t)(x >> 24); 
-    p[5] = (tb_byte_t)(x >> 16); 
-    p[6] = (tb_byte_t)(x >> 8); 
+    p[0] = (tb_byte_t)(x >> 56);
+    p[1] = (tb_byte_t)(x >> 48);
+    p[2] = (tb_byte_t)(x >> 40);
+    p[3] = (tb_byte_t)(x >> 32);
+    p[4] = (tb_byte_t)(x >> 24);
+    p[5] = (tb_byte_t)(x >> 16);
+    p[6] = (tb_byte_t)(x >> 8);
     p[7] = (tb_byte_t)x;
 }
 
@@ -672,7 +672,7 @@ static __tb_inline__ tb_uint32_t tb_bits_swap_u32_inline(tb_uint32_t x)
 }
 static __tb_inline__ tb_hize_t tb_bits_swap_u64_inline(tb_hize_t x)
 {
-    union 
+    union
     {
         tb_hize_t u64;
         tb_uint32_t u32[2];
@@ -743,19 +743,19 @@ static __tb_inline__ tb_size_t tb_bits_cb1_u32_inline(tb_uint32_t x)
     tb_check_return_val(x, 0);
 
 #if 0
-    /* 
-     * 0x55555555 = 01010101010101010101010101010101 
-     * 0x33333333 = 00110011001100110011001100110011 
-     * 0x0f0f0f0f = 00001111000011110000111100001111 
-     * 0x00ff00ff = 00000000111111110000000011111111 
-     * 0x0000ffff = 00000000000000001111111111111111 
-     */  
+    /*
+     * 0x55555555 = 01010101010101010101010101010101
+     * 0x33333333 = 00110011001100110011001100110011
+     * 0x0f0f0f0f = 00001111000011110000111100001111
+     * 0x00ff00ff = 00000000111111110000000011111111
+     * 0x0000ffff = 00000000000000001111111111111111
+     */
 
-    x = (x & 0x55555555) + ((x >> 1) & 0x55555555);  
-    x = (x & 0x33333333) + ((x >> 2) & 0x33333333);  
-    x = (x & 0x0f0f0f0f) + ((x >> 4) & 0x0f0f0f0f);  
-    x = (x & 0x00ff00ff) + ((x >> 8) & 0x00ff00ff);  
-    x = (x & 0x0000ffff) + ((x >> 16) & 0x0000ffff); 
+    x = (x & 0x55555555) + ((x >> 1) & 0x55555555);
+    x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+    x = (x & 0x0f0f0f0f) + ((x >> 4) & 0x0f0f0f0f);
+    x = (x & 0x00ff00ff) + ((x >> 8) & 0x00ff00ff);
+    x = (x & 0x0000ffff) + ((x >> 16) & 0x0000ffff);
 #elif 0
     // mit hackmem count
     x = x - ((x >> 1) & 0x55555555);
@@ -860,7 +860,7 @@ static __tb_inline__ tb_double_t tb_bits_get_double_bbe_inline(tb_byte_t const* 
             && defined(TB_WORDS_BIGENDIAN)
     return *((tb_double_t*)p);
 #else
-    union 
+    union
     {
         tb_uint32_t i[2];
         tb_double_t d;
@@ -880,7 +880,7 @@ static __tb_inline__ tb_double_t tb_bits_get_double_ble_inline(tb_byte_t const* 
             && !defined(TB_WORDS_BIGENDIAN)
     return *((tb_double_t*)p);
 #else
-    union 
+    union
     {
         tb_uint32_t i[2];
         tb_double_t d;
@@ -901,7 +901,7 @@ static __tb_inline__ tb_double_t tb_bits_get_double_lbe_inline(tb_byte_t const* 
             && defined(TB_WORDS_BIGENDIAN)
     return *((tb_double_t*)p);
 #else
-    union 
+    union
     {
         tb_uint32_t i[2];
         tb_double_t d;
@@ -921,7 +921,7 @@ static __tb_inline__ tb_double_t tb_bits_get_double_lle_inline(tb_byte_t const* 
             && !defined(TB_WORDS_BIGENDIAN)
     return *((tb_double_t*)p);
 #else
-    union 
+    union
     {
         tb_uint32_t i[2];
         tb_double_t d;
@@ -942,7 +942,7 @@ static __tb_inline__ tb_void_t tb_bits_set_double_bbe_inline(tb_byte_t* p, tb_do
             && defined(TB_WORDS_BIGENDIAN)
     *((tb_double_t*)p) = x;
 #else
-    union 
+    union
     {
         tb_uint32_t     i[2];
         tb_double_t     d;
@@ -964,7 +964,7 @@ static __tb_inline__ tb_void_t tb_bits_set_double_ble_inline(tb_byte_t* p, tb_do
             && !defined(TB_WORDS_BIGENDIAN)
     *((tb_double_t*)p) = x;
 #else
-    union 
+    union
     {
         tb_uint32_t     i[2];
         tb_double_t     d;
@@ -986,7 +986,7 @@ static __tb_inline__ tb_void_t tb_bits_set_double_lbe_inline(tb_byte_t* p, tb_do
             && defined(TB_WORDS_BIGENDIAN)
     *((tb_double_t*)p) = x;
 #else
-    union 
+    union
     {
         tb_uint32_t     i[2];
         tb_double_t     d;
@@ -1008,7 +1008,7 @@ static __tb_inline__ tb_void_t tb_bits_set_double_lle_inline(tb_byte_t* p, tb_do
             && !defined(TB_WORDS_BIGENDIAN)
     *((tb_double_t*)p) = x;
 #else
-    union 
+    union
     {
         tb_uint32_t     i[2];
         tb_double_t     d;

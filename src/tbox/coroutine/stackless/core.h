@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -74,7 +74,7 @@
 /*
  * Implementation of local continuations based on the "Labels as
  * values" feature of gcc
- * 
+ *
  * @author Adam Dunkels <adam@sics.se>
  *
  * This implementation of local continuations is based on a special
@@ -125,10 +125,10 @@
  * WARNING! the implementation using switch() does not work if an
  * core_set() is done within another switch() statement!
  */
-#   define tb_lo_core_init(co)              tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY 
+#   define tb_lo_core_init(co)              tb_lo_core(co)->branch = 0; tb_lo_core(co)->state = TB_STATE_READY
 #   define tb_lo_core_resume(co)            switch (tb_lo_core(co)->branch) case 0:
 #   define tb_lo_core_record_(co, label)    tb_lo_core(co)->branch = (tb_uint16_t)label; case label:
-#   define tb_lo_core_exit(co)              tb_lo_core(co)->branch = 0, tb_lo_core(co)->state = TB_STATE_END 
+#   define tb_lo_core_exit(co)              tb_lo_core(co)->branch = 0, tb_lo_core(co)->state = TB_STATE_END
 #   ifdef TB_COMPILER_IS_MSVC
 #       define tb_lo_core_record(co)        tb_lo_core_record_(co, __COUNTER__ + 1)
 #   else

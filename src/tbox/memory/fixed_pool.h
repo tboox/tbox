@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -44,7 +44,7 @@ __tb_extern_c_enter__
  */
 
 /*! the fixed pool ref type
- * 
+ *
  * <pre>
  *
  * current:
@@ -53,18 +53,18 @@ __tb_extern_c_enter__
  *  --------------    |
  * |     slot     |<--
  * |--------------|
- * ||||||||||||||||  
- * |--------------| 
- * |              | 
- * |--------------| 
- * |              | 
- * |--------------| 
- * ||||||||||||||||  
- * |--------------| 
- * |||||||||||||||| 
- * |--------------| 
- * |              | 
- *  --------------  
+ * ||||||||||||||||
+ * |--------------|
+ * |              |
+ * |--------------|
+ * |              |
+ * |--------------|
+ * ||||||||||||||||
+ * |--------------|
+ * ||||||||||||||||
+ * |--------------|
+ * |              |
+ *  --------------
  *
  * partial:
  *
@@ -107,15 +107,15 @@ __tb_extern_c_enter__
  *  -------------- ------------------------>|
  * |     head     |                         |
  * |--------------|                         |
- * |||   item     |                         |  
+ * |||   item     |                         |
  * |--------------|                         |
- * |||   item     |                         |  
+ * |||   item     |                         |
  * |--------------|                         | data
- * |||   item     |                         |  
- * |--------------|                         | 
- * |      ...     |                         |  
- * |--------------|                         | 
- * |||   item     |                         | 
+ * |||   item     |                         |
+ * |--------------|                         |
+ * |      ...     |                         |
+ * |--------------|                         |
+ * |||   item     |                         |
  *  -------------- ------------------------>|
  *
  * </pre>
@@ -144,19 +144,19 @@ typedef tb_bool_t       (*tb_fixed_pool_item_walk_func_t)(tb_pointer_t data, tb_
  * @param item_exit         the item exit func
  * @param priv              the private data
  *
- * @return                  the pool 
+ * @return                  the pool
  */
 tb_fixed_pool_ref_t         tb_fixed_pool_init(tb_allocator_ref_t large_allocator, tb_size_t slot_size, tb_size_t item_size, tb_fixed_pool_item_init_func_t item_init, tb_fixed_pool_item_exit_func_t item_exit, tb_cpointer_t priv);
 
 /*! exit pool
  *
- * @param pool              the pool 
+ * @param pool              the pool
  */
 tb_void_t                   tb_fixed_pool_exit(tb_fixed_pool_ref_t pool);
 
 /*! the item count
  *
- * @param pool              the pool 
+ * @param pool              the pool
  *
  * @return                  the item count
  */
@@ -164,7 +164,7 @@ tb_size_t                   tb_fixed_pool_size(tb_fixed_pool_ref_t pool);
 
 /*! the item size
  *
- * @param pool              the pool 
+ * @param pool              the pool
  *
  * @return                  the item size
  */
@@ -172,21 +172,21 @@ tb_size_t                   tb_fixed_pool_item_size(tb_fixed_pool_ref_t pool);
 
 /*! clear pool
  *
- * @param pool              the pool 
+ * @param pool              the pool
  */
 tb_void_t                   tb_fixed_pool_clear(tb_fixed_pool_ref_t pool);
 
 /*! malloc data
  *
- * @param pool              the pool 
- * 
+ * @param pool              the pool
+ *
  * @return                  the data
  */
 tb_pointer_t                tb_fixed_pool_malloc_(tb_fixed_pool_ref_t pool __tb_debug_decl__);
 
 /*! malloc data and clear it
  *
- * @param pool              the pool 
+ * @param pool              the pool
  *
  * @return                  the data
  */
@@ -194,7 +194,7 @@ tb_pointer_t                tb_fixed_pool_malloc0_(tb_fixed_pool_ref_t pool __tb
 
 /*! free data
  *
- * @param pool              the pool 
+ * @param pool              the pool
  * @param data              the data
  *
  * @return                  tb_true or tb_false
@@ -211,7 +211,7 @@ tb_bool_t                   tb_fixed_pool_free_(tb_fixed_pool_ref_t pool, tb_poi
     }
  * @endcode
  *
- * @param pool              the pool 
+ * @param pool              the pool
  * @param func              the walk func
  * @param priv              the private data
  */
@@ -220,7 +220,7 @@ tb_void_t                   tb_fixed_pool_walk(tb_fixed_pool_ref_t pool, tb_fixe
 #ifdef __tb_debug__
 /*! dump pool
  *
- * @param pool              the pool 
+ * @param pool              the pool
  */
 tb_void_t                   tb_fixed_pool_dump(tb_fixed_pool_ref_t pool);
 #endif

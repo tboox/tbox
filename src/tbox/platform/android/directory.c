@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -45,9 +45,9 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     tb_assert_and_check_return_val(jvm, 0);
 
     // attempt to get jni environment first
-    JNIEnv*     jenv = tb_null; 
+    JNIEnv*     jenv = tb_null;
     tb_bool_t   jattached = tb_false;
-    if ((*jvm)->GetEnv(jvm, (tb_pointer_t*)&jenv, JNI_VERSION_1_4) != JNI_OK) 
+    if ((*jvm)->GetEnv(jvm, (tb_pointer_t*)&jenv, JNI_VERSION_1_4) != JNI_OK)
     {
         // bind jni environment
         if ((*jvm)->AttachCurrentThread(jvm, &jenv, tb_null) != JNI_OK) return 0;
@@ -73,7 +73,7 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
         jmethodID getDownloadCacheDirectory_func = (*jenv)->GetStaticMethodID(jenv, environment, "getDownloadCacheDirectory", "()Ljava/io/File;");
         tb_assert_and_check_break(getDownloadCacheDirectory_func);
 
-        // get the download cache directory 
+        // get the download cache directory
         jobject directory = (*jenv)->CallStaticObjectMethod(jenv, environment, getDownloadCacheDirectory_func);
         tb_assert_and_check_break(!(error = (*jenv)->ExceptionCheck(jenv)) && directory);
 

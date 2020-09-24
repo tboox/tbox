@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -135,7 +135,7 @@ static tb_int_t tb_timer_instance_loop(tb_cpointer_t priv)
 
     // loop timer
     if (timer) tb_timer_loop(timer);
-    
+
     // trace
     tb_trace_d("loop: exit");
 
@@ -234,7 +234,7 @@ tb_timer_ref_t tb_timer_init(tb_size_t grow, tb_bool_t ctime)
         // init pool
         timer->pool         = tb_fixed_pool_init(tb_null, timer->grow, sizeof(tb_timer_task_t), tb_null, tb_null, tb_null);
         tb_assert_and_check_break(timer->pool);
-        
+
         // init heap
         timer->heap         = tb_heap_init(timer->grow, element);
         tb_assert_and_check_break(timer->heap);
@@ -273,7 +273,7 @@ tb_void_t tb_timer_exit(tb_timer_ref_t self)
     while (tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED) && tryn--) tb_msleep(500);
 
     // warning
-    if (!tryn && tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED)) 
+    if (!tryn && tb_atomic32_get_explicit(&timer->work, TB_ATOMIC_RELAXED))
     {
         tb_trace_w("[timer]: the loop has been not exited now!");
     }
@@ -351,7 +351,7 @@ tb_hize_t tb_timer_top(tb_timer_ref_t self)
     tb_spinlock_enter(&timer->lock);
 
     // done
-    tb_hize_t when = -1; 
+    tb_hize_t when = -1;
     if (tb_heap_size(timer->heap))
     {
         // the task
@@ -378,7 +378,7 @@ tb_size_t tb_timer_delay(tb_timer_ref_t self)
     tb_spinlock_enter(&timer->lock);
 
     // done
-    tb_size_t delay = -1; 
+    tb_size_t delay = -1;
     if (tb_heap_size(timer->heap))
     {
         // the task
@@ -418,7 +418,7 @@ tb_bool_t tb_timer_spak(tb_timer_ref_t self)
     tb_bool_t               killed = tb_false;
     do
     {
-        // empty? 
+        // empty?
         if (!tb_heap_size(timer->heap))
         {
             ok = tb_true;
@@ -457,7 +457,7 @@ tb_bool_t tb_timer_spak(tb_timer_ref_t self)
                 // continue timer_task
                 tb_heap_put(timer->heap, timer_task);
             }
-            else 
+            else
             {
                 // refn--
                 if (timer_task->refn > 1) timer_task->refn--;
@@ -489,7 +489,7 @@ tb_void_t tb_timer_loop(tb_timer_ref_t self)
     // work++
     tb_atomic32_fetch_and_add_explicit(&timer->work, 1, TB_ATOMIC_RELAXED);
 
-    // init event 
+    // init event
     tb_spinlock_enter(&timer->lock);
     if (!timer->event) timer->event = tb_event_init();
     tb_spinlock_leave(&timer->lock);
@@ -548,7 +548,7 @@ tb_timer_task_ref_t tb_timer_task_init_at(tb_timer_ref_t self, tb_hize_t when, t
     tb_timer_task_t*    timer_task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
     if (timer_task)
     {
-        // the top when 
+        // the top when
         if (tb_heap_size(timer->heap))
         {
             tb_timer_task_t* timer_task = (tb_timer_task_t*)tb_heap_top(timer->heap);
@@ -616,7 +616,7 @@ tb_void_t tb_timer_task_post_at(tb_timer_ref_t self, tb_hize_t when, tb_size_t p
     tb_timer_task_t*    timer_task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
     if (timer_task)
     {
-        // the top when 
+        // the top when
         if (tb_heap_size(timer->heap))
         {
             tb_timer_task_t* timer_task = (tb_timer_task_t*)tb_heap_top(timer->heap);
@@ -651,7 +651,7 @@ tb_void_t tb_timer_task_post_after(tb_timer_ref_t self, tb_hize_t after, tb_size
     tb_timer_t* timer = (tb_timer_t*)self;
     tb_assert_and_check_return(timer && func);
 
-    // run task 
+    // run task
     tb_timer_task_post_at(self, tb_timer_now(timer) + after, period, repeat, func, priv);
 }
 tb_void_t tb_timer_task_exit(tb_timer_ref_t self, tb_timer_task_ref_t task)
@@ -673,12 +673,12 @@ tb_void_t tb_timer_task_exit(tb_timer_ref_t self, tb_timer_task_ref_t task)
         // refn--
         timer_task->refn--;
 
-        // cancel task 
+        // cancel task
         timer_task->func      = tb_null;
         timer_task->priv      = tb_null;
         timer_task->repeat    = 0;
     }
-    // remove it from pool directly if the timer_task have been expired 
+    // remove it from pool directly if the timer_task have been expired
     else tb_fixed_pool_free(timer->pool, timer_task);
 
     // leave
@@ -716,7 +716,7 @@ tb_void_t tb_timer_task_kill(tb_timer_ref_t self, tb_timer_task_ref_t task)
 
         // no repeat
         timer_task->repeat = 0;
-                
+
         // modify when => now
         timer_task->when = tb_timer_now(timer);
 

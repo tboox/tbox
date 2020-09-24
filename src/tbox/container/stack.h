@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,7 +37,7 @@ __tb_extern_c_enter__
  * types
  */
 
-/*! the stack ref type 
+/*! the stack ref type
  *
  * <pre>
  * stack: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
@@ -46,7 +46,7 @@ __tb_extern_c_enter__
  * stack: |||||||||||||||||||||||||||||||||||||||||------|
  *       head                                   last    tail
  *
- * performance: 
+ * performance:
  *
  * push:    fast
  * pop:     fast

@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 static tb_void_t tb_test_sha(tb_size_t mode, tb_char_t const* data)
@@ -17,7 +17,7 @@ static tb_void_t tb_test_sha(tb_size_t mode, tb_char_t const* data)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_hash_sha_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_test_sha(TB_SHA_MODE_SHA1_160, argv[1]);

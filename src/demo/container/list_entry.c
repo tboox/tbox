@@ -8,7 +8,7 @@
  */
 
 // the demo entry type
-typedef struct __tb_demo_entry_t 
+typedef struct __tb_demo_entry_t
 {
     // the list entry
     tb_list_entry_t     entry;
@@ -36,7 +36,7 @@ static tb_void_t tb_demo_entry_copy(tb_pointer_t litem, tb_pointer_t ritem)
 tb_int_t tb_demo_container_list_entry_main(tb_int_t argc, tb_char_t** argv)
 {
     // init the entries
-    tb_demo_entry_t entries[12] = 
+    tb_demo_entry_t entries[12] =
     {
         {{0}, 0}
     ,   {{0}, 1}

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -70,7 +70,7 @@ typedef struct __tb_database_sql_value_t
     tb_char_t const*            name;
 
     /// the data
-    union 
+    union
     {
         // int
         tb_int8_t               i8;
@@ -91,7 +91,7 @@ typedef struct __tb_database_sql_value_t
 #endif
 
         // blob
-        struct 
+        struct
         {
             tb_byte_t const*    data;
             tb_size_t           size;
@@ -102,14 +102,14 @@ typedef struct __tb_database_sql_value_t
         }                       blob;
 
         // text
-        struct 
+        struct
         {
             tb_char_t const*    data;
             tb_size_t           hint;
 
         }                       text;
 
-    }u; 
+    }u;
 
 }tb_database_sql_value_t;
 
@@ -337,7 +337,7 @@ static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_text(tb_database_s
 /// the value is blob?
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_blob(tb_database_sql_value_t const* value)
 {
-    return (    value 
+    return (    value
             &&  (   value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB32
                 ||  value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB16
                 ||  value->type == TB_DATABASE_SQL_VALUE_TYPE_BLOB8))? tb_true : tb_false;
@@ -358,7 +358,7 @@ static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_integer(tb_databas
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 static __tb_inline_force__ tb_bool_t tb_database_sql_value_is_float(tb_database_sql_value_t const* value)
 {
-    return (    value 
+    return (    value
             &&  (   value->type == TB_DATABASE_SQL_VALUE_TYPE_FLOAT
                 ||  value->type == TB_DATABASE_SQL_VALUE_TYPE_DOUBLE))? tb_true : tb_false;
 }
@@ -397,7 +397,7 @@ static __tb_inline_force__ tb_char_t const* tb_database_sql_value_text(tb_databa
     tb_assert_and_check_return_val(value, tb_null);
 
     // is text?
-    if (tb_database_sql_value_is_text(value)) 
+    if (tb_database_sql_value_is_text(value))
         return value->u.text.data;
     // is blob?
     else if (tb_database_sql_value_is_blob(value))
@@ -418,10 +418,10 @@ static __tb_inline_force__ tb_byte_t const* tb_database_sql_value_blob(tb_databa
     tb_assert_and_check_return_val(value, tb_null);
 
     // is blob?
-    if (tb_database_sql_value_is_blob(value)) 
+    if (tb_database_sql_value_is_blob(value))
         return value->u.blob.data;
     // is text?
-    else if (tb_database_sql_value_is_text(value)) 
+    else if (tb_database_sql_value_is_text(value))
         return (tb_byte_t const*)value->u.text.data;
     // is null?
     else if (tb_database_sql_value_is_null(value))

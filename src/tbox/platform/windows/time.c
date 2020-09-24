@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -70,12 +70,12 @@ tb_hong_t tb_uclock()
     LARGE_INTEGER t = {{0}};
     if (!QueryPerformanceCounter(&t)) return 0;
     tb_assert_and_check_return_val(t.QuadPart, 0);
-    
+
     return (t.QuadPart * 1000000) / f.QuadPart;
 }
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
-    union 
+    union
     {
         tb_uint64_t ns100; //< time since 1 Jan 1601 in 100ns units
         FILETIME    ft;

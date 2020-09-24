@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -45,7 +45,7 @@ tb_bool_t tb_event_post(tb_event_ref_t event)
 {
     // check
     tb_assert_and_check_return_val(event, tb_false);
-    
+
     // post
     return SetEvent((HANDLE)event)? tb_true : tb_false;
 }

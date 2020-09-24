@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,38 +37,38 @@ __tb_extern_c_enter__
  */
 
 /*! init event
- * 
- * @return          the event 
+ *
+ * @return          the event
  */
 tb_event_ref_t      tb_event_init(tb_noarg_t);
 
 /*! exit event
- * 
- * @param event     the event 
+ *
+ * @param event     the event
  */
 tb_void_t           tb_event_exit(tb_event_ref_t event);
 
 /*! post event
- * 
- * @param event     the event 
+ *
+ * @param event     the event
  *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_event_post(tb_event_ref_t event);
 
 /*! wait event
- * 
- * @param event     the event 
+ *
+ * @param event     the event
  * @param timeout   the timeout
  *
  * @return          ok: 1, timeout or interrupted: 0, fail: -1
  */
 tb_long_t           tb_event_wait(tb_event_ref_t event, tb_long_t timeout);
 
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
 __tb_extern_c_leave__
-   
+
 #endif

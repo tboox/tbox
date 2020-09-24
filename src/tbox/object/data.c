@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -65,7 +65,7 @@ static tb_object_ref_t tb_oc_data_copy(tb_object_ref_t object)
 static tb_void_t tb_oc_data_exit(tb_object_ref_t object)
 {
     tb_oc_data_t* data = tb_oc_data_cast(object);
-    if (data) 
+    if (data)
     {
         tb_buffer_exit(&data->buffer);
         tb_free(data);
@@ -94,7 +94,7 @@ static tb_oc_data_t* tb_oc_data_init_base()
         data->base.copy     = tb_oc_data_copy;
         data->base.exit     = tb_oc_data_exit;
         data->base.clear    = tb_oc_data_clear;
-        
+
         // ok
         ok = tb_true;
 
@@ -167,7 +167,7 @@ tb_object_ref_t tb_oc_data_init_from_data(tb_pointer_t addr, tb_size_t size)
     return (tb_object_ref_t)data;
 }
 tb_object_ref_t tb_oc_data_init_from_buffer(tb_buffer_ref_t pbuf)
-{   
+{
     // make
     tb_oc_data_t* data = tb_oc_data_init_base();
     tb_assert_and_check_return_val(data, tb_null);
@@ -237,7 +237,7 @@ tb_bool_t tb_oc_data_writ_to_url(tb_object_ref_t object, tb_char_t const* url)
     // ctrl
     if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
         tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-    
+
     // open stream
     tb_bool_t ok = tb_false;
     if (tb_stream_open(stream))

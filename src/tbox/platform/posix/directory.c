@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -77,7 +77,7 @@ static tb_bool_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
             tb_directory_remove(dpath);
     }
 
-    // copy 
+    // copy
     switch (info->type)
     {
     case TB_FILE_TYPE_FILE:
@@ -102,7 +102,7 @@ static tb_bool_t tb_directory_walk_impl(tb_char_t const* path, tb_long_t recursi
     tb_long_t       last = tb_strlen(path) - 1;
     tb_assert_and_check_return_val(last >= 0, tb_false);
 
-    // done 
+    // done
     tb_bool_t       ok = tb_true;
     tb_char_t       temp[4096] = {0};
     DIR*            directory = tb_null;
@@ -170,13 +170,13 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
         tb_char_t const*    p = full;
         tb_char_t*          t = temp;
         tb_char_t const*    e = temp + TB_PATH_MAXN - 1;
-        for (; t < e && *p; t++) 
+        for (; t < e && *p; t++)
         {
             *t = *p;
             if (*p == '/')
             {
                 // make directory if not exists
-                if (!tb_file_info(temp, tb_null)) 
+                if (!tb_file_info(temp, tb_null))
                 {
                     if (mkdir(temp, S_IRWXU | S_IRWXG | S_IRWXO) != 0)
                         return tb_false;
@@ -261,7 +261,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_
 
     // walk it directly if rootdir is relative path
     tb_file_info_t info = {0};
-    if (!tb_path_is_absolute(path) && tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
+    if (!tb_path_is_absolute(path) && tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
         tb_directory_walk_impl(path, recursion, prefix, func, priv);
     else
     {
@@ -297,7 +297,7 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_bool_t ok = tuple[2].b;
 
     // copy empty directory?
-    if (ok && !tb_file_info(dest, tb_null)) 
+    if (ok && !tb_file_info(dest, tb_null))
         return tb_directory_create(dest);
 
     // ok?

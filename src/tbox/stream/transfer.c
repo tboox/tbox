@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -25,7 +25,7 @@
  */
 #define TB_TRACE_MODULE_NAME                "transfer"
 #define TB_TRACE_MODULE_DEBUG               (1)
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -40,11 +40,11 @@
 tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_t lrate, tb_transfer_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(ostream && istream, -1); 
+    tb_assert_and_check_return_val(ostream && istream, -1);
 
     // open it first if istream have been not opened
     if (tb_stream_is_closed(istream) && !tb_stream_open(istream)) return -1;
-    
+
     // open it first if ostream have been not opened
     if (tb_stream_is_closed(ostream) && !tb_stream_open(ostream)) return -1;
 
@@ -77,7 +77,7 @@ tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_
             writ += real;
 
             // has func or limit rate?
-            if (func || lrate) 
+            if (func || lrate)
             {
                 // the time
                 time = tb_cache_time_spak();
@@ -90,7 +90,7 @@ tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_
 
                     // save current rate if < 1s from base
                     if (time < base + 1000) crate = writ1s;
-                
+
                     // compute the delay for limit rate
                     if (lrate) delay = writ1s >= lrate? (tb_size_t)(base1s + 1000 - time) : 0;
                 }
@@ -116,7 +116,7 @@ tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_
                 if (delay) tb_msleep(delay);
             }
         }
-        else if (!real) 
+        else if (!real)
         {
             // wait
             tb_long_t wait = tb_stream_wait(istream, TB_STREAM_WAIT_READ, tb_stream_timeout(istream));
@@ -136,14 +136,14 @@ tb_hong_t tb_transfer(tb_stream_ref_t istream, tb_stream_ref_t ostream, tb_size_
     if (!tb_stream_sync(ostream, tb_true)) return -1;
 
     // has func?
-    if (func) 
+    if (func)
     {
         // the time
         time = tb_cache_time_spak();
 
         // compute the total rate
         tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : (tb_size_t)writ;
-    
+
         // done func
         func(TB_STATE_CLOSED, tb_stream_offset(istream), tb_stream_size(istream), writ, trate, priv);
     }
@@ -166,7 +166,7 @@ tb_hong_t tb_transfer_to_url(tb_stream_ref_t istream, tb_char_t const* ourl, tb_
         tb_assert_and_check_break(ostream);
 
         // ctrl file
-        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE)
         {
             // ctrl mode
             if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
@@ -221,7 +221,7 @@ tb_hong_t tb_transfer_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_
     tb_stream_ref_t     ostream = tb_null;
     do
     {
-        // copy file to file? 
+        // copy file to file?
         if (    tb_url_protocol_probe(iurl) == TB_URL_PROTOCOL_FILE
             &&  tb_url_protocol_probe(ourl) == TB_URL_PROTOCOL_FILE)
         {
@@ -243,7 +243,7 @@ tb_hong_t tb_transfer_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_
         tb_assert_and_check_break(ostream);
 
         // ctrl file
-        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE)
         {
             // ctrl mode
             if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
@@ -251,7 +251,7 @@ tb_hong_t tb_transfer_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_
 
         // open istream
         if (!tb_stream_open(istream)) break;
-        
+
         // open ostream
         if (!tb_stream_open(ostream)) break;
 
@@ -352,7 +352,7 @@ tb_hong_t tb_transfer_data_to_url(tb_byte_t const* idata, tb_size_t isize, tb_ch
         tb_assert_and_check_break(ostream);
 
         // ctrl file
-        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
+        if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE)
         {
             // ctrl mode
             if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;

@@ -22,7 +22,7 @@ static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_timer_main(tb_int_t argc, tb_char_t** argv)
 {
     // add task: every
@@ -30,7 +30,7 @@ tb_int_t tb_demo_platform_timer_main(tb_int_t argc, tb_char_t** argv)
 
     // add task: one
     tb_timer_task_ref_t one = tb_timer_task_init(tb_timer(), 10000, tb_false, tb_demo_timer_task_func, "one");
-    
+
     // add task: after
     tb_timer_task_ref_t after = tb_timer_task_init_after(tb_timer(), 10000, 5000, tb_true, tb_demo_timer_task_func, "after");
 

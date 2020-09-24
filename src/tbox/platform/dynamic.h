@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -44,22 +44,22 @@ typedef __tb_typeref__(dynamic);
  */
 
 /*! init dynamic library
- * 
+ *
  * @param name      the library name
  *
- * @return          the dynamic library 
+ * @return          the dynamic library
  */
 tb_dynamic_ref_t    tb_dynamic_init(tb_char_t const* name);
 
 /*! exit dynamic library
- * 
- * @param dynamic   the dynamic library 
+ *
+ * @param dynamic   the dynamic library
  */
 tb_void_t           tb_dynamic_exit(tb_dynamic_ref_t dynamic);
 
 /*! the dynamic library function
- * 
- * @param dynamic   the dynamic library 
+ *
+ * @param dynamic   the dynamic library
  * @param name      the function name
  *
  * @return          the function address
@@ -67,8 +67,8 @@ tb_void_t           tb_dynamic_exit(tb_dynamic_ref_t dynamic);
 tb_pointer_t        tb_dynamic_func(tb_dynamic_ref_t dynamic, tb_char_t const* name);
 
 /*! the dynamic library variable
- * 
- * @param dynamic   the dynamic library 
+ *
+ * @param dynamic   the dynamic library
  * @param name      the variable name
  *
  * @return          the variable address

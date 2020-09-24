@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -72,10 +72,10 @@ tb_stdfile_ref_t        tb_stdfile_output(tb_noarg_t);
 tb_stdfile_ref_t        tb_stdfile_error(tb_noarg_t);
 
 /*! init the standard input/ouput device file
- * 
+ *
  * @param type          the file type, e.g. stdin, stdout, stderr
  *
- * @return              the stdfile 
+ * @return              the stdfile
  */
 tb_stdfile_ref_t        tb_stdfile_init(tb_size_t type);
 
@@ -96,14 +96,14 @@ tb_size_t               tb_stdfile_type(tb_stdfile_ref_t stdfile);
 /*! forces a write of all buffered data for the given output
  *
  * @note does not support to flush stdin
- * 
- * @param file          the file 
+ *
+ * @param file          the file
  */
 tb_bool_t               tb_stdfile_flush(tb_stdfile_ref_t stdfile);
 
 /*! read the stdfile data (block mode)
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param data          the data
  * @param size          the size
  *
@@ -112,8 +112,8 @@ tb_bool_t               tb_stdfile_flush(tb_stdfile_ref_t stdfile);
 tb_bool_t               tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, tb_size_t size);
 
 /*! write the stdfile data (block mode)
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param data          the data
  * @param size          the size
  *
@@ -122,8 +122,8 @@ tb_bool_t               tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, 
 tb_bool_t               tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /*! peek an character from stdfile
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param ch            the character pointer
  *
  * @return              tb_true or tb_false
@@ -131,8 +131,8 @@ tb_bool_t               tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* 
 tb_bool_t               tb_stdfile_peek(tb_stdfile_ref_t file, tb_char_t* pch);
 
 /*! read an character from stdfile
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param ch            the character pointer
  *
  * @return              tb_true or tb_false
@@ -140,23 +140,23 @@ tb_bool_t               tb_stdfile_peek(tb_stdfile_ref_t file, tb_char_t* pch);
 tb_bool_t               tb_stdfile_getc(tb_stdfile_ref_t file, tb_char_t* pch);
 
 /*! write an character to stdfile
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param ch            the character
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_stdfile_putc(tb_stdfile_ref_t file, tb_char_t ch);
 
-/*! reads characters from stdfile and stores them as a C string into str until (num-1) characters have been read 
+/*! reads characters from stdfile and stores them as a C string into str until (num-1) characters have been read
  * or either a newline or the end-of-file is reached, whichever happens first.
- * 
+ *
  * a newline character makes fgets stop reading, but it is considered a valid character by the function and
  * included in the string copied to str.
  *
  * a terminating null character is automatically appended after the characters copied to str.
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param str           pointer to an array of chars where the string read is copied.
  * @param num           maximum number of characters to be copied into str (including the terminating null-character).
  *
@@ -166,10 +166,10 @@ tb_bool_t               tb_stdfile_gets(tb_stdfile_ref_t file, tb_char_t* str, t
 
 /*! writes the C string pointed by str to the stdfile.
  *
- * the function begins copying from the address specified (str) until it reaches the terminating null character ('\0'). 
+ * the function begins copying from the address specified (str) until it reaches the terminating null character ('\0').
  * this terminating null-character is not copied to the stdfile.
- * 
- * @param file          the stdfile 
+ *
+ * @param file          the stdfile
  * @param s             C string with the content to be written to stdfile.
  *
  * @return              tb_true or tb_false

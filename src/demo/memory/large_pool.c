@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // init pool
 #if 1
@@ -16,7 +16,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * demo
- */ 
+ */
 tb_void_t tb_demo_large_allocator_leak(tb_noarg_t);
 tb_void_t tb_demo_large_allocator_leak()
 {
@@ -31,11 +31,11 @@ tb_void_t tb_demo_large_allocator_leak()
         // make data0
         tb_pointer_t data0 = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data0);
-    
+
         // make data1
         tb_pointer_t data1 = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data1);
-    
+
 #ifdef __tb_debug__
         // dump pool
         tb_allocator_dump(pool);
@@ -60,11 +60,11 @@ tb_void_t tb_demo_large_allocator_free2()
         // make data
         tb_pointer_t data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
-    
+
         // exit data
         tb_allocator_large_free(pool, data);
         tb_allocator_large_free(pool, data);
-     
+
 #ifdef __tb_debug__
         // dump pool
         tb_allocator_dump(pool);
@@ -88,13 +88,13 @@ tb_void_t tb_demo_large_allocator_underflow()
         // make data
         tb_pointer_t data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
-    
+
         // done underflow
         tb_memset(data, 0, 10 + 1);
 
         // exit data
         tb_allocator_large_free(pool, data);
- 
+
 #ifdef __tb_debug__
         // dump pool
         tb_allocator_dump(pool);
@@ -118,14 +118,14 @@ tb_void_t tb_demo_large_allocator_underflow2()
         // make data
         tb_pointer_t data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
-    
+
         // done underflow
         tb_memset(data, 0, 10 + 1);
 
         // make data2
         data = tb_allocator_large_malloc(pool, 10, tb_null);
         tb_assert_and_check_break(data);
- 
+
 #ifdef __tb_debug__
         // dump pool
         tb_allocator_dump(pool);
@@ -175,7 +175,7 @@ tb_void_t tb_demo_large_allocator_perf()
         tb_pointer_t*   list = (tb_pointer_t*)tb_allocator_large_nalloc0(pool, maxn, sizeof(tb_pointer_t), tb_null);
         tb_assert_and_check_break(list);
 
-        // done 
+        // done
         __tb_volatile__ tb_size_t indx = 0;
         __tb_volatile__ tb_size_t pagesize = tb_page_size();
         __tb_volatile__ tb_hong_t time = tb_mclock();
@@ -186,7 +186,7 @@ tb_void_t tb_demo_large_allocator_perf()
             tb_assert_and_check_break(list[indx]);
 
             // re-make data
-            if (!(indx & 31)) 
+            if (!(indx & 31))
             {
                 list[indx] = tb_allocator_large_ralloc(pool, list[indx], tb_random_range(1, pagesize << 4), tb_null);
                 tb_assert_and_check_break(list[indx]);
@@ -197,7 +197,7 @@ tb_void_t tb_demo_large_allocator_perf()
             if (size > 5 && indx)
             {
                 size -= 5;
-                while (size--) 
+                while (size--)
                 {
                     // the free index
                     tb_size_t free_indx = tb_random_range(0, indx);
@@ -229,7 +229,7 @@ tb_void_t tb_demo_large_allocator_perf()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_memory_large_allocator_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1

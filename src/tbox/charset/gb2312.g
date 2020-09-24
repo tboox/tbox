@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author		ruki
@@ -29,7 +29,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_uint16_t g_charset_gb2312_to_ucs4_table_data[] = 
+static tb_uint16_t g_charset_gb2312_to_ucs4_table_data[] =
 {
 	0x3000
 ,	0x3001
@@ -29593,7 +29593,7 @@ static tb_uint16_t g_charset_ucs4_to_gb2312_table_data[][2] =
 	{0xffe5, 0xa3a4} 	/* '￥' -> 65509 */
 };
 
-tb_size_t g_charset_gb2312_to_ucs4_table_size = sizeof(g_charset_gb2312_to_ucs4_table_data); 
-tb_size_t g_charset_ucs4_to_gb2312_table_size = sizeof(g_charset_ucs4_to_gb2312_table_data); 
+tb_size_t g_charset_gb2312_to_ucs4_table_size = sizeof(g_charset_gb2312_to_ucs4_table_data);
+tb_size_t g_charset_ucs4_to_gb2312_table_size = sizeof(g_charset_ucs4_to_gb2312_table_data);
 
 

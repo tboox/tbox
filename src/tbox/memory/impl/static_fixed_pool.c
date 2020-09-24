@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@
 
 #ifdef TB_WORDS_BIGENDIAN
 
-// allocate the index 
+// allocate the index
 #   define tb_static_fixed_pool_used_set1(used, i)          do {(used)[(i) >> 3] |= (0x1 << (7 - ((i) & 7)));} while (0)
 
 // free the index
@@ -50,7 +50,7 @@
 
 #else
 
-// allocate the index 
+// allocate the index
 #   define tb_static_fixed_pool_used_set1(used, i)          do {(used)[(i) >> 3] |= (0x1 << ((i) & 7));} while (0)
 
 // free the index
@@ -152,7 +152,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fix
         // the predict index
         tb_size_t pred_index = pool->pred_index - 1;
         tb_assert((pred_index << TB_CPU_SHIFT) < pool->item_maxn);
-    
+
         // the predict data
         tb_size_t* data = (tb_size_t*)pool->used_info + pred_index;
 
@@ -161,7 +161,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fix
 
         // the free bit index
         tb_size_t index = (pred_index << TB_CPU_SHIFT) + tb_static_fixed_pool_find_free(*data);
-        
+
         // out of range?
         if (index >= pool->item_maxn)
         {
@@ -180,7 +180,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_pred(tb_static_fix
         tb_static_fixed_pool_used_set1(pool->used_info, index);
 
         // the predict data is full
-        if (!((*data) + 1)) 
+        if (!((*data) + 1))
         {
             // clear the predict index
             pool->pred_index = 0;
@@ -217,7 +217,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_find(tb_static_fix
     tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), tb_null);
 
     // find the free chunk, item_space * 32|64 items
-#ifdef __tb_small__ 
+#ifdef __tb_small__
 //  while (p < e && *p == 0xffffffff) p++;
 //  while (p < e && *p == 0xffffffffffffffffL) p++;
     while (p < e && !((*p) + 1)) p++;
@@ -234,7 +234,7 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_find(tb_static_fix
         if (p[7] + 1) { p += 7; break; }
         p += 8;
     }
-    while (p < e && !(*p + 1)) p++; 
+    while (p < e && !(*p + 1)) p++;
 #endif
     tb_check_return_val(p < e, tb_null);
 
@@ -272,10 +272,10 @@ static tb_pool_data_empty_head_t* tb_static_fixed_pool_malloc_find(tb_static_fix
         b = i & 0x07;
 
         // u++
-        if (!b) 
+        if (!b)
         {
             u = *p++;
-                
+
             // skip the non-free byte
             //if (u == 0xff)
             if (!(u + 1))
@@ -333,7 +333,7 @@ static tb_void_t tb_static_fixed_pool_check_data(tb_static_fixed_pool_t* pool, t
     } while (0);
 
     // failed? dump it
-    if (!ok) 
+    if (!ok)
     {
         // dump data
         tb_pool_data_dump(data, tb_true, "[static_fixed_pool]: [error]: ");
@@ -427,7 +427,7 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
     // init the used info size
     pool->info_size = tb_align(pool->item_maxn, TB_CPU_BITSIZE) >> 3;
     tb_assert_and_check_return_val(pool->info_size && !(pool->info_size & (TB_CPU_BITBYTE - 1)), tb_null);
- 
+
     // clear the used info
     tb_memset_(pool->used_info, 0, pool->info_size);
 
@@ -456,7 +456,7 @@ tb_static_fixed_pool_ref_t tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t 
 }
 tb_void_t tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t self)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return(pool);
 
@@ -468,7 +468,7 @@ tb_void_t tb_static_fixed_pool_exit(tb_static_fixed_pool_ref_t self)
 }
 tb_size_t tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t self)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool, 0);
 
@@ -477,7 +477,7 @@ tb_size_t tb_static_fixed_pool_size(tb_static_fixed_pool_ref_t self)
 }
 tb_size_t tb_static_fixed_pool_maxn(tb_static_fixed_pool_ref_t self)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool, 0);
 
@@ -486,7 +486,7 @@ tb_size_t tb_static_fixed_pool_maxn(tb_static_fixed_pool_ref_t self)
 }
 tb_bool_t tb_static_fixed_pool_full(tb_static_fixed_pool_ref_t self)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool, 0);
 
@@ -495,7 +495,7 @@ tb_bool_t tb_static_fixed_pool_full(tb_static_fixed_pool_ref_t self)
 }
 tb_bool_t tb_static_fixed_pool_null(tb_static_fixed_pool_ref_t self)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool, 0);
 
@@ -504,7 +504,7 @@ tb_bool_t tb_static_fixed_pool_null(tb_static_fixed_pool_ref_t self)
 }
 tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t self)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return(pool);
 
@@ -513,7 +513,7 @@ tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t self)
 
     // clear size
     pool->item_count = 0;
-   
+
     // init the predict index
     pool->pred_index = 1;
 
@@ -530,7 +530,7 @@ tb_void_t tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_t self)
 }
 tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t self __tb_debug_decl__)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool && pool->item_space, tb_null);
 
@@ -571,7 +571,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t self __tb_de
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_(data, TB_POOL_DATA_PATCH, pool->item_space - pool->data_head_size);
- 
+
         // update the real size
         pool->real_size     += pool->item_size;
 
@@ -586,7 +586,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t self __tb_de
 
         // update the malloc count
         pool->malloc_count++;
-        
+
         // check the prev data
         tb_static_fixed_pool_check_prev(pool, data_head);
 
@@ -605,7 +605,7 @@ tb_pointer_t tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t self __tb_de
 }
 tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t self, tb_pointer_t data __tb_debug_decl__)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return_val(pool && pool->item_space, tb_false);
 
@@ -641,7 +641,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t self, tb_pointer_
 
         // free it
         tb_static_fixed_pool_used_set0(pool->used_info, index);
-        
+
         // predict it if no cache
         if (!pool->pred_index) tb_static_fixed_pool_cache_pred(pool, index);
 
@@ -655,7 +655,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t self, tb_pointer_
 
     // failed? dump it
 #ifdef __tb_debug__
-    if (!ok) 
+    if (!ok)
     {
         // trace
         tb_trace_e("free(%p) failed! at %s(): %lu, %s", data, func_, line_, file_);
@@ -673,7 +673,7 @@ tb_bool_t tb_static_fixed_pool_free(tb_static_fixed_pool_ref_t self, tb_pointer_
 }
 tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t self, tb_fixed_pool_item_walk_func_t func, tb_cpointer_t priv)
 {
-    // check 
+    // check
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return(pool && pool->item_maxn && pool->item_space && func);
 
@@ -690,10 +690,10 @@ tb_void_t tb_static_fixed_pool_walk(tb_static_fixed_pool_ref_t self, tb_fixed_po
         b = i & 0x07;
 
         // u++
-        if (!b) 
+        if (!b)
         {
             u = *p++;
-                
+
             // this byte is all occupied?
             //if (u == 0xff)
             if (!(u + 1))
@@ -730,12 +730,12 @@ tb_void_t tb_static_fixed_pool_dump(tb_static_fixed_pool_ref_t self)
     tb_static_fixed_pool_t* pool = (tb_static_fixed_pool_t*)self;
     tb_assert_and_check_return(pool && pool->used_info);
 
-    // dump 
+    // dump
     tb_size_t index = 0;
     for (index = 0; index < pool->item_maxn; ++index)
     {
         // leak?
-        if (tb_static_fixed_pool_used_bset(pool->used_info, index)) 
+        if (tb_static_fixed_pool_used_bset(pool->used_info, index))
         {
             // the data head
             tb_pool_data_empty_head_t* data_head = (tb_pool_data_empty_head_t*)(pool->data + index * pool->item_space);

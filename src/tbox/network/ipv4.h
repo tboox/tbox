@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,7 +49,7 @@ __tb_extern_c_enter__
  */
 typedef union __tb_ipv4_t
 {
-    /// u32, little-endian 
+    /// u32, little-endian
     tb_uint32_t     u32;
 
     /// u16
@@ -108,7 +108,7 @@ tb_char_t const*    tb_ipv4_cstr(tb_ipv4_ref_t ipv4, tb_char_t* data, tb_size_t 
 /*! set the ipv4 from string
  *
  * @param ipv4      the ipv4
- * @param cstr      the ipv4 string 
+ * @param cstr      the ipv4 string
  *
  * @return          tb_true or tb_false
  */

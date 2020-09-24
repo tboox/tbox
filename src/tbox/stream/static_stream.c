@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -31,7 +31,7 @@
 #include "../platform/platform.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 tb_bool_t tb_static_stream_init(tb_static_stream_ref_t stream, tb_byte_t* data, tb_size_t size)
 {
@@ -65,7 +65,7 @@ tb_bool_t tb_static_stream_sync(tb_static_stream_ref_t stream)
     tb_assert_and_check_return_val(stream, tb_false);
 
     // sync
-    if (stream->b) 
+    if (stream->b)
     {
         // check
         tb_assert_and_check_return_val(stream->p + 1 <= stream->e, tb_false);
@@ -94,7 +94,7 @@ tb_byte_t const* tb_static_stream_pos(tb_static_stream_ref_t stream)
     // sync
     tb_static_stream_sync(stream);
 
-    // the position 
+    // the position
     return stream->p;
 }
 tb_byte_t const* tb_static_stream_end(tb_static_stream_ref_t stream)
@@ -205,14 +205,14 @@ tb_uint32_t tb_static_stream_peek_ubits32(tb_static_stream_ref_t stream, tb_size
     // no nbits?
     tb_check_return_val(nbits, 0);
 
-    // save 
+    // save
     tb_byte_t*  p = stream->p;
     tb_size_t   b = stream->b;
 
     // peek value
     tb_uint32_t val = tb_static_stream_read_ubits32(stream, nbits);
 
-    // restore 
+    // restore
     stream->p = p;
     stream->b = b;
 
@@ -227,14 +227,14 @@ tb_sint32_t tb_static_stream_peek_sbits32(tb_static_stream_ref_t stream, tb_size
     // no nbits?
     tb_check_return_val(nbits, 0);
 
-    // save 
+    // save
     tb_byte_t*  p = stream->p;
     tb_size_t   b = stream->b;
 
     // peek value
     tb_sint32_t val = tb_static_stream_read_sbits32(stream, nbits);
 
-    // restore 
+    // restore
     stream->p = p;
     stream->b = b;
 
@@ -321,17 +321,17 @@ tb_size_t tb_static_stream_read_data(tb_static_stream_ref_t stream, tb_byte_t* d
 {
     // check
     tb_assert_and_check_return_val(stream && stream->p <= stream->e && data, 0);
-    
+
     // no size?
     tb_check_return_val(size, 0);
 
     // sync it first
     if (!tb_static_stream_sync(stream)) return 0;
-    
+
     // the need size
     tb_size_t need = size;
     if (stream->e - stream->p < need) need = stream->e - stream->p;
-    if (need) 
+    if (need)
     {
         // copy it
         tb_memcpy(data, stream->p, need);
@@ -353,7 +353,7 @@ tb_uint8_t tb_static_stream_read_u1(tb_static_stream_ref_t stream)
 
     // update position
     stream->b++;
-    if (stream->b >= 8) 
+    if (stream->b >= 8)
     {
         // check
         tb_assert_and_check_return_val(stream->p <= stream->e, 0);
@@ -641,7 +641,7 @@ tb_bool_t tb_static_stream_writ_u1(tb_static_stream_ref_t stream, tb_uint8_t val
 
     // update position
     stream->b++;
-    if (stream->b >= 8) 
+    if (stream->b >= 8)
     {
         // check
         tb_assert_and_check_return_val(stream->p <= stream->e, 0);

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -34,13 +34,13 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 #if defined(TB_COMPILER_IS_MSVC)
 #   define __tb_try                 __try
 #   define __tb_except(x)           __except(!!(x))
 #   define __tb_leave               __leave
-#   define __tb_end                 
+#   define __tb_end
 #elif defined(TB_WINDOWS_EXCEPTION_USE_SETJMP)
 
     // try
@@ -94,7 +94,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // for mingw
 #if defined(TB_WINDOWS_EXCEPTION_USE_SETJMP)
@@ -105,7 +105,7 @@
 typedef tb_int_t (*tb_exception_func_t)(tb_pointer_t, tb_pointer_t, tb_pointer_t, tb_pointer_t);
 
 // the expception float context type
-typedef struct __tb_exception_context_float_t 
+typedef struct __tb_exception_context_float_t
 {
     tb_uint32_t                         controlword;
     tb_uint32_t                         statusword;
@@ -198,7 +198,7 @@ typedef struct __tb_exception_handler_t
     tb_exception_record_t                   record;
 
     // the context
-    tb_exception_context_t                  context;    
+    tb_exception_context_t                  context;
 
 }tb_exception_handler_t;
 

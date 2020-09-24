@@ -142,7 +142,7 @@ tb_int_t tb_demo_libc_string_main(tb_int_t argc, tb_char_t** argv)
     tb_test_strncmp("abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz", 10);
     tb_test_strncmp("1234", "1234567890", 10);
     tb_test_strncmp("abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz1234567890", 20);
-    
+
     tb_printf("\n");
     tb_test_strnicmp("", "", 10);
     tb_test_strnicmp("1", "1", 10);
@@ -181,7 +181,7 @@ tb_int_t tb_demo_libc_string_main(tb_int_t argc, tb_char_t** argv)
     tb_test_strcpy("1234567890abcbefg");
     tb_test_strcpy("abcdefghijklmnopqrstuvwxyz1234567890");
     tb_test_strcpy("abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890");
-    
+
     tb_printf("\n");
     tb_test_strncpy("", 5);
     tb_test_strncpy("1", 5);

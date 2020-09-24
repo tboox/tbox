@@ -5,19 +5,19 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define BUFSIZE     (8192 << 1)
 #define COUNT       (10000)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_int_t tb_demo_pipe_pair_read(tb_cpointer_t priv) 
+static tb_int_t tb_demo_pipe_pair_read(tb_cpointer_t priv)
 {
     tb_pipe_file_ref_t file = (tb_pipe_file_ref_t)priv;
     tb_byte_t data[BUFSIZE];
     tb_size_t count = 0;
-    while (1) 
+    while (1)
     {
         count++;
         if (!tb_pipe_file_bread(file, data, sizeof(data))) break;
@@ -29,7 +29,7 @@ static tb_int_t tb_demo_pipe_pair_read(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_pipe_pair_main(tb_int_t argc, tb_char_t** argv)
 {
     // test the anonymous pipe

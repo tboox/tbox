@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -72,7 +72,7 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t 
 #ifdef TB_ARCH_SSE2
 static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v2(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
-    if (n >= 64) 
+    if (n >= 64)
     {
         // aligned by 16-bytes
         for (; ((tb_size_t)s) & 0x0f; --n) *s++ = c;
@@ -83,7 +83,7 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v2(tb_byte_t* s, tb_byte_t 
         // fill 4 x 16 bytes
         __m128i*    d = (__m128i*)(s);
         __m128i     v = _mm_set1_epi8(c);
-        while (n) 
+        while (n)
         {
             _mm_store_si128(d++, v);
             _mm_store_si128(d++, v);
@@ -120,7 +120,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_byte_t c, tb_size_t n)
 #if defined(TB_ASSEMBLER_IS_GAS) && TB_CPU_BIT32
 static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
-    // align by 4-bytes 
+    // align by 4-bytes
     if (((tb_size_t)s) & 0x3)
     {
         *s++ = c;
@@ -140,7 +140,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint
 #ifdef TB_ARCH_SSE2
 static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
-    if (n >= 32) 
+    if (n >= 32)
     {
         // aligned by 16-bytes
         for (; ((tb_size_t)s) & 0x0f; --n) *s++ = c;
@@ -151,7 +151,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint
         // fill 4 x 16 bytes
         __m128i*    d = (__m128i*)(s);
         __m128i     v = _mm_set1_epi16(c);
-        while (n) 
+        while (n)
         {
             _mm_store_si128(d++, v);
             _mm_store_si128(d++, v);
@@ -172,7 +172,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
     // check
     tb_assert_and_check_return_val(s, tb_null);
 
-    // align by 2-bytes 
+    // align by 2-bytes
     tb_assert(!(((tb_size_t)s) & 0x1));
     if (!n) return s;
 
@@ -208,7 +208,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint
 #ifdef TB_ARCH_SSE2
 static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
-    if (n >= 16) 
+    if (n >= 16)
     {
         // aligned by 16-bytes
         for (; ((tb_size_t)s) & 0x0f; --n) *s++ = c;
@@ -219,7 +219,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint
         // fill 4 x 16 bytes
         __m128i*    d = (__m128i*)(s);
         __m128i     v = _mm_set1_epi32(c);
-        while (n) 
+        while (n)
         {
             _mm_store_si128(d++, v);
             _mm_store_si128(d++, v);
@@ -240,7 +240,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
     // check
     tb_assert_and_check_return_val(s, tb_null);
 
-    // align by 4-bytes 
+    // align by 4-bytes
     tb_assert(!(((tb_size_t)s) & 0x3));
     if (!n) return s;
 

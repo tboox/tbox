@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -55,9 +55,9 @@ tb_pointer_t tb_virtual_memory_ralloc(tb_pointer_t data, tb_size_t size)
     // no data? malloc it
     if (!data) return tb_virtual_memory_malloc(size);
     // realloc it
-    else 
+    else
     {
-        // shrink size? return it directly 
+        // shrink size? return it directly
         tb_pool_data_head_t* block = &((tb_pool_data_head_t*)data)[-1];
         if (size <= block->size)
             return data;
@@ -72,7 +72,7 @@ tb_pointer_t tb_virtual_memory_ralloc(tb_pointer_t data, tb_size_t size)
 tb_bool_t tb_virtual_memory_free(tb_pointer_t data)
 {
     tb_pool_data_head_t* block = (tb_pool_data_head_t*)data;
-    if (block) 
+    if (block)
     {
         block--;
         return VirtualFree((tb_pointer_t)block, 0, MEM_RELEASE);

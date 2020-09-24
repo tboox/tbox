@@ -1,18 +1,18 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
 {
     // check
@@ -58,7 +58,7 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
         // init socket
         sock = tb_socket_init(TB_SOCKET_TYPE_TCP, TB_IPADDR_FAMILY_UNIX);
         tb_assert_and_check_break(sock);
-        
+
         if (!is_abstract)
         {
             // clear old socket
@@ -97,7 +97,7 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_unix_echo_server_main(tb_int_t argc, tb_char_t** argv)
 {
     // check

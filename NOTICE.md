@@ -36,7 +36,7 @@ expressions, which can be obtained at:
   * HOMEPAGE:
     * http://www.pcre.org/
 
-This product optionally depends on 'mbedtls', an open source, portable, easy to use, 
+This product optionally depends on 'mbedtls', an open source, portable, easy to use,
 readable and flexible SSL library, which can be obtained at:
 
   * LICENSE:
@@ -44,7 +44,7 @@ readable and flexible SSL library, which can be obtained at:
   * HOMEPAGE:
     * https://tls.mbed.org/
 
-This product optionally depends on 'polarssl', an open source, portable, easy to use, 
+This product optionally depends on 'polarssl', an open source, portable, easy to use,
 readable and flexible SSL library, which can be obtained at:
 
   * LICENSE:
@@ -52,7 +52,7 @@ readable and flexible SSL library, which can be obtained at:
   * HOMEPAGE:
     * https://tls.mbed.org/
 
-This product optionally depends on 'openssl', a TLS/SSL and crypto library, 
+This product optionally depends on 'openssl', a TLS/SSL and crypto library,
 which can be obtained at:
 
   * LICENSE:

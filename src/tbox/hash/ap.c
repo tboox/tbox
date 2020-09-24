@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,11 +40,11 @@ tb_size_t tb_ap_make(tb_byte_t const* data, tb_size_t size, tb_size_t seed)
     // generate it
     tb_size_t           i = 0;
     tb_byte_t const*    p = data;
-    for (i = 0; i < size; i++, p++) 
-    {  
-        v ^= (!(i & 1)) ? ((v << 7) ^ ((*p) * (v >> 3))) : (~(((v << 11) + (*p)) ^ (v >> 5)));  
+    for (i = 0; i < size; i++, p++)
+    {
+        v ^= (!(i & 1)) ? ((v << 7) ^ ((*p) * (v >> 3))) : (~(((v << 11) + (*p)) ^ (v >> 5)));
     }
-    return v;  
+    return v;
 }
 tb_size_t tb_ap_make_from_cstr(tb_char_t const* cstr, tb_size_t seed)
 {

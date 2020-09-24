@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -81,7 +81,7 @@ static tb_thread_local_t g_iocp_object_pollerdata_send_local = TB_THREAD_LOCAL_I
 static tb_void_t tb_iocp_object_pollerdata_free(tb_cpointer_t priv)
 {
     tb_pollerdata_ref_t pollerdata = (tb_pollerdata_ref_t)priv;
-    if (pollerdata) 
+    if (pollerdata)
     {
         tb_pollerdata_exit(pollerdata);
         tb_free(pollerdata);
@@ -110,7 +110,7 @@ static tb_bool_t tb_iocp_object_cache_clean(tb_iterator_ref_t iterator, tb_cpoin
 static tb_void_t tb_iocp_object_cache_free(tb_cpointer_t priv)
 {
     tb_list_entry_head_ref_t cache = (tb_list_entry_head_ref_t)priv;
-    if (cache) 
+    if (cache)
     {
         // trace
         tb_trace_d("exit iocp cache(%lu)", tb_list_entry_size(cache));
@@ -127,7 +127,7 @@ static tb_void_t tb_iocp_object_cache_free(tb_cpointer_t priv)
 
             // exit this iocp object
             tb_iocp_object_ref_t iocp_object = (tb_iocp_object_ref_t)tb_list_entry(cache, entry);
-            if (iocp_object) 
+            if (iocp_object)
             {
                 // trace
                 tb_trace_d("exit %s iocp_object(%p) in cache", tb_state_cstr(iocp_object->state), iocp_object->ref.sock);
@@ -138,7 +138,7 @@ static tb_void_t tb_iocp_object_cache_free(tb_cpointer_t priv)
                 // free iocp object
                 tb_free(iocp_object);
             }
-        } 
+        }
 
         // exit cache entry
         tb_list_entry_exit(cache);
@@ -151,12 +151,12 @@ static tb_list_entry_head_ref_t tb_iocp_object_cache()
 {
     // init local iocp object cache local data
     if (!tb_thread_local_init(&g_iocp_object_cache_local, tb_iocp_object_cache_free)) return tb_null;
- 
+
     // init local iocp object cache
     tb_list_entry_head_ref_t cache = (tb_list_entry_head_ref_t)tb_thread_local_get(&g_iocp_object_cache_local);
     if (!cache)
     {
-        // make cache 
+        // make cache
         cache = tb_malloc0_type(tb_list_entry_head_t);
         if (cache)
         {
@@ -186,8 +186,8 @@ static tb_iocp_object_ref_t tb_iocp_object_cache_alloc()
         }
     }
 
-    // found? 
-    if (result) 
+    // found?
+    if (result)
     {
         // trace
         tb_trace_d("alloc an new iocp object from cache(%lu)", tb_list_entry_size(cache));
@@ -234,7 +234,7 @@ static tb_pollerdata_ref_t tb_iocp_object_pollerdata(tb_size_t waitevent)
         // init local socket data
         tb_thread_local_ref_t pollerdata_local = (waitevent & TB_SOCKET_EVENT_RECV)? &g_iocp_object_pollerdata_recv_local : &g_iocp_object_pollerdata_send_local;
         if (!tb_thread_local_init(pollerdata_local, tb_iocp_object_pollerdata_free)) return tb_null;
-     
+
         // init socket data
         tb_pollerdata_ref_t pollerdata = (tb_pollerdata_ref_t)tb_thread_local_get(pollerdata_local);
         if (!pollerdata)
@@ -277,7 +277,7 @@ static tb_void_t tb_iocp_object_pollerdata_remove(tb_poller_object_ref_t object,
         // clean some objects in cache
         tb_remove_if(tb_list_entry_itor(cache), tb_iocp_object_cache_clean, cache);
 
-        // waiting and cancel ok? 
+        // waiting and cancel ok?
         if (iocp_object->state == TB_STATE_WAITING && tb_iocp_object_cancel(iocp_object))
         {
             // move this iocp object to the cache
@@ -319,10 +319,10 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_poller_object_ref_t object, tb
     tb_assert_and_check_return_val(object, tb_null);
     tb_assert(object->type == TB_POLLER_OBJECT_SOCK || object->type == TB_POLLER_OBJECT_PIPE);
 
-    // get or new iocp object 
+    // get or new iocp object
     tb_iocp_object_ref_t iocp_object = tb_null;
     do
-    { 
+    {
         // get the poller data
         tb_pollerdata_ref_t pollerdata = tb_iocp_object_pollerdata(waitevent);
         tb_check_break(pollerdata);
@@ -331,7 +331,7 @@ tb_iocp_object_ref_t tb_iocp_object_get_or_new(tb_poller_object_ref_t object, tb
         iocp_object = (tb_iocp_object_ref_t)tb_pollerdata_get(pollerdata, object);
 
         // new an iocp object if not exists
-        if (!iocp_object) 
+        if (!iocp_object)
         {
             // attempt to alloc iocp object from the cache first
             iocp_object = tb_iocp_object_cache_alloc();
@@ -416,10 +416,10 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, tb_null);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return tb_null;
 
-    // post a accept event 
+    // post a accept event
     tb_bool_t ok = tb_false;
     tb_bool_t init_ok = tb_false;
     tb_bool_t AcceptEx_ok = tb_false;
@@ -475,13 +475,13 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
 
         /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
          *
-         * 40ms is the tcp ack delay, which indicates that you are likely 
-         * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+         * 40ms is the tcp ack delay, which indicates that you are likely
+         * encountering a bad interaction between delayed acks and the nagle's algorithm.
          *
-         * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
-         * whereas the other two must be set at the appropriate times during the life of the connection 
+         * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket,
+         * whereas the other two must be set at the appropriate times during the life of the connection
          * and can therefore be trickier to use.
-         * 
+         *
          * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
          */
         tb_int_t enable = 1;
@@ -530,7 +530,7 @@ tb_socket_ref_t tb_iocp_object_accept(tb_iocp_object_ref_t iocp_object, tb_ipadd
     if (!ok)
     {
         // pending? continue it
-        if (init_ok && WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()) 
+        if (init_ok && WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())
         {
             iocp_object->code  = TB_IOCP_OBJECT_CODE_ACPT;
             iocp_object->state = TB_STATE_WAITING;
@@ -586,10 +586,10 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
-    // post a connection event 
+    // post a connection event
     tb_long_t ok = -1;
     tb_bool_t init_ok = tb_false;
     tb_bool_t ConnectEx_ok = tb_false;
@@ -611,7 +611,7 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
         if (!(laddr_size = tb_sockaddr_load(&laddr_data, &laddr))) break;
 
         // bind it first for ConnectEx
-        if (SOCKET_ERROR == tb_ws2_32()->bind((SOCKET)tb_sock2fd(iocp_object->ref.sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size)) 
+        if (SOCKET_ERROR == tb_ws2_32()->bind((SOCKET)tb_sock2fd(iocp_object->ref.sock), (LPSOCKADDR)&laddr_data, (tb_int_t)laddr_size))
         {
             // trace
             tb_trace_e("connect(%p, %{ipaddr}): bind failed, error: %u", iocp_object->ref.sock, addr, GetLastError());
@@ -648,7 +648,7 @@ tb_long_t tb_iocp_object_connect(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref
     if (ok < 0)
     {
         // pending? continue to wait it
-        if (init_ok && WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()) 
+        if (init_ok && WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())
         {
             ok = 0;
             iocp_object->code          = TB_IOCP_OBJECT_CODE_CONN;
@@ -699,7 +699,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data
@@ -723,7 +723,7 @@ tb_long_t tb_iocp_object_recv(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
     tb_trace_d("recv(%p): WSARecv: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_RECV;
         iocp_object->state = TB_STATE_WAITING;
@@ -750,7 +750,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t iocp_object, tb_byte_t const*
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
             return iocp_object->u.send.result;
-        }     
+        }
         // waiting timeout before?
         else if (iocp_object->state == TB_STATE_WAITING)
         {
@@ -769,7 +769,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t iocp_object, tb_byte_t const*
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attempt buffer data
@@ -792,7 +792,7 @@ tb_long_t tb_iocp_object_send(tb_iocp_object_ref_t iocp_object, tb_byte_t const*
     tb_trace_d("send(%p): WSASend: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_SEND;
         iocp_object->state = TB_STATE_WAITING;
@@ -840,7 +840,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data
@@ -859,7 +859,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     DWORD* pflag = (DWORD*)((tb_byte_t*)iocp_object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
     *pflag = 0;
 
-    /* post to recv event 
+    /* post to recv event
      *
      * It's not safe to skip completion notifications for UDP:
      * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
@@ -870,7 +870,7 @@ tb_long_t tb_iocp_object_urecv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     tb_trace_d("urecv(%p): WSARecvFrom: %ld, lasterror: %d", iocp_object->ref.sock, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_URECV;
         iocp_object->state = TB_STATE_WAITING;
@@ -897,7 +897,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
             return iocp_object->u.usend.result;
-        }  
+        }
         // waiting timeout before?
         else if (iocp_object->state == TB_STATE_WAITING && tb_ipaddr_is_equal(&iocp_object->u.usend.addr, addr))
         {
@@ -916,7 +916,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data and address
@@ -952,7 +952,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     tb_trace_d("usend(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", iocp_object->ref.sock, addr, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_USEND;
         iocp_object->state = TB_STATE_WAITING;
@@ -999,7 +999,7 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t iocp_object, tb_file_ref_t f
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // do send file
@@ -1011,7 +1011,7 @@ tb_hong_t tb_iocp_object_sendf(tb_iocp_object_ref_t iocp_object, tb_file_ref_t f
     tb_trace_d("sendfile(%p): TransmitFile: %d, lasterror: %d", iocp_object->ref.sock, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_SENDF;
         iocp_object->state = TB_STATE_WAITING;
@@ -1059,7 +1059,7 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data
@@ -1083,7 +1083,7 @@ tb_long_t tb_iocp_object_recvv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
     tb_trace_d("recvv(%p): WSARecv: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_RECVV;
         iocp_object->state = TB_STATE_WAITING;
@@ -1129,7 +1129,7 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data
@@ -1152,7 +1152,7 @@ tb_long_t tb_iocp_object_sendv(tb_iocp_object_ref_t iocp_object, tb_iovec_t cons
     tb_trace_d("sendv(%p): WSASend: %ld, skip: %d, lasterror: %d", iocp_object->ref.sock, ok, iocp_object->skip_cpos, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue to wait it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_SENDV;
         iocp_object->state = TB_STATE_WAITING;
@@ -1199,7 +1199,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data
@@ -1218,7 +1218,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
     DWORD* pflag = (DWORD*)((tb_byte_t*)iocp_object->buffer + sizeof(struct sockaddr_storage) + sizeof(tb_int_t));
     *pflag = 0;
 
-    /* post to recv event 
+    /* post to recv event
      *
      * It's not safe to skip completion notifications for UDP:
      * https://blogs.technet.com/b/winserverperformance/archive/2008/06/26/designing-applications-for-high-performance-part-iii.aspx
@@ -1229,7 +1229,7 @@ tb_long_t tb_iocp_object_urecvv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
     tb_trace_d("urecvv(%p): WSARecvFrom: %ld, lasterror: %d", iocp_object->ref.sock, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_URECVV;
         iocp_object->state = TB_STATE_WAITING;
@@ -1275,7 +1275,7 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_false)) return -1;
 
     // attach buffer data and address
@@ -1311,7 +1311,7 @@ tb_long_t tb_iocp_object_usendv(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_
     tb_trace_d("usendv(%p, %{ipaddr}): WSASendTo: %ld, lasterror: %d", iocp_object->ref.sock, addr, ok, tb_ws2_32()->WSAGetLastError());
 
     // ok or pending? continue it
-    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError()))) 
+    if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == tb_ws2_32()->WSAGetLastError())))
     {
         iocp_object->code  = TB_IOCP_OBJECT_CODE_USENDV;
         iocp_object->state = TB_STATE_WAITING;
@@ -1354,7 +1354,7 @@ tb_long_t tb_iocp_object_read(tb_iocp_object_ref_t iocp_object, tb_byte_t* data,
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_true)) return -1;
 
     // attempt to read data directly
@@ -1400,7 +1400,7 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
             // clear the previous iocp object data first, but the result cannot be cleared
             tb_iocp_object_clear(iocp_object);
             return iocp_object->u.write.result;
-        }     
+        }
         // waiting timeout before?
         else if (iocp_object->state == TB_STATE_WAITING)
         {
@@ -1416,7 +1416,7 @@ tb_long_t tb_iocp_object_write(tb_iocp_object_ref_t iocp_object, tb_byte_t const
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_true)) return -1;
 
     // attempt to write data directly
@@ -1478,7 +1478,7 @@ tb_long_t tb_iocp_object_connect_pipe(tb_iocp_object_ref_t iocp_object)
     // check state
     tb_assert_and_check_return_val(iocp_object->state != TB_STATE_WAITING, -1);
 
-    // bind iocp object first 
+    // bind iocp object first
     if (!tb_poller_iocp_bind_object(tb_poller_iocp_self(), iocp_object, tb_true)) return -1;
 
     // attempt to connect pipe directly

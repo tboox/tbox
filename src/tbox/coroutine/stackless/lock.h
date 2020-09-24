@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,19 +38,19 @@
 #define tb_lo_lock_init(lock)           tb_lo_semaphore_init(lock, 1)
 
 /*! exit lock
- * 
+ *
  * @param lock          the lock pointer
  */
 #define tb_lo_lock_exit(lock)           tb_lo_semaphore_exit(lock)
 
 /*! enter lock
- * 
+ *
  * @param lock          the lock pointer
  */
 #define tb_lo_lock_enter(lock)          tb_lo_semaphore_wait(lock)
 
 /*! try to enter lock
- * 
+ *
  * @param lock          the lock pointer
  *
  * @return              tb_true or tb_false
@@ -58,7 +58,7 @@
 #define tb_lo_lock_enter_try(lock)      tb_lo_semaphore_wait_try(lock)
 
 /*! leave lock
- * 
+ *
  * @param lock          the lock pointer
  */
 #define tb_lo_lock_leave(lock)          tb_lo_semaphore_post(lock, 1)

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -235,7 +235,7 @@ tb_size_t           tb_static_stream_left_bits(tb_static_stream_ref_t stream);
  */
 tb_bool_t           tb_static_stream_valid(tb_static_stream_ref_t stream);
 
-/*! skip the given size 
+/*! skip the given size
  *
  * @param stream    the stream
  * @param size      the skiped size
@@ -244,7 +244,7 @@ tb_bool_t           tb_static_stream_valid(tb_static_stream_ref_t stream);
  */
 tb_bool_t           tb_static_stream_skip(tb_static_stream_ref_t stream, tb_size_t size);
 
-/*! skip the given bits 
+/*! skip the given bits
  *
  * @param stream    the stream
  * @param nbits     the skiped bits count
@@ -253,7 +253,7 @@ tb_bool_t           tb_static_stream_skip(tb_static_stream_ref_t stream, tb_size
  */
 tb_bool_t           tb_static_stream_skip_bits(tb_static_stream_ref_t stream, tb_size_t nbits);
 
-/*! skip the given c-string 
+/*! skip the given c-string
  *
  * @param stream    the stream
  *

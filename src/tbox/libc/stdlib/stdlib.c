@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@ tb_uint64_t tb_s2tou64(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -62,7 +62,7 @@ tb_uint64_t tb_s2tou64(tb_char_t const* s)
         if (tb_isdigit2(ch))
             val = (val << 1) + (ch - '0');
         else break;
-    
+
         s++;
     }
 
@@ -82,7 +82,7 @@ tb_uint64_t tb_s8tou64(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -101,7 +101,7 @@ tb_uint64_t tb_s8tou64(tb_char_t const* s)
         if (tb_isdigit8(ch))
             val = (val << 3) + (ch - '0');
         else break;
-    
+
         s++;
     }
 
@@ -121,7 +121,7 @@ tb_uint64_t tb_s10tou64(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -140,7 +140,7 @@ tb_uint64_t tb_s10tou64(tb_char_t const* s)
         if (tb_isdigit10(ch))
             val = val * 10 + (ch - '0');
         else break;
-    
+
         s++;
     }
 
@@ -160,7 +160,7 @@ tb_uint64_t tb_s16tou64(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -187,7 +187,7 @@ tb_uint64_t tb_s16tou64(tb_char_t const* s)
         else if (ch > ('A' - 1) && ch < ('F' + 1))
             val = (val << 4) + (ch - 'A') + 10;
         else break;
-    
+
         s++;
     }
 
@@ -262,7 +262,7 @@ tb_double_t tb_s2tod(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -297,7 +297,7 @@ tb_double_t tb_s2tod(tb_char_t const* s)
         // is the part of decimal?
         if (ch == '.')
         {
-            if (!dec) 
+            if (!dec)
             {
                 dec = 1;
                 s++;
@@ -310,7 +310,7 @@ tb_double_t tb_s2tod(tb_char_t const* s)
         if (tb_isdigit2(ch))
         {
             // save decimals
-            if (dec) 
+            if (dec)
             {
                 if (d < e)
                 {
@@ -329,7 +329,7 @@ tb_double_t tb_s2tod(tb_char_t const* s)
             else lhs = (lhs << 1) + (ch - '0');
         }
         else break;
-    
+
         s++;
     }
 
@@ -338,7 +338,7 @@ tb_double_t tb_s2tod(tb_char_t const* s)
     // compute decimal
     while (d-- > decimals) rhs = (rhs + *d) / 2;
 
-    // merge 
+    // merge
     return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
 }
 tb_double_t tb_s8tod(tb_char_t const* s)
@@ -351,7 +351,7 @@ tb_double_t tb_s8tod(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -385,7 +385,7 @@ tb_double_t tb_s8tod(tb_char_t const* s)
         // is the part of decimal?
         if (ch == '.')
         {
-            if (!dec) 
+            if (!dec)
             {
                 dec = 1;
                 s++;
@@ -398,7 +398,7 @@ tb_double_t tb_s8tod(tb_char_t const* s)
         if (tb_isdigit8(ch))
         {
             // save decimals
-            if (dec) 
+            if (dec)
             {
                 if (d < e)
                 {
@@ -417,7 +417,7 @@ tb_double_t tb_s8tod(tb_char_t const* s)
             else lhs = (lhs << 3) + (ch - '0');
         }
         else break;
-    
+
         s++;
     }
 
@@ -427,7 +427,7 @@ tb_double_t tb_s8tod(tb_char_t const* s)
     // compute decimal
     while (d-- > decimals) rhs = (rhs + *d) / 8;
 
-    // merge 
+    // merge
     return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
 }
 tb_double_t tb_s10tod(tb_char_t const* s)
@@ -440,7 +440,7 @@ tb_double_t tb_s10tod(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -474,7 +474,7 @@ tb_double_t tb_s10tod(tb_char_t const* s)
         // is the part of decimal?
         if (ch == '.')
         {
-            if (!dec) 
+            if (!dec)
             {
                 dec = 1;
                 s++;
@@ -487,7 +487,7 @@ tb_double_t tb_s10tod(tb_char_t const* s)
         if (tb_isdigit10(ch))
         {
             // save decimals
-            if (dec) 
+            if (dec)
             {
                 if (d < e)
                 {
@@ -506,7 +506,7 @@ tb_double_t tb_s10tod(tb_char_t const* s)
             else lhs = lhs * 10 + (ch - '0');
         }
         else break;
-    
+
         s++;
     }
 
@@ -516,7 +516,7 @@ tb_double_t tb_s10tod(tb_char_t const* s)
     // compute decimal
     while (d-- > decimals) rhs = (rhs + *d) / 10;
 
-    // merge 
+    // merge
     return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
 }
 tb_double_t tb_s16tod(tb_char_t const* s)
@@ -529,7 +529,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
 
     // has sign?
     tb_int_t sign = 0;
-    if (*s == '-') 
+    if (*s == '-')
     {
         sign = 1;
         s++;
@@ -564,7 +564,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
         // is the part of decimal?
         if (ch == '.')
         {
-            if (!dec) 
+            if (!dec)
             {
                 dec = 1;
                 s++;
@@ -577,7 +577,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
         if (tb_isdigit10(ch))
         {
             // save decimals
-            if (dec) 
+            if (dec)
             {
                 if (d < e)
                 {
@@ -598,7 +598,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
         else if (ch > ('a' - 1) && ch < ('f' + 1))
         {
             // save decimals
-            if (dec) 
+            if (dec)
             {
                 if (d < e)
                 {
@@ -619,7 +619,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
         else if (ch > ('A' - 1) && ch < ('F' + 1))
         {
             // save decimals
-            if (dec) 
+            if (dec)
             {
                 if (d < e)
                 {
@@ -638,7 +638,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
             else lhs = (lhs << 4) + (ch - 'A') + 10;
         }
         else break;
-    
+
         s++;
     }
 
@@ -648,7 +648,7 @@ tb_double_t tb_s16tod(tb_char_t const* s)
     // compute decimal
     while (d-- > decimals) rhs = (rhs + *d) / 16;
 
-    // merge 
+    // merge
     return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
 }
 tb_double_t tb_stod(tb_char_t const* s)

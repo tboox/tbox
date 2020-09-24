@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -32,12 +32,12 @@ tb_size_t tb_syserror_state()
     // get last error
     switch (errno)
     {
-    case EPERM:     
+    case EPERM:
     case EACCES:
         return TB_STATE_SYSERROR_NOT_PERM;
     case ENOENT:
         return TB_STATE_SYSERROR_NOT_FILEDIR;
-    default: 
+    default:
         return TB_STATE_SYSERROR_UNKNOWN_ERROR;
     }
 }

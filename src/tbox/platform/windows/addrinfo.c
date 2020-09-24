@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -31,7 +31,7 @@
 #ifdef TB_ADDRINFO_ADDR_IMPL
 static __tb_inline__ tb_int_t tb_addrinfo_ai_family(tb_ipaddr_ref_t addr)
 {
-    // get the ai family for getaddrinfo 
+    // get the ai family for getaddrinfo
     switch (tb_ipaddr_family(addr))
     {
     case TB_IPADDR_FAMILY_IPV4:

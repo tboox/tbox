@@ -1,19 +1,19 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the sleep local type
 typedef struct __tb_demo_lo_sleep_t
 {
-    // the interval 
+    // the interval
     tb_size_t       interval;
 
-    // the count 
+    // the count
     tb_size_t       count;
 
     // the time
@@ -23,7 +23,7 @@ typedef struct __tb_demo_lo_sleep_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_lo_coroutine_sleep_func(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // the local
@@ -52,7 +52,7 @@ static tb_void_t tb_demo_lo_coroutine_sleep_func(tb_lo_coroutine_ref_t coroutine
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler
@@ -60,7 +60,7 @@ tb_int_t tb_demo_lo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start coroutines
-        tb_demo_lo_sleep_t sleeps[] = 
+        tb_demo_lo_sleep_t sleeps[] =
         {
             {1000,  10}
         ,   {2000,  10}

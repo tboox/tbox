@@ -12,7 +12,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_platform_context_test_func1(tb_context_from_t from)
 {
     // check
@@ -65,7 +65,7 @@ static tb_context_from_t test()
     return from;
 }
 static tb_void_t tb_demo_platform_context_test()
-{ 
+{
     // the stacks
     static tb_context_ref_t contexts[3];
     static tb_byte_t        stacks1[8192];
@@ -129,7 +129,7 @@ static tb_void_t tb_demo_platform_context_perf_func2(tb_context_from_t from)
     tb_context_jump(contexts[0], tb_null);
 }
 static tb_void_t tb_demo_platform_context_perf()
-{ 
+{
     // the stacks
     static tb_context_ref_t contexts[3];
     static tb_byte_t        stacks1[8192];
@@ -156,7 +156,7 @@ static tb_void_t tb_demo_platform_context_perf()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_context_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_demo_platform_context_test();

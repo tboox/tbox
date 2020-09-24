@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -62,7 +62,7 @@ static tb_size_t tb_strlen_impl(tb_char_t const* s)
         "   orrgt   r3, r3, #0x00ff0000\n"      //!< continue to fill 0xff if left > 0
 #endif
         "1:\n"                                  //!< align handler
-        "   tst     r3, #0x000000ff\n"      
+        "   tst     r3, #0x000000ff\n"
         "   tstne   r3, #0x0000ff00\n"
         "   tstne   r3, #0x00ff0000\n"
         "   tstne   r3, #0xff000000\n"

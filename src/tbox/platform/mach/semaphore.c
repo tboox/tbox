@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -58,7 +58,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
         impl = tb_malloc0_type(tb_semaphore_impl_t);
         tb_assert_and_check_break(impl);
 
-        // init semaphore 
+        // init semaphore
         if (KERN_SUCCESS != semaphore_create(mach_task_self(), &(impl->semaphore), SYNC_POLICY_FIFO, init)) break;
 
         // init value
@@ -83,7 +83,7 @@ tb_semaphore_ref_t tb_semaphore_init(tb_size_t init)
 tb_void_t tb_semaphore_exit(tb_semaphore_ref_t semaphore)
 {
     tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
-    if (semaphore) 
+    if (semaphore)
     {
         // exit semaphore
         semaphore_destroy(mach_task_self(), impl->semaphore);
@@ -105,7 +105,7 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
         tb_atomic32_fetch_and_add(&impl->value, 2);
 
         // signal
-        if (KERN_SUCCESS != semaphore_signal(impl->semaphore)) 
+        if (KERN_SUCCESS != semaphore_signal(impl->semaphore))
         {
             // restore
             tb_atomic32_fetch_and_sub(&impl->value, 2);
@@ -154,10 +154,10 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 
     // check value
     tb_assert_and_check_return_val((tb_long_t)tb_atomic32_get(&impl->value) > 0, -1);
-    
+
     // value--
     tb_atomic32_fetch_and_sub(&impl->value, 1);
-    
+
     // ok
     return 1;
 }

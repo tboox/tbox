@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -35,7 +35,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
- 
+
 // the date type
 typedef struct __tb_oc_date_t
 {
@@ -89,7 +89,7 @@ static tb_oc_date_t* tb_oc_date_init_base()
         date->base.copy     = tb_oc_date_copy;
         date->base.exit     = tb_oc_date_exit;
         date->base.clear    = tb_oc_date_clear;
-        
+
         // ok
         ok = tb_true;
 

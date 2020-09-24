@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -51,7 +51,7 @@ tb_size_t tb_rfind_if(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail
 
     // ok?
     return find? itor : tb_iterator_tail(iterator);
-} 
+}
 tb_size_t tb_rfind_all_if(tb_iterator_ref_t iterator, tb_predicate_ref_t pred, tb_cpointer_t value)
 {
     return tb_rfind_if(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), pred, value);

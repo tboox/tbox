@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -35,7 +35,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* compute the uint8 hash 
+/* compute the uint8 hash
  *
  * @param value     the value
  * @param mask      the mask
@@ -45,7 +45,7 @@ __tb_extern_c_enter__
  */
 tb_size_t           tb_element_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t index);
 
-/* compute the uint16 hash 
+/* compute the uint16 hash
  *
  * @param value     the value
  * @param mask      the mask
@@ -55,7 +55,7 @@ tb_size_t           tb_element_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_s
  */
 tb_size_t           tb_element_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t index);
 
-/* compute the uint32 hash 
+/* compute the uint32 hash
  *
  * @param value     the value
  * @param mask      the mask
@@ -65,7 +65,7 @@ tb_size_t           tb_element_hash_uint16(tb_uint16_t value, tb_size_t mask, tb
  */
 tb_size_t           tb_element_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t index);
 
-/* compute the uint64 hash 
+/* compute the uint64 hash
  *
  * @param value     the value
  * @param mask      the mask
@@ -75,7 +75,7 @@ tb_size_t           tb_element_hash_uint32(tb_uint32_t value, tb_size_t mask, tb
  */
 tb_size_t           tb_element_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t index);
 
-/* compute the data hash 
+/* compute the data hash
  *
  * @param data      the data
  * @param size      the size
@@ -86,7 +86,7 @@ tb_size_t           tb_element_hash_uint64(tb_uint64_t value, tb_size_t mask, tb
  */
 tb_size_t           tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t mask, tb_size_t index);
 
-/* compute the cstring hash 
+/* compute the cstring hash
  *
  * @param cstr      the cstring
  * @param mask      the mask

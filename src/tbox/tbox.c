@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -34,7 +34,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
  */
- 
+
 // the state
 static tb_atomic32_t  g_state = TB_STATE_END;
 
@@ -57,7 +57,7 @@ static __tb_inline__ tb_bool_t tb_check_order_word()
 static __tb_inline__ tb_bool_t tb_check_order_double()
 {
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-    union 
+    union
     {
         tb_uint32_t i[2];
         double      f;
@@ -174,7 +174,7 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init platform envirnoment
     if (!tb_platform_init_env(priv)) return tb_false;
 
-    // init libc envirnoment 
+    // init libc envirnoment
     if (!tb_libc_init_env()) return tb_false;
 
     // init math envirnoment
@@ -212,22 +212,22 @@ tb_void_t tb_exit()
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
     tb_object_exit_env();
 #endif
-    
+
     // exit network envirnoment
     tb_network_exit_env();
-     
+
     // exit libm envirnoment
     tb_libm_exit_env();
-     
+
     // exit math envirnoment
     tb_math_exit_env();
-    
+
     // exit libc envirnoment
     tb_libc_exit_env();
-    
+
     // exit platform envirnoment
     tb_platform_exit_env();
-    
+
     // exit singleton
     tb_singleton_exit();
 

@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
-static tb_option_item_t g_options[] = 
+ */
+static tb_option_item_t g_options[] =
 {
     {   'f'
     ,   "filter"
@@ -52,7 +52,7 @@ static tb_option_item_t g_options[] =
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_object_jcat_main(tb_int_t argc, tb_char_t** argv)
 {
     // init option
@@ -71,11 +71,11 @@ tb_int_t tb_demo_object_jcat_main(tb_int_t argc, tb_char_t** argv)
                 {
                     // done filter
                     tb_object_ref_t object = root;
-                    if (tb_option_find(option, "filter")) 
+                    if (tb_option_find(option, "filter"))
                         object = tb_object_seek(root, tb_option_item_cstr(option, "filter"), tb_true);
 
                     // dump object
-                    if (object) 
+                    if (object)
                     {
                         // done
                         tb_char_t info[8192] = {0};
@@ -102,7 +102,7 @@ tb_int_t tb_demo_object_jcat_main(tb_int_t argc, tb_char_t** argv)
             else tb_option_help(option);
         }
         else tb_option_help(option);
-    
+
         // exit option
         tb_option_exit(option);
     }

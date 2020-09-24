@@ -28,7 +28,7 @@
 
 * [#70](https://github.com/tboox/tbox/issues/70): Add `tb_stream_init_from_sock_ref()` to open a given socket as stream
 * Add stdfile api to read/write stdin, stdout and stderr.
-* [#81](https://github.com/tboox/tbox/issues/81): Add set/get thread/process cpu affinity 
+* [#81](https://github.com/tboox/tbox/issues/81): Add set/get thread/process cpu affinity
 * Add filelock api
 * Add anonymous and named pipe
 
@@ -39,7 +39,7 @@
 * Improve charset encoding and add ANSI support
 * Improve atomic and add c11-like atomic apis
 * Improve spinlock
-* Support to redirect process output to pipe 
+* Support to redirect process output to pipe
 * Uses virtual memory for coroutine stack
 * Improve openssl/mbedtls for https
 
@@ -61,12 +61,12 @@
 
 * Fix the charset problem of envirnoment variables
 * Fix process exit bug
-* Fix setenv empty value crash 
+* Fix setenv empty value crash
 * Fix coroutine.sleep bug
-* Fix windows root path bug 
+* Fix windows root path bug
 * Fix thread local memory leak
 * Fix context bug for coroutine
-* Fix `tb_vsnprintf` overflow 
+* Fix `tb_vsnprintf` overflow
 * [#43](https://github.com/tboox/tbox/issues/43): Fix read dns server and stream bug
 
 ## v1.6.2
@@ -127,7 +127,7 @@
 ### Changes
 
 * Optimize and rewrite thread local store module
-* Modify thread interfaces 
+* Modify thread interfaces
 * Mark the asio module as deprecated
 * Optimize exception interfaces
 
@@ -180,20 +180,20 @@
 ### New features
 
 * Add automaticlly check libc interfaces
-* Support custom allocator 
+* Support custom allocator
 * Add trace for allocator in the debug mode
 * Add `static_pool` module
 * Add stream interfaces for reading all data to string
 * Add adler32 hash algorithm
 * Add `tb_memmem` interface
-* Add regex module with pcre, pcre2 or posix regex 
+* Add regex module with pcre, pcre2 or posix regex
 
 ### Changes
 
 * Optimize stream and support read/write character device file
 * Modify `tb_init` api and support allocator arguments
 * Improve memory manager and use the allocator mode
-* Redefine `assert` and will abort for debug mode 
+* Redefine `assert` and will abort for debug mode
 
 ### Bugs fixed
 
@@ -303,7 +303,7 @@
 
 * 针对协程上下文切换，支持mips架构
 * 添加`__tb_thread_local__`关键字宏
-* 添加 `--micro=y|n` 选项，实现极小编译，针对嵌入式平台，编译tbox微内核(~64K) 
+* 添加 `--micro=y|n` 选项，实现极小编译，针对嵌入式平台，编译tbox微内核(~64K)
 * 添加 `tb_addrinfo_addr` and `tb_addrinfo_name` 接口
 * 添加stackless协程，更加轻量的协程支持，每个协程只占用几十个bytes，同时支持io调度
 * 针对stackless协程，增加lock和semaphone支持

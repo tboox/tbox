@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -68,7 +68,7 @@ typedef struct __tb_poller_kqueue_t
 
     // the events count
     tb_size_t               events_count;
-   
+
     // the poller data
     tb_pollerdata_t         pollerdata;
 
@@ -105,7 +105,7 @@ static tb_bool_t tb_poller_kqueue_change(tb_poller_kqueue_ref_t poller, struct k
 
     // change events
     struct timespec t = {0};
-    if (kevent(poller->kqfd, events, count, tb_null, 0, &t) < 0) 
+    if (kevent(poller->kqfd, events, count, tb_null, 0, &t) < 0)
     {
         // trace
         tb_trace_e("change kevent failed, errno: %d", errno);
@@ -191,7 +191,7 @@ static tb_bool_t tb_poller_kqueue_insert(tb_poller_t* self, tb_poller_object_ref
 
     // change it
     tb_bool_t ok = n? tb_poller_kqueue_change(poller, e, n) : tb_true;
-    
+
     // save events to object
     if (ok) tb_pollerdata_set(&poller->pollerdata, object, (tb_cpointer_t)events);
 
@@ -256,12 +256,12 @@ static tb_bool_t tb_poller_kqueue_modify(tb_poller_t* self, tb_poller_object_ref
     struct kevent   e[2];
     tb_size_t       n = 0;
     tb_int_t        fd = tb_ptr2fd(object->ref.ptr);
-    if (adde & TB_SOCKET_EVENT_RECV) 
+    if (adde & TB_SOCKET_EVENT_RECV)
     {
         EV_SET(&e[n], fd, EVFILT_READ, add_event, NOTE_EOF, 0, (tb_pointer_t)priv);
         n++;
     }
-    else if (dele & TB_SOCKET_EVENT_RECV) 
+    else if (dele & TB_SOCKET_EVENT_RECV)
     {
         EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, (tb_pointer_t)priv);
         n++;
@@ -310,15 +310,15 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
     }
 
     // wait events
-    tb_long_t events_count = kevent(poller->kqfd, tb_null, 0, poller->events, poller->events_count, timeout >= 0? &t : tb_null); 
+    tb_long_t events_count = kevent(poller->kqfd, tb_null, 0, poller->events, poller->events_count, timeout >= 0? &t : tb_null);
 
     // timeout or interrupted?
-    if (!events_count || (events_count == -1 && errno == EINTR)) 
+    if (!events_count || (events_count == -1 && errno == EINTR))
         return 0;
 
     // error?
     tb_assert_and_check_return_val(events_count >= 0 && events_count <= poller->events_count, -1);
-    
+
     // grow it if events is full
     if (events_count == poller->events_count)
     {
@@ -332,10 +332,10 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
     }
     tb_assert(events_count <= poller->events_count);
 
-    // limit 
+    // limit
     events_count = tb_min(events_count, poller->maxn);
 
-    // handle events 
+    // handle events
     tb_size_t          i = 0;
     tb_size_t          wait = 0;
     struct kevent*     e = tb_null;
@@ -343,7 +343,7 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
     tb_poller_object_t object;
     for (i = 0; i < events_count; i++)
     {
-        // the kevents 
+        // the kevents
         e = poller->events + i;
 
         // get the object pointer
@@ -351,7 +351,7 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
         tb_assert(object.ref.ptr);
 
         // spank socket events?
-        if (object.ref.sock == pair && e->filter == EVFILT_READ) 
+        if (object.ref.sock == pair && e->filter == EVFILT_READ)
         {
             // read spak
             tb_char_t spak = '\0';
@@ -367,15 +367,15 @@ static tb_long_t tb_poller_kqueue_wait(tb_poller_t* self, tb_poller_event_func_t
         // skip spak
         tb_check_continue(object.ref.sock != pair);
 
-        // init events 
+        // init events
         tb_size_t events = TB_POLLER_EVENT_NONE;
         if (e->filter == EVFILT_READ) events |= TB_POLLER_EVENT_RECV;
         if (e->filter == EVFILT_WRITE) events |= TB_POLLER_EVENT_SEND;
-        if ((e->flags & EV_ERROR) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND))) 
+        if ((e->flags & EV_ERROR) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND)))
             events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
         // connection closed for the edge trigger?
-        if (e->flags & EV_EOF) 
+        if (e->flags & EV_EOF)
             events |= TB_POLLER_EVENT_EOF;
 
         // call event function
@@ -432,7 +432,7 @@ tb_poller_t* tb_poller_kqueue_init()
         tb_poller_object_t pair1;
         pair1.type     = TB_POLLER_OBJECT_SOCK;
         pair1.ref.sock = poller->pair[1];
-        if (!tb_poller_kqueue_insert((tb_poller_t*)poller, &pair1, TB_POLLER_EVENT_RECV, tb_null)) break;  
+        if (!tb_poller_kqueue_insert((tb_poller_t*)poller, &pair1, TB_POLLER_EVENT_RECV, tb_null)) break;
 
         // ok
         ok = tb_true;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -82,7 +82,7 @@ typedef struct __tb_process_t
     posix_spawn_file_actions_t  spawn_action;
 #endif
 
-}tb_process_t; 
+}tb_process_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -246,7 +246,7 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
                 tb_assertf(0, "suspend process not supported!");
 #endif
             }
-             
+
             // put the child in its own process group, so ctrl-c won't reach it.
             if (attr->flags & TB_PROCESS_FLAG_DETACH)
             {
@@ -268,7 +268,7 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
         tb_int_t status = posix_spawnp(&process->pid, pathname, &process->spawn_action, &process->spawn_attr, (tb_char_t* const*)argv, (tb_char_t* const*)envp);
         if (status != 0)
         {
-            // pass the error code to parent/errno 
+            // pass the error code to parent/errno
             errno = status;
             break;
         }
@@ -336,7 +336,7 @@ static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_
             // exit it
             _exit(-1);
 
-        case 0: 
+        case 0:
 
             // TODO
             // check
@@ -397,7 +397,7 @@ static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_
                     _exit(-1);
             }
 
-            // get environment 
+            // get environment
             tb_char_t const** envp = attr? attr->envp : tb_null;
 
 #if defined(TB_CONFIG_POSIX_HAVE_EXECVPE)
@@ -440,7 +440,7 @@ static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_
             // exec it in the child process
             execvp(pathname, (tb_char_t* const*)argv);
 #else
-#   error 
+#   error
 #endif
             // exit it
             _exit(-1);
@@ -578,7 +578,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 // fill zero
                 *p = '\0';
 
-                // save this argument 
+                // save this argument
                 if (b)
                 {
                     // trace
@@ -595,11 +595,11 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             // get the argument pointer
             if ((s || !tb_isspace(ch)) && !b) b = p;
 
-            // next 
+            // next
             p++;
         }
-        
-        // save this argument 
+
+        // save this argument
         if (b)
         {
             // trace
@@ -617,7 +617,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
         // init process
         process = tb_process_init(argv[0], argv, attr);
-    
+
     } while (0);
 
     // exit buffer
@@ -665,7 +665,7 @@ tb_void_t tb_process_exit(tb_process_ref_t self)
         // exit spawn attributes
         posix_spawnattr_destroy(&process->spawn_attr);
 
-        // exit spawn action 
+        // exit spawn action
         posix_spawn_file_actions_destroy(&process->spawn_action);
     }
 #endif
@@ -754,7 +754,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine if timeout is non-zero
-    if (timeout && tb_coroutine_self()) 
+    if (timeout && tb_coroutine_self())
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_PROC;
@@ -778,8 +778,8 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
         {
             /* save status, only get 8bits retval
              *
-             * tt's limited to 8-bits, which means 1 byte, 
-             * which means the int from WEXITSTATUS can only range from 0-255. 
+             * tt's limited to 8-bits, which means 1 byte,
+             * which means the int from WEXITSTATUS can only range from 0-255.
              *
              * in fact, any unix program will only ever return a max of 255.
              */
@@ -821,7 +821,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
         // exited?
         if (result != 0)
         {
-            // find this process 
+            // find this process
             tb_process_t const** pprocess = (tb_process_t const**)processes;
             for (; *pprocess && (*pprocess)->pid != result; pprocess++) ;
 
@@ -844,7 +844,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
                     // error or timeout? end
                     tb_check_break(result != 0);
 
-                    // find this process 
+                    // find this process
                     tb_process_t const** pprocess = (tb_process_t const**)processes;
                     for (; *pprocess && (*pprocess)->pid != result; pprocess++) ;
 

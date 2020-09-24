@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -45,7 +45,7 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
     tb_long_t r = poll(&pfd, 1, timeout);
 
     // timeout or interrupted?
-    if (!r || (r == -1 && errno == EINTR)) 
+    if (!r || (r == -1 && errno == EINTR))
         return 0;
 
     // poll error?
@@ -61,7 +61,7 @@ tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t 
     tb_long_t e = TB_SOCKET_EVENT_NONE;
     if (pfd.revents & POLLIN) e |= TB_SOCKET_EVENT_RECV;
     if (pfd.revents & POLLOUT) e |= TB_SOCKET_EVENT_SEND;
-    if ((pfd.revents & POLLHUP) && !(e & (TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND))) 
+    if ((pfd.revents & POLLHUP) && !(e & (TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND)))
         e |= TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND;
     return e;
 }

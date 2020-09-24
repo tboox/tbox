@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -42,19 +42,19 @@ __tb_extern_c_enter__
 typedef enum __tb_url_protocol_t
 {
     TB_URL_PROTOCOL_NONE    = 0
-,   TB_URL_PROTOCOL_FILE    = 1     //!< file://... 
+,   TB_URL_PROTOCOL_FILE    = 1     //!< file://...
 ,   TB_URL_PROTOCOL_SOCK    = 2     //!< sock://... or socks://...
 ,   TB_URL_PROTOCOL_HTTP    = 3     //!< http://... or https://...
-,   TB_URL_PROTOCOL_DATA    = 4     //!< data://... 
-,   TB_URL_PROTOCOL_RTSP    = 5     //!< rtsp://... 
-,   TB_URL_PROTOCOL_SQL     = 6     //!< sql://... 
+,   TB_URL_PROTOCOL_DATA    = 4     //!< data://...
+,   TB_URL_PROTOCOL_RTSP    = 5     //!< rtsp://...
+,   TB_URL_PROTOCOL_SQL     = 6     //!< sql://...
 
 }tb_url_protocol_t;
 
 /// the url type
 typedef struct __tb_url_t
 {
-    // the protocol 
+    // the protocol
     tb_uint16_t         protocol: 6;
 
     // is ssl?
@@ -63,7 +63,7 @@ typedef struct __tb_url_t
     // is win?
     tb_uint16_t         is_win:   1;
 
-    // the windows prefix 
+    // the windows prefix
     tb_uint16_t         pwin:     8;
 
     // the addr
@@ -133,7 +133,7 @@ tb_char_t const*    tb_url_cstr(tb_url_ref_t url);
  */
 tb_bool_t           tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr);
 
-/*! copy the url 
+/*! copy the url
  *
  * @param url       the url
  * @param copy      the copied url

@@ -33,7 +33,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
     tb_mutex_ref_t lock = (tb_mutex_ref_t)priv;
 #elif defined(TB_TEST_LOCK_SPINLOCK)
     tb_spinlock_ref_t lock = (tb_spinlock_ref_t)priv;
-#endif   
+#endif
 
     // get cpu core index
     static tb_size_t cpuidx = 0;
@@ -42,7 +42,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
 
     // set thread affinity
     tb_cpuset_t cpuset;
-    TB_CPUSET_ZERO(&cpuset); 
+    TB_CPUSET_ZERO(&cpuset);
     TB_CPUSET_SET(cpu, &cpuset);
     if (!tb_thread_setaffinity(tb_null, &cpuset))
     {
@@ -50,13 +50,13 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
     }
 
     // get cpu core again
-    TB_CPUSET_ZERO(&cpuset); 
+    TB_CPUSET_ZERO(&cpuset);
     if (tb_thread_getaffinity(tb_null, &cpuset))
     {
         tb_size_t i;
-        for (i = 0; i < TB_CPUSET_SIZE; i++) 
+        for (i = 0; i < TB_CPUSET_SIZE; i++)
         {
-            if (TB_CPUSET_ISSET(i, &cpuset)) 
+            if (TB_CPUSET_ISSET(i, &cpuset))
             {
                 tb_trace_d("thread[%x]: init cpu core(%zu), cpu: %zu", self, i, cpu);
                 break;
@@ -107,7 +107,7 @@ static tb_int_t tb_test_mutx_loop(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
 {
     // init lock
@@ -142,7 +142,7 @@ tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
     for (i = 0; i < TB_TEST_LOOP_MAXN; i++)
     {
         // kill thread
-        if (loop[i]) 
+        if (loop[i])
         {
             tb_thread_wait(loop[i], -1, tb_null);
             tb_thread_exit(loop[i]);

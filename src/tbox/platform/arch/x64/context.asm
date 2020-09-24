@@ -2,7 +2,7 @@
 ;  Distributed under the Boost Software License, Version 1.0.
 ;     (See accompanying file LICENSE_1_0.txt or copy at
 ;           http://www.boost.org/LICENSE_1_0.txt)
-; 
+;
 
 ; Boost Software License - Version 1.0 - August 17th, 2003
 ;
@@ -43,7 +43,7 @@ extern _exit:proc
 
 ; make context (refer to boost.context)
 ;
-; 
+;
 ;             -----------------------------------------------------------------------------------------
 ; stackdata: |                                                          |         context        |||||||
 ;             -----------------------------------------------------------------------------------|-----
@@ -51,21 +51,21 @@ extern _exit:proc
 ;
 ;
 ;             ---------------------------------------
-; context:   |  fiber  | dealloc |  limit  |  base   | 
-;             ---------------------------------------   
-;            0         8         16         24
-;                                                                                                          
+; context:   |  fiber  | dealloc |  limit  |  base   |
 ;             ---------------------------------------
-;            |   r12   |   r13   |   r14   |   r15   | 
-;             ---------------------------------------   
+;            0         8         16         24
+;
+;             ---------------------------------------
+;            |   r12   |   r13   |   r14   |   r15   |
+;             ---------------------------------------
 ;            32        40        48        56                 -------------------------------------------------------
 ;                                                            |                                                       |
 ;                                    func    __end           |         __entry      arguments                    retval(from)
 ;             ----------------------------------------------------------------------------------------------------------------------------------
 ;            |   rdi   |   rsi   |   rbx   |   rbp   | retval(saved) |   rip   |   from(ctx/priv)  | context(unused) |  priv(unused)  | padding |
 ;             ----------------------------------------------------------------------------------------------------------------------------------
-;            64        72        80        88        96              104       112                 128               136              144                          
-;                                                                              |         
+;            64        72        80        88        96              104       112                 128               136              144
+;                                                                              |
 ;                                                                              | 16-align
 ;                                                                              |
 ;                                                                    rsp when jump to function
@@ -90,7 +90,7 @@ tb_context_make proc frame
     ; 4 * 8 = 32
     sub rax, 32
 
-    ; 16-align of the stack top address 
+    ; 16-align of the stack top address
     and rax, -16
 
     ; reserve space for context-data on context-stack
@@ -129,7 +129,7 @@ tb_context_make proc frame
     mov [rax + 88], rcx
 
     ; return pointer to context-data
-    ret 
+    ret
 
 __entry:
 
@@ -139,13 +139,13 @@ __entry:
     ; jump to the context function entry(rip)
     ;
     ;
-    ;                                     
+    ;
     ;              -----------------------------------------------------------------
     ; context: .. |   end   |  unused  | context(unused) |  priv(unused)  | padding |
     ;              -----------------------------------------------------------------
-    ;             0         8 arguments 
-    ;             |         
-    ;            rsp 16-align 
+    ;             0         8 arguments
+    ;             |
+    ;            rsp 16-align
     ;           (now)
     ;;
     jmp rbx
@@ -156,7 +156,7 @@ __end:
     call _exit
     hlt
 
-tb_context_make endp 
+tb_context_make endp
 
 ; jump context (refer to boost.context)
 ;
@@ -180,7 +180,7 @@ tb_context_jump proc frame
     push rsi
     push rdi
     push r15
-    push r14 
+    push r14
     push r13
     push r12
 
@@ -194,11 +194,11 @@ tb_context_jump proc frame
     ; save current stack limit
     mov rax, [r10 + 010h]
     push rax
-    
+
     ; save current deallocation stack
     mov rax, [r10 + 01478h]
     push rax
-    
+
     ; save fiber local storage
     mov rax, [r10 + 018h]
     push rax
@@ -219,11 +219,11 @@ tb_context_jump proc frame
     ; restore deallocation stack
     pop rax
     mov [r10 + 01478h], rax
-    
+
     ; restore stack limit
     pop rax
     mov [r10 + 010h], rax
-    
+
     ; restore stack base
     pop rax
     mov [r10 + 08h], rax
@@ -239,12 +239,12 @@ tb_context_jump proc frame
     pop rbp
 
     ; restore retval (saved) to rax
-    pop rax 
+    pop rax
 
     ; restore the return or function address(r10)
     pop r10
 
-    ; return from-context(retval: [rcx](context: r9, priv: r8)) from jump 
+    ; return from-context(retval: [rcx](context: r9, priv: r8)) from jump
     ;
     ; it will write context (unused) and priv (unused) when jump to a new context function entry first
     ;;
@@ -266,18 +266,18 @@ tb_context_jump proc frame
     ; jump to the return or function address(rip)
     ;
     ;
-    ;                                     
+    ;
     ;              -----------------------------------------------------------------
     ; context: .. |   end   |  unused  | context(unused) |  priv(unused)  | padding |
     ;              -----------------------------------------------------------------
-    ;             0         8 arguments 
+    ;             0         8 arguments
     ;             |         |
-    ;            rsp     16-align 
+    ;            rsp     16-align
     ;           (now)
     ;;
     jmp r10
 
-tb_context_jump endp 
+tb_context_jump endp
 
 end
 

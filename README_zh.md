@@ -2,7 +2,7 @@
 
   <a href="https://tboox.io">
     <img width="160" heigth="160" src="https://tboox.io/assets/img/logo_text.png">
-  </a>  
+  </a>
 
   <div>
     <a href="https://github.com/tboox/tbox/actions?query=workflow%3Abuild">
@@ -69,7 +69,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 #### 流库
 
 针对http、file、socket、data等流数据，实现统一接口进行读写，并且支持: 阻塞、非阻塞、异步 三种读写模式。
-支持中间增加多层filter流进行流过滤，实现边读取，内部边进行解压、编码转换、加密等操作，极大的减少了内存使用。 
+支持中间增加多层filter流进行流过滤，实现边读取，内部边进行解压、编码转换、加密等操作，极大的减少了内存使用。
 
 主要提供以下模块：
 
@@ -182,7 +182,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 - 实现swap16、swap32、swap64等位交换操作，并针对各个平台进行了优化。
 - 实现一些高级的位处理接口，例如：位0的快速统计、前导0和前导1的快速位计数、后导01的快速位计数
 - 实现单例模块，可以对静态对象、实例对象进行快速的单例封装，实现全局线程安全
-- 实现option模块，对命令行参数进行解析，提供快速方便的命令行选项建立和解析操作，对于写终端程序还是很有帮助的   
+- 实现option模块，对命令行参数进行解析，提供快速方便的命令行选项建立和解析操作，对于写终端程序还是很有帮助的
 
 #### 正则表达式库
 
@@ -198,7 +198,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 * [itrace](https://github.com/tboox/itrace)
 * [更多项目](https://github.com/tboox/tbox/wiki/%E4%BD%BF%E7%94%A8tbox%E7%9A%84%E5%BC%80%E6%BA%90%E5%BA%93)
 
-## 编译 
+## 编译
 
 请先安装: [xmake](https://github.com/xmake-io/xmake)
 
@@ -209,12 +209,12 @@ $ xmake
 
 # 编译mingw平台
 $ cd ./tbox
-$ xmake f -p mingw --sdk=/home/mingwsdk 
+$ xmake f -p mingw --sdk=/home/mingwsdk
 $ xmake
 
 # 编译iphoneos平台
 $ cd ./tbox
-$ xmake f -p iphoneos 
+$ xmake f -p iphoneos
 $ xmake
 
 # 编译android平台
@@ -281,7 +281,7 @@ int main(int argc, char** argv)
         tb_stream_exit(stream);
     }
 
-    // wait 
+    // wait
     tb_getchar();
 
     // exit tbox

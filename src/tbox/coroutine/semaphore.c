@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -151,17 +151,17 @@ tb_long_t tb_co_semaphore_wait(tb_co_semaphore_ref_t self, tb_long_t timeout)
     // attempt to get the semaphore value
     tb_long_t ok = 1;
     if (semaphore->value) semaphore->value--;
-    // no semaphore? 
+    // no semaphore?
     else if (timeout)
     {
-        // get the running coroutine 
+        // get the running coroutine
         tb_coroutine_t* running = (tb_coroutine_t*)tb_coroutine_self();
         tb_assert(running);
 
         // save this coroutine to the waiting coroutines
         tb_single_list_entry_insert_tail(&semaphore->waiting, &running->rs.single_entry);
 
-        // wait semaphore 
+        // wait semaphore
         ok = (tb_long_t)tb_coroutine_sleep(timeout);
     }
     // timeout and no waiting

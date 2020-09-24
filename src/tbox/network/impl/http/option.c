@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -34,7 +34,7 @@
  * implementation
  */
 tb_bool_t tb_http_option_init(tb_http_option_t* option)
-{    
+{
     // check
     tb_assert_and_check_return_val(option, tb_false);
 
@@ -88,7 +88,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             // url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(url, tb_false);
-            
+
             // set url
             if (tb_url_cstr_set(&option->url, url)) return tb_true;
         }
@@ -123,7 +123,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         {
             // phost
             tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(phost, tb_false); 
+            tb_assert_and_check_return_val(phost, tb_false);
 
             // get host
             tb_char_t const* host = tb_url_host(&option->url);
@@ -135,7 +135,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_PORT:
-        {   
+        {
             // port
             tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
             tb_assert_and_check_return_val(port, tb_false);
@@ -157,11 +157,11 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_PATH:
-        {   
+        {
             // path
             tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(path, tb_false);
- 
+
             // set path
             tb_url_path_set(&option->url, path);
             return tb_true;
@@ -183,7 +183,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_METHOD:
-        {   
+        {
             // method
             tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
 
@@ -212,8 +212,8 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             // val
             tb_char_t const* val = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(val, tb_false);
- 
-            // remove the previous key and value 
+
+            // remove the previous key and value
             tb_bool_t           head_same = tb_false;
             tb_char_t const*    head_head = (tb_char_t const*)tb_buffer_data(&option->head_data);
             tb_char_t const*    head_data = head_head;
@@ -226,8 +226,8 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
                 tb_char_t const* next = data + tb_strlen(data) + 1;
                 tb_check_break(data < head_tail);
 
-                // is this? 
-                if (!tb_stricmp(name, key)) 
+                // is this?
+                if (!tb_stricmp(name, key))
                 {
                     // value is different? remove it
                     if (tb_stricmp(val, data)) tb_buffer_memmovp(&option->head_data, name - head_head, next - head_head);
@@ -260,7 +260,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             tb_char_t const** pval = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             tb_assert_and_check_return_val(pval, tb_false);
 
-            // find head 
+            // find head
             tb_char_t const*    head_data = (tb_char_t const*)tb_buffer_data(&option->head_data);
             tb_char_t const*    head_tail = head_data + tb_buffer_size(&option->head_data);
             while (head_data < head_tail)
@@ -271,7 +271,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
                 tb_check_break(data < head_tail);
 
                 // is this?
-                if (!tb_stricmp(name, key)) 
+                if (!tb_stricmp(name, key))
                 {
                     // ok
                     *pval = data;
@@ -353,7 +353,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_SSL:
-        {   
+        {
             // bssl
             tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
 
@@ -374,7 +374,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_TIMEOUT:
-        {   
+        {
             // the timeout
             tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
 
@@ -395,7 +395,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_COOKIES:
-        {   
+        {
             // set cookies
             option->cookies = (tb_cookies_ref_t)tb_va_arg(args, tb_cookies_ref_t);
             return tb_true;
@@ -421,7 +421,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
             // clear post data and size
             option->post_data = tb_null;
             option->post_size = 0;
-            
+
             // set url
             if (tb_url_cstr_set(&option->post_url, url)) return tb_true;
         }
@@ -442,7 +442,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_POST_DATA:
-        {   
+        {
             // post data
             tb_byte_t const*    data = (tb_byte_t const*)tb_va_arg(args, tb_byte_t const*);
 
@@ -451,7 +451,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
 
             // clear post url
             tb_url_clear(&option->post_url);
-            
+
             // set post data
             option->post_data = data;
             option->post_size = size;
@@ -493,7 +493,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_POST_PRIV:
-        {   
+        {
             // post priv
             tb_cpointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
@@ -535,7 +535,7 @@ tb_bool_t tb_http_option_ctrl(tb_http_option_t* option, tb_size_t code, tb_va_li
         }
         break;
     case TB_HTTP_OPTION_SET_AUTO_UNZIP:
-        {   
+        {
             // bunzip
             tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
 
@@ -621,7 +621,7 @@ tb_void_t tb_http_option_dump(tb_http_option_t* option)
     tb_trace_i("option: range: %llu-%llu",      option->range.bof, option->range.eof);
     tb_trace_i("option: bunzip: %s",            option->bunzip? "true" : "false");
 
-    // dump head 
+    // dump head
     tb_char_t const*    head_data = (tb_char_t const*)tb_buffer_data(&option->head_data);
     tb_char_t const*    head_tail = head_data + tb_buffer_size(&option->head_data);
     while (head_data < head_tail)

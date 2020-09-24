@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,7 +37,7 @@
  * globals
  */
 
-// the allocator 
+// the allocator
 __tb_extern_c__ extern tb_allocator_ref_t   g_allocator;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ tb_bool_t tb_memory_init_env(tb_allocator_ref_t allocator)
     // done
     tb_bool_t ok = tb_false;
     do
-    {   
+    {
         // init page
         if (!tb_page_init()) break;
 
@@ -71,7 +71,7 @@ tb_bool_t tb_memory_init_env(tb_allocator_ref_t allocator)
 
     // failed? exit it
     if (!ok) tb_memory_exit_env();
-    
+
     // ok?
     return ok;
 }

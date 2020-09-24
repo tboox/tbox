@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -89,7 +89,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint
             "mov.w %1,@-%2\n\t" /* *--s = c */
             "mov.w %1,@-%2\n\t" /* *--s = c */
             "bf 1b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s) /* constraint: register */
         );
     }
@@ -109,9 +109,9 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint
             "mov.w %1,@-%2\n\t" /* *--s = c */
             "mov.w %1,@-%2\n\t" /* *--s = c */
             "bf 2b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s), "r" (l) /* constraint: register */
-        ); 
+        );
     }
     else
     {
@@ -154,7 +154,7 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_uint16_t c, tb_size_t 
     // check
     tb_assert_and_check_return_val(s, tb_null);
 
-    // align by 2-bytes 
+    // align by 2-bytes
     tb_assert(!(((tb_size_t)s) & 0x1));
     if (!n) return s;
 
@@ -178,28 +178,28 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint
         n >>= 2;
         __tb_asm__ __tb_volatile__
         (
-            "1:\n\t" 
+            "1:\n\t"
             "dt %0\n\t"         /* i--, i > 0? T = 0 : 1 */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "bf 1b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s) /* constraint: register */
-        ); 
+        );
     }
     else
     {
         __tb_asm__ __tb_volatile__
         (
-            "1:\n\t" 
+            "1:\n\t"
             "dt %0\n\t"         /* i--, i > 0? T = 0 : 1 */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "bf 1b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s) /* constraint: register */
-        ); 
+        );
     }
 }
 static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
@@ -211,16 +211,16 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint
         n >>= 2;
         __tb_asm__ __tb_volatile__
         (
-            "1:\n\t" 
+            "1:\n\t"
             "dt %0\n\t"         /* i--, i > 0? T = 0 : 1 */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "bf 1b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s) /* constraint: register */
-        ); 
+        );
     }
     else if (n >= 4) /* fixme */
     {
@@ -238,25 +238,25 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "bf 2b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s), "r" (l) /* constraint: register */
-        ); 
+        );
     }
     else
     {
         __tb_asm__ __tb_volatile__
         (
-            "1:\n\t" 
+            "1:\n\t"
             "dt %0\n\t"         /* i--, i > 0? T = 0 : 1 */
             "mov.l %1,@-%2\n\t" /* *--s = c */
             "bf 1b\n\t"         /* if T == 0 goto label 1: */
-            :                   /* no output registers */ 
+            :                   /* no output registers */
             : "r" (n), "r" (c), "r" (s) /* constraint: register */
-        ); 
+        );
     }
 }
 static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v3(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
-{   
+{
     s += n << 2;
     __tb_asm__ __tb_volatile__
     (
@@ -264,7 +264,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v3(tb_uint32_t* s, tb_uint
         "dt %0\n\t"         /* i--, i > 0? T = 0 : 1 */
         "mov.l %1,@-%2\n\t" /* *--s = c */
         "bf 1b\n\t"         /* if T == 0 goto label 1: */
-        :                   /* no output registers */ 
+        :                   /* no output registers */
         : "r" (n), "r" (c), "r" (s) /* constraint: register */
     );
 }
@@ -276,7 +276,7 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_uint32_t c, tb_size_t 
     // check
     tb_assert_and_check_return_val(s, tb_null);
 
-    // align by 4-bytes 
+    // align by 4-bytes
     tb_assert(!(((tb_size_t)s) & 0x3));
     if (!n) return s;
 

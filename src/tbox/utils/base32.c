@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@
  */
 tb_size_t tb_base32_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on)
 {
-    // table 
+    // table
     static tb_char_t const table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
     // check
@@ -64,7 +64,7 @@ tb_size_t tb_base32_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
             idx = (idx + 5) & 0x07;
             if (idx == 0) i++;
         }
-        *pb++ = table[w];       
+        *pb++ = table[w];
     }
     *pb = '\0';
     return (pb - ob);
@@ -122,7 +122,7 @@ tb_size_t tb_base32_decode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
     // check
     tb_assert_and_check_return_val(ib && ob && on > (in * 5) / 8, 0);
 
-    // init 
+    // init
     tb_memset(ob, 0, on);
 
     // decode

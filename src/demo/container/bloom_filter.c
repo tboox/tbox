@@ -26,7 +26,7 @@ static tb_void_t tb_demo_test_cstr_h(tb_size_t index)
     g_func_prev = tb_element_str(tb_true);
 
     // the element
-    tb_element_t element = g_func_prev; 
+    tb_element_t element = g_func_prev;
     element.hash = tb_demo_test_hash_func;
 
     // init filter
@@ -112,7 +112,7 @@ static tb_void_t tb_demo_test_uint8_h(tb_size_t index)
     g_func_prev = tb_element_uint8();
 
     // the element
-    tb_element_t element = g_func_prev; 
+    tb_element_t element = g_func_prev;
     element.hash = tb_demo_test_hash_func;
 
     // init filter
@@ -154,7 +154,7 @@ static tb_void_t tb_demo_test_uint16_h(tb_size_t index)
     g_func_prev = tb_element_uint16();
 
     // the element
-    tb_element_t element = g_func_prev; 
+    tb_element_t element = g_func_prev;
     element.hash = tb_demo_test_hash_func;
 
     // init filter
@@ -196,7 +196,7 @@ static tb_void_t tb_demo_test_uint32_h(tb_size_t index)
     g_func_prev = tb_element_uint32();
 
     // the element
-    tb_element_t element = g_func_prev; 
+    tb_element_t element = g_func_prev;
     element.hash = tb_demo_test_hash_func;
 
     // init filter
@@ -238,7 +238,7 @@ static tb_void_t tb_demo_test_long_h(tb_size_t index)
     g_func_prev = tb_element_long();
 
     // the element
-    tb_element_t element = g_func_prev; 
+    tb_element_t element = g_func_prev;
     element.hash = tb_demo_test_hash_func;
 
     // init filter
@@ -329,7 +329,7 @@ tb_int_t tb_demo_container_bloom_filter_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_test_uint8_h(13);
     tb_demo_test_uint8_h(14);
     tb_demo_test_uint8_h(15);
-    
+
     tb_trace_i("===========================================================");
     tb_demo_test_uint16_h(0);
     tb_demo_test_uint16_h(1);

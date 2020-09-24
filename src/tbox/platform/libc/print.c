@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -41,7 +41,7 @@ tb_void_t tb_printl(tb_char_t const* string)
 {
     // check
     tb_check_return(string);
- 
+
     // print string to the stdout
     fputs(string, stdout);
 

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -91,18 +91,18 @@ static __tb_inline__ tb_void_t tb_atomic64_set_explicit_gcc(tb_atomic64_t* a, tb
 static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_explicit_gcc(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
 {
     tb_assert(a);
-    return __atomic_compare_exchange(a, p, &v, 0, succ, fail);	
+    return __atomic_compare_exchange(a, p, &v, 0, succ, fail);
 }
 static __tb_inline__ tb_bool_t tb_atomic64_compare_and_swap_weak_explicit_gcc(tb_atomic64_t* a, tb_int64_t* p, tb_int64_t v, tb_int_t succ, tb_int_t fail)
 {
     tb_assert(a);
-    return __atomic_compare_exchange(a, p, &v, 1, succ, fail);	
+    return __atomic_compare_exchange(a, p, &v, 1, succ, fail);
 }
 static __tb_inline__ tb_int64_t tb_atomic64_fetch_and_set_explicit_gcc(tb_atomic64_t* a, tb_int64_t v, tb_int_t mo)
 {
     tb_assert(a);
     tb_int64_t o;
-    __atomic_exchange(a, &v, &o, mo);	
+    __atomic_exchange(a, &v, &o, mo);
     return o;
 }
 #else

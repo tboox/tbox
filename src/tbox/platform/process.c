@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -48,7 +48,7 @@ __tb_extern_c_leave__
 #   include "posix/process.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_WAITPID) && \
          (defined(TB_CONFIG_POSIX_HAVE_FORK) || defined(TB_CONFIG_POSIX_HAVE_VFORK)) && \
-            (defined(TB_CONFIG_POSIX_HAVE_EXECVP) || defined(TB_CONFIG_POSIX_HAVE_EXECVPE)) 
+            (defined(TB_CONFIG_POSIX_HAVE_EXECVP) || defined(TB_CONFIG_POSIX_HAVE_EXECVPE))
 #   include "posix/process.c"
 #else
 tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr)

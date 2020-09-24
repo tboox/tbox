@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -32,7 +32,7 @@
 #ifdef __tb_debug__
 static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
-    // the comparer 
+    // the comparer
     if (!comp) comp = tb_iterator_comp;
 
     // walk
@@ -67,8 +67,8 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_ref_t iterator, tb_size
  *                        --------------             -------------
  *                       |              |           |             |
  *                       8(parent)      7           9             3
- *                   ---------      
- *                  |         |     
+ *                   ---------
+ *                  |         |
  *                  2      (hole) <= 11(val)
  * after:
  *                                          16(top)
@@ -78,9 +78,9 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_ref_t iterator, tb_size
  *                        --------------             -------------
  *                       |              |           |             |
  *                       11(hole)       7           9             3
- *                   ---------      
- *                  |         |    
- *                  2         8 
+ *                   ---------
+ *                  |         |
+ *                  2         8
  * </pre>
  */
 #if 0
@@ -94,7 +94,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_ref_t iterator, tb_size_
     tb_size_t       parent = 0;
     tb_cpointer_t   parent_item = tb_null;
     for (parent = (hole - 1) >> 1; hole > top && (comp(iterator, (parent_item = tb_iterator_item(iterator, head + parent)), item) < 0); parent = (hole - 1) >> 1)
-    {   
+    {
         // move item: parent => hole
 //      tb_iterator_copy(iterator, head + parent, item);
         tb_iterator_copy(iterator, head + hole, parent_item);
@@ -151,7 +151,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_ref_t iterator, tb_size_
  */
 static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t hole, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
-    // the comparer 
+    // the comparer
     if (!comp) comp = tb_iterator_comp;
 
 #if 0
@@ -161,20 +161,20 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_ref_t iterator, tb_siz
     // 2 * hole + 2: the right child node of hole
     tb_size_t child = (hole << 1) + 2;
     for (; child < tail; child = (child << 1) + 2)
-    {   
+    {
         // the larger child node
         if (comp(iterator, tb_iterator_item(iterator, head + child), tb_iterator_item(iterator, head + child - 1)) < 0) child--;
 
         // the larger child node => hole
         tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + child));
 
-        // move the hole down to it's larger child node 
+        // move the hole down to it's larger child node
         hole = child;
     }
 
-    // no right child node? 
+    // no right child node?
     if (child == tail)
-    {   
+    {
         // the last child => hole
         tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + tail - 1));
 
@@ -191,10 +191,10 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_ref_t iterator, tb_siz
     tb_cpointer_t   child_item = tb_null;
     tb_cpointer_t   child_item_r = tb_null;
     for (; child < tail; child = (child << 1) + 1)
-    {   
+    {
         // the larger child node
         child_item = tb_iterator_item(iterator, head + child);
-        if (child + 1 < tail && comp(iterator, child_item, (child_item_r = tb_iterator_item(iterator, head + child + 1))) < 0) 
+        if (child + 1 < tail && comp(iterator, child_item, (child_item_r = tb_iterator_item(iterator, head + child + 1))) < 0)
         {
             child++;
             child_item = child_item_r;
@@ -206,7 +206,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_ref_t iterator, tb_siz
         // the larger child node => hole
         tb_iterator_copy(iterator, head + hole, child_item);
 
-        // move the hole down to it's larger child node 
+        // move the hole down to it's larger child node
         hole = child;
     }
 
@@ -263,7 +263,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_ref_t iterator, tb_size_
 /*!pop the top of heap to last and reheap
  *
  * <pre>
- *                                          16(head) 
+ *                                          16(head)
  *                               ----------------|--------
  *                              |                |        |
  *                              14               |        10
@@ -275,7 +275,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_ref_t iterator, tb_size_
  *                  2         4     1(last)<-----
  *                                (hole)
  * </pre>
- */   
+ */
 static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item, tb_iterator_comp_t comp)
 {
     // top => last
@@ -292,8 +292,8 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_ref_t iterator, tb_size_
  * implementation
  */
 
-/*!the heap sort 
- * 
+/*!the heap sort
+ *
  * <pre>
  * init:
  *
@@ -307,7 +307,7 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_ref_t iterator, tb_size_
  *                   ---------       ----
  *                  |         |     |
  *                  2         8     1(last - 1)
- * 
+ *
  * make_heap:
  *
  *                                           16(head)
@@ -327,73 +327,73 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_ref_t iterator, tb_size_
  *                              |                         |                    |
  *                              4                         10                   |
  *                        --------------             -------------             |
- *                       |              |           |             |            | 
+ *                       |              |           |             |            |
  *                       14             7           9             3            |
  *                   ---------       ----                                      |
  *                  |         |     |                                          |
- *                  2         8     1(last - 1) <------------------------------ 
+ *                  2         8     1(last - 1) <------------------------------
  *
  *                                          (hole)(head)
- *                               -------------------------               
- *                              |                         |                  
- *                              4                         10                 
- *                        --------------             -------------           
+ *                               -------------------------
+ *                              |                         |
+ *                              4                         10
+ *                        --------------             -------------
  *                       |              |           |             |          (val = 1)
- *                       14             7           9             3         
- *                   ---------       ----                                    
- *                  |         |     |                                       
+ *                       14             7           9             3
+ *                   ---------       ----
+ *                  |         |     |
  *                  2         8     16(last - 1)
- *                           
+ *
  * adjust_heap:
  *                                          14(head)
- *                               -------------------------               
- *                              |                         |                  
- *                              8                        10                 
- *                        --------------             -------------           
- *                       |              |           |             |           (val = 1)         
- *                       4              7           9             3         
- *                   ---------                                         
- *                  |         |                                            
+ *                               -------------------------
+ *                              |                         |
+ *                              8                        10
+ *                        --------------             -------------
+ *                       |              |           |             |           (val = 1)
+ *                       4              7           9             3
+ *                   ---------
+ *                  |         |
  *                  2      (hole)(last - 1)   16
  *
  *
  * push_heap:
  *                                          14(head)
- *                               -------------------------               
- *                              |                         |                  
- *                              8                        10                 
- *                        --------------             -------------           
- *                       |              |           |             |           (val = 1)         
+ *                               -------------------------
+ *                              |                         |
+ *                              8                        10
+ *                        --------------             -------------
+ *                       |              |           |             |           (val = 1)
  *                       4              7           9             3              |
  *                   ---------                                                   |
  *                  |         | /-----------------------------------------------
  *                  2      (hole)(last - 1)   16
  *
  *                                          14(head)
- *                               -------------------------               
- *                              |                         |                  
- *                              8                        10                 
- *                        --------------             -------------           
- *                       |              |           |             |           (val = 1)         
- *                       4              7           9             3            
- *                   ---------                                                   
- *                  |         |  
+ *                               -------------------------
+ *                              |                         |
+ *                              8                        10
+ *                        --------------             -------------
+ *                       |              |           |             |           (val = 1)
+ *                       4              7           9             3
+ *                   ---------
+ *                  |         |
  *                  2       1(last - 1)   16
  *
  * pop_heap adjust_heap push_heap ...
  *
  * final_heap:
  *                                           1(head)
- *                            
- *                         
- *                              2                         3               
- *                               
- *                              
- *                       4              7           8             9           
- *                                                            
- *             
+ *
+ *
+ *                              2                         3
+ *
+ *
+ *                       4              7           8             9
+ *
+ *
  *                  10       14      16
- *     
+ *
  * result: 1 2 3 4 7 8 9 10 14 16
  * </pre>
  */

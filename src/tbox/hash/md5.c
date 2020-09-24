@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
  * macros
  */
 
-// TB_MD5_F, TB_MD5_G and TB_MD5_H are basic MD5 functions: selection, majority, parity 
+// TB_MD5_F, TB_MD5_G and TB_MD5_H are basic MD5 functions: selection, majority, parity
 #define TB_MD5_F(x, y, z)   (((x) & (y)) | ((~x) & (z)))
 #define TB_MD5_G(x, y, z)   (((x) & (z)) | ((y) & (~z)))
 #define TB_MD5_H(x, y, z)   ((x) ^ (y) ^ (z))
@@ -45,7 +45,7 @@
 #define TB_MD5_HH(a, b, c, d, x, s, ac) {(a) += TB_MD5_H ((b), (c), (d)) + (x) + (tb_uint32_t)(ac); (a) = TB_MD5_ROTATE_LEFT ((a), (s)); (a) += (b); }
 #define TB_MD5_II(a, b, c, d, x, s, ac) {(a) += TB_MD5_I ((b), (c), (d)) + (x) + (tb_uint32_t)(ac); (a) = TB_MD5_ROTATE_LEFT ((a), (s)); (a) += (b); }
 
-// Constants for transformation 
+// Constants for transformation
 #define TB_MD5_S11 7  // Round 1
 #define TB_MD5_S12 12
 #define TB_MD5_S13 17
@@ -68,7 +68,7 @@
  */
 
 /* Padding */
-static tb_byte_t g_md5_padding[64] = 
+static tb_byte_t g_md5_padding[64] =
 {
     0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 ,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -93,7 +93,7 @@ static tb_void_t tb_md5_transform(tb_uint32_t* sp, tb_uint32_t* ip)
     // init
     tb_uint32_t a = sp[0], b = sp[1], c = sp[2], d = sp[3];
 
-    // round 1 
+    // round 1
     TB_MD5_FF ( a, b, c, d, ip[ 0], TB_MD5_S11, (tb_uint32_t) 3614090360u); /* 1 */
     TB_MD5_FF ( d, a, b, c, ip[ 1], TB_MD5_S12, (tb_uint32_t) 3905402710u); /* 2 */
     TB_MD5_FF ( c, d, a, b, ip[ 2], TB_MD5_S13, (tb_uint32_t)  606105819u); /* 3 */
@@ -184,7 +184,7 @@ tb_void_t tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand)
     // init
     md5->i[0] = md5->i[1] = (tb_uint32_t)0;
 
-    // load magic initialization constants 
+    // load magic initialization constants
     md5->sp[0] = (tb_uint32_t)0x67452301 + (pseudo_rand * 11);
     md5->sp[1] = (tb_uint32_t)0xefcdab89 + (pseudo_rand * 71);
     md5->sp[2] = (tb_uint32_t)0x98badcfe + (pseudo_rand * 37);
@@ -214,7 +214,7 @@ tb_void_t tb_md5_spak(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size)
         // add new character to buffer, increment mdi
         md5->ip[mdi++] = *data++;
 
-        // transform if necessary 
+        // transform if necessary
         if (mdi == 0x40)
         {
             for (i = 0, ii = 0; i < 16; i++, ii += 4)
@@ -243,7 +243,7 @@ tb_void_t tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size)
     tb_size_t   ii = 0;
     tb_size_t   pad_n = 0;
 
-    // save number of bits 
+    // save number of bits
     ip[14] = md5->i[0];
     ip[15] = md5->i[1];
 
@@ -282,7 +282,7 @@ tb_size_t tb_md5_make(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_
     // check
     tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);
 
-    // init 
+    // init
     tb_md5_t md5;
     tb_md5_init(&md5, 0);
 

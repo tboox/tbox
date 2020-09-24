@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -46,7 +46,7 @@ typedef __tb_typeref__(xml_writer);
 
 /*! init the xml writer
  *
- * @return              the writer 
+ * @return              the writer
  */
 tb_xml_writer_ref_t     tb_xml_writer_init(tb_noarg_t);
 
@@ -82,7 +82,7 @@ tb_void_t               tb_xml_writer_save(tb_xml_writer_ref_t writer, tb_xml_no
 
 /*! write the xml document node: <?xml version = \"...\" encoding = \"...\" ?>
  *
- * @param writer        the xml writer 
+ * @param writer        the xml writer
  * @param version       the xml version
  * @param encoding      the xml encoding
  */
@@ -98,35 +98,35 @@ tb_void_t               tb_xml_writer_document_type(tb_xml_writer_ref_t writer, 
 /*! write the xml cdata: <![CDATA[...]]>
  *
  * @param writer        the xml writer
- * @param data          the xml cdata 
+ * @param data          the xml cdata
  */
 tb_void_t               tb_xml_writer_cdata(tb_xml_writer_ref_t writer, tb_char_t const* data);
 
 /*! write the xml text
  *
  * @param writer        the xml writer
- * @param text          the xml text 
+ * @param text          the xml text
  */
 tb_void_t               tb_xml_writer_text(tb_xml_writer_ref_t writer, tb_char_t const* text);
 
 /*! write the xml comment: <!-- ... -->
  *
  * @param writer        the xml writer
- * @param comment       the xml comment 
+ * @param comment       the xml comment
  */
 tb_void_t               tb_xml_writer_comment(tb_xml_writer_ref_t writer, tb_char_t const* comment);
 
 /*! write the empty xml element: <name/>
  *
  * @param writer        the xml writer
- * @param name          the xml element name 
+ * @param name          the xml element name
  */
 tb_void_t               tb_xml_writer_element_empty(tb_xml_writer_ref_t writer, tb_char_t const* name);
 
 /*! write the xml element head: <name> ...
  *
  * @param writer        the xml writer
- * @param name          the xml element name 
+ * @param name          the xml element name
  */
 tb_void_t               tb_xml_writer_element_enter(tb_xml_writer_ref_t writer, tb_char_t const* name);
 

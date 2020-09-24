@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -133,7 +133,7 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
     tb_size_t   n = tb_static_stream_left(sstream);
 
     // 0x00000000 - 0x0000007f
-    if (ch <= 0x0000007f) 
+    if (ch <= 0x0000007f)
     {
         // not enough? break it
         tb_check_return_val(n, -1);
@@ -142,7 +142,7 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
         *p++ = ch;
     }
     // 0x00000080 - 0x000007ff
-    else if (ch <= 0x000007ff) 
+    else if (ch <= 0x000007ff)
     {
         // not enough? break it
         tb_check_return_val(n > 1, -1);
@@ -154,7 +154,7 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
         *p++ = (ch & 0x3f) | 0x80;
     }
     // 0x00000800 - 0x0000ffff
-    else if (ch <= 0x0000ffff) 
+    else if (ch <= 0x0000ffff)
     {
         // not enough? break it
         tb_check_return_val(n > 2, -1);
@@ -167,7 +167,7 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
         *p++ = (ch & 0x3f) | 0x80;
     }
     // 0x00010000 - 0x001fffff
-    else if (ch <= 0x001fffff) 
+    else if (ch <= 0x001fffff)
     {
         // not enough? break it
         tb_check_return_val(n > 3, -1);
@@ -181,7 +181,7 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
         *p++ = (ch & 0x3f) | 0x80;
     }
     // 0x00200000 - 0x03ffffff
-    else if (ch <= 0x03ffffff) 
+    else if (ch <= 0x03ffffff)
     {
         // not enough? break it
         tb_check_return_val(n > 4, -1);
@@ -196,7 +196,7 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
         *p++ = (ch & 0x3f) | 0x80;
     }
     // 0x04000000 - 0x7fffffff
-    else if (ch <= 0x7fffffff) 
+    else if (ch <= 0x7fffffff)
     {
         // not enough? break it
         tb_check_return_val(n > 5, -1);

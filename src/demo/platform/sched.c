@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_sched_main(tb_int_t argc, tb_char_t** argv)
 {
     // get cpu count
@@ -18,9 +18,9 @@ tb_int_t tb_demo_platform_sched_main(tb_int_t argc, tb_char_t** argv)
     if (tb_sched_getaffinity(0, &cpuset))
     {
         tb_size_t i;
-        for (i = 0; i < cpu_count; i++) 
+        for (i = 0; i < cpu_count; i++)
         {
-            if (TB_CPUSET_ISSET(i, &cpuset)) 
+            if (TB_CPUSET_ISSET(i, &cpuset))
                 tb_trace_i("get previous cpu core: %d", i);
         }
     }
@@ -34,13 +34,13 @@ tb_int_t tb_demo_platform_sched_main(tb_int_t argc, tb_char_t** argv)
     TB_CPUSET_SET(cpu, &cpuset);
     if (tb_sched_setaffinity(0, &cpuset))
     {
-        TB_CPUSET_ZERO(&cpuset); 
+        TB_CPUSET_ZERO(&cpuset);
         if (tb_sched_getaffinity(0, &cpuset))
         {
             tb_size_t i;
-            for (i = 0; i < cpu_count; i++) 
+            for (i = 0; i < cpu_count; i++)
             {
-                if (TB_CPUSET_ISSET(i, &cpuset)) 
+                if (TB_CPUSET_ISSET(i, &cpuset))
                     tb_trace_i("get cpu core: %d", i);
             }
         }

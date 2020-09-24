@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -123,7 +123,7 @@ typedef tb_void_t   (*tb_poller_event_func_t)(tb_poller_ref_t poller, tb_poller_
 
 /*! init poller
  *
- * @param priv      the user private data 
+ * @param priv      the user private data
  *
  * @return          the poller
  */

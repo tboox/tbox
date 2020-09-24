@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * demo
- */ 
+ */
 tb_void_t tb_demo_small_allocator_leak(tb_noarg_t);
 tb_void_t tb_demo_small_allocator_leak()
 {
@@ -20,11 +20,11 @@ tb_void_t tb_demo_small_allocator_leak()
         // make data0
         tb_pointer_t data0 = tb_allocator_malloc(small_allocator, 10);
         tb_assert_and_check_break(data0);
-    
+
         // make data1
         tb_pointer_t data1 = tb_allocator_malloc(small_allocator, 10);
         tb_assert_and_check_break(data1);
-    
+
 #ifdef __tb_debug__
         // dump small_allocator
         tb_allocator_dump(small_allocator);
@@ -50,11 +50,11 @@ tb_void_t tb_demo_small_allocator_free2()
         // make data
         tb_pointer_t data = tb_allocator_malloc(small_allocator, 10);
         tb_assert_and_check_break(data);
-    
+
         // exit data
         tb_allocator_free(small_allocator, data);
         tb_allocator_free(small_allocator, data);
-     
+
 #ifdef __tb_debug__
         // dump small_allocator
         tb_allocator_dump(small_allocator);
@@ -79,13 +79,13 @@ tb_void_t tb_demo_small_allocator_underflow()
         // make data
         tb_pointer_t data = tb_allocator_malloc(small_allocator, 10);
         tb_assert_and_check_break(data);
-    
+
         // done underflow
         tb_memset(data, 0, 10 + 1);
 
         // exit data
         tb_allocator_free(small_allocator, data);
- 
+
 #ifdef __tb_debug__
         // dump small_allocator
         tb_allocator_dump(small_allocator);
@@ -110,14 +110,14 @@ tb_void_t tb_demo_small_allocator_underflow2()
         // make data
         tb_pointer_t data = tb_allocator_malloc(small_allocator, 10);
         tb_assert_and_check_break(data);
-    
+
         // done underflow
         tb_memset(data, 0, 10 + 1);
 
         // make data2
         data = tb_allocator_malloc(small_allocator, 10);
         tb_assert_and_check_break(data);
- 
+
 #ifdef __tb_debug__
         // dump small_allocator
         tb_allocator_dump(small_allocator);
@@ -149,7 +149,7 @@ tb_void_t tb_demo_small_allocator_perf()
         tb_pointer_t*   list = (tb_pointer_t*)tb_allocator_large_nalloc0(large_allocator, maxn, sizeof(tb_pointer_t), tb_null);
         tb_assert_and_check_break(list);
 
-        // done 
+        // done
         __tb_volatile__ tb_size_t indx = 0;
         __tb_volatile__ tb_hong_t time = tb_mclock();
         __tb_volatile__ tb_size_t rand = 0xbeaf;
@@ -163,7 +163,7 @@ tb_void_t tb_demo_small_allocator_perf()
             rand = (rand * 10807 + 1) & 0xffffffff;
 
             // re-make data
-            if (!(indx & 31)) 
+            if (!(indx & 31))
             {
                 list[indx] = tb_allocator_ralloc(small_allocator, list[indx], (rand & 3071) + 1);
                 tb_assert_and_check_break(list[indx]);
@@ -174,7 +174,7 @@ tb_void_t tb_demo_small_allocator_perf()
             if (size > 5 && indx)
             {
                 size -= 5;
-                while (size--) 
+                while (size--)
                 {
                     // the free index
                     tb_size_t free_indx = rand % indx;
@@ -214,7 +214,7 @@ tb_void_t tb_demo_small_allocator_perf()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_memory_small_allocator_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 1

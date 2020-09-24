@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -81,7 +81,7 @@ typedef tb_int_t        (*tb_thread_func_t)(tb_cpointer_t priv);
             // trace
             tb_trace_i("wait: ok, retval: %d", retval);
         }
-    
+
         // exit thread
         tb_thread_exit(thread);
     }
@@ -90,7 +90,7 @@ typedef tb_int_t        (*tb_thread_func_t)(tb_cpointer_t priv);
  * @param name          the thread name, maybe null
  * @param func          the thread func
  * @param priv          the thread func private data
- * @param stack         the thread stack, using the default stack size if be zero 
+ * @param stack         the thread stack, using the default stack size if be zero
  *
  * @return              the thread handle
  */
@@ -98,13 +98,13 @@ tb_thread_ref_t         tb_thread_init(tb_char_t const* name, tb_thread_func_t f
 
 /*! exit thread
  *
- * @param thread        the thread 
+ * @param thread        the thread
  */
 tb_void_t               tb_thread_exit(tb_thread_ref_t thread);
 
 /*! wait thread
  *
- * @param thread        the thread 
+ * @param thread        the thread
  * @param timeout       the timeout
  * @param retval        the return value pointer of the thread (optional)
  *
@@ -114,7 +114,7 @@ tb_long_t               tb_thread_wait(tb_thread_ref_t thread, tb_long_t timeout
 
 /*! suspend thread
  *
- * @param thread        the thread 
+ * @param thread        the thread
  *
  * @return              tb_true or tb_false
  */
@@ -122,7 +122,7 @@ tb_bool_t               tb_thread_suspend(tb_thread_ref_t thread);
 
 /*! resume thread
  *
- * @param thread        the thread 
+ * @param thread        the thread
  *
  * @return              tb_true or tb_false
  */
@@ -136,14 +136,14 @@ tb_size_t               tb_thread_self(tb_noarg_t);
 
 /*! return the thread value
  *
- * @param value         the return value of the thread 
+ * @param value         the return value of the thread
  */
 tb_void_t               tb_thread_return(tb_int_t value);
 
 /*! run the given function only once
  *
  * @code
-    
+
     // the once function
     static tb_bool_t tb_thread_once_func(tb_cpointer_t priv)
     {
@@ -153,7 +153,7 @@ tb_void_t               tb_thread_return(tb_int_t value);
         // ok
         return tb_true;
     }
- 
+
     // run the once function
     static tb_atomic32_t once = 0;
     if (tb_thread_once(&once, tb_thread_once_func, "hello"))
@@ -174,8 +174,8 @@ tb_bool_t               tb_thread_once(tb_atomic32_t* lock, tb_bool_t (*func)(tb
 
 /*! set cpu affinity for the given thread
  *
- * @param thread        the thread, set the current thread if be null 
- * @param cpuset        the cpu set 
+ * @param thread        the thread, set the current thread if be null
+ * @param cpuset        the cpu set
  *
  * @return              tb_true or tb_false
  */
@@ -183,8 +183,8 @@ tb_bool_t               tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_
 
 /*! get cpu affinity from the given thread
  *
- * @param thread        the thread, set the current thread if be null 
- * @param cpuset        the cpu set 
+ * @param thread        the thread, set the current thread if be null
+ * @param cpuset        the cpu set
  *
  * @return              tb_true or tb_false
  */

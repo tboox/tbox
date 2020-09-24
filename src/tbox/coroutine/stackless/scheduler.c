@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -50,7 +50,7 @@
  */
 
 #if !defined(TB_CONFIG_MICRO_ENABLE) && !defined(__tb_thread_local__)
-// the self scheduler local 
+// the self scheduler local
 static tb_thread_local_t                        g_scheduler_self = TB_THREAD_LOCAL_INIT;
 #endif
 
@@ -91,9 +91,9 @@ static tb_void_t tb_lo_scheduler_make_ready(tb_lo_scheduler_t* scheduler, tb_lo_
     // mark ready state
     tb_lo_core_state_set(coroutine, TB_STATE_READY);
 
-    // insert this coroutine to ready coroutines 
+    // insert this coroutine to ready coroutines
     if (scheduler->running)
-    { 
+    {
         // .. -> coroutine(inserted) -> running -> ..
         tb_list_entry_insert_prev(&scheduler->coroutines_ready, &scheduler->running->entry, &coroutine->entry);
     }
@@ -141,7 +141,7 @@ static __tb_inline__ tb_lo_coroutine_t* tb_lo_scheduler_next_ready(tb_lo_schedul
     // check
     tb_assert(scheduler && tb_list_entry_size(&scheduler->coroutines_ready));
 
-    // get the next entry 
+    // get the next entry
     tb_list_entry_ref_t entry_next = scheduler->running? tb_list_entry_next(&scheduler->running->entry) : tb_list_entry_head(&scheduler->coroutines_ready);
     tb_assert(entry_next);
 
@@ -249,7 +249,7 @@ tb_void_t tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t
     tb_lo_scheduler_make_ready(scheduler, coroutine);
 }
 tb_lo_scheduler_ref_t tb_lo_scheduler_self_()
-{ 
+{
     // get self scheduler on the current thread
 #if defined(TB_CONFIG_MICRO_ENABLE) || defined(__tb_thread_local__)
     return (tb_lo_scheduler_ref_t)g_scheduler_self_ex;
@@ -305,8 +305,8 @@ tb_void_t tb_lo_scheduler_exit(tb_lo_scheduler_ref_t self)
 
     // must be stopped
     tb_assert(scheduler->stopped);
-    
-    // exit io scheduler first 
+
+    // exit io scheduler first
     if (scheduler->scheduler_io) tb_lo_scheduler_io_exit(scheduler->scheduler_io);
     scheduler->scheduler_io = tb_null;
 
@@ -314,13 +314,13 @@ tb_void_t tb_lo_scheduler_exit(tb_lo_scheduler_ref_t self)
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_ready));
     tb_assert(!tb_list_entry_size(&scheduler->coroutines_suspend));
 
-    // free all dead coroutines 
+    // free all dead coroutines
     tb_lo_scheduler_free(&scheduler->coroutines_dead);
 
-    // free all ready coroutines 
+    // free all ready coroutines
     tb_lo_scheduler_free(&scheduler->coroutines_ready);
 
-    // free all suspend coroutines 
+    // free all suspend coroutines
     tb_lo_scheduler_free(&scheduler->coroutines_suspend);
 
     // exit dead coroutines
@@ -360,7 +360,7 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
     {
         // init self scheduler local
         if (!tb_thread_local_init(&g_scheduler_self, tb_null)) return ;
-     
+
         // update and overide the current scheduler
         tb_thread_local_set(&g_scheduler_self, self);
     }
@@ -379,7 +379,7 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
 #endif
 
     // schedule all ready coroutines
-    while (tb_list_entry_size(&scheduler->coroutines_ready) && !scheduler->stopped) 
+    while (tb_list_entry_size(&scheduler->coroutines_ready) && !scheduler->stopped)
     {
         // trace
         tb_trace_d("[loop]: ready %lu", tb_list_entry_size(&scheduler->coroutines_ready));
@@ -397,11 +397,11 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
             // mark this coroutine as dead if the running coroutine(root level) have been finished
             if (state == TB_STATE_END)
                 tb_lo_scheduler_make_dead(scheduler, scheduler->running);
-            // suspend the running coroutine 
+            // suspend the running coroutine
             else if (state == TB_STATE_SUSPEND)
                 tb_lo_scheduler_make_suspend(scheduler, scheduler->running);
         }
-            
+
         // switch to it if the next coroutine (may be running coroutine) is ready
         if (tb_lo_core_state(coroutine_next) == TB_STATE_READY)
             tb_lo_scheduler_switch(scheduler, coroutine_next);
@@ -409,7 +409,7 @@ tb_void_t tb_lo_scheduler_loop(tb_lo_scheduler_ref_t self, tb_bool_t exclusive)
 
     // stop it
     scheduler->stopped = tb_true;
- 
+
 #ifdef __tb_thread_local__
     g_scheduler_self_ex = tb_null;
 #else

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -31,7 +31,7 @@
  * implementation
  */
 static tb_size_t tb_element_mem_hash(tb_element_ref_t element, tb_cpointer_t data, tb_size_t mask, tb_size_t index)
-{   
+{
     return tb_element_hash_data((tb_byte_t const*)data, element->size, mask, index);
 }
 static tb_long_t tb_element_mem_comp(tb_element_ref_t element, tb_cpointer_t ldata, tb_cpointer_t rdata)
@@ -83,7 +83,7 @@ static tb_void_t tb_element_mem_repl(tb_element_ref_t element, tb_pointer_t buff
     // check
     tb_assert_and_check_return(element && element->size && buff && data);
 
-    // the free is hooked? free it 
+    // the free is hooked? free it
     if (element->free != tb_element_mem_free && element->free)
         element->free(element, buff);
 
@@ -103,7 +103,7 @@ static tb_void_t tb_element_mem_nfree(tb_element_ref_t element, tb_pointer_t buf
     // check
     tb_assert_and_check_return(element && element->size && buff);
 
-    // the free is hooked? free it 
+    // the free is hooked? free it
     if (element->free != tb_element_mem_free && element->free)
     {
         tb_size_t n = size;

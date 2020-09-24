@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -104,7 +104,7 @@ tb_bool_t tb_kernel32_has_SetFileCompletionNotificationModes()
 
             // has XP1_IFS_HANDLES? see https://support.microsoft.com/kb/2568167 for details
             tb_int_t i = 0;
-            for (i = 0; i < iNuminfo; i++) 
+            for (i = 0; i < iNuminfo; i++)
             {
                 if (!(lpProtocolInfo[i].dwServiceFlags1 & XP1_IFS_HANDLES))
                     break;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -155,7 +155,7 @@ static tb_char_t const* tb_url_parse_data(tb_string_ref_t data, tb_char_t const*
     // clear path
     tb_string_clear(data);
 
-    // skip '/' and '\\' and ' ' 
+    // skip '/' and '\\' and ' '
     while (*p && (*p == '/' || *p == '\\' || tb_isspace(*p))) p++;
 
     // done
@@ -266,7 +266,7 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
     case TB_URL_PROTOCOL_SOCK:
     case TB_URL_PROTOCOL_HTTP:
     case TB_URL_PROTOCOL_RTSP:
-        {   
+        {
             // the port
             tb_uint16_t port = tb_ipaddr_port(&url->addr);
 
@@ -297,18 +297,18 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
 
             // add port
             if (    (url->protocol != TB_URL_PROTOCOL_HTTP)
-                ||  (url->is_ssl && port != TB_HTTP_DEFAULT_PORT_SSL) 
+                ||  (url->is_ssl && port != TB_HTTP_DEFAULT_PORT_SSL)
                 ||  (!url->is_ssl && port != TB_HTTP_DEFAULT_PORT))
             {
                 tb_string_cstrfcat(&url->cache, ":%u", port);
             }
 
             // add path
-            if (tb_string_size(&url->path)) 
+            if (tb_string_size(&url->path))
                 tb_string_cstrncat(&url->cache, tb_string_cstr(&url->path), tb_string_size(&url->path));
 
             // add args
-            if (tb_string_size(&url->args)) 
+            if (tb_string_size(&url->args))
             {
                 tb_string_chrcat(&url->cache, '?');
                 tb_string_strcat(&url->cache, &url->args);
@@ -334,11 +334,11 @@ tb_char_t const* tb_url_cstr(tb_url_ref_t url)
             }
 
             // add path
-            if (tb_string_size(&url->path)) 
+            if (tb_string_size(&url->path))
                 tb_string_cstrncat(&url->cache, tb_string_cstr(&url->path), tb_string_size(&url->path));
 
             // add args
-            if (tb_string_size(&url->args)) 
+            if (tb_string_size(&url->args))
             {
                 tb_string_chrcat(&url->cache, '?');
                 tb_string_strcat(&url->cache, &url->args);
@@ -358,7 +358,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
 {
     // check
     tb_assert_and_check_return_val(url && cstr, tb_false);
-    
+
     // done
     tb_bool_t ok = tb_false;
     do
@@ -369,7 +369,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
         // parse proto
         tb_char_t const*    p = cstr;
         tb_char_t           full[TB_PATH_MAXN];
-        if (!tb_strnicmp(p, "http://", 7)) 
+        if (!tb_strnicmp(p, "http://", 7))
         {
             url->protocol = TB_URL_PROTOCOL_HTTP;
             url->is_ssl = 0;
@@ -418,10 +418,10 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             p += 6;
         }
         // ./file or /home/file or c:/file or c:\\file ...
-        else if ((p = tb_path_absolute(cstr, full, TB_PATH_MAXN))) 
+        else if ((p = tb_path_absolute(cstr, full, TB_PATH_MAXN)))
         {
             // for unix style path
-            if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
+            if ((*p == '/') || (!tb_strnicmp(p, "file://", 7)))
             {
                 url->protocol = TB_URL_PROTOCOL_FILE;
                 url->is_ssl = 0;
@@ -459,7 +459,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             // parse host
             p = tb_url_parse_host(&url->host, p);
             tb_assert_and_check_break(p);
-        
+
             // attempt to parse address
             if (tb_string_size(&url->host)) tb_ipaddr_ip_cstr_set(&url->addr, tb_string_cstr(&url->host), TB_IPADDR_FAMILY_NONE);
 
@@ -481,7 +481,7 @@ tb_bool_t tb_url_cstr_set(tb_url_ref_t url, tb_char_t const* cstr)
             tb_ipaddr_port_set(&url->addr, port);
         }
 
-        // parse path and args 
+        // parse path and args
         if (url->protocol != TB_URL_PROTOCOL_DATA)
         {
             // parse path
@@ -562,7 +562,7 @@ tb_char_t const* tb_url_protocol_cstr(tb_url_ref_t url)
     tb_assert_and_check_return_val(url, tb_null);
 
     // the protocols
-    static tb_char_t const* s_protocols[] = 
+    static tb_char_t const* s_protocols[] =
     {
         tb_null
     ,   "file"
@@ -594,7 +594,7 @@ tb_size_t tb_url_protocol_probe(tb_char_t const* url)
     else if (!tb_strnicmp(p, "rtsp://", 7))     protocol = TB_URL_PROTOCOL_RTSP;
     else if (!tb_strnicmp(p, "sql://", 6))      protocol = TB_URL_PROTOCOL_SQL;
     else if (!tb_strnstr(p, 16, "://"))         protocol = TB_URL_PROTOCOL_FILE;
-    else 
+    else
     {
         tb_trace_e("unknown protocol for url: %s", url);
     }
@@ -666,13 +666,13 @@ tb_void_t tb_url_addr_set(tb_url_ref_t url, tb_ipaddr_ref_t addr)
         url->addr = *addr;
 
         // set it if the host not exists
-        if (!tb_string_size(&url->host)) 
+        if (!tb_string_size(&url->host))
         {
             // address => host
             tb_char_t           data[TB_IPADDR_CSTR_MAXN];
             tb_char_t const*    host = tb_ipaddr_ip_cstr(addr, data, sizeof(data));
             if (host) tb_string_cstrcpy(&url->host, host);
- 
+
             // clear url
             tb_string_clear(&url->cache);
         }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -57,13 +57,13 @@ tb_size_t tb_environment_load(tb_environment_ref_t environment, tb_char_t const*
 
         // make value
         if (c != ':' && c) tb_string_chrcat(&value, c);
-        else 
+        else
         {
             // save value to environment
-            if (tb_string_size(&value)) 
+            if (tb_string_size(&value))
                 tb_vector_insert_tail(environment, tb_string_cstr(&value));
 
-            // clear value 
+            // clear value
             tb_string_clear(&value);
 
             // end?

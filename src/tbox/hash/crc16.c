@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
  */
 
 // the crc16(ANSI) table
-tb_uint16_t const g_crc16_table[] = 
+tb_uint16_t const g_crc16_table[] =
 {
     0x0000, 0x0580, 0x0f80, 0x0a00, 0x1b80, 0x1e00, 0x1400, 0x1180
 ,	0x3380, 0x3600, 0x3c00, 0x3980, 0x2800, 0x2d80, 0x2780, 0x2200
@@ -67,7 +67,7 @@ tb_uint16_t const g_crc16_table[] =
 };
 
 // the crc16(CCITT) table
-tb_uint16_t const g_crc16_ccitt_table[] = 
+tb_uint16_t const g_crc16_ccitt_table[] =
 {
     0x0000, 0x2110, 0x4220, 0x6330, 0x8440, 0xa550, 0xc660, 0xe770
 ,	0x0881, 0x2991, 0x4aa1, 0x6bb1, 0x8cc1, 0xadd1, 0xcee1, 0xeff1

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX op->n Source Group.
  *
  * @author      ruki
@@ -57,7 +57,7 @@ tb_size_t tb_iterator_head(tb_iterator_ref_t iterator)
 {
     // check
     tb_assert(iterator && iterator->op && iterator->op->head);
-    
+
     // head
     return iterator->op->head(iterator);
 }
@@ -65,7 +65,7 @@ tb_size_t tb_iterator_last(tb_iterator_ref_t iterator)
 {
     // check
     tb_assert(iterator && iterator->op && iterator->op->last);
-    
+
     // last
     return iterator->op->last(iterator);
 }
@@ -114,7 +114,7 @@ tb_void_t tb_iterator_nremove(tb_iterator_ref_t iterator, tb_size_t prev, tb_siz
     // check
     tb_assert(iterator && iterator->op && iterator->op->nremove);
 
-    // nremove 
+    // nremove
     return iterator->op->nremove(iterator, prev, next, size);
 }
 tb_void_t tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item)

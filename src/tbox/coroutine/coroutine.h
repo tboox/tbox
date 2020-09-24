@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -51,7 +51,7 @@ typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
  * interfaces
  */
 
-/*! start coroutine 
+/*! start coroutine
  *
  * @param scheduler     the scheduler, uses the current scheduler if be null
  * @param func          the coroutine function
@@ -63,7 +63,7 @@ typedef tb_void_t       (*tb_coroutine_func_t)(tb_cpointer_t priv);
 tb_bool_t               tb_coroutine_start(tb_co_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
 /*! yield the current coroutine
- * 
+ *
  * @return              tb_true(yield ok) or tb_false(yield failed, no more coroutines)
  */
 tb_bool_t               tb_coroutine_yield(tb_noarg_t);
@@ -79,7 +79,7 @@ tb_pointer_t            tb_coroutine_resume(tb_coroutine_ref_t coroutine, tb_cpo
 
 /*! suspend the current coroutine
  *
- * @param priv          the user private data as the return value of resume() 
+ * @param priv          the user private data as the return value of resume()
  *
  * @return              the user private data from resume(priv)
  */
@@ -93,7 +93,7 @@ tb_pointer_t            tb_coroutine_suspend(tb_cpointer_t priv);
  */
 tb_pointer_t            tb_coroutine_sleep(tb_long_t interval);
 
-/*! wait io events 
+/*! wait io events
  *
  * @param object        the poller object
  * @param events        the waited events, will remove this object from io scheduler if be TB_SOCKET_EVENT_NONE
@@ -103,7 +103,7 @@ tb_pointer_t            tb_coroutine_sleep(tb_long_t interval);
  */
 tb_long_t               tb_coroutine_waitio(tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
-/*! wait process status 
+/*! wait process status
  *
  * @param object        the poller object
  * @param pstatus       the process exited status pointer, maybe null

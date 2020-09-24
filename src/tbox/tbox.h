@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -92,7 +92,7 @@ __tb_extern_c_enter__
  *
  *                  - tb_null
  *                      uses tb_default_allocator(tb_null, 0) for large mode
- *                      uses tb_native_allocator() for small mode, need define __tb_small__ 
+ *                      uses tb_native_allocator() for small mode, need define __tb_small__
  *
  * @return          tb_true or tb_false
  *
@@ -109,7 +109,7 @@ __tb_extern_c_enter__
         tb_trace_i("hello tbox");
 
         // print info only for debug
-        tb_trace_d("hello tbox"); 
+        tb_trace_d("hello tbox");
 
         // print error info
         tb_trace_e("hello tbox");
@@ -161,7 +161,7 @@ __tb_extern_c_enter__
  *
  *                  - tb_null
  *                      uses tb_default_allocator(tb_null, 0) for large mode
- *                      uses tb_native_allocator() for small mode, need define __tb_small__ 
+ *                      uses tb_native_allocator() for small mode, need define __tb_small__
  *
  * @param mode      the compile mode for check __tb_small__ and __tb_debug__
  * @param build     the build version

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -121,7 +121,7 @@ typedef struct __tb_hash_map_t
 static tb_bool_t tb_hash_map_item_find(tb_hash_map_t* hash_map, tb_cpointer_t name, tb_size_t* pbuck, tb_size_t* pitem)
 {
     tb_assert_and_check_return_val(hash_map && hash_map->hash_list && hash_map->hash_size, tb_false);
-    
+
     // get step
     tb_size_t step = hash_map->element_name.size + hash_map->element_data.size;
     tb_assert_and_check_return_val(step, tb_false);
@@ -163,7 +163,7 @@ static tb_bool_t tb_hash_map_item_find(tb_hash_map_t* hash_map, tb_cpointer_t na
 {
     // check
     tb_assert_and_check_return_val(hash_map && hash_map->hash_list && hash_map->hash_size, tb_false);
-    
+
     // get step
     tb_size_t step = hash_map->element_name.size + hash_map->element_data.size;
     tb_assert_and_check_return_val(step, tb_false);
@@ -194,7 +194,7 @@ static tb_bool_t tb_hash_map_item_find(tb_hash_map_t* hash_map, tb_cpointer_t na
         if (t < 0) r = m;
         else if (t > 0) l = m + 1;
         else break;
-    
+
         // next
         m = (l + r) >> 1;
     }
@@ -216,7 +216,7 @@ static tb_bool_t tb_hash_map_item_at(tb_hash_map_t* hash_map, tb_size_t buck, tb
 {
     // check
     tb_assert_and_check_return_val(hash_map && hash_map->hash_list && hash_map->hash_size && buck < hash_map->hash_size, tb_false);
-    
+
     // get step
     tb_size_t step = hash_map->element_name.size + hash_map->element_data.size;
     tb_assert_and_check_return_val(step, tb_false);
@@ -227,7 +227,7 @@ static tb_bool_t tb_hash_map_item_at(tb_hash_map_t* hash_map, tb_size_t buck, tb
 
     // get name
     if (pname) *pname = hash_map->element_name.data(&hash_map->element_name, ((tb_byte_t*)&list[1]) + item * step);
-    
+
     // get data
     if (pdata) *pdata = hash_map->element_data.data(&hash_map->element_data, ((tb_byte_t*)&list[1]) + item * step + hash_map->element_name.size);
 
@@ -315,7 +315,7 @@ static tb_void_t tb_hash_map_itor_copy(tb_iterator_ref_t iterator, tb_size_t ito
     // check
     tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->hash_list && hash_map->hash_size);
-    
+
     // the buck and item
     tb_size_t b = tb_hash_map_index_buck(itor);
     tb_size_t i = tb_hash_map_index_item(itor);
@@ -338,7 +338,7 @@ static tb_long_t tb_hash_map_itor_comp(tb_iterator_ref_t iterator, tb_cpointer_t
     // check
     tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->element_name.comp && lelement && relement);
-    
+
     // done
     return hash_map->element_name.comp(&hash_map->element_name, ((tb_hash_map_item_ref_t)lelement)->name, ((tb_hash_map_item_ref_t)relement)->name);
 }
@@ -347,7 +347,7 @@ static tb_void_t tb_hash_map_itor_remove(tb_iterator_ref_t iterator, tb_size_t i
     // check
     tb_hash_map_t* hash_map = (tb_hash_map_t*)iterator;
     tb_assert(hash_map && hash_map->hash_list && hash_map->hash_size);
-    
+
     // buck & item
     tb_size_t buck = tb_hash_map_index_buck(itor);
     tb_size_t item = tb_hash_map_index_item(itor);
@@ -376,7 +376,7 @@ static tb_void_t tb_hash_map_itor_remove(tb_iterator_ref_t iterator, tb_size_t i
         list->size--;
     }
     // remove list
-    else 
+    else
     {
         // free it
         tb_free(list);
@@ -429,7 +429,7 @@ static tb_void_t tb_hash_map_itor_nremove(tb_iterator_ref_t iterator, tb_size_t 
         item_tail--;
         tb_assert(buck_last < hash_map->hash_size && item_tail < TB_HASH_MAP_BUCKET_ITEM_MAXN);
     }
-    else 
+    else
     {
         buck_last = hash_map->hash_size - 1;
         item_tail = -1;
@@ -500,7 +500,7 @@ tb_hash_map_ref_t tb_hash_map_init(tb_size_t bucket_size, tb_element_t element_n
         hash_map->element_data = element_data;
 
         // init operation
-        static tb_iterator_op_t op = 
+        static tb_iterator_op_t op =
         {
             tb_hash_map_itor_size
         ,   tb_hash_map_itor_head
@@ -665,7 +665,7 @@ tb_size_t tb_hash_map_insert(tb_hash_map_ref_t self, tb_cpointer_t name, tb_cpoi
 
         // get list
         tb_hash_map_item_list_t* list = hash_map->hash_list[buck];
-        
+
         // insert item
         if (list)
         {
@@ -680,7 +680,7 @@ tb_size_t tb_hash_map_insert(tb_hash_map_ref_t self, tb_cpointer_t name, tb_cpoi
                 tb_assert_and_check_return_val(maxn > list->maxn, 0);
 
                 // realloc it
-                list = (tb_hash_map_item_list_t*)tb_ralloc(list, sizeof(tb_hash_map_item_list_t) + maxn * step);  
+                list = (tb_hash_map_item_list_t*)tb_ralloc(list, sizeof(tb_hash_map_item_list_t) + maxn * step);
                 tb_assert_and_check_return_val(list, 0);
 
                 // update the hash_map item maxn
@@ -791,7 +791,7 @@ tb_void_t tb_hash_map_dump(tb_hash_map_ref_t self)
             // trace
             tb_trace_i("buck[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
 
-            // done 
+            // done
             tb_size_t j = 0;
             for (j = 0; j < list->size; j++)
             {
@@ -809,15 +809,15 @@ tb_void_t tb_hash_map_dump(tb_hash_map_ref_t self)
                 {
                     tb_trace_i("    %s => %s", hash_map->element_name.cstr(&hash_map->element_name, element_name, name, sizeof(name)), hash_map->element_data.cstr(&hash_map->element_data, element_data, data, sizeof(data)));
                 }
-                else if (hash_map->element_name.cstr) 
+                else if (hash_map->element_name.cstr)
                 {
                     tb_trace_i("    %s => %p", hash_map->element_name.cstr(&hash_map->element_name, element_name, name, sizeof(name)), element_data);
                 }
-                else if (hash_map->element_data.cstr) 
+                else if (hash_map->element_data.cstr)
                 {
                     tb_trace_i("    %x => %p", element_name, hash_map->element_data.cstr(&hash_map->element_data, element_data, data, sizeof(data)));
                 }
-                else 
+                else
                 {
                     tb_trace_i("    %p => %p", element_name, element_data);
                 }

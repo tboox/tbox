@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -49,7 +49,7 @@ __tb_extern_c_enter__
 // the coroutine function type
 typedef struct __tb_coroutine_rs_func_t
 {
-    // the function 
+    // the function
     tb_coroutine_func_t             func;
 
     // the user private data as the argument of function
@@ -92,7 +92,7 @@ typedef struct __tb_coroutine_t
     // the scheduler
     tb_co_scheduler_ref_t           scheduler;
 
-    // the context 
+    // the context
     tb_context_ref_t                context;
 
     // the stack base (top)
@@ -105,7 +105,7 @@ typedef struct __tb_coroutine_t
     tb_cpointer_t                   rs_priv;
 
     // the passed private data between resume() and suspend()
-    union 
+    union
     {
         // the function
         tb_coroutine_rs_func_t      func;
@@ -132,18 +132,18 @@ typedef struct __tb_coroutine_t
  * interfaces
  */
 
-/* init coroutine 
+/* init coroutine
  *
  * @param scheduler     the scheduler
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  * @param stacksize     the stack size, uses the default stack size if be zero
  *
- * @return              the coroutine 
+ * @return              the coroutine
  */
 tb_coroutine_t*         tb_coroutine_init(tb_co_scheduler_ref_t scheduler, tb_coroutine_func_t func, tb_cpointer_t priv, tb_size_t stacksize);
 
-/* reinit the given coroutine 
+/* reinit the given coroutine
  *
  * @param coroutine     the coroutine
  * @param func          the coroutine function

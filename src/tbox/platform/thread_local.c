@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -83,7 +83,7 @@ tb_void_t tb_thread_local_walk(tb_walk_func_t func, tb_cpointer_t priv)
 {
     // enter lock
     tb_spinlock_enter(&g_thread_local_lock);
-    
+
     // walk all thread locals
     tb_walk_all(tb_single_list_entry_itor(&g_thread_local_list), func, priv);
 

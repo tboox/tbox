@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -53,7 +53,7 @@ static tb_pointer_t tb_virtual_allocator_ralloc(tb_allocator_ref_t allocator, tb
 }
 static tb_bool_t tb_virtual_allocator_free(tb_allocator_ref_t allocator, tb_pointer_t data __tb_debug_decl__)
 {
-    // trace    
+    // trace
     tb_trace_d("vfree(%p) at %s(): %lu, %s", data, func_, line_, file_);
 
     // free it

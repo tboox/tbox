@@ -1,17 +1,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define COUNT   (50)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
- */ 
-static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv) 
+ */
+static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
 {
     // get arguments
     tb_char_t** argv = (tb_char_t**)priv;
@@ -39,7 +39,7 @@ static tb_void_t tb_demo_coroutine_proc(tb_cpointer_t priv)
 tb_int_t tb_demo_coroutine_process_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_co_scheduler_ref_t scheduler = tb_co_scheduler_init();
-    if (scheduler) 
+    if (scheduler)
     {
         // start coroutines
         tb_size_t count = COUNT;

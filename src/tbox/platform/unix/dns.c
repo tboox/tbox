@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@ tb_bool_t tb_dns_init_env()
 {
     // done
     tb_size_t count = 0;
-    if (tb_file_info("/etc/resolv.conf", tb_null)) 
+    if (tb_file_info("/etc/resolv.conf", tb_null))
     {
         /* try get list from "/etc/resolv.conf"
          *
@@ -49,7 +49,7 @@ tb_bool_t tb_dns_init_env()
         if (stream)
         {
             // open
-            if (tb_stream_open(stream)) 
+            if (tb_stream_open(stream))
             {
                 // read
                 tb_long_t size = 0;
@@ -71,7 +71,7 @@ tb_bool_t tb_dns_init_env()
                     }
                 }
             }
-    
+
             // exit
             tb_stream_exit(stream);
         }

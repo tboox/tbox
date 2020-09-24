@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -34,8 +34,8 @@
  * private implementation
  */
 
-// http://xorshift.di.unimi.it/xorshift128plus.c 
-static tb_uint64_t tb_uuid4_xorshift128plus(tb_uint64_t* s) 
+// http://xorshift.di.unimi.it/xorshift128plus.c
+static tb_uint64_t tb_uuid4_xorshift128plus(tb_uint64_t* s)
 {
     tb_uint64_t s1       = s[0];
     tb_uint64_t const s0 = s[1];
@@ -52,7 +52,7 @@ static tb_bool_t tb_uuid4_generate(tb_byte_t uuid[16], tb_uint64_t seed[2])
     s.word[1] = tb_uuid4_xorshift128plus(seed);
 
     /* generate uuid
-     * 
+     *
      * t: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
      *    xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx
      */
@@ -61,7 +61,7 @@ static tb_bool_t tb_uuid4_generate(tb_byte_t uuid[16], tb_uint64_t seed[2])
     tb_int_t t = 0;
     tb_int_t c1 = 0;
     tb_int_t c2 = 0;
-    for (t = 0; t < 32; t++) 
+    for (t = 0; t < 32; t++)
     {
         n = s.b[i >> 1];
         n = (i & 1) ? (n >> 4) : (n & 0xf);
@@ -100,7 +100,7 @@ tb_bool_t tb_uuid4_make(tb_byte_t uuid[16], tb_char_t const* name)
 
     // init seed
     tb_uint64_t seed[2];
-    if (name) 
+    if (name)
     {
         tb_assert_static(sizeof(seed) == 16);
         tb_md5_make((tb_byte_t const*)name, tb_strlen(name), (tb_byte_t*)seed, 16);

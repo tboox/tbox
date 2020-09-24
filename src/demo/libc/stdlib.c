@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 #include <ctype.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 #define TB_TEST_ISXXX           (0)
 
 #define TB_TEST_TOLOWER         (0)
@@ -21,7 +21,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 #if TB_TEST_ISXXX
 static tb_void_t tb_check_is()
 {
@@ -101,7 +101,7 @@ static tb_void_t tb_test_stoi32(tb_char_t const* s, tb_int32_t val)
  * main
  */
 tb_int_t tb_demo_libc_stdlib_main(tb_int_t argc, tb_char_t** argv)
-{   
+{
     tb_make_isspace_table();
     tb_make_isalpha_table();
 

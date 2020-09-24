@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -47,7 +47,7 @@
 #define TB_SCHEDULER_IO_TIMER_GROW          (TB_SCHEDULER_IO_LTIMER_GROW >> 4)
 
 // the poller object data grow
-#ifdef __tb_small__ 
+#ifdef __tb_small__
 #   define TB_SCHEDULER_IO_POLLERDATA_GROW    (64)
 #else
 #   define TB_SCHEDULER_IO_POLLERDATA_GROW    (4096)
@@ -60,7 +60,7 @@ static tb_void_t tb_co_scheduler_io_resume(tb_co_scheduler_t* scheduler, tb_coro
 {
     // exists the timer task? remove it
     tb_cpointer_t task = coroutine->rs.wait.task;
-    if (task) 
+    if (task)
     {
         // get io scheduler
         tb_co_scheduler_io_ref_t scheduler_io = tb_co_scheduler_io(scheduler);
@@ -108,7 +108,7 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
             }
         }
 
-        // resume the coroutine 
+        // resume the coroutine
         tb_co_scheduler_io_resume(scheduler, coroutine, TB_POLLER_EVENT_NONE);
     }
 }
@@ -167,15 +167,15 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_poller_obj
         pollerdata->co_send = tb_null;
         tb_co_scheduler_io_resume(scheduler_io->scheduler, co_recv, events);
     }
-    else 
+    else
     {
-        if (co_recv) 
+        if (co_recv)
         {
             pollerdata->co_recv = tb_null;
             tb_co_scheduler_io_resume(scheduler_io->scheduler, co_recv, events & ~TB_POLLER_EVENT_SEND);
             events &= ~TB_POLLER_EVENT_RECV;
         }
-        if (co_send) 
+        if (co_send)
         {
             pollerdata->co_send = tb_null;
             tb_co_scheduler_io_resume(scheduler_io->scheduler, co_send, events & ~TB_POLLER_EVENT_RECV);
@@ -183,7 +183,7 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_poller_obj
         }
 
         // no coroutines are waiting? cache this events
-        if ((events & TB_POLLER_EVENT_RECV) || (events & TB_POLLER_EVENT_SEND)) 
+        if ((events & TB_POLLER_EVENT_RECV) || (events & TB_POLLER_EVENT_SEND))
         {
             // trace
             tb_trace_d("object: %p, cache events %lu", object->ref.ptr, events);
@@ -229,7 +229,7 @@ static tb_void_t tb_co_scheduler_io_loop(tb_cpointer_t priv)
     while (!scheduler->stopped)
     {
         // finish all other ready coroutines first
-        while (tb_co_scheduler_yield(scheduler)) 
+        while (tb_co_scheduler_yield(scheduler))
         {
             // spak timer
             if (!tb_co_scheduler_io_timer_spak(scheduler_io)) break;
@@ -248,7 +248,7 @@ static tb_void_t tb_co_scheduler_io_loop(tb_cpointer_t priv)
         tb_trace_d("loop: wait %lu ms, %lu pending coroutines ..", tb_min(delay, ldelay), tb_co_scheduler_suspend_count(scheduler));
 
         // no more ready coroutines? wait io events and timers
-        if (tb_poller_wait(poller, tb_co_scheduler_io_events, tb_min(delay, ldelay)) < 0) 
+        if (tb_poller_wait(poller, tb_co_scheduler_io_events, tb_min(delay, ldelay)) < 0)
         {
             tb_trace_e("loop: wait poller failed!");
             break;
@@ -480,7 +480,7 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_poll
         if ((events_wait & TB_POLLER_EVENT_SEND) && !pollerdata->co_send) events_wait &= ~TB_POLLER_EVENT_SEND;
         events_wait |= events;
 
-        // modify poller object from poller for waiting events if the waiting events has been changed 
+        // modify poller object from poller for waiting events if the waiting events has been changed
         if ((events_prev_wait & events_wait) != events_wait)
         {
             // trace
@@ -538,11 +538,11 @@ tb_long_t tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t scheduler_io, tb_poll
     coroutine->rs.wait.object       = *object;
     coroutine->rs.wait.is_ltimer    = is_ltimer;
 
-    // save waiting events 
+    // save waiting events
     pollerdata->poller_events_wait = (tb_uint16_t)events_wait;
     pollerdata->poller_events_save = 0;
 
-    // save the current coroutine 
+    // save the current coroutine
     if (events & TB_POLLER_EVENT_RECV) pollerdata->co_recv = coroutine;
     if (events & TB_POLLER_EVENT_SEND) pollerdata->co_send = coroutine;
 

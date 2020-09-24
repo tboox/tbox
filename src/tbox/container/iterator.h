@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -81,7 +81,7 @@ typedef struct __tb_iterator_op_t
     /// the iterator remove
     tb_void_t               (*remove)(struct __tb_iterator_t* iterator, tb_size_t itor);
 
-    /// the iterator nremove 
+    /// the iterator nremove
     tb_void_t               (*nremove)(struct __tb_iterator_t* iterator, tb_size_t prev, tb_size_t next, tb_size_t size);
 
 }tb_iterator_op_t;
@@ -114,7 +114,7 @@ typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb
  */
 
 /*! the iterator mode
- * 
+ *
  * @param iterator  the iterator
  *
  * @return          the iterator mode
@@ -122,7 +122,7 @@ typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb
 tb_size_t           tb_iterator_mode(tb_iterator_ref_t iterator);
 
 /*! the iterator step
- * 
+ *
  * @param iterator  the iterator
  *
  * @return          the iterator step
@@ -130,7 +130,7 @@ tb_size_t           tb_iterator_mode(tb_iterator_ref_t iterator);
 tb_size_t           tb_iterator_step(tb_iterator_ref_t iterator);
 
 /*! the iterator size
- * 
+ *
  * @param iterator  the iterator
  *
  * @return          the iterator size
@@ -138,7 +138,7 @@ tb_size_t           tb_iterator_step(tb_iterator_ref_t iterator);
 tb_size_t           tb_iterator_size(tb_iterator_ref_t iterator);
 
 /*! the iterator head
- * 
+ *
  * @param iterator  the iterator
  *
  * @return          the iterator head
@@ -146,7 +146,7 @@ tb_size_t           tb_iterator_size(tb_iterator_ref_t iterator);
 tb_size_t           tb_iterator_head(tb_iterator_ref_t iterator);
 
 /*! the iterator last
- * 
+ *
  * @param iterator  the iterator
  *
  * @return          the iterator last
@@ -154,7 +154,7 @@ tb_size_t           tb_iterator_head(tb_iterator_ref_t iterator);
 tb_size_t           tb_iterator_last(tb_iterator_ref_t iterator);
 
 /*! the iterator tail
- * 
+ *
  * @param iterator  the iterator
  *
  * @return          the iterator tail
@@ -162,7 +162,7 @@ tb_size_t           tb_iterator_last(tb_iterator_ref_t iterator);
 tb_size_t           tb_iterator_tail(tb_iterator_ref_t iterator);
 
 /*! the iterator prev
- * 
+ *
  * @param iterator  the iterator
  * @param itor      the item itor
  *
@@ -171,7 +171,7 @@ tb_size_t           tb_iterator_tail(tb_iterator_ref_t iterator);
 tb_size_t           tb_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /*! the iterator next
- * 
+ *
  * @param iterator  the iterator
  * @param itor      the item itor
  *
@@ -180,7 +180,7 @@ tb_size_t           tb_iterator_prev(tb_iterator_ref_t iterator, tb_size_t itor)
 tb_size_t           tb_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /*! the iterator item
- * 
+ *
  * @param iterator  the iterator
  * @param itor      the item itor
  *
@@ -189,14 +189,14 @@ tb_size_t           tb_iterator_next(tb_iterator_ref_t iterator, tb_size_t itor)
 tb_pointer_t        tb_iterator_item(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /*! remove the iterator item
- * 
+ *
  * @param iterator  the iterator
  * @param itor      the item itor
  */
 tb_void_t           tb_iterator_remove(tb_iterator_ref_t iterator, tb_size_t itor);
 
 /*! remove the iterator items from range(prev, next)
- * 
+ *
  * @param iterator  the iterator
  * @param prev      the prev item
  * @param next      the next item
@@ -205,7 +205,7 @@ tb_void_t           tb_iterator_remove(tb_iterator_ref_t iterator, tb_size_t ito
 tb_void_t           tb_iterator_nremove(tb_iterator_ref_t iterator, tb_size_t prev, tb_size_t next, tb_size_t size);
 
 /*! copy the iterator item
- * 
+ *
  * @param iterator  the iterator
  * @param itor      the item itor
  * @param item      the copied item
@@ -213,7 +213,7 @@ tb_void_t           tb_iterator_nremove(tb_iterator_ref_t iterator, tb_size_t pr
 tb_void_t           tb_iterator_copy(tb_iterator_ref_t iterator, tb_size_t itor, tb_cpointer_t item);
 
 /*! compare the iterator item
- * 
+ *
  * @param iterator  the iterator
  * @param litem     the item
  * @param ritem     the compared item

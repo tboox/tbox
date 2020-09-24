@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -193,7 +193,7 @@ static tb_int_t tb_ssl_bio_method_init(BIO* bio)
     // trace
     tb_trace_d("bio: init");
 
-    // init 
+    // init
     BIO_set_init(bio, 1);
     BIO_set_data(bio, tb_null);
     BIO_set_shutdown(bio, 1);
@@ -209,7 +209,7 @@ static tb_int_t tb_ssl_bio_method_exit(BIO* bio)
     // trace
     tb_trace_d("bio: exit");
 
-    // exit 
+    // exit
     BIO_set_init(bio, 0);
     BIO_set_data(bio, tb_null);
     BIO_set_shutdown(bio, 0);
@@ -226,7 +226,7 @@ static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
     tb_ssl_t* ssl = (tb_ssl_t*)BIO_get_data(bio);
     tb_assert_and_check_return_val(ssl && ssl->read, -1);
 
-    // writ 
+    // writ
     tb_long_t real = ssl->read(ssl->priv, (tb_byte_t*)data, size);
 
     // trace
@@ -235,20 +235,20 @@ static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
     // ok? clear wait
     if (real > 0) ssl->lwait = 0;
     // peer closed?
-    else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_SOCKET_EVENT_RECV)) 
+    else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_SOCKET_EVENT_RECV))
     {
         BIO_clear_retry_flags(bio);
         real = -1;
     }
     // no data? continue to read it
-    else if (!real) 
+    else if (!real)
     {
         BIO_clear_retry_flags(bio);
         BIO_set_retry_read(bio);
         real = -1;
     }
     // failed?
-    else 
+    else
     {
         BIO_clear_retry_flags(bio);
         real = -1;
@@ -266,7 +266,7 @@ static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t
     tb_ssl_t* ssl = (tb_ssl_t*)BIO_get_data(bio);
     tb_assert_and_check_return_val(ssl && ssl->writ, -1);
 
-    // writ 
+    // writ
     tb_long_t real = ssl->writ(ssl->priv, (tb_byte_t const*)data, size);
 
     // trace
@@ -275,13 +275,13 @@ static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t
     // ok? clear wait
     if (real > 0) ssl->lwait = 0;
     // peer closed?
-    else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_SOCKET_EVENT_SEND)) 
+    else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_SOCKET_EVENT_SEND))
     {
         BIO_clear_retry_flags(bio);
         real = -1;
     }
     // no data? continue to writ
-    else if (!real) 
+    else if (!real)
     {
         BIO_clear_retry_flags(bio);
         BIO_set_retry_write(bio);
@@ -378,12 +378,12 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         // init ctx
         ssl->ctx = SSL_CTX_new(SSLv23_method());
         tb_assert_and_check_break(ssl->ctx);
-        
+
         // make ssl
         ssl->ssl = SSL_new(ssl->ctx);
         tb_assert_and_check_break(ssl->ssl);
 
-        // init endpoint 
+        // init endpoint
         if (bserver) SSL_set_accept_state(ssl->ssl);
         else SSL_set_connect_state(ssl->ssl);
 
@@ -506,7 +506,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
 
         // do handshake
         tb_long_t r = SSL_do_handshake(ssl->ssl);
-    
+
         // trace
         tb_trace_d("open: handshake: %ld", r);
 
@@ -536,7 +536,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
             {
                 // trace
                 tb_trace_d("open: handshake: failed: %s", tb_ssl_error(error));
-    
+
                 // save state
                 ssl->state = TB_STATE_SOCK_SSL_FAILED;
             }
@@ -604,7 +604,7 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
 
         // do shutdown
         tb_long_t r = SSL_shutdown(ssl->ssl);
-    
+
         // trace
         tb_trace_d("close: shutdown: %ld", r);
 
@@ -634,7 +634,7 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
             {
                 // trace
                 tb_trace_d("close: shutdown: failed: %s", tb_ssl_error(error));
-    
+
                 // save state
                 ssl->state = TB_STATE_SOCK_SSL_FAILED;
             }
@@ -787,7 +787,7 @@ tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t events, tb_long_t timeout)
     // the ssl
     tb_ssl_t* ssl = (tb_ssl_t*)self;
     tb_assert_and_check_return_val(ssl && ssl->wait, -1);
-    
+
     // the ssl state
     switch (ssl->state)
     {

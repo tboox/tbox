@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 0
@@ -194,7 +194,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
             else break;
         }
     }
-        
+
     // exit file
     if (ifile) tb_file_exit(ifile);
     if (ofile) tb_file_exit(ofile);

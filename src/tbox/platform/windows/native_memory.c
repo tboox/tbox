@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,13 +36,13 @@
 static tb_handle_t      g_heap = tb_null;
 
 // the lock
-static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT; 
+static tb_spinlock_t    g_lock = TB_SPINLOCK_INIT;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_native_memory_init()
-{   
+{
     // enter
     tb_spinlock_enter_without_profiler(&g_lock);
 
@@ -69,8 +69,8 @@ tb_bool_t tb_native_memory_init()
     return ok;
 }
 tb_void_t tb_native_memory_exit()
-{   
-    // enter 
+{
+    // enter
     tb_spinlock_enter_without_profiler(&g_lock);
 
     // exit heap
@@ -91,7 +91,7 @@ tb_pointer_t tb_native_memory_malloc(tb_size_t size)
     // init data
     tb_pointer_t data = tb_null;
 
-    // enter 
+    // enter
     tb_spinlock_enter_without_profiler(&g_lock);
 
     // alloc data
@@ -111,7 +111,7 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
     // init data
     tb_pointer_t data = tb_null;
 
-    // enter 
+    // enter
     tb_spinlock_enter_without_profiler(&g_lock);
 
     // alloc data
@@ -126,7 +126,7 @@ tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_null); 
+    tb_check_return_val(item && size, tb_null);
 
     // nalloc
     return tb_native_memory_malloc(item * size);
@@ -134,7 +134,7 @@ tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
     // check
-    tb_check_return_val(item && size, tb_null);     
+    tb_check_return_val(item && size, tb_null);
 
     // nalloc0
     return tb_native_memory_malloc0(item * size);
@@ -142,7 +142,7 @@ tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
     // no size? free it
-    if (!size) 
+    if (!size)
     {
         tb_native_memory_free(data);
         return tb_null;
@@ -150,9 +150,9 @@ tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
     // no data? malloc it
     else if (!data) return tb_native_memory_malloc(size);
     // realloc it
-    else 
+    else
     {
-        // enter 
+        // enter
         tb_spinlock_enter_without_profiler(&g_lock);
 
         // realloc
@@ -170,7 +170,7 @@ tb_bool_t tb_native_memory_free(tb_pointer_t data)
     // check
     tb_check_return_val(data, tb_true);
 
-    // enter 
+    // enter
     tb_spinlock_enter_without_profiler(&g_lock);
 
     // free data

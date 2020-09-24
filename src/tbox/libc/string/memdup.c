@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -27,7 +27,7 @@
 #include "../../memory/impl/prefix.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_pointer_t tb_memdup_(tb_cpointer_t s, tb_size_t n)
 {
@@ -43,7 +43,7 @@ tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
 {
     // check
     tb_assert_and_check_return_val(s, tb_null);
-    
+
     // check
 #ifdef __tb_debug__
     {

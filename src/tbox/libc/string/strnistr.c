@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -26,7 +26,7 @@
 #include "string.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 tb_char_t* tb_strnistr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2)
 {
@@ -39,16 +39,16 @@ tb_char_t* tb_strnistr(tb_char_t const* s1, tb_size_t n1, tb_char_t const* s2)
     __tb_register__ tb_size_t        n = n1;
 
     // done
-    do 
+    do
     {
         if (!*p) return (tb_char_t* )s1;
-        if (n && ((*p == *s) || (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s))))) 
+        if (n && ((*p == *s) || (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s)))))
         {
             ++p;
             ++s;
             --n;
-        } 
-        else 
+        }
+        else
         {
             p = s2;
             if (!*s || !n) return tb_null;

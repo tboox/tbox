@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -78,7 +78,7 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
     sem_t* h = (sem_t*)semaphore;
     tb_assert_and_check_return_val(h && post, tb_false);
 
-    // post 
+    // post
     while (post--)
     {
         if (sem_post(h) < 0) return tb_false;

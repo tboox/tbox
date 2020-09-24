@@ -11,11 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        ipv4.c 
+ * @file        ipv4.c
  * @ingroup     network
  *
  */
@@ -112,7 +112,7 @@ tb_bool_t tb_ipv4_cstr_set(tb_ipv4_ref_t ipv4, tb_char_t const* cstr)
             v = 0;
         }
         // failed?
-        else 
+        else
         {
             // trace
             tb_trace_d("invalid ipv4 addr: %s", cstr);

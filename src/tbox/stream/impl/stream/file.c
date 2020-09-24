@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -81,7 +81,7 @@ static tb_bool_t tb_stream_file_open(tb_stream_ref_t stream)
 
     // open file
     stream_file->file = tb_file_init(url, stream_file->mode);
-    
+
     // open file failed?
     if (!stream_file->file)
     {
@@ -122,7 +122,7 @@ static tb_long_t tb_stream_file_read(tb_stream_ref_t stream, tb_byte_t* data, tb
     tb_check_return_val(data, -1);
     tb_check_return_val(size, 0);
 
-    // read 
+    // read
     stream_file->read = tb_file_read(stream_file->file, data, size);
     if (stream_file->read > 0)
         stream_file->offset += stream_file->read;
@@ -183,9 +183,9 @@ static tb_long_t tb_stream_file_wait(tb_stream_ref_t stream, tb_size_t wait, tb_
     tb_stream_file_t* stream_file = tb_stream_file_cast(stream);
     tb_assert_and_check_return_val(stream_file && stream_file->file, -1);
 
-    // wait 
+    // wait
     tb_long_t events = 0;
-    if (wait & TB_STREAM_WAIT_READ) 
+    if (wait & TB_STREAM_WAIT_READ)
     {
         if (stream_file->bstream)
             events |= TB_STREAM_WAIT_READ;
@@ -220,7 +220,7 @@ static tb_bool_t tb_stream_file_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             tb_assert_and_check_return_val(psize, tb_false);
 
             // get size
-            if (!stream_file->bstream) 
+            if (!stream_file->bstream)
             {
                 tb_hize_t filesize = stream_file->file? tb_file_size(stream_file->file) : 0;
                 if (!filesize)
@@ -294,7 +294,7 @@ tb_stream_ref_t tb_stream_init_file()
                                             ,   tb_null);
     tb_assert_and_check_return_val(stream, tb_null);
 
-    // init the file stream 
+    // init the file stream
     tb_stream_file_t* stream_file = tb_stream_file_cast(stream);
     if (stream_file)
     {
@@ -323,10 +323,10 @@ tb_stream_ref_t tb_stream_init_from_file(tb_char_t const* path, tb_size_t mode)
 
         // set path
         if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_SET_URL, path)) break;
-        
+
         // set mode
         if (mode) if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, mode)) break;
-    
+
         // ok
         ok = tb_true;
 

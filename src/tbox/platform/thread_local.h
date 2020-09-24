@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -78,12 +78,12 @@ typedef struct __tb_thread_local_t
  * interfaces
  */
 
-/*! init a thread local 
+/*! init a thread local
  *
  * @note support to be called repeatly, thread safely and only init it once
  *
  * @code
- 
+
     // the thread local free function
     static tb_void_t tb_thread_local_free_func(tb_cpointer_t priv)
     {
@@ -97,7 +97,7 @@ typedef struct __tb_thread_local_t
         static tb_thread_local_t s_local = TB_THREAD_LOCAL_INIT;
         if (!tb_thread_local_init(&s_local, tb_thread_local_free_func)) return tb_null;
 
-        // get the thread local data 
+        // get the thread local data
         tb_char_t const* data = tb_null;
         if (!(data = tb_thread_local_get(&s_local)))
         {
@@ -124,7 +124,7 @@ tb_bool_t               tb_thread_local_init(tb_thread_local_ref_t local, tb_thr
 
 /*! exit the thread local (optional)
  *
- * @note this local will be exited automaticlly after tb_exit() was called 
+ * @note this local will be exited automaticlly after tb_exit() was called
  *       and we call also manually call this function to exit the thread local in earlier time
  *
  * @param local         the thread local reference
@@ -149,7 +149,7 @@ tb_pointer_t            tb_thread_local_get(tb_thread_local_ref_t local);
 
 /*! set thead local data to the current thread
  *
- * @note this data will be freed automaticlly after it's thread was returned 
+ * @note this data will be freed automaticlly after it's thread was returned
  *
  * @param local         the thread local reference
  * @param priv          the thread local private data

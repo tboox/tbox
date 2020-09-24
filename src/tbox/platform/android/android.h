@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@
  */
 tb_bool_t           tb_android_init_env(JavaVM* jvm);
 
-/// exit the android platform 
+/// exit the android platform
 tb_void_t           tb_android_exit_env(tb_noarg_t);
 
 /*! the java machine pointer

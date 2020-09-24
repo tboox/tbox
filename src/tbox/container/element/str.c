@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -61,7 +61,7 @@ static tb_void_t tb_element_str_free(tb_element_ref_t element, tb_pointer_t buff
 
     // exists?
     tb_pointer_t cstr = *((tb_pointer_t*)buff);
-    if (cstr) 
+    if (cstr)
     {
         // free it
         tb_free(cstr);
@@ -116,7 +116,7 @@ static tb_void_t tb_element_str_repl(tb_element_ref_t element, tb_pointer_t buff
             tb_assert(cstr);
 
             // copy the left data
-            tb_memcpy((tb_char_t*)cstr + copy, q, left + 1); 
+            tb_memcpy((tb_char_t*)cstr + copy, q, left + 1);
 
             // update the cstr
             *((tb_pointer_t*)buff) = cstr;
@@ -145,7 +145,7 @@ static tb_void_t tb_element_str_nfree(tb_element_ref_t element, tb_pointer_t buf
     // check
     tb_assert_and_check_return(element && buff);
 
-    // free elements 
+    // free elements
     if (element->free)
     {
         tb_size_t n = size;

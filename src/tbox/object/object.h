@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -199,12 +199,12 @@ tb_object_ref_t     tb_object_data(tb_object_ref_t object, tb_size_t format);
         7. ".macro3"               : 3.1415926
         8. ".macro4[0]"            : "hello world!"
 
- * 
+ *
  * </pre>
  *
  * @param object    the object
  * @param path      the object path
- * @param bmacro    enable macro(like "$.path")? 
+ * @param bmacro    enable macro(like "$.path")?
  *
  * <code>
  * tb_object_ref_t object = tb_object_seek(root, ".array[5].string", tb_false);

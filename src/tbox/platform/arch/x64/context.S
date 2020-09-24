@@ -46,7 +46,7 @@
  *             ------------------------------------------------------------------------------------------
  * context:   |   r12   |   r13   |   r14   |   r15   |   rbx   |   rbp   |   rip   | args | padding ... |
  *             ------------------------------------------------------------------------------------------
- *            0         8         16        24        32        40        48        56        
+ *            0         8         16        24        32        40        48        56
  *                                                                                  |  16-align for macosx
  *                                                                                  |
  *                                                                       esp when jump to function
@@ -82,7 +82,7 @@ function(tb_context_make)
     movq %rcx, 40(%rax)
 
     // return the context pointer
-    ret 
+    ret
 
 __entry:
 
@@ -97,9 +97,9 @@ __entry:
      *             -------------------------------
      * context: .. |   end   | args | padding ... |
      *             -------------------------------
-     *             0         8        
-     *             | 16-align for macosx  
-     *            rsp   
+     *             0         8
+     *             | 16-align for macosx
+     *            rsp
      */
     jmp *%rbx
 
@@ -149,7 +149,7 @@ function(tb_context_jump)
     // restore the return or function address(rip)
     popq %r8
 
-    // return from-context(context: rax, priv: rdx) from jump 
+    // return from-context(context: rax, priv: rdx) from jump
     movq %rsi, %rdx
 
     /* jump to the return or function address(rip)
@@ -157,9 +157,9 @@ function(tb_context_jump)
      *              ---------------------
      * context: .. |  args | padding ... |
      *              ---------------------
-     *             0       8        
-     *             | 16-align for macosx 
-     *            rsp   
+     *             0       8
+     *             | 16-align for macosx
+     *            rsp
      */
     jmp *%r8
 

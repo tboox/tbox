@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,9 +43,9 @@ static tb_int_t tb_socket_type(tb_size_t type)
     {
     case TB_SOCKET_TYPE_SOCK_STREAM:
         return SOCK_STREAM;
-    case TB_SOCKET_TYPE_SOCK_DGRAM: 
+    case TB_SOCKET_TYPE_SOCK_DGRAM:
         return SOCK_DGRAM;
-    case TB_SOCKET_TYPE_SOCK_RAW: 
+    case TB_SOCKET_TYPE_SOCK_RAW:
         return SOCK_RAW;
     }
 
@@ -62,9 +62,9 @@ static tb_int_t tb_socket_proto(tb_size_t type, tb_size_t family)
     {
     case TB_SOCKET_TYPE_IPPROTO_TCP:
         return IPPROTO_TCP;
-    case TB_SOCKET_TYPE_IPPROTO_UDP: 
+    case TB_SOCKET_TYPE_IPPROTO_UDP:
         return IPPROTO_UDP;
-    case TB_SOCKET_TYPE_IPPROTO_ICMP: 
+    case TB_SOCKET_TYPE_IPPROTO_ICMP:
         return family == TB_IPADDR_FAMILY_IPV6? IPPROTO_ICMPV6 : IPPROTO_ICMP;
     }
 
@@ -139,7 +139,7 @@ tb_socket_ref_t tb_socket_init(tb_size_t type, tb_size_t family)
 {
     // check
     tb_assert_and_check_return_val(type, tb_null);
-    
+
     // done
     tb_socket_ref_t sock = tb_null;
     do
@@ -175,11 +175,11 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
 {
     // check
     tb_assert_and_check_return_val(type && pair, tb_false);
-    
+
     // init pair
     pair[0] = tb_null;
     pair[1] = tb_null;
- 
+
     // init socket type and protocol
     tb_int_t p = 0;
     tb_int_t t = tb_socket_type(type);
@@ -200,14 +200,14 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
         SOCKADDR_IN b = {0};
         b.sin_family = AF_INET;
         b.sin_port = 0;
-        b.sin_addr.S_un.S_addr = tb_bits_ne_to_be_u32(INADDR_LOOPBACK); 
+        b.sin_addr.S_un.S_addr = tb_bits_ne_to_be_u32(INADDR_LOOPBACK);
 
         // reuse addr
 #ifdef SO_REUSEADDR
         {
             tb_int_t reuseaddr = 1;
-            if (tb_ws2_32()->setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0) 
-                break; 
+            if (tb_ws2_32()->setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0)
+                break;
         }
 #endif
 
@@ -240,7 +240,7 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2])
         if (tb_ws2_32()->ioctlsocket(sock1, FIONBIO, &nb) == SOCKET_ERROR) break;
         if (tb_ws2_32()->ioctlsocket(sock2, FIONBIO, &nb) == SOCKET_ERROR) break;
 
-        // ok 
+        // ok
         ok = tb_true;
 
     } while (0);
@@ -292,7 +292,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             u_long nb = is_block? 0 : 1;
             tb_ws2_32()->ioctlsocket(tb_sock2fd(sock), FIONBIO, &nb);
 
-            // ok 
+            // ok
             ok = tb_true;
         }
         break;
@@ -323,7 +323,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             {
                 // save it
                 *penable = (tb_bool_t)enable;
-            
+
                 // ok
                 ok = tb_true;
             }
@@ -350,7 +350,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             {
                 // save it
                 *pbuff_size = real;
-            
+
                 // ok
                 ok = tb_true;
             }
@@ -377,7 +377,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
             {
                 // save it
                 *pbuff_size = real;
-            
+
                 // ok
                 ok = tb_true;
             }
@@ -412,7 +412,7 @@ tb_bool_t tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...)
         }
         break;
     }
-    
+
     // exit args
     tb_va_end(args);
 
@@ -449,7 +449,7 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (e == WSAEISCONN) return 1;
 
     // continue?
-    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS) 
+    if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS)
         return 0;
 
     // error
@@ -470,7 +470,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (tb_ipaddr_family(addr) != TB_IPADDR_FAMILY_UNIX)
     {
         tb_int_t reuseaddr = 1;
-        if (tb_ws2_32()->setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0) 
+        if (tb_ws2_32()->setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEADDR, (tb_char_t*)&reuseaddr, sizeof(reuseaddr)) < 0)
         {
             // trace
             tb_trace_e("reuseaddr: failed");
@@ -483,7 +483,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     if (tb_ipaddr_port(addr))
     {
         tb_int_t reuseport = 1;
-        if (tb_ws2_32()->setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_char_t*)&reuseport, sizeof(reuseport)) < 0) 
+        if (tb_ws2_32()->setsockopt(tb_sock2fd(sock), SOL_SOCKET, SO_REUSEPORT, (tb_char_t*)&reuseport, sizeof(reuseport)) < 0)
         {
             // trace
             tb_trace_e("reuseport: %u failed", tb_ipaddr_port(addr));
@@ -491,7 +491,7 @@ tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     }
 #endif
 
-    // bind 
+    // bind
     return !tb_ws2_32()->bind(tb_sock2fd(sock), (struct sockaddr *)&d, n);
 }
 tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
@@ -518,7 +518,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     tb_socket_ref_t acpt = tb_null;
     do
     {
-        // done  
+        // done
         struct sockaddr_storage d = {0};
         tb_int_t                n = sizeof(d);
         SOCKET                  fd = tb_ws2_32()->accept(tb_sock2fd(sock), (struct sockaddr *)&d, &n);
@@ -535,13 +535,13 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
         /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
          *
-         * 40ms is the tcp ack delay, which indicates that you are likely 
-         * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+         * 40ms is the tcp ack delay, which indicates that you are likely
+         * encountering a bad interaction between delayed acks and the nagle's algorithm.
          *
-         * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
-         * whereas the other two must be set at the appropriate times during the life of the connection 
+         * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket,
+         * whereas the other two must be set at the appropriate times during the life of the connection
          * and can therefore be trickier to use.
-         * 
+         *
          * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
          */
         tb_int_t enable = 1;
@@ -549,7 +549,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
         // save address
         if (addr) tb_sockaddr_save(addr, &d);
-        
+
         // ok
         ok = tb_true;
 
@@ -606,7 +606,7 @@ tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
 
     // kill it
     tb_bool_t ok = !tb_ws2_32()->shutdown(tb_sock2fd(sock), how)? tb_true : tb_false;
- 
+
     // failed?
     if (!ok)
     {
@@ -751,7 +751,7 @@ tb_long_t tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t*
     tb_long_t               r = tb_ws2_32()->recvfrom(tb_sock2fd(sock), (tb_char_t*)data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
     // ok?
-    if (r >= 0) 
+    if (r >= 0)
     {
         if (addr) tb_sockaddr_save(addr, &d);
         return r;
@@ -923,7 +923,7 @@ tb_long_t tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_
 
     // save address
     if (addr) tb_sockaddr_save(addr, &d);
- 
+
     // ok?
     return read;
 }

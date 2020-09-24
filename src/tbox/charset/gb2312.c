@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -68,12 +68,12 @@ static tb_uint32_t tb_charset_gb2312_to_ucs4(tb_uint32_t ch)
  */
 tb_long_t tb_charset_gb2312_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_gb2312_get(tb_static_stream_ref_t sstream, tb_bool_t be, tb_uint32_t* ch)
-{   
+{
     // init
     tb_byte_t const*    p = tb_static_stream_pos(sstream);
     tb_size_t           n = tb_static_stream_left(sstream);
 
-    if (*p <= 0x7f) 
+    if (*p <= 0x7f)
     {
         // not enough? break it
         tb_check_return_val(n, -1);
@@ -102,7 +102,7 @@ tb_long_t tb_charset_gb2312_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb
 
     // character
     ch = tb_charset_gb2312_from_ucs4(ch);
-    if (ch <= 0x7f) 
+    if (ch <= 0x7f)
     {
         // not enough? break it
         tb_check_return_val(n, -1);

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -107,7 +107,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
     tb_long_t           rate = -1;
     tb_socket_ref_t     sock = tb_null;
     do
-    { 
+    {
         // trace
         tb_trace_d("test: %{ipaddr}: ..", addr);
 
@@ -135,10 +135,10 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
          * tb_uint16_t cd     :1;       // checking disabled
          * tb_uint16_t rcode  :4;       // response code
          *
-         * this is a query 
-         * this is a standard query 
-         * not authoritive answer 
-         * not truncated 
+         * this is a query
+         * this is a standard query
+         * not authoritive answer
+         * not truncated
          * recursion desired
          *
          * recursion not available! hey we dont have it (lol)
@@ -168,7 +168,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
          * tb_uint16_t resource;        // number of resource entries
          *
          */
-        tb_static_stream_writ_u16_be(&sstream, 1); 
+        tb_static_stream_writ_u16_be(&sstream, 1);
         tb_static_stream_writ_u16_be(&sstream, 0);
         tb_static_stream_writ_u16_be(&sstream, 0);
         tb_static_stream_writ_u16_be(&sstream, 0);
@@ -215,13 +215,13 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
 
             // check
             tb_check_break_state(real >= 0, fail, tb_true);
-            
+
             // no data?
             if (!real)
             {
                 // abort?
                 tb_check_break_state(!writ, fail, tb_true);
-     
+
                 // wait
                 real = tb_socket_wait(sock, TB_SOCKET_EVENT_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
 
@@ -234,7 +234,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
         // failed?
         tb_check_break(!fail);
 
-        // only recv id & answer, 8 bytes 
+        // only recv id & answer, 8 bytes
         tb_long_t read = 0;
         while (read < 8)
         {
@@ -246,7 +246,7 @@ static tb_long_t tb_dns_server_test(tb_ipaddr_ref_t addr)
 
             // check
             tb_check_break(r >= 0);
-            
+
             // no data?
             if (!r)
             {
@@ -335,7 +335,7 @@ tb_bool_t tb_dns_server_init()
     do
     {
         // init list
-        if (!g_list.list) 
+        if (!g_list.list)
         {
             g_list.list = tb_vector_init(8, tb_element_mem(sizeof(tb_dns_server_t), tb_null, tb_null));
             g_list.sort = tb_false;
@@ -375,9 +375,9 @@ tb_void_t tb_dns_server_dump()
 {
     // enter
     tb_spinlock_enter(&g_lock);
-    
+
     // dump list
-    if (g_list.list) 
+    if (g_list.list)
     {
         // trace
         tb_trace_i("============================================================");
@@ -422,7 +422,7 @@ tb_void_t tb_dns_server_sort()
         // init list
         list = tb_vector_init(8, element);
         tb_assert_and_check_break(list);
-        
+
         // copy list
         tb_vector_copy(list, g_list.list);
 
@@ -444,7 +444,7 @@ tb_void_t tb_dns_server_sort()
 
     // sort list
     tb_sort_all(list, tb_null);
-    
+
     // enter
     tb_spinlock_enter(&g_lock);
 
@@ -463,13 +463,13 @@ tb_void_t tb_dns_server_sort()
     tb_vector_exit(list);
 }
 tb_size_t tb_dns_server_get(tb_ipaddr_t addr[2])
-{ 
+{
     // check
     tb_assert_and_check_return_val(addr, 0);
 
     // sort first
     tb_dns_server_sort();
-        
+
     // enter
     tb_spinlock_enter(&g_lock);
 
@@ -490,7 +490,7 @@ tb_size_t tb_dns_server_get(tb_ipaddr_t addr[2])
         {
             // the dns server
             tb_dns_server_t const* server = (tb_dns_server_t const*)tb_iterator_item(g_list.list, i);
-            if (server) 
+            if (server)
             {
                 // save addr
                 addr[ok++] = server->addr;

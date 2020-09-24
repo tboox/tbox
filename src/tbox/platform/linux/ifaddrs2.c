@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -65,7 +65,7 @@ static tb_long_t tb_ifaddrs_netlink_socket_init()
         ok = tb_true;
 
     } while (0);
-    
+
     // failed?
     if (!ok)
     {
@@ -96,7 +96,7 @@ static tb_long_t tb_ifaddrs_netlink_socket_send(tb_long_t sock, tb_long_t reques
     packet.m_hdr.nlmsg_pid      = 0;
     packet.m_hdr.nlmsg_seq      = (tb_int_t)sock;
     packet.m_msg.rtgen_family   = AF_UNSPEC;
-    
+
     // send packet
     struct sockaddr_nl addr;
     memset(&addr, 0, sizeof(addr));
@@ -125,14 +125,14 @@ static tb_long_t tb_ifaddrs_netlink_socket_recv(tb_long_t sock, tb_pointer_t dat
 
         // recv packet
         tb_long_t ok = recvmsg(sock, &packet, 0);
-        
-        // failed or continue 
+
+        // failed or continue
         if (ok < 0)
         {
             if (errno == EINTR) continue;
             return -2;
         }
-        
+
         // buffer was too small
         if (packet.msg_flags & MSG_TRUNC) return -1;
 
@@ -203,7 +203,7 @@ static tb_size_t tb_ifaddrs_netlink_ipaddr_save(tb_ipaddr_ref_t ipaddr, tb_size_
         tb_assert(0);
         break;
     }
-    
+
     // ok?
     return size;
 }
@@ -226,7 +226,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
     // the info
     struct ifaddrmsg* info = (struct ifaddrmsg *)NLMSG_DATA(response);
 
-    // must be not link 
+    // must be not link
     tb_assert_and_check_return(info->ifa_family != AF_PACKET);
 
     // attempt to find the interface name
@@ -294,7 +294,7 @@ static tb_void_t tb_ifaddrs_interface_done_ipaddr(tb_list_ref_t interfaces, tb_h
                     if (!tb_ifaddrs_netlink_ipaddr_save(&ipaddr, info->ifa_family, info->ifa_index, rta_data)) break;
 
                     // save flags
-                    if ((info->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr)) 
+                    if ((info->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr))
                         interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
                     // save ipaddr
@@ -468,7 +468,7 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map
         // make data
         data = tb_ralloc(data, size);
         tb_assert_and_check_break(data);
-        
+
         // trace
         tb_trace_d("netlink: recv: ..");
 
@@ -496,7 +496,7 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map
         {
             // trace
             tb_trace_d("type: %d, pid: %ld ?= %ld, sock: %ld ?= %ld", response->nlmsg_type, (tb_long_t)response->nlmsg_pid, (tb_long_t)pid, (tb_long_t)response->nlmsg_seq, (tb_long_t)sock);
- 
+
             // failed?
             tb_check_break_state(response->nlmsg_type != NLMSG_ERROR, failed, tb_true);
 
@@ -506,7 +506,7 @@ static tb_long_t tb_ifaddrs_interface_done(tb_list_ref_t interfaces, tb_hash_map
             // isn't it?
             if ((pid_t)response->nlmsg_pid != pid || (tb_long_t)response->nlmsg_seq != sock)
                 continue;
-           
+
             // done?
             if (response->nlmsg_type == NLMSG_DONE)
             {
@@ -594,7 +594,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     tb_assert_and_check_return_val(interfaces, tb_null);
 
     // uses the cached interfaces?
-    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
+    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces);
 
     // clear interfaces first
     tb_list_clear(interfaces);

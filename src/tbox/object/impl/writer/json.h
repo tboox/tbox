@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -62,7 +62,7 @@ tb_oc_writer_t*                 tb_oc_json_writer(tb_noarg_t);
 
 /*! hook the json writer
  *
- * @param type                  the object type 
+ * @param type                  the object type
  * @param func                  the writer func
  *
  * @return                      tb_true or tb_false
@@ -71,7 +71,7 @@ tb_bool_t                       tb_oc_json_writer_hook(tb_size_t type, tb_oc_jso
 
 /*! the json writer func
  *
- * @param type                  the object type 
+ * @param type                  the object type
  *
  * @return                      the object writer func
  */

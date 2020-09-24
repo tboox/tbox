@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@ tb_bool_t tb_dns_init_env()
         // init the dns property name
         tb_char_t prop_name[PROP_NAME_MAX] = {0};
         tb_snprintf(prop_name, sizeof(prop_name) - 1, "net.dns%lu", count + 1);
-        
+
         // get dns address name
         tb_char_t dns[64] = {0};
         if (!__system_property_get(prop_name, dns)) break;

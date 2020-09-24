@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,10 +52,10 @@ static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_set_explicit_x86(tb_atomic
     // check
     tb_assert(a);
 
-    __tb_asm__ __tb_volatile__ 
+    __tb_asm__ __tb_volatile__
     (
         "lock xchgl %0, %1\n"   //!< xchgl v, [a]
-        : "+r" (v) 
+        : "+r" (v)
         : "m" (*a)
         : "memory"
     );
@@ -71,12 +71,12 @@ static __tb_inline__ tb_bool_t tb_atomic32_compare_and_swap_explicit_x86(tb_atom
     /*
      * cmpxchgl v, [a]:
      *
-     * if (eax == [a]) 
+     * if (eax == [a])
      * {
      *      zf = 1;
      *      [a] = v;
-     * } 
-     * else 
+     * }
+     * else
      * {
      *      zf = 0;
      *      eax = [a];
@@ -85,11 +85,11 @@ static __tb_inline__ tb_bool_t tb_atomic32_compare_and_swap_explicit_x86(tb_atom
      */
     tb_int32_t o;
     tb_int32_t e = *p;
-    __tb_asm__ __tb_volatile__ 
+    __tb_asm__ __tb_volatile__
     (
         "lock cmpxchgl  %3, %1  \n"     //!< cmpxchgq v, [a]
-        : "=a" (o) 
-        : "m" (*a), "a" (e), "r" (v) 
+        : "=a" (o)
+        : "m" (*a), "a" (e), "r" (v)
         : "cc", "memory"                //!< "cc" means that flags were changed.
     );
     *p = o;
@@ -110,11 +110,11 @@ static __tb_inline__ tb_int32_t tb_atomic32_fetch_and_add_explicit_x86(tb_atomic
      *
      * cf, ef, of, sf, zf, pf... maybe changed
      */
-    __tb_asm__ __tb_volatile__ 
+    __tb_asm__ __tb_volatile__
     (
         "lock xaddl %0, %1 \n"          //!< xaddl v, [a]
-        : "+r" (v) 
-        : "m" (*a) 
+        : "+r" (v)
+        : "m" (*a)
         : "cc", "memory"
     );
 

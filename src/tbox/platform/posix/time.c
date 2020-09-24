@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -83,14 +83,14 @@ tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
     if (gettimeofday(&ttv, &ttz)) return tb_false;
 
     // tv
-    if (tv) 
+    if (tv)
     {
         tv->tv_sec = (tb_time_t)ttv.tv_sec;
         tv->tv_usec = (tb_suseconds_t)ttv.tv_usec;
     }
 
     // tz
-    if (tz) 
+    if (tz)
     {
         tz->tz_minuteswest = ttz.tz_minuteswest;
         tz->tz_dsttime = ttz.tz_dsttime;

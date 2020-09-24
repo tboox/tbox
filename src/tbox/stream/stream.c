@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -105,7 +105,7 @@ tb_stream_ref_t tb_stream_init(     tb_size_t type
 
     } while (0);
 
-    // failed? 
+    // failed?
     if (!ok)
     {
         // exit it
@@ -122,7 +122,7 @@ tb_stream_ref_t tb_stream_init_from_url(tb_char_t const* url)
     tb_assert_and_check_return_val(url, tb_null);
 
     // the init
-    static tb_stream_ref_t (*s_init[])() = 
+    static tb_stream_ref_t (*s_init[])() =
     {
         tb_null
     ,   tb_stream_init_file
@@ -207,7 +207,7 @@ tb_long_t tb_stream_wait(tb_stream_ref_t self, tb_size_t wait, tb_long_t timeout
 
     // wait it
     tb_long_t ok = stream->wait(self, wait, timeout);
-    
+
     // wait failed? save state
     if (ok < 0 && !stream->state) stream->state = TB_STATE_WAIT_FAILED;
 
@@ -218,7 +218,7 @@ tb_long_t tb_stream_wait(tb_stream_ref_t self, tb_size_t wait, tb_long_t timeout
     if (tb_queue_buffer_maxn(&stream->cache))
     {
         // have read cache?
-        if ((wait & TB_STREAM_WAIT_READ) && !stream->bwrited && !tb_queue_buffer_null(&stream->cache)) 
+        if ((wait & TB_STREAM_WAIT_READ) && !stream->bwrited && !tb_queue_buffer_null(&stream->cache))
             ok |= TB_STREAM_WAIT_READ;
         // have writ cache?
         else if ((wait & TB_STREAM_WAIT_WRIT) && stream->bwrited && !tb_queue_buffer_full(&stream->cache))
@@ -268,7 +268,7 @@ tb_hize_t tb_stream_left(tb_stream_ref_t self)
 {
     // check
     tb_assert_and_check_return_val(self, 0);
-    
+
     // the size
     tb_hong_t size = tb_stream_size(self);
     tb_check_return_val(size >= 0, -1);
@@ -331,7 +331,7 @@ tb_bool_t tb_stream_is_opened(tb_stream_ref_t self)
 
     // the state
     tb_size_t state = tb_atomic32_get(&stream->istate);
-    
+
     // is opened?
     return (TB_STATE_OPENED == state || TB_STATE_KILLING == state)? tb_true : tb_false;
 }
@@ -379,7 +379,7 @@ tb_bool_t tb_stream_ctrl(tb_stream_ref_t self, tb_size_t ctrl, ...)
     return ok;
 }
 tb_bool_t tb_stream_ctrl_with_args(tb_stream_ref_t self, tb_size_t ctrl, tb_va_list_t args)
-{   
+{
     // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream && stream->ctrl, tb_false);
@@ -597,7 +597,7 @@ tb_void_t tb_stream_kill(tb_stream_ref_t self)
         // trace
         tb_trace_d("kill: %s: ok", tb_url_cstr(&stream->url));
     }
-    else 
+    else
     {
         // closed? killed
         tb_atomic32_fetch_and_cmpset(&stream->istate, TB_STATE_CLOSED, TB_STATE_KILLED);
@@ -632,7 +632,7 @@ tb_bool_t tb_stream_open(tb_stream_ref_t self)
 }
 tb_bool_t tb_stream_clos(tb_stream_ref_t self)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream, tb_false);
 
@@ -659,7 +659,7 @@ tb_bool_t tb_stream_clos(tb_stream_ref_t self)
 }
 tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(data && size, tb_false);
 
@@ -685,7 +685,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
     tb_assert_and_check_return_val(tb_queue_buffer_maxn(&stream->cache) && size <= tb_queue_buffer_maxn(&stream->cache), tb_false);
 
     // enough?
-    if (size <= tb_queue_buffer_size(&stream->cache)) 
+    if (size <= tb_queue_buffer_size(&stream->cache))
     {
         // save data
         *data = tb_queue_buffer_head(&stream->cache);
@@ -705,7 +705,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
     {
         // read data
         tb_long_t real = stream->read(self, tail + read, push - read);
-        
+
         // ok?
         if (real > 0)
         {
@@ -723,7 +723,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
         }
         else break;
     }
-    
+
     // leave cache for push
     tb_queue_buffer_push_exit(&stream->cache, read);
 
@@ -746,7 +746,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
 }
 tb_long_t tb_stream_peek(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(data && size, -1);
 
@@ -773,7 +773,7 @@ tb_long_t tb_stream_peek(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
 
     // attempt to peek data from cache directly?
     tb_size_t cached_size = tb_queue_buffer_size(&stream->cache);
-    if (cached_size) 
+    if (cached_size)
     {
         *data = tb_queue_buffer_head(&stream->cache);
         return tb_min(size, cached_size);
@@ -803,11 +803,11 @@ tb_long_t tb_stream_peek(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
         return tb_min(size, real);
     }
     // need wait
-    else return 0; 
+    else return 0;
 }
 tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(data, -1);
 
@@ -850,7 +850,7 @@ tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
             tb_check_return_val(real >= 0, -1);
 
             // read the left data from cache
-            if (real > 0) 
+            if (real > 0)
             {
                 // leave cache for push
                 tb_queue_buffer_push_exit(&stream->cache, real);
@@ -859,11 +859,11 @@ tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
                 real = tb_queue_buffer_read(&stream->cache, data + read, tb_min(real, size - read));
                 tb_check_return_val(real >= 0, -1);
 
-                // save read 
+                // save read
                 read += real;
             }
         }
-        else 
+        else
         {
             // read it directly
             read = stream->read(self, data, size);
@@ -880,7 +880,7 @@ tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
 }
 tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(data, -1);
 
@@ -905,7 +905,7 @@ tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t 
             // writ data to cache first
             writ = tb_queue_buffer_writ(&stream->cache, data, size);
             tb_check_return_val(writ >= 0, -1);
-            
+
             // ok?
             tb_check_break(!writ);
 
@@ -931,11 +931,11 @@ tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t 
                 real = tb_queue_buffer_writ(&stream->cache, data + writ, tb_min(real, size - writ));
                 tb_check_return_val(real >= 0, -1);
 
-                // save writ 
+                // save writ
                 writ += real;
             }
         }
-        else 
+        else
         {
             // writ it directly
             writ = stream->writ(self, data, size);
@@ -952,7 +952,7 @@ tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t 
 }
 tb_bool_t tb_stream_bread(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream && data, tb_false);
     tb_check_return_val(size, tb_true);
@@ -970,7 +970,7 @@ tb_bool_t tb_stream_bread(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
     while (read < size && (TB_STATE_OPENED == tb_atomic32_get(&stream->istate)))
     {
         // read data
-        tb_long_t real = tb_stream_read(self, data + read, tb_min(size - read, TB_STREAM_BLOCK_MAXN));    
+        tb_long_t real = tb_stream_read(self, data + read, tb_min(size - read, TB_STREAM_BLOCK_MAXN));
         if (real > 0) read += real;
         else if (!real)
         {
@@ -993,7 +993,7 @@ tb_bool_t tb_stream_bread(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
 }
 tb_bool_t tb_stream_bwrit(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream && data, tb_false);
     tb_check_return_val(size, tb_true);
@@ -1003,7 +1003,7 @@ tb_bool_t tb_stream_bwrit(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t
     while (writ < size && (TB_STATE_OPENED == tb_atomic32_get(&stream->istate)))
     {
         // writ data
-        tb_long_t real = tb_stream_writ(self, data + writ, tb_min(size - writ, TB_STREAM_BLOCK_MAXN));    
+        tb_long_t real = tb_stream_writ(self, data + writ, tb_min(size - writ, TB_STREAM_BLOCK_MAXN));
         if (real > 0) writ += real;
         else if (!real)
         {
@@ -1026,7 +1026,7 @@ tb_bool_t tb_stream_bwrit(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t
 }
 tb_bool_t tb_stream_sync(tb_stream_ref_t self, tb_bool_t bclosing)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream && stream->writ && stream->wait && tb_stream_is_opened(self), tb_false);
 
@@ -1095,7 +1095,7 @@ tb_bool_t tb_stream_sync(tb_stream_ref_t self, tb_bool_t bclosing)
 }
 tb_bool_t tb_stream_seek(tb_stream_ref_t self, tb_hize_t offset)
 {
-    // check 
+    // check
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream && tb_stream_is_opened(self), tb_false);
 
@@ -1141,7 +1141,7 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t self, tb_hize_t offset)
 
                 // save offset
                 stream->offset = offset;
-                
+
                 // ok
                 ok = tb_true;
             }
@@ -1159,7 +1159,7 @@ tb_bool_t tb_stream_seek(tb_stream_ref_t self, tb_hize_t offset)
             {
                 // save offset
                 stream->offset = offset;
-    
+
                 // clear cache
                 tb_queue_buffer_clear(&stream->cache);
             }
@@ -1191,7 +1191,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
     tb_stream_t* stream = tb_stream_cast(self);
     tb_assert_and_check_return_val(stream, -1);
 
-    // init static buffer 
+    // init static buffer
     tb_static_buffer_t buffer;
     if (!tb_static_buffer_init(&buffer, (tb_byte_t*)data, size)) return -1;
 
@@ -1212,7 +1212,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
                 tb_static_buffer_memncat(&buffer, line, n);
                 break;
             }
-            else 
+            else
             {
                 if (!tb_stream_skip(self, real)) return -1;
                 tb_static_buffer_memncat(&buffer, line, real);
@@ -1227,7 +1227,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
                 break;
             }
         }
-        else 
+        else
         {
             eof = tb_true;
             break;
@@ -1239,7 +1239,7 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
 
     // ok?
     tb_size_t linesize = tb_static_buffer_size(&buffer);
-    if (linesize) 
+    if (linesize)
     {
         if (linesize && data[linesize - 1] == '\n') linesize--;
         if (linesize && data[linesize - 1] == '\r') linesize--;
@@ -1252,7 +1252,7 @@ tb_long_t tb_stream_bwrit_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
 {
     // writ data
     tb_long_t writ = 0;
-    if (size) 
+    if (size)
     {
         if (!tb_stream_bwrit(self, (tb_byte_t*)data, size)) return -1;
     }
@@ -1264,7 +1264,7 @@ tb_long_t tb_stream_bwrit_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
             if (!tb_stream_bwrit(self, (tb_byte_t*)p, 1)) return -1;
             p++;
         }
-    
+
         writ = p - data;
     }
 
@@ -1351,10 +1351,10 @@ tb_byte_t* tb_stream_bread_all(tb_stream_ref_t self, tb_bool_t is_cstr, tb_size_
                 }
 
                 // read data
-                tb_long_t real = tb_stream_read(self, data + read, maxn - read);    
+                tb_long_t real = tb_stream_read(self, data + read, maxn - read);
 
                 // ok?
-                if (real > 0) 
+                if (real > 0)
                 {
                     // update size
                     read += real;
@@ -1375,7 +1375,7 @@ tb_byte_t* tb_stream_bread_all(tb_stream_ref_t self, tb_bool_t is_cstr, tb_size_
 
             // check
             tb_assert_and_check_break(data && read <= maxn);
-            
+
             // append '\0' if be c-string
             if (is_cstr) data[read] = '\0';
 
@@ -1385,7 +1385,7 @@ tb_byte_t* tb_stream_bread_all(tb_stream_ref_t self, tb_bool_t is_cstr, tb_size_
             // ok
             ok = tb_true;
         }
-    
+
     } while (0);
 
     // failed?
@@ -1408,7 +1408,7 @@ tb_bool_t tb_stream_bread_s8(tb_stream_ref_t self, tb_sint8_t* pvalue)
     return tb_stream_bread(self, (tb_byte_t*)pvalue, 1);
 }
 tb_bool_t tb_stream_bread_u16_le(tb_stream_ref_t self, tb_uint16_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[2];
     tb_bool_t ok = tb_stream_bread(self, b, 2);
@@ -1420,7 +1420,7 @@ tb_bool_t tb_stream_bread_u16_le(tb_stream_ref_t self, tb_uint16_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s16_le(tb_stream_ref_t self, tb_sint16_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[2];
     tb_bool_t ok = tb_stream_bread(self, b, 2);
@@ -1432,7 +1432,7 @@ tb_bool_t tb_stream_bread_s16_le(tb_stream_ref_t self, tb_sint16_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u24_le(tb_stream_ref_t self, tb_uint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[3];
     tb_bool_t ok = tb_stream_bread(self, b, 3);
@@ -1444,7 +1444,7 @@ tb_bool_t tb_stream_bread_u24_le(tb_stream_ref_t self, tb_uint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s24_le(tb_stream_ref_t self, tb_sint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[3];
     tb_bool_t ok = tb_stream_bread(self, b, 3);
@@ -1456,7 +1456,7 @@ tb_bool_t tb_stream_bread_s24_le(tb_stream_ref_t self, tb_sint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u32_le(tb_stream_ref_t self, tb_uint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[4];
     tb_bool_t ok = tb_stream_bread(self, b, 4);
@@ -1468,7 +1468,7 @@ tb_bool_t tb_stream_bread_u32_le(tb_stream_ref_t self, tb_uint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s32_le(tb_stream_ref_t self, tb_sint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[4];
     tb_bool_t ok = tb_stream_bread(self, b, 4);
@@ -1480,7 +1480,7 @@ tb_bool_t tb_stream_bread_s32_le(tb_stream_ref_t self, tb_sint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u64_le(tb_stream_ref_t self, tb_uint64_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[8];
     tb_bool_t ok = tb_stream_bread(self, b, 8);
@@ -1492,7 +1492,7 @@ tb_bool_t tb_stream_bread_u64_le(tb_stream_ref_t self, tb_uint64_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s64_le(tb_stream_ref_t self, tb_sint64_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[8];
     tb_bool_t ok = tb_stream_bread(self, b, 8);
@@ -1504,7 +1504,7 @@ tb_bool_t tb_stream_bread_s64_le(tb_stream_ref_t self, tb_sint64_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u16_be(tb_stream_ref_t self, tb_uint16_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[2];
     tb_bool_t ok = tb_stream_bread(self, b, 2);
@@ -1516,7 +1516,7 @@ tb_bool_t tb_stream_bread_u16_be(tb_stream_ref_t self, tb_uint16_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s16_be(tb_stream_ref_t self, tb_sint16_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[2];
     tb_bool_t ok = tb_stream_bread(self, b, 2);
@@ -1528,7 +1528,7 @@ tb_bool_t tb_stream_bread_s16_be(tb_stream_ref_t self, tb_sint16_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u24_be(tb_stream_ref_t self, tb_uint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[3];
     tb_bool_t ok = tb_stream_bread(self, b, 3);
@@ -1540,7 +1540,7 @@ tb_bool_t tb_stream_bread_u24_be(tb_stream_ref_t self, tb_uint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s24_be(tb_stream_ref_t self, tb_sint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[3];
     tb_bool_t ok = tb_stream_bread(self, b, 3);
@@ -1552,7 +1552,7 @@ tb_bool_t tb_stream_bread_s24_be(tb_stream_ref_t self, tb_sint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u32_be(tb_stream_ref_t self, tb_uint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[4];
     tb_bool_t ok = tb_stream_bread(self, b, 4);
@@ -1564,7 +1564,7 @@ tb_bool_t tb_stream_bread_u32_be(tb_stream_ref_t self, tb_uint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s32_be(tb_stream_ref_t self, tb_sint32_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[4];
     tb_bool_t ok = tb_stream_bread(self, b, 4);
@@ -1576,7 +1576,7 @@ tb_bool_t tb_stream_bread_s32_be(tb_stream_ref_t self, tb_sint32_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_u64_be(tb_stream_ref_t self, tb_uint64_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[8];
     tb_bool_t ok = tb_stream_bread(self, b, 8);
@@ -1588,7 +1588,7 @@ tb_bool_t tb_stream_bread_u64_be(tb_stream_ref_t self, tb_uint64_t* pvalue)
     return ok;
 }
 tb_bool_t tb_stream_bread_s64_be(tb_stream_ref_t self, tb_sint64_t* pvalue)
-{   
+{
     // read data
     tb_byte_t b[8];
     tb_bool_t ok = tb_stream_bread(self, b, 8);
@@ -1624,7 +1624,7 @@ tb_bool_t tb_stream_bwrit_s16_le(tb_stream_ref_t self, tb_sint16_t value)
     return tb_stream_bwrit(self, b, 2);
 }
 tb_bool_t tb_stream_bwrit_u24_le(tb_stream_ref_t self, tb_uint32_t value)
-{   
+{
     tb_byte_t b[3];
     tb_bits_set_u24_le(b, value);
     return tb_stream_bwrit(self, b, 3);
@@ -1636,7 +1636,7 @@ tb_bool_t tb_stream_bwrit_s24_le(tb_stream_ref_t self, tb_sint32_t value)
     return tb_stream_bwrit(self, b, 3);
 }
 tb_bool_t tb_stream_bwrit_u32_le(tb_stream_ref_t self, tb_uint32_t value)
-{   
+{
     tb_byte_t b[4];
     tb_bits_set_u32_le(b, value);
     return tb_stream_bwrit(self, b, 4);
@@ -1648,7 +1648,7 @@ tb_bool_t tb_stream_bwrit_s32_le(tb_stream_ref_t self, tb_sint32_t value)
     return tb_stream_bwrit(self, b, 4);
 }
 tb_bool_t tb_stream_bwrit_u64_le(tb_stream_ref_t self, tb_uint64_t value)
-{   
+{
     tb_byte_t b[8];
     tb_bits_set_u64_le(b, value);
     return tb_stream_bwrit(self, b, 8);
@@ -1672,7 +1672,7 @@ tb_bool_t tb_stream_bwrit_s16_be(tb_stream_ref_t self, tb_sint16_t value)
     return tb_stream_bwrit(self, b, 2);
 }
 tb_bool_t tb_stream_bwrit_u24_be(tb_stream_ref_t self, tb_uint32_t value)
-{   
+{
     tb_byte_t b[3];
     tb_bits_set_u24_be(b, value);
     return tb_stream_bwrit(self, b, 3);
@@ -1684,7 +1684,7 @@ tb_bool_t tb_stream_bwrit_s24_be(tb_stream_ref_t self, tb_sint32_t value)
     return tb_stream_bwrit(self, b, 3);
 }
 tb_bool_t tb_stream_bwrit_u32_be(tb_stream_ref_t self, tb_uint32_t value)
-{   
+{
     tb_byte_t b[4];
     tb_bits_set_u32_be(b, value);
     return tb_stream_bwrit(self, b, 4);
@@ -1696,7 +1696,7 @@ tb_bool_t tb_stream_bwrit_s32_be(tb_stream_ref_t self, tb_sint32_t value)
     return tb_stream_bwrit(self, b, 4);
 }
 tb_bool_t tb_stream_bwrit_u64_be(tb_stream_ref_t self, tb_uint64_t value)
-{   
+{
     tb_byte_t b[8];
     tb_bits_set_u64_be(b, value);
     return tb_stream_bwrit(self, b, 8);

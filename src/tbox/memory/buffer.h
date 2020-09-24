@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -154,7 +154,7 @@ tb_byte_t*          tb_buffer_memnset(tb_buffer_ref_t buffer, tb_byte_t b, tb_si
  */
 tb_byte_t*          tb_buffer_memnsetp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t b, tb_size_t n);
 
-/*! memcpy: b => 0 ... 
+/*! memcpy: b => 0 ...
  *
  * @param buffer    the buffer
  * @param b         the copied buffer
@@ -163,7 +163,7 @@ tb_byte_t*          tb_buffer_memnsetp(tb_buffer_ref_t buffer, tb_size_t p, tb_b
  */
 tb_byte_t*          tb_buffer_memcpy(tb_buffer_ref_t buffer, tb_buffer_ref_t b);
 
-/*! memcpy: b => p ... 
+/*! memcpy: b => p ...
  *
  * @param buffer    the buffer
  * @param p         the start position
@@ -173,7 +173,7 @@ tb_byte_t*          tb_buffer_memcpy(tb_buffer_ref_t buffer, tb_buffer_ref_t b);
  */
 tb_byte_t*          tb_buffer_memcpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_buffer_ref_t b);
 
-/*! memcpy: b ... n => 0 ... 
+/*! memcpy: b ... n => 0 ...
  *
  * @param buffer    the buffer
  * @param b         the copied buffer
@@ -183,7 +183,7 @@ tb_byte_t*          tb_buffer_memcpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_bu
  */
 tb_byte_t*          tb_buffer_memncpy(tb_buffer_ref_t buffer, tb_byte_t const* b, tb_size_t n);
 
-/*! memcpy: b ... n => p ... 
+/*! memcpy: b ... n => p ...
  *
  * @param buffer    the buffer
  * @param p         the start position
@@ -194,7 +194,7 @@ tb_byte_t*          tb_buffer_memncpy(tb_buffer_ref_t buffer, tb_byte_t const* b
  */
 tb_byte_t*          tb_buffer_memncpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n);
 
-/*! memmov: b ... e => 0 ... 
+/*! memmov: b ... e => 0 ...
  *
  * @param buffer    the buffer
  * @param b         the moved start position
@@ -203,7 +203,7 @@ tb_byte_t*          tb_buffer_memncpyp(tb_buffer_ref_t buffer, tb_size_t p, tb_b
  */
 tb_byte_t*          tb_buffer_memmov(tb_buffer_ref_t buffer, tb_size_t b);
 
-/*! memmov: b ... e => p ... 
+/*! memmov: b ... e => p ...
  *
  * @param buffer    the buffer
  * @param p         the moved destination position
@@ -213,7 +213,7 @@ tb_byte_t*          tb_buffer_memmov(tb_buffer_ref_t buffer, tb_size_t b);
  */
 tb_byte_t*          tb_buffer_memmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_size_t b);
 
-/*! memmov: b ... n => 0 ... 
+/*! memmov: b ... n => 0 ...
  *
  * @param buffer    the buffer
  * @param b         the moved start position
@@ -223,7 +223,7 @@ tb_byte_t*          tb_buffer_memmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_si
  */
 tb_byte_t*          tb_buffer_memnmov(tb_buffer_ref_t buffer, tb_size_t b, tb_size_t n);
 
-/*! memmov: b ... n => p ... 
+/*! memmov: b ... n => p ...
  *
  * @param buffer    the buffer
  * @param p         the moved destination position
@@ -234,7 +234,7 @@ tb_byte_t*          tb_buffer_memnmov(tb_buffer_ref_t buffer, tb_size_t b, tb_si
  */
 tb_byte_t*          tb_buffer_memnmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_size_t b, tb_size_t n);
 
-/*! memcat: b +=> e ... 
+/*! memcat: b +=> e ...
  *
  * @param buffer    the buffer
  * @param b         the concated buffer
@@ -243,7 +243,7 @@ tb_byte_t*          tb_buffer_memnmovp(tb_buffer_ref_t buffer, tb_size_t p, tb_s
  */
 tb_byte_t*          tb_buffer_memcat(tb_buffer_ref_t buffer, tb_buffer_ref_t b);
 
-/*! memcat: b ... n +=> e ... 
+/*! memcat: b ... n +=> e ...
  *
  * @param buffer    the buffer
  * @param b         the concated buffer

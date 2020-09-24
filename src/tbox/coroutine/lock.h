@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,9 +43,9 @@ typedef __tb_typeref__(co_lock);
  * interfaces
  */
 
-/*! init lock 
+/*! init lock
  *
- * @return              the lock 
+ * @return              the lock
  */
 tb_co_lock_ref_t        tb_co_lock_init(tb_noarg_t);
 

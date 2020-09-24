@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
- */ 
+ */
 static tb_void_t tb_demo_regex_test_match_simple(tb_char_t const* pattern, tb_char_t const* content)
 {
     // trace
@@ -21,7 +21,7 @@ static tb_void_t tb_demo_regex_test_match_simple(tb_char_t const* pattern, tb_ch
             // trace
             tb_trace_i("[%lu, %lu]: %s", entry->start, entry->size, entry->cstr);
         }
-        
+
         // exit results
         tb_vector_exit(results);
     }
@@ -97,7 +97,7 @@ static tb_void_t tb_demo_regex_test_replace_global(tb_char_t const* pattern, tb_
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_regex_main(tb_int_t argc, tb_char_t** argv)
 {
     // test arguments

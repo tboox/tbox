@@ -6,12 +6,12 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // the timeout
 //#define TB_DEMO_TIMEOUT             (-1)
@@ -35,12 +35,12 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the spider type
 typedef struct __tb_demo_spider_t
 {
-    // the homepage 
+    // the homepage
     tb_char_t const*        homepage;
 
     // the root directory
@@ -85,12 +85,12 @@ typedef struct __tb_demo_spider_parser_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
- */ 
+ */
 static tb_void_t tb_demo_spider_urls_free(tb_pointer_t data, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_spider_exit(tb_demo_spider_ref_t spider)
 {
     // check
@@ -125,7 +125,7 @@ static tb_demo_spider_ref_t tb_demo_spider_init(tb_char_t const* homepage, tb_ch
     tb_demo_spider_ref_t    spider = tb_null;
     do
     {
-        // make spider 
+        // make spider
         spider = tb_malloc0_type(tb_demo_spider_t);
         tb_assert_and_check_break(spider);
 
@@ -152,7 +152,7 @@ static tb_demo_spider_ref_t tb_demo_spider_init(tb_char_t const* homepage, tb_ch
         // trace
         tb_trace_i("rootdir: %s, homepage: %s", spider->rootdir, spider->homepage);
 
-        // ok 
+        // ok
         ok = tb_true;
 
     } while (0);
@@ -275,12 +275,12 @@ static tb_bool_t tb_demo_spider_parser_open(tb_demo_spider_parser_ref_t parser, 
             if (!tb_url_cstr_set(&parser->url, iurl)) break;
 
             // init data
-            if (!parser->data) 
+            if (!parser->data)
             {
                 parser->maxn = (tb_size_t)size + 1;
                 parser->data = tb_malloc_bytes(parser->maxn);
             }
-            else if (size + 1 > parser->maxn) 
+            else if (size + 1 > parser->maxn)
             {
                 parser->maxn = (tb_size_t)size + 1;
                 parser->data = tb_ralloc_bytes(parser->data, parser->maxn);
@@ -327,12 +327,12 @@ static tb_char_t const* tb_demo_spider_parser_read(tb_demo_spider_parser_ref_t p
 
     /* read the next url
      *
-     * <a href="" />? 
-     * <link href="" /> 
-     * <img src="" />? 
-     * <script src="" />? 
-     * <source src="" />? 
-     * <frame src="" />? 
+     * <a href="" />?
+     * <link href="" />
+     * <img src="" />?
+     * <script src="" />?
+     * <source src="" />?
+     * <frame src="" />?
      */
     tb_bool_t ok = tb_false;
     while (!ok && parser->offset + 16 < parser->size)
@@ -350,7 +350,7 @@ static tb_char_t const* tb_demo_spider_parser_read(tb_demo_spider_parser_ref_t p
             // get url
             tb_char_t const* e = p;
             while (e < b + n && *e && *e != '\"') e++;
-            if (p < e && e - p < sizeof(parser->path) && e - p > 16) 
+            if (p < e && e - p < sizeof(parser->path) && e - p > 16)
             {
                 // save path
                 tb_strncpy(parser->path, p, e - p);
@@ -458,7 +458,7 @@ static tb_bool_t tb_demo_spider_page_save(tb_size_t state, tb_hize_t offset, tb_
         ok = tb_true;
     }
     // failed or killed?
-    else 
+    else
     {
         // trace
         tb_trace_e("save[%s]: %s", url, tb_state_cstr(state));
@@ -482,13 +482,13 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
     {
         // recv url
         iurl = (tb_char_t const*)tb_co_channel_recv(spider->urls);
-        tb_check_break(iurl); 
+        tb_check_break(iurl);
 
         // trace
         tb_trace_d("grab: %s", iurl);
 
         // init stream
-        if (!stream) 
+        if (!stream)
         {
             // init stream
             stream = tb_stream_init_from_url(iurl);
@@ -521,13 +521,13 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
         if (!tb_demo_spider_make_ourl(spider, iurl, ourl, sizeof(ourl))) break;
 
         // save stream to file
-        if (tb_transfer_to_url(stream, ourl, TB_DEMO_LIMITRATE, tb_demo_spider_page_save, iurl) > 0) 
+        if (tb_transfer_to_url(stream, ourl, TB_DEMO_LIMITRATE, tb_demo_spider_page_save, iurl) > 0)
         {
             // init parser first
             if (!parser) parser = tb_demo_spider_parser_init();
             tb_assert_and_check_break(parser);
 
-            // open parser 
+            // open parser
             if (tb_demo_spider_parser_open(parser, iurl, ourl))
             {
                 // read url
@@ -535,13 +535,13 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
                 while ((url = tb_demo_spider_parser_read(parser)))
                 {
                     // have been cached already?
-                    if (!tb_bloom_filter_set(spider->filter, url)) 
+                    if (!tb_bloom_filter_set(spider->filter, url))
                         continue ;
 
                     // trace
                     tb_trace_d("send %s", url);
 
-                    // try to send url 
+                    // try to send url
                     url = tb_strdup(url);
                     if (url && !tb_co_channel_send_try(spider->urls, url))
                     {
@@ -550,7 +550,7 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
                     }
                 }
 
-                // close parser 
+                // close parser
                 tb_demo_spider_parser_clos(parser);
             }
         }
@@ -577,7 +577,7 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_spider_main(tb_int_t argc, tb_char_t** argv)
 {
     // done

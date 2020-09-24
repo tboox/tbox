@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -31,7 +31,7 @@
 // the http stream type
 typedef struct __tb_stream_http_t
 {
-    // the http 
+    // the http
     tb_http_ref_t         http;
 
 }tb_stream_http_t;
@@ -164,7 +164,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(url, tb_false);
-        
+
             // set url
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_URL, url);
         }
@@ -174,7 +174,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // purl
             tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             tb_assert_and_check_return_val(purl, tb_false);
-    
+
             // get url
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_URL, purl);
         }
@@ -184,7 +184,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // host
             tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(host, tb_false);
-    
+
             // set host
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_HOST, host);
         }
@@ -193,7 +193,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
         {
             // phost
             tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-            tb_assert_and_check_return_val(phost, tb_false); 
+            tb_assert_and_check_return_val(phost, tb_false);
 
             // get host
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_HOST, phost);
@@ -204,7 +204,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // port
             tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
             tb_assert_and_check_return_val(port, tb_false);
-    
+
             // set port
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_PORT, port);
         }
@@ -214,7 +214,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // pport
             tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(pport, tb_false);
-    
+
             // get port
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_PORT, pport);
         }
@@ -224,7 +224,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // path
             tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(path, tb_false);
-    
+
             // set path
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_PATH, path);
         }
@@ -234,7 +234,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // ppath
             tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             tb_assert_and_check_return_val(ppath, tb_false);
-    
+
             // get path
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_PATH, ppath);
         }
@@ -243,7 +243,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
         {
             // method
             tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
-    
+
             // set method
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_METHOD, method);
         }
@@ -253,7 +253,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // pmethod
             tb_size_t* pmethod = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(pmethod, tb_false);
-    
+
             // get method
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_METHOD, pmethod);
         }
@@ -267,7 +267,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // val
             tb_char_t const* val = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(val, tb_false);
-    
+
             // set head
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_HEAD, key, val);
         }
@@ -281,7 +281,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // pval
             tb_char_t const** pval = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
             tb_assert_and_check_return_val(pval, tb_false);
-    
+
             // get head
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_HEAD, key, pval);
         }
@@ -349,7 +349,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
         {
             // bssl
             tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-    
+
             // set ssl
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_SSL, bssl);
         }
@@ -359,7 +359,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // pssl
             tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
             tb_assert_and_check_return_val(pssl, tb_false);
-    
+
             // get ssl
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_SSL, pssl);
         }
@@ -369,7 +369,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // timeout
             tb_size_t timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
             tb_assert_and_check_return_val(timeout, tb_false);
-    
+
             // set timeout
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_TIMEOUT, timeout);
         }
@@ -379,7 +379,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // ptimeout
             tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
             tb_assert_and_check_return_val(ptimeout, tb_false);
-    
+
             // get timeout
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
         }
@@ -389,7 +389,7 @@ static tb_bool_t tb_stream_http_ctrl(tb_stream_ref_t stream, tb_size_t ctrl, tb_
             // url
             tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
             tb_assert_and_check_return_val(url, tb_false);
-            
+
             // set url
             return tb_http_ctrl(stream_http->http, TB_HTTP_OPTION_SET_POST_URL, url);
         }
@@ -595,11 +595,11 @@ tb_stream_ref_t tb_stream_init_http()
         // init the http stream
         tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
         tb_assert_and_check_break(stream_http);
-    
+
         // init http
         stream_http->http = tb_http_init();
         tb_assert_and_check_break(stream_http->http);
-    
+
         // ok
         ok = tb_true;
 

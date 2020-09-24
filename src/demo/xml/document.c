@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
 {
     // init reader and writer
@@ -30,7 +30,7 @@ tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
         }
     }
 
-    // exit reader 
+    // exit reader
     if (reader) tb_xml_reader_exit(reader);
     reader = tb_null;
 

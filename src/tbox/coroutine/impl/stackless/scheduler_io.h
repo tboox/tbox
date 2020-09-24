@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -62,7 +62,7 @@ typedef struct __tb_lo_scheduler_io_t
     // is stopped?
     tb_bool_t           stop;
 
-    // the scheduler 
+    // the scheduler
     tb_lo_scheduler_t*  scheduler;
 
     // the poller
@@ -88,31 +88,31 @@ typedef struct __tb_lo_scheduler_io_t
  * interfaces
  */
 
-/* init io scheduler 
+/* init io scheduler
  *
  * @param scheduler         the scheduler
  *
- * @return                  the io scheduler 
+ * @return                  the io scheduler
  */
 tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_init(tb_lo_scheduler_t* scheduler);
 
-/* exit io scheduler 
+/* exit io scheduler
  *
  * @param scheduler_io      the io scheduler
  */
 tb_void_t                   tb_lo_scheduler_io_exit(tb_lo_scheduler_io_ref_t scheduler_io);
 
-/* need io scheduler 
+/* need io scheduler
  *
  * ensure the io scheduler has been initialized
  *
  * @param scheduler         the scheduler
  *
- * @return                  the io scheduler 
+ * @return                  the io scheduler
  */
 tb_lo_scheduler_io_ref_t    tb_lo_scheduler_io_need(tb_lo_scheduler_t* scheduler);
 
-/* kill the current io scheduler 
+/* kill the current io scheduler
  *
  * @param scheduler_io      the io scheduler
  */
@@ -125,7 +125,7 @@ tb_void_t                   tb_lo_scheduler_io_kill(tb_lo_scheduler_io_ref_t sch
  */
 tb_void_t                   tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t scheduler_io, tb_long_t interval);
 
-/* wait io events 
+/* wait io events
  *
  * @param scheduler_io      the io scheduler
  * @param object            the poller object
@@ -136,7 +136,7 @@ tb_void_t                   tb_lo_scheduler_io_sleep(tb_lo_scheduler_io_ref_t sc
  */
 tb_bool_t                   tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
-/* wait process status 
+/* wait process status
  *
  * @param scheduler_io      the io scheduler
  * @param object            the poller object
@@ -146,7 +146,7 @@ tb_bool_t                   tb_lo_scheduler_io_wait(tb_lo_scheduler_io_ref_t sch
  */
 tb_bool_t                   tb_lo_scheduler_io_wait_proc(tb_lo_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_long_t timeout);
 
-/*! cancel io events for the given poller 
+/*! cancel io events for the given poller
  *
  * @param scheduler_io      the io scheduler
  * @param object            the poller object

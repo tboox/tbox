@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -162,7 +162,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* timer_
     do
     {
         // empty? move to the wheel head
-        if (!tb_fixed_pool_size(timer->pool)) 
+        if (!tb_fixed_pool_size(timer->pool))
         {
             timer->btime = tb_ltimer_now(timer);
             timer->wbase = 0;
@@ -252,10 +252,10 @@ static tb_bool_t tb_ltimer_expired_task_done(tb_iterator_ref_t iterator, tb_poin
 {
     // the task
     tb_ltimer_task_t const* timer_task = (tb_ltimer_task_t const*)item;
-    
+
     // done func
-    if (timer_task && timer_task->func) 
-    { 
+    if (timer_task && timer_task->func)
+    {
         // trace
         tb_trace_d("done: expired: when: %lld, period: %u, refn: %u, killed: %u", timer_task->when, timer_task->period, timer_task->refn, timer_task->killed);
 
@@ -539,7 +539,7 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
 
         // update the wheel base
         timer->wbase = (timer->wbase + diff) & (TB_LTIMER_WHEEL_MAXN - 1);
-        
+
         // ok
         ok = tb_true;
 
@@ -554,7 +554,7 @@ tb_bool_t tb_ltimer_spak(tb_ltimer_ref_t self)
         // done all expired list
         tb_for_all_if (tb_vector_ref_t, list, timer->expired, list)
         {
-            // done the expired task 
+            // done the expired task
             tb_walk_all(list, tb_ltimer_expired_task_done, tb_null);
 
             // enter
@@ -737,7 +737,7 @@ tb_void_t tb_ltimer_task_exit(tb_ltimer_ref_t self, tb_ltimer_task_ref_t task)
         timer_task->priv      = tb_null;
         timer_task->repeat    = 0;
     }
-    // remove it from pool directly if the task have been expired 
+    // remove it from pool directly if the task have been expired
     else tb_fixed_pool_free(timer->pool, timer_task);
 
     // leave
@@ -775,7 +775,7 @@ tb_void_t tb_ltimer_task_kill(tb_ltimer_ref_t self, tb_ltimer_task_ref_t task)
 
         // no repeat
         timer_task->repeat = 0;
-                
+
         // modify when => now
         timer_task->when = tb_ltimer_now(timer);
 

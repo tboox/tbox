@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -21,13 +21,13 @@ typedef struct __tb_ip_header_t
     tb_uint8_t              vihl;
 
     // type of service
-    tb_uint8_t              tos;  
+    tb_uint8_t              tos;
 
     // total length of the packet
-    tb_uint16_t             total_len;      
+    tb_uint16_t             total_len;
 
     // unique identifier
-    tb_uint16_t             id; 
+    tb_uint16_t             id;
 
     // flags and fragment offset
     tb_uint16_t             frag_and_flags;
@@ -50,13 +50,13 @@ typedef struct __tb_ip_header_t
 } __tb_packed__ tb_ip_header_t;
 
 // the icmp header type - rfc792
-typedef struct __tb_icmp_header_t 
+typedef struct __tb_icmp_header_t
 {
     // icmp type
     tb_uint8_t              type;
 
     // type sub code
-    tb_uint8_t              code;  
+    tb_uint8_t              code;
 
     // checksum
     tb_uint16_t             checksum;
@@ -73,7 +73,7 @@ typedef struct __tb_icmp_header_t
 } __tb_packed__ tb_icmp_header_t;
 
 // the icmp echo request type
-typedef struct __tb_icmp_echo_request_t 
+typedef struct __tb_icmp_echo_request_t
 {
     // the icmp header
     tb_icmp_header_t        icmp;
@@ -84,12 +84,12 @@ typedef struct __tb_icmp_echo_request_t
 } __tb_packed__ tb_icmp_echo_request_t;
 
 // the icmp echo reply type
-typedef struct __tb_icmp_echo_reply_t 
+typedef struct __tb_icmp_echo_reply_t
 {
     // the ip header
     tb_ip_header_t          ip;
 
-    // the echo request 
+    // the echo request
     tb_icmp_echo_request_t  request;
 
 } __tb_packed__ tb_icmp_echo_reply_t;
@@ -105,7 +105,7 @@ static tb_uint16_t tb_calculate_checksum(tb_byte_t const* data, tb_long_t size)
     tb_uint32_t         sum = 0;
     tb_long_t           nleft = size;
     tb_byte_t const*    p = data;
-    while (nleft > 1) 
+    while (nleft > 1)
     {
         sum += tb_bits_get_u16_le(p);
         nleft -= 2;
@@ -114,7 +114,7 @@ static tb_uint16_t tb_calculate_checksum(tb_byte_t const* data, tb_long_t size)
 
     // calculate answer
     tb_uint16_t answer = 0;
-    if (nleft == 1) 
+    if (nleft == 1)
     {
         *(tb_byte_t *)(&answer) = *p;
         sum += answer;
@@ -126,7 +126,7 @@ static tb_uint16_t tb_calculate_checksum(tb_byte_t const* data, tb_long_t size)
 }
 static tb_bool_t tb_ping_send(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_uint16_t seq)
 {
-    // init echo 
+    // init echo
     tb_icmp_echo_request_t echo;
     tb_uint64_t time            = tb_mclock();
     echo.icmp.type              = TB_ICMP_ECHOREQ;
@@ -146,7 +146,7 @@ static tb_bool_t tb_ping_send(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_uin
     while (send < size)
     {
         tb_long_t real = tb_socket_usend(sock, addr, data + send, size - send);
-        if (real > 0) 
+        if (real > 0)
         {
             send += real;
             wait = tb_false;
@@ -165,7 +165,7 @@ static tb_bool_t tb_ping_send(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_uin
 }
 static tb_bool_t tb_ping_recv(tb_socket_ref_t sock, tb_uint16_t seq)
 {
-    // recv echo 
+    // recv echo
     tb_icmp_echo_reply_t echo;
     tb_long_t recv = 0;
     tb_long_t size = sizeof(echo);
@@ -174,7 +174,7 @@ static tb_bool_t tb_ping_recv(tb_socket_ref_t sock, tb_uint16_t seq)
     while (recv < size)
     {
         tb_long_t real = tb_socket_urecv(sock, tb_null, data + recv, size - recv);
-        if (real > 0) 
+        if (real > 0)
         {
             recv += real;
             wait = tb_false;
@@ -215,7 +215,7 @@ static tb_void_t tb_demo_coroutine_ping(tb_cpointer_t priv)
     tb_ipaddr_ref_t addr = (tb_ipaddr_ref_t)priv;
     tb_assert_and_check_return(addr);
 
-    // init socket 
+    // init socket
     tb_socket_ref_t sock = tb_socket_init(TB_SOCKET_TYPE_ICMP, TB_IPADDR_FAMILY_IPV4);
     if (sock)
     {
@@ -239,7 +239,7 @@ static tb_void_t tb_demo_coroutine_ping(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_ping_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
@@ -257,7 +257,7 @@ tb_int_t tb_demo_coroutine_ping_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start ping
-        tb_size_t n = 10; 
+        tb_size_t n = 10;
         while (n--)
         {
             // start it

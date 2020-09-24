@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #ifdef TB_CONFIG_LIBC_HAVE_STRCASECMP
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
@@ -56,14 +56,14 @@ static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
     // check
 #ifdef __tb_debug__
     {
-        // check overflow? 
+        // check overflow?
         tb_strlen(s1);
         tb_strlen(s2);
     }

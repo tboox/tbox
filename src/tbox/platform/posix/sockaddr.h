@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -160,7 +160,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
         tb_assert(0);
         break;
     }
-    
+
     // ok?
     return size;
 }
@@ -260,7 +260,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_load(struct sockaddr_storage* saddr,
         tb_assert(0);
         break;
     }
-    
+
     // ok?
     return size;
 }

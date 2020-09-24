@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -164,8 +164,8 @@ typedef tb_void_t               (*tb_element_ncopy_func_t)(tb_element_ref_t elem
 typedef enum __tb_element_type_t
 {
     TB_ELEMENT_TYPE_NULL           = 0     //!< null
-,   TB_ELEMENT_TYPE_LONG           = 1     //!< long 
-,   TB_ELEMENT_TYPE_SIZE           = 2     //!< size 
+,   TB_ELEMENT_TYPE_LONG           = 1     //!< long
+,   TB_ELEMENT_TYPE_SIZE           = 2     //!< size
 ,   TB_ELEMENT_TYPE_UINT8          = 3     //!< uint8
 ,   TB_ELEMENT_TYPE_UINT16         = 4     //!< uint16
 ,   TB_ELEMENT_TYPE_UINT32         = 5     //!< uint32
@@ -202,7 +202,7 @@ typedef struct __tb_element_t
     /// the data function
     tb_element_data_func_t      data;
 
-    /// the string function 
+    /// the string function
     tb_element_cstr_func_t      cstr;
 
     /// the free element
@@ -215,7 +215,7 @@ typedef struct __tb_element_t
     tb_element_repl_func_t      repl;
 
     /// the copy function
-    tb_element_copy_func_t      copy; 
+    tb_element_copy_func_t      copy;
 
     /// the free elements function
     tb_element_nfree_func_t     nfree;
@@ -243,19 +243,19 @@ tb_element_t        tb_element_null(tb_noarg_t);
 
 /*! the true element, no space
  *
- * .e.g for hash data 
+ * .e.g for hash data
  *
  * @return          the element
  */
 tb_element_t        tb_element_true(tb_noarg_t);
 
-/*! the long element  
+/*! the long element
  *
  * @return          the element
  */
 tb_element_t        tb_element_long(tb_noarg_t);
 
-/*! the size element 
+/*! the size element
  *
  * @return          the element
  */
@@ -273,7 +273,7 @@ tb_element_t        tb_element_uint8(tb_noarg_t);
  */
 tb_element_t        tb_element_uint16(tb_noarg_t);
 
-/*! the uint32 element 
+/*! the uint32 element
  *
  * @return          the element
  */
@@ -285,7 +285,7 @@ tb_element_t        tb_element_uint32(tb_noarg_t);
  *
  * @return          the element
  */
-tb_element_t        tb_element_str(tb_bool_t is_case); 
+tb_element_t        tb_element_str(tb_bool_t is_case);
 
 /*! the pointer element
  *
@@ -298,7 +298,7 @@ tb_element_t        tb_element_str(tb_bool_t is_case);
  */
 tb_element_t        tb_element_ptr(tb_element_free_func_t free, tb_cpointer_t priv);
 
-/*! the object element 
+/*! the object element
  *
  * @return          the element
  */

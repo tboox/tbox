@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -67,17 +67,17 @@ __tb_extern_c_enter__
 #       define tb_assertf_and_check_break(x, fmt, ...)                      tb_assertf(x, fmt, __VA_ARGS__)
 #       define tb_assertf_and_check_continue(x, fmt, ...)                   tb_assertf(x, fmt, __VA_ARGS__)
 #   else
-#       define tb_assertf                                   
-#       define tb_assertf_and_check_abort                                 
-#       define tb_assertf_and_check_return                                
-#       define tb_assertf_and_check_return_val                           
-#       define tb_assertf_and_check_goto                                 
-#       define tb_assertf_and_check_break                                  
-#       define tb_assertf_and_check_continue                               
+#       define tb_assertf
+#       define tb_assertf_and_check_abort
+#       define tb_assertf_and_check_return
+#       define tb_assertf_and_check_return_val
+#       define tb_assertf_and_check_goto
+#       define tb_assertf_and_check_break
+#       define tb_assertf_and_check_continue
 #   endif
 #else
 #   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
-#       define tb_assertf(x, fmt, arg...)                             
+#       define tb_assertf(x, fmt, arg...)
 #       define tb_assertf_and_check_abort(x, fmt, arg...)                   tb_check_abort(x)
 #       define tb_assertf_and_check_return(x, fmt, arg...)                  tb_check_return(x)
 #       define tb_assertf_and_check_return_val(x, v, fmt, arg...)           tb_check_return_val(x, v)
@@ -85,7 +85,7 @@ __tb_extern_c_enter__
 #       define tb_assertf_and_check_break(x, fmt, arg...)                   tb_check_break(x)
 #       define tb_assertf_and_check_continue(x, fmt, arg...)                tb_check_continue(x)
 #   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#       define tb_assertf(x, fmt, ...)                             
+#       define tb_assertf(x, fmt, ...)
 #       define tb_assertf_and_check_abort(x, fmt, ...)                      tb_check_abort(x)
 #       define tb_assertf_and_check_return(x, fmt, ...)                     tb_check_return(x)
 #       define tb_assertf_and_check_return_val(x, v, fmt, ...)              tb_check_return_val(x, v)
@@ -93,13 +93,13 @@ __tb_extern_c_enter__
 #       define tb_assertf_and_check_break(x, fmt, ...)                      tb_check_break(x)
 #       define tb_assertf_and_check_continue(x, fmt, ...)                   tb_check_continue(x)
 #   else
-#       define tb_assertf                                              
-#       define tb_assertf_and_check_abort                                 
-#       define tb_assertf_and_check_return                                
-#       define tb_assertf_and_check_return_val                            
-#       define tb_assertf_and_check_goto                                 
-#       define tb_assertf_and_check_break                                   
-#       define tb_assertf_and_check_continue                                
+#       define tb_assertf
+#       define tb_assertf_and_check_abort
+#       define tb_assertf_and_check_return
+#       define tb_assertf_and_check_return_val
+#       define tb_assertf_and_check_goto
+#       define tb_assertf_and_check_break
+#       define tb_assertf_and_check_continue
 #   endif
 #endif
 
@@ -150,25 +150,25 @@ __tb_extern_c_enter__
 #       define tb_assertf_pass_and_check_break(x, fmt, ...)                     tb_assertf_pass_break(x, fmt, __VA_ARGS__)
 #       define tb_assertf_pass_and_check_continue(x, fmt, ...)                  tb_assertf_pass_continue(x, fmt, __VA_ARGS__)
 #   else
-#       define tb_assertf_pass_return                            
-#       define tb_assertf_pass_return_val              
-#       define tb_assertf_pass_goto                       
-#       define tb_assertf_pass_break                             
-#       define tb_assertf_pass_continue                          
-#       define tb_assertf_pass_and_check_abort                            
-#       define tb_assertf_pass_and_check_return                             
-#       define tb_assertf_pass_and_check_return_val                     
-#       define tb_assertf_pass_and_check_goto                                  
-#       define tb_assertf_pass_and_check_break                              
-#       define tb_assertf_pass_and_check_continue                                
+#       define tb_assertf_pass_return
+#       define tb_assertf_pass_return_val
+#       define tb_assertf_pass_goto
+#       define tb_assertf_pass_break
+#       define tb_assertf_pass_continue
+#       define tb_assertf_pass_and_check_abort
+#       define tb_assertf_pass_and_check_return
+#       define tb_assertf_pass_and_check_return_val
+#       define tb_assertf_pass_and_check_goto
+#       define tb_assertf_pass_and_check_break
+#       define tb_assertf_pass_and_check_continue
 #   endif
 #else
 #   if defined(TB_COMPILER_IS_GCC) || defined(TB_COMPILER_IS_TINYC)
-#       define tb_assertf_pass_return(x, fmt, arg...)                            
-#       define tb_assertf_pass_return_val(x, v, fmt, arg...)                     
-#       define tb_assertf_pass_goto(x, b, fmt, arg...)                           
-#       define tb_assertf_pass_break(x, fmt, arg...)                             
-#       define tb_assertf_pass_continue(x, fmt, arg...)                          
+#       define tb_assertf_pass_return(x, fmt, arg...)
+#       define tb_assertf_pass_return_val(x, v, fmt, arg...)
+#       define tb_assertf_pass_goto(x, b, fmt, arg...)
+#       define tb_assertf_pass_break(x, fmt, arg...)
+#       define tb_assertf_pass_continue(x, fmt, arg...)
 #       define tb_assertf_pass_and_check_abort(x, fmt, arg...)                  tb_check_abort(x)
 #       define tb_assertf_pass_and_check_return(x, fmt, arg...)                 tb_check_return(x)
 #       define tb_assertf_pass_and_check_return_val(x, v, fmt, arg...)          tb_check_return_val(x, v)
@@ -176,11 +176,11 @@ __tb_extern_c_enter__
 #       define tb_assertf_pass_and_check_break(x, fmt, arg...)                  tb_check_break(x)
 #       define tb_assertf_pass_and_check_continue(x, fmt, arg...)               tb_check_continue(x)
 #   elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#       define tb_assertf_pass_return(x, fmt, ...)                            
-#       define tb_assertf_pass_return_val(x, v, fmt, ...)                     
-#       define tb_assertf_pass_goto(x, b, fmt, ...)                           
-#       define tb_assertf_pass_break(x, fmt, ...)                             
-#       define tb_assertf_pass_continue(x, fmt, ...)                          
+#       define tb_assertf_pass_return(x, fmt, ...)
+#       define tb_assertf_pass_return_val(x, v, fmt, ...)
+#       define tb_assertf_pass_goto(x, b, fmt, ...)
+#       define tb_assertf_pass_break(x, fmt, ...)
+#       define tb_assertf_pass_continue(x, fmt, ...)
 #       define tb_assertf_pass_and_check_abort(x, fmt, ...)                     tb_check_abort(x)
 #       define tb_assertf_pass_and_check_return(x, fmt, ...)                    tb_check_return(x)
 #       define tb_assertf_pass_and_check_return_val(x, v, fmt, ...)             tb_check_return_val(x, v)
@@ -188,17 +188,17 @@ __tb_extern_c_enter__
 #       define tb_assertf_pass_and_check_break(x, fmt, ...)                     tb_check_break(x)
 #       define tb_assertf_pass_and_check_continue(x, fmt, ...)                  tb_check_continue(x)
 #   else
-#       define tb_assertf_pass_return                            
-#       define tb_assertf_pass_return_val               
-#       define tb_assertf_pass_goto                       
-#       define tb_assertf_pass_break                             
-#       define tb_assertf_pass_continue                          
-#       define tb_assertf_pass_and_check_abort                                 
-#       define tb_assertf_pass_and_check_return                                 
-#       define tb_assertf_pass_and_check_return_val                            
-#       define tb_assertf_pass_and_check_goto                                   
-#       define tb_assertf_pass_and_check_break                                 
-#       define tb_assertf_pass_and_check_continue                               
+#       define tb_assertf_pass_return
+#       define tb_assertf_pass_return_val
+#       define tb_assertf_pass_goto
+#       define tb_assertf_pass_break
+#       define tb_assertf_pass_continue
+#       define tb_assertf_pass_and_check_abort
+#       define tb_assertf_pass_and_check_return
+#       define tb_assertf_pass_and_check_return_val
+#       define tb_assertf_pass_and_check_goto
+#       define tb_assertf_pass_and_check_break
+#       define tb_assertf_pass_and_check_continue
 #   endif
 #endif
 
@@ -260,7 +260,7 @@ __tb_extern_c_enter__
  * declaration
  */
 
-/*! dump backtrace 
+/*! dump backtrace
  *
  * @param prefix    the prefix tag
  * @pragm frames    the frame list
@@ -286,24 +286,24 @@ tb_void_t           tb_used_ptr(tb_cpointer_t variable);
  * tb_assert(v);
  * @endcode
  *
- * @param x                     the boolean value of the expression 
- * @param expr                  the expression string 
+ * @param x                     the boolean value of the expression
+ * @param expr                  the expression string
  *
- * @return                      the boolean value of the expression 
+ * @return                      the boolean value of the expression
  */
-static __tb_inline__ tb_bool_t  tb_assert_impl(tb_bool_t x, tb_char_t const* expr __tb_debug_decl__) 
+static __tb_inline__ tb_bool_t  tb_assert_impl(tb_bool_t x, tb_char_t const* expr __tb_debug_decl__)
 {
     // failed?
     if (!x)
     {
         // trace
-        tb_trace_a("expr[%s] at %s(): %d, %s", expr __tb_debug_args__); 
+        tb_trace_a("expr[%s] at %s(): %d, %s", expr __tb_debug_args__);
 
         // dump backtrace
         tb_assert_backtrace_dump();
 
         // sync trace
-        tb_trace_sync(); 
+        tb_trace_sync();
 
         // abort it
         tb_abort();
@@ -317,7 +317,7 @@ static __tb_inline__ tb_bool_t  tb_assert_impl(tb_bool_t x, tb_char_t const* exp
  *
  * @return                      only tb_false
  */
-static __tb_inline__ tb_bool_t  tb_assert_empty_impl(tb_noarg_t) 
+static __tb_inline__ tb_bool_t  tb_assert_empty_impl(tb_noarg_t)
 {
     return tb_false;
 }

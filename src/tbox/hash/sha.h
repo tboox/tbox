@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,7 +36,7 @@ __tb_extern_c_enter__
  * types
  */
 
-// data structure for sha (message data) computation 
+// data structure for sha (message data) computation
 typedef struct __tb_sha_t
 {
     tb_uint8_t      digest_len;  //!< digest length in 32-bit words
@@ -60,14 +60,14 @@ typedef enum __tb_sha_mode_t
  * interfaces
  */
 
-/*! init sha 
+/*! init sha
  *
  * @param sha           the sha
  * @param mode          the mode
  */
 tb_void_t               tb_sha_init(tb_sha_t* sha, tb_size_t mode);
 
-/*! exit sha 
+/*! exit sha
  *
  * @param sha           the sha
  * @param data          the data
@@ -75,7 +75,7 @@ tb_void_t               tb_sha_init(tb_sha_t* sha, tb_size_t mode);
  */
 tb_void_t               tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size);
 
-/*! spak sha 
+/*! spak sha
  *
  * @param sha           the sha
  * @param data          the data
@@ -83,7 +83,7 @@ tb_void_t               tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t si
  */
 tb_void_t               tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size);
 
-/*! make sha 
+/*! make sha
  *
  * @param mode          the mode
  * @param ib            the input data

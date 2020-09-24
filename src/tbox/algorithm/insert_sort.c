@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@
  * step1: ((5))     2       6       2       8       6       1
  *        (next) <=
  *
- *        (hole)  
+ *        (hole)
  * step2: ((2))    (5)      6       2       8       6       1
  *                (next) <=
  *
@@ -47,7 +47,7 @@
  * step3:   2       5     ((6))     2       8       6       1
  *                        (next) <=
  *
- *                 (hole)       
+ *                 (hole)
  * step4:   2      ((2))   (5)     (6)      8       6       1
  *                                (next) <=
  *
@@ -55,23 +55,23 @@
  * step5:   2       2       5       6     ((8))     6       1
  *                                        (next) <=
  *
- *                                        (hole) 
+ *                                        (hole)
  * step6:   2       2       5       6     ((6))    (8)       1
  *                                                (next) <=
  *
- *        (hole)                                         
- * step7: ((1))    (2)     (2)     (5)     (6)     (6)      (8)       
+ *        (hole)
+ * step7: ((1))    (2)     (2)     (5)     (6)     (6)      (8)
  *                                                        (next)
  * </pre>
  */
 tb_void_t tb_insert_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
-{   
+{
     // check
     tb_assert_and_check_return(iterator);
     tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD));
     tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_REVERSE));
     tb_check_return(head != tail);
-    
+
     // init
     tb_size_t       step = tb_iterator_step(iterator);
     tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;

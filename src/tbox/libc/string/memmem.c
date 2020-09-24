@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #if defined(TB_CONFIG_LIBC_HAVE_MEMMEM)
 static tb_pointer_t tb_memmem_impl(tb_cpointer_t s1, tb_size_t n1, tb_cpointer_t s2, tb_size_t n2)
@@ -51,16 +51,16 @@ static tb_pointer_t tb_memmem_impl(tb_cpointer_t s1, tb_size_t n1, tb_cpointer_t
 	if (!n2) return (tb_pointer_t)s1;
 
     // done
-	if (n1 >= n2) 
+	if (n1 >= n2)
     {
         tb_size_t           n = 0;
 		tb_byte_t const*    ph = (tb_byte_t const*)s1;
 		tb_byte_t const*    pn = (tb_byte_t const*)s2;
 		tb_byte_t const*    plast = ph + (n1 - n2);
-		do 
+		do
         {
 			n = 0;
-			while (ph[n] == pn[n]) 
+			while (ph[n] == pn[n])
             {
                 // found?
 				if (++n == n2) return (tb_pointer_t)ph;
@@ -75,7 +75,7 @@ static tb_pointer_t tb_memmem_impl(tb_cpointer_t s1, tb_size_t n1, tb_cpointer_t
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_pointer_t tb_memmem_(tb_cpointer_t s1, tb_size_t n1, tb_cpointer_t s2, tb_size_t n2)
 {

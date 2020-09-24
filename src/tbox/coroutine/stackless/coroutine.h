@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,9 +52,9 @@
 
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
     tb_lo_coroutine_ref_t   co__ = co;
-    tb_int_t                lo_yield_flag__ = 1; 
+    tb_int_t                lo_yield_flag__ = 1;
     for (; lo_yield_flag__; tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
-        switch (tb_lo_core(co__)->branch) 
+        switch (tb_lo_core(co__)->branch)
             case 0:
                 {
                     for (i = 0; i < 100; i++)
@@ -62,34 +62,34 @@
                         lo_yield_flag__ = 0;
                         tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
                         if (lo_yield_flag__ == 0)
-                            return ; 
+                            return ;
                     }
-                } 
+                }
 
     // or ..
 
     // after expanding again for gcc label (init: branch = tb_null, state = TB_STATE_READY)
     tb_lo_coroutine_ref_t   co__ = co;
-    tb_int_t                lo_yield_flag__ = 1; 
+    tb_int_t                lo_yield_flag__ = 1;
     for (; lo_yield_flag__; tb_lo_core(co__)->branch = tb_null, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
-        if (tb_lo_core(co)->branch) 
-        { 
+        if (tb_lo_core(co)->branch)
+        {
             goto *(tb_lo_core(co)->branch);
-        } 
+        }
         else
         {
             for (i = 0; i < 100; i++)
             {
                 lo_yield_flag__ = 0;
-                do 
-                { 
-                    __tb_mconcat_ex__(__tb_lo_core_label, __tb_line__): 
-                    tb_lo_core(co)->branch = &&__tb_mconcat_ex__(__tb_lo_core_label, __tb_line__); 
-                    
+                do
+                {
+                    __tb_mconcat_ex__(__tb_lo_core_label, __tb_line__):
+                    tb_lo_core(co)->branch = &&__tb_mconcat_ex__(__tb_lo_core_label, __tb_line__);
+
                 } while(0)
 
                 if (lo_yield_flag__ == 0)
-                    return ; 
+                    return ;
             }
         }
 
@@ -130,9 +130,9 @@ do \
 
     // after expanding again (init: branch = 0, state = TB_STATE_READY)
     tb_lo_coroutine_ref_t co__ = co;
-    tb_int_t    lo_yield_flag__ = 1; 
+    tb_int_t    lo_yield_flag__ = 1;
     for (; lo_yield_flag__; tb_lo_core(co__)->branch = 0, tb_lo_core(co__)->state = TB_STATE_END, lo_yield_flag__ = 0)
-        switch (tb_lo_core(co__)->branch) 
+        switch (tb_lo_core(co__)->branch)
             case 0:
             {
                 for (i = 0; i < 100; i++)
@@ -140,15 +140,15 @@ do \
                     lo_yield_flag__ = 0;
                     tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
                     if (lo_yield_flag__ == 0)
-                        return ; 
+                        return ;
 
                     // suspend coroutine
                     tb_lo_core(co__)->state = TB_STATE_SUSPEND;
                     tb_lo_core(co__)->branch = __tb_line__; case __tb_line__:;
                     if (tb_lo_core(co__)->state == TB_STATE_SUSPEND)
-                        return ; 
+                        return ;
                 }
-            } 
+            }
  * @endcode
  */
 #define tb_lo_coroutine_suspend() \
@@ -236,11 +236,11 @@ do \
 /// get waited exited status of process
 #define tb_lo_coroutine_proc_status()           tb_lo_coroutine_proc_status_(tb_lo_coroutine_self())
 
-/*! pass the user private data 
+/*! pass the user private data
  *
  * @code
- 
-    // start coroutine 
+
+    // start coroutine
     tb_lo_coroutine_start(scheduler, coroutine_func, tb_lo_coroutine_pass(tb_xxxx_priv_t));
 
  * @endcode
@@ -248,7 +248,7 @@ do \
  * =>
  *
  * @code
- 
+
     // start coroutine
     tb_lo_coroutine_start(scheduler, coroutine_func, tb_malloc0_type(tb_xxxx_priv_t), tb_lo_coroutine_pass_free_);
 
@@ -259,15 +259,15 @@ do \
 /*! pass the user private data and init one member
  *
  * @code
- 
+
     typedef struct __tb_xxxx_priv_t
     {
         tb_size_t   member;
         tb_size_t   others;
 
     }tb_xxxx_priv_t;
- 
-    // start coroutine 
+
+    // start coroutine
     tb_lo_coroutine_start(scheduler, coroutine_func, tb_lo_coroutine_pass1(tb_xxxx_priv_t, member, value));
 
  * @endcode
@@ -275,13 +275,13 @@ do \
  * =>
  *
  * @code
- 
+
     tb_xxxx_priv_t* priv = tb_malloc0_type(tb_xxxx_priv_t);
     if (priv)
     {
         priv->member = value;
     }
- 
+
     // start coroutine
     tb_lo_coroutine_start(scheduler, coroutine_func, priv, tb_lo_coroutine_pass_free_);
 
@@ -300,7 +300,7 @@ __tb_extern_c_enter__
 
 /* get the scheduler of coroutine
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  *
  * @return              the scheduler
  */
@@ -308,14 +308,14 @@ tb_lo_scheduler_ref_t   tb_lo_coroutine_scheduler_(tb_lo_coroutine_ref_t corouti
 
 /* sleep the current coroutine
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  * @param interval      the interval (ms), infinity: -1
  */
 tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, tb_long_t interval);
 
-/* wait io events 
+/* wait io events
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  * @param object        the poller object
  * @param events        the waited events
  * @param timeout       the timeout, infinity: -1
@@ -324,9 +324,9 @@ tb_void_t               tb_lo_coroutine_sleep_(tb_lo_coroutine_ref_t coroutine, 
  */
 tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
-/* wait process status 
+/* wait process status
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  * @param object        the poller object
  * @param timeout       the timeout, infinity: -1
  *
@@ -334,17 +334,17 @@ tb_bool_t               tb_lo_coroutine_waitio_(tb_lo_coroutine_ref_t coroutine,
  */
 tb_bool_t               tb_lo_coroutine_waitproc_(tb_lo_coroutine_ref_t coroutine, tb_poller_object_ref_t object, tb_long_t timeout);
 
-/* get the waited return results 
+/* get the waited return results
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  *
  * @return              ok or events: > 0, failed: -1, timeout: 0
  */
 tb_long_t               tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t coroutine);
 
-/* get the waited process status 
+/* get the waited process status
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  *
  * @return              process status
  */
@@ -387,7 +387,7 @@ tb_pointer_t            tb_lo_coroutine_pass2_make_(tb_size_t type_size, tb_cpoi
  * interfaces
  */
 
-/*! start coroutine 
+/*! start coroutine
  *
  * @code
     static tb_void_t switchtask(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
@@ -450,7 +450,7 @@ tb_bool_t               tb_lo_coroutine_start(tb_lo_scheduler_ref_t scheduler, t
 
 /*! resume the given coroutine
  *
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  */
 tb_void_t               tb_lo_coroutine_resume(tb_lo_coroutine_ref_t coroutine);
 

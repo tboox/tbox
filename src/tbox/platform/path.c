@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -78,7 +78,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
         // move the path and ensure the enough space for the home directory
         tb_memmov(path + home_size, path + 1, path_size - 1);
 
-        // copy the home directory 
+        // copy the home directory
         tb_memcpy(path, home, home_size);
         path[home_size + path_size - 1] = '\0';
     }
@@ -96,7 +96,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
             // repeat it
             repeat++;
         }
-        else 
+        else
         {
             // save character
             *q++ = *p;
@@ -112,14 +112,14 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
     // end
     *q = '\0';
 
-    // is windows path? 
+    // is windows path?
     if (q > path + 1 && tb_isalpha(path[0]) && path[1] == ':')
     {
         // get the upper drive prefix
         path[0] = tb_toupper(path[0]);
 
         // root? patch "x:" => "x:\"
-        if (q == path + 2 && q + 1 < path + maxn) 
+        if (q == path + 2 && q + 1 < path + maxn)
         {
             *q++ = TB_PATH_SEPARATOR;
             *q = '\0';
@@ -254,7 +254,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
             // empty item? remove repeat
             else if (!n) ;
             // too small?
-            else 
+            else
             {
                 // trace
                 tb_trace_e("the data path is too small for %s", path);
@@ -281,9 +281,9 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
         *q = '\0';
     }
 
-    // trace    
+    // trace
     tb_trace_d("absolute: %s", data);
-    
+
     // ok?
     return data;
 #endif
@@ -326,7 +326,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     tb_size_t root_size = 0;
     tb_char_t root_absolute[TB_PATH_MAXN];
     tb_size_t root_maxn = sizeof(root_absolute);
-    if (root) 
+    if (root)
     {
         // get the absolute root
         root        = tb_path_absolute(root, root_absolute, root_maxn);
@@ -347,7 +347,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     tb_trace_d("root_absolute: %s", root);
 
     // same directory? return "."
-    if (path_size == root_size && !tb_strncmp(path, root, root_size)) 
+    if (path_size == root_size && !tb_strncmp(path, root, root_size))
     {
         // check
         tb_assert_and_check_return_val(maxn >= 2, ".");
@@ -364,7 +364,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
         path_absolute[path_size++] = TB_PATH_SEPARATOR;
         path_absolute[path_size] = '\0';
     }
-    if (root_size + 1 < root_maxn) 
+    if (root_size + 1 < root_maxn)
     {
         root_absolute[root_size++] = TB_PATH_SEPARATOR;
         root_absolute[root_size] = '\0';
@@ -432,9 +432,9 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
         *d = '\0';
     }
 
-    // trace    
+    // trace
     tb_trace_d("relative: %s", data);
-    
+
     // ok?
     return data;
 }

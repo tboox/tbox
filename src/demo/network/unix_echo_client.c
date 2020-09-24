@@ -1,18 +1,18 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_network_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
@@ -37,7 +37,7 @@ tb_int_t tb_demo_network_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
 
         // connect socket
         tb_long_t ok;
-        while (!(ok = tb_socket_connect(sock, &addr))) 
+        while (!(ok = tb_socket_connect(sock, &addr)))
         {
             // wait it
             if (tb_socket_wait(sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT) <= 0) break;

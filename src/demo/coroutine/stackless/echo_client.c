@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // port
 #define TB_DEMO_PORT        (9090)
@@ -15,7 +15,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the client type
 typedef struct __tb_demo_lo_client_t
@@ -51,7 +51,7 @@ typedef struct __tb_demo_lo_client_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv)
 {
     // check
@@ -59,7 +59,7 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
     tb_assert(client);
 
     // enter coroutine
-    tb_lo_coroutine_enter(coroutine) 
+    tb_lo_coroutine_enter(coroutine)
     {
         // done
         do
@@ -75,11 +75,11 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
             tb_trace_i("connecting %{ipaddr} ..", &client->addr);
 
             // connect socket
-            while (!(client->ok = tb_socket_connect(client->sock, &client->addr))) 
+            while (!(client->ok = tb_socket_connect(client->sock, &client->addr)))
             {
                 // wait it
                 tb_lo_coroutine_wait_sock(client->sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT);
-                
+
                 // wait failed?
                 if (tb_lo_coroutine_wait_result() <= 0) break;
             }
@@ -136,7 +136,7 @@ static tb_void_t tb_demo_lo_coroutine_echo(tb_lo_coroutine_ref_t coroutine, tb_c
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_lo_coroutine_echo_client_main(tb_int_t argc, tb_char_t** argv)
 {
     // check

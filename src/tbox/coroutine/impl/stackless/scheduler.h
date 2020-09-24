@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -70,7 +70,7 @@ typedef struct __tb_lo_scheduler_t
     tb_list_entry_head_t            coroutines_dead;
 
     /* the ready coroutines
-     * 
+     *
      * ready: head -> ready -> .. -> running -> .. -> ready -> ..->
      *         |                                                   |
      *          ---------------------------<-----------------------
@@ -86,9 +86,9 @@ typedef struct __tb_lo_scheduler_t
  * interfaces
  */
 
-/* start coroutine 
+/* start coroutine
  *
- * @param scheduler     the scheduler 
+ * @param scheduler     the scheduler
  * @param func          the coroutine function
  * @param priv          the passed user private data as the argument of function
  * @param free          the user private data free function
@@ -100,7 +100,7 @@ tb_bool_t               tb_lo_scheduler_start(tb_lo_scheduler_t* scheduler, tb_l
 /* resume the given coroutine
  *
  * @param scheduler     the scheduler
- * @param coroutine     the coroutine 
+ * @param coroutine     the coroutine
  */
 tb_void_t               tb_lo_scheduler_resume(tb_lo_scheduler_t* scheduler, tb_lo_coroutine_t* coroutine);
 

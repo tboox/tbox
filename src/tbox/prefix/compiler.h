@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -126,13 +126,13 @@
 #       error Unknown borland c++ Compiler Version
 #   endif
 
-// gnu c/c++ 
+// gnu c/c++
 #elif defined(__GNUC__)
 #   define TB_COMPILER_IS_GCC
-#   if defined(__MINGW32__) || defined(__MINGW64__) 
+#   if defined(__MINGW32__) || defined(__MINGW64__)
 #       define TB_COMPILER_IS_MINGW
 #   endif
-#   if defined(__MSYS__) 
+#   if defined(__MSYS__)
 #       define TB_COMPILER_ON_MSYS
 #   endif
 #   if defined(__CYGWIN__) || defined(__CYGWIN32__)
@@ -196,17 +196,17 @@
          *
          * unknown warning group '-Wnullability-completeness', ignored [-Werror,-Wunknown-pragmas]
          */
-#       pragma clang diagnostic ignored             "-Wunknown-pragmas" 
+#       pragma clang diagnostic ignored             "-Wunknown-pragmas"
 
         /* suppress warning
          *
          * signal.h
          * pointer is missing a nullability type specifier (_Nonnull, _Nullable, or _Null_unspecified)
          */
-#       pragma clang diagnostic ignored             "-Wnullability-completeness" 
+#       pragma clang diagnostic ignored             "-Wnullability-completeness"
 #   endif
 
-// watcom c/c++ 
+// watcom c/c++
 #elif defined(__WATCOMC__)
 #   define TB_COMPILER_IS_WATCOM
 #   define TB_COMPILER_VERSION_BT(major, minor)     (__WATCOMC__ > ((major) * 100 + (minor)))
@@ -312,7 +312,7 @@
 #   elif (_MSC_VER == 1300)
 #       define TB_COMPILER_VERSION_STRING           "visual c++ .net (7.0)"
 #   elif (_MSC_VER == 1310)
-#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2003 (7.1)" 
+#       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2003 (7.1)"
 #   elif (_MSC_VER == 1400)
 #       define TB_COMPILER_VERSION_STRING           "visual c++ .net 2005 (8.0)"
 #   elif (_MSC_VER == 1500)

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 
 tb_time_t tb_mktime(tb_tm_t const* tm)
@@ -49,7 +49,7 @@ tb_time_t tb_mktime(tb_tm_t const* tm)
     t.tm_wday   = (tb_int_t)tm->week;
     t.tm_yday   = (tb_int_t)tm->yday;
     t.tm_isdst  = (tb_int_t)tm->isdst;
-    
+
     // mktime
     return (tb_time_t)mktime(&t);
 #else

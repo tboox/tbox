@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -42,7 +42,7 @@
  * interfaces
  */
 
-/*! init spinlock 
+/*! init spinlock
  *
  * @param lock      the lock
  *
@@ -90,7 +90,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
     while (1)
     {
         /* try non-atomic directly reading to reduce the performance loss of atomic synchronization,
-         * this maybe read some dirty data, but only leads to enter wait state fastly, 
+         * this maybe read some dirty data, but only leads to enter wait state fastly,
          * but does not affect to acquire lock.
          */
         if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock))
@@ -124,16 +124,16 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_ref_t lock)
                  *    jmp spin_Lock
                  * get_Lock:
                  *
-                 * The PAUSE instruction will "de-pipeline" the memory reads, 
-                 * so that the pipeline is not filled with speculative CMP (2) instructions like in the first example. 
-                 * (I.e. it could block the pipeline until all older memory instructions are committed.) 
-                 * Because the CMP instructions (2) execute sequentially it is unlikely (i.e. the time window is much shorter) 
+                 * The PAUSE instruction will "de-pipeline" the memory reads,
+                 * so that the pipeline is not filled with speculative CMP (2) instructions like in the first example.
+                 * (I.e. it could block the pipeline until all older memory instructions are committed.)
+                 * Because the CMP instructions (2) execute sequentially it is unlikely (i.e. the time window is much shorter)
                  * that an external write occurs after the CMP instruction (2) read lockvar but before the CMP is committed.
                  */
-                for (i = 0; i < n; i++) 
+                for (i = 0; i < n; i++)
                     tb_cpu_pause();
 
-                if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
+                if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock))
                     return ;
             }
         }
@@ -157,7 +157,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
 #endif
     while (1)
     {
-        if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
+        if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock))
             return ;
 
 #if defined(tb_cpu_pause) && !defined(TB_CONFIG_MICRO_ENABLE)
@@ -166,10 +166,10 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter_without_profiler(tb_spinl
             tb_size_t i, n;
             for (n = 1; n < 2048; n <<= 1)
             {
-                for (i = 0; i < n; i++) 
+                for (i = 0; i < n; i++)
                     tb_cpu_pause();
 
-                if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock)) 
+                if (!tb_atomic_flag_test_noatomic(lock) && !tb_atomic_flag_test_and_set(lock))
                     return ;
             }
         }

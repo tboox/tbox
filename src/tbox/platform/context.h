@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -70,7 +70,7 @@ typedef tb_void_t       (*tb_context_func_t)(tb_context_from_t from);
  */
 tb_context_ref_t        tb_context_make(tb_byte_t* stackdata, tb_size_t stacksize, tb_context_func_t func);
 
-/*! jump to the given context 
+/*! jump to the given context
  *
  * @param context       the to-context
  * @param priv          the passed user private data

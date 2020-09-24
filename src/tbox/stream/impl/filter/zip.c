@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -41,7 +41,7 @@ typedef struct __tb_filter_zip_t
     // the action
     tb_size_t                   action;
 
-    // the zip 
+    // the zip
     tb_zip_ref_t                zip;
 
 }tb_filter_zip_t;
@@ -166,7 +166,7 @@ tb_filter_ref_t tb_filter_init_from_zip(tb_size_t algo, tb_size_t action)
         filter = tb_malloc0_type(tb_filter_zip_t);
         tb_assert_and_check_break(filter);
 
-        // init filter 
+        // init filter
         if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_ZIP)) break;
         filter->base.open   = tb_filter_zip_open;
         filter->base.clos   = tb_filter_zip_clos;

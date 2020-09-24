@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -19,7 +19,7 @@
  * @ingroup     object
  *
  */
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -75,7 +75,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_data(tb_oc_bin_reader_t* reader, tb
     tb_assert_and_check_return_val(data, tb_null);
 
     // read data
-    if (!tb_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size)) 
+    if (!tb_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size))
     {
         tb_free(data);
         return tb_null;
@@ -90,7 +90,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_data(tb_oc_bin_reader_t* reader, tb
     }
 
     // make the data object
-    tb_object_ref_t object = tb_oc_data_init_from_data(data, (tb_size_t)size); 
+    tb_object_ref_t object = tb_oc_data_init_from_data(data, (tb_size_t)size);
 
     // exit data
     tb_free(data);
@@ -129,7 +129,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_array(tb_oc_bin_reader_t* reader, t
         {
             // the object index
             tb_size_t index = (tb_size_t)size;
-        
+
             // check
             tb_assert_and_check_break(index < tb_vector_size(reader->list));
 
@@ -182,7 +182,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_string(tb_oc_bin_reader_t* reader, 
     tb_assert_and_check_return_val(data, tb_null);
 
     // read data
-    if (!tb_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size)) 
+    if (!tb_stream_bread(reader->stream, (tb_byte_t*)data, (tb_size_t)size))
     {
         tb_free(data);
         return tb_null;
@@ -197,7 +197,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_string(tb_oc_bin_reader_t* reader, 
     }
 
     // make string
-    tb_object_ref_t string = tb_oc_string_init_from_cstr(data); 
+    tb_object_ref_t string = tb_oc_string_init_from_cstr(data);
 
     // exit data
     tb_free(data);
@@ -340,7 +340,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_dictionary(tb_oc_bin_reader_t* read
             {
                 // the object index
                 tb_size_t index = (tb_size_t)size;
-            
+
                 // check
                 tb_assert_and_check_break(index < tb_vector_size(reader->list));
 
@@ -372,7 +372,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_dictionary(tb_oc_bin_reader_t* read
         // check
         tb_assert_and_check_break(key && tb_object_type(key) == TB_OBJECT_TYPE_STRING);
         tb_assert_and_check_break(tb_oc_string_size(key) && tb_oc_string_cstr(key));
-        
+
         // read val
         tb_object_ref_t val = tb_null;
         do
@@ -390,7 +390,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_dictionary(tb_oc_bin_reader_t* read
             {
                 // the object index
                 tb_size_t index = (tb_size_t)size;
-            
+
                 // check
                 tb_assert_and_check_break(index < tb_vector_size(reader->list));
 
@@ -412,7 +412,7 @@ static tb_object_ref_t tb_oc_bin_reader_func_dictionary(tb_oc_bin_reader_t* read
                 // save it
                 if (val) tb_vector_insert_tail(reader->list, val);
             }
-        
+
         } while (0);
 
         // check
@@ -438,7 +438,7 @@ static tb_object_ref_t tb_oc_bin_reader_done(tb_stream_ref_t stream)
     tb_byte_t data[32] = {0};
     if (!tb_stream_bread(stream, data, 5)) return tb_null;
 
-    // check 
+    // check
     if (tb_strnicmp((tb_char_t const*)data, "tbo00", 5)) return tb_null;
 
     // init
@@ -503,7 +503,7 @@ tb_oc_reader_t* tb_oc_bin_reader()
     s_reader.hooker = tb_hash_map_init(TB_HASH_MAP_BUCKET_SIZE_MICRO, tb_element_uint32(), tb_element_ptr(tb_null, tb_null));
     tb_assert_and_check_return_val(s_reader.hooker, tb_null);
 
-    // hook reader 
+    // hook reader
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NULL, tb_oc_bin_reader_func_null);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATE, tb_oc_bin_reader_func_date);
     tb_hash_map_insert(s_reader.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DATA, tb_oc_bin_reader_func_data);

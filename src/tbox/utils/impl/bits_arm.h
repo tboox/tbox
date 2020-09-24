@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -69,7 +69,7 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 #else
     __tb_register__ tb_uint32_t t;
     __tb_asm__ __tb_volatile__
-    ( 
+    (
         "eor %1, %0, %0, ror #16 \n"
         "bic %1, %1, #0xff0000   \n"
         "mov %0, %0, ror #8      \n"

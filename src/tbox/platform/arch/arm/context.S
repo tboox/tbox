@@ -59,7 +59,7 @@
  *             -------------------------------------------------------
  * context:   |  sjlj  | retval |   r4    |   r5    |   r6   |   r7   |
  *             -------------------------------------------------------
- *            0        4    |   8         12        16       20                             
+ *            0        4    |   8         12        16       20
  *                          |
  *                           ------------------------------------------------
  *                                                                          \|/
@@ -67,7 +67,7 @@
  *             --------------------------------------------------------------------------------------
  *            |   r8   |   r9   |   r10   |   r11   |   lr   |   pc   | context |  priv  |  padding  |
  *             --------------------------------------------------------------------------------------
- *            24       28       32        36        40       44       48        52       |     
+ *            24       28       32        36        40       44       48        52       |
  *                                                                    |                  |
  *                                                                    |              16-align
  *                                                                    |
@@ -78,15 +78,15 @@
  *             -----------------------------------------------
  * context:   |  retval |   r4    |   r5    |   r6   |   r7   |
  *             -----------------------------------------------
- *            0    |   4        8         12        16                                  
- *                 |        
+ *            0    |   4        8         12        16
+ *                 |
  *                  ---------------------------------------------------------
  *                                                                          \|/
  *                                                    __end     func      retval(from)
  *             --------------------------------------------------------------------------------------
  *            |   r8   |   r9   |   r10   |   r11   |   lr   |   pc   | context |  priv  |  padding  |
  *             --------------------------------------------------------------------------------------
- *            20       24       28        32        36       40       44        48       |     
+ *            20       24       28        32        36       40       44        48       |
  *                                                                    |                  |
  *                                                                    |              16-align
  *                                                                    |
@@ -104,7 +104,7 @@ function tb_context_make, export=1
     // save the stack top to r0
     add r0, r0, r1
 
-    // 16-align of the stack top address 
+    // 16-align of the stack top address
     bic r0, r0, #15
 
     /* reserve space for context-data on context-stack
@@ -128,7 +128,7 @@ function tb_context_make, export=1
     str r1, [r0, #36 + TB_CONTEXT_SJLJ_BYTES]
 
     // return pointer to context-data
-    bx lr 
+    bx lr
 
 __end:
     // exit(0)
@@ -182,7 +182,7 @@ function tb_context_jump, export=1
     // restore retval, r4 - r11, lr
     pop {r3, r4 - r11, lr}
 
-    // return from-context: retval(context: r0, priv: r2) from jump 
+    // return from-context: retval(context: r0, priv: r2) from jump
     str r0, [r3, #0]
     str r2, [r3, #4]
 
@@ -195,7 +195,7 @@ function tb_context_jump, export=1
      *             ---------------------------------------
      * context:   |   pc   | context |  priv  |  padding  |
      *             ---------------------------------------
-     *            0        4         8             
+     *            0        4         8
      *            |
      *            sp
      */

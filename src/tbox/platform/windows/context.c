@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -40,7 +40,7 @@ tb_context_ref_t tb_context_init(tb_byte_t* data, tb_size_t size)
     // get context
     tb_context_ref_t context = (tb_context_ref_t)data;
 
-    // init context 
+    // init context
     tb_memset(data, 0, context_size);
 
     // ok
@@ -56,7 +56,7 @@ tb_bool_t tb_context_save(tb_context_ref_t context)
     LPCONTEXT mcontext = (LPCONTEXT)context;
     tb_assert_and_check_return_val(mcontext, tb_false);
 
-    // save and restore the full machine context 
+    // save and restore the full machine context
     mcontext->ContextFlags = CONTEXT_FULL;
 
     // get it
@@ -78,7 +78,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     LPCONTEXT mcontext = (LPCONTEXT)context;
     tb_assert_and_check_return_val(mcontext && stack && stacksize && func, tb_false);
 
-    // save and restore the full machine context 
+    // save and restore the full machine context
     mcontext->ContextFlags = CONTEXT_FULL;
 
     // get context first
@@ -86,8 +86,8 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
 
     // make stack address
     tb_uint64_t* sp = (tb_uint64_t*)stack + stacksize / sizeof(tb_uint64_t);
- 
-    // 16-align 
+
+    // 16-align
     sp = (tb_uint64_t*)((tb_size_t)sp & ~0xf);
 
     // push return address(unused, only reverse the stack space)
@@ -102,7 +102,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     /* save function and stack address
      *
      * rcx:     arg1
-     * sp:      return address(0)   => rsp 
+     * sp:      return address(0)   => rsp
      */
     mcontext->Rip = (tb_uint64_t)func;
     mcontext->Rsp = (tb_uint64_t)sp;
@@ -117,7 +117,7 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
     LPCONTEXT mcontext = (LPCONTEXT)context;
     tb_assert_and_check_return_val(mcontext && stack && stacksize && func, tb_false);
 
-    // save and restore the full machine context 
+    // save and restore the full machine context
     mcontext->ContextFlags = CONTEXT_FULL;
 
     // get context first
@@ -125,8 +125,8 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
 
     // make stack address
     tb_uint32_t* sp = (tb_uint32_t*)stack + stacksize / sizeof(tb_uint32_t);
- 
-    // 16-align 
+
+    // 16-align
     sp = (tb_uint32_t*)((tb_size_t)sp & ~0xf);
 
     // push arguments
@@ -137,8 +137,8 @@ tb_bool_t tb_context_make(tb_context_ref_t context, tb_pointer_t stack, tb_size_
 
     /* save function and stack address
      *
-     * sp + 4:  arg1                         
-     * sp:      return address(0)   => esp 
+     * sp + 4:  arg1
+     * sp:      return address(0)   => esp
      */
     mcontext->Eip = (tb_uint32_t)func;
     mcontext->Esp = (tb_uint32_t)sp;
@@ -152,7 +152,7 @@ tb_void_t tb_context_swap(tb_context_ref_t context, tb_context_ref_t context_new
     // check
     tb_assert_and_check_return(context && context_new);
 
-    // save and restore the full machine context 
+    // save and restore the full machine context
     ((LPCONTEXT)context)->ContextFlags      = CONTEXT_FULL;
     ((LPCONTEXT)context_new)->ContextFlags  = CONTEXT_FULL;
 

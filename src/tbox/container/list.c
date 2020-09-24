@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@
  */
 
 // the self grow
-#ifdef __tb_small__ 
+#ifdef __tb_small__
 #   define TB_LIST_GROW             (128)
 #else
 #   define TB_LIST_GROW             (256)
@@ -173,13 +173,13 @@ static tb_void_t tb_list_itor_nremove(tb_iterator_ref_t iterator, tb_size_t prev
     if (size > list_size) size = list_size;
 
     // remove the body items
-    if (prev) 
+    if (prev)
     {
         tb_size_t itor = tb_iterator_next((tb_list_ref_t)iterator, prev);
         while (itor != next && size--) itor = tb_list_remove((tb_list_ref_t)iterator, itor);
     }
     // remove the head items
-    else 
+    else
     {
         while (size--) tb_list_remove_head((tb_list_ref_t)iterator);
     }
@@ -218,7 +218,7 @@ tb_list_ref_t tb_list_init(tb_size_t grow, tb_element_t element)
         list->element = element;
 
         // init operation
-        static tb_iterator_op_t op = 
+        static tb_iterator_op_t op =
         {
             tb_list_itor_size
         ,   tb_list_itor_head
@@ -267,7 +267,7 @@ tb_void_t tb_list_exit(tb_list_ref_t self)
     // check
     tb_list_t* list = (tb_list_t*)self;
     tb_assert_and_check_return(list);
-    
+
     // clear data
     tb_list_clear((tb_list_ref_t)list);
 
@@ -389,7 +389,7 @@ tb_size_t tb_list_remove(tb_list_ref_t self, tb_size_t itor)
 
     // free node
     tb_fixed_pool_free(list->pool, node);
-    
+
     // the next node
     return (tb_size_t)next;
 }
@@ -445,7 +445,7 @@ tb_void_t tb_list_dump(tb_list_ref_t self)
     tb_for_all (tb_pointer_t, data, self)
     {
         // trace
-        if (list->element.cstr) 
+        if (list->element.cstr)
         {
             tb_trace_i("    %s", list->element.cstr(&list->element, data, cstr, sizeof(cstr)));
         }

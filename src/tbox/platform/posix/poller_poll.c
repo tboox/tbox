@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -53,7 +53,7 @@ typedef struct __tb_poller_poll_t
 
     // the socket data
     tb_pollerdata_t           pollerdata;
-    
+
 }tb_poller_poll_t, *tb_poller_poll_ref_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ static tb_bool_t tb_poller_poll_walk_modify(tb_iterator_ref_t iterator, tb_point
 
     // is this?
     struct pollfd* pfd = (struct pollfd*)item;
-    if (pfd && pfd->fd == fd) 
+    if (pfd && pfd->fd == fd)
     {
         // the events
         tb_size_t events = tuple[1].ul;
@@ -234,7 +234,7 @@ static tb_long_t tb_poller_poll_wait(tb_poller_t* self, tb_poller_event_func_t f
         tb_long_t pfdn = poll(pfds, pfdm, timeout);
 
         // timeout or interrupted?
-        if (!pfdn || (pfdn == -1 && errno == EINTR)) 
+        if (!pfdn || (pfdn == -1 && errno == EINTR))
             return 0;
 
         // error?
@@ -284,7 +284,7 @@ static tb_long_t tb_poller_poll_wait(tb_poller_t* self, tb_poller_event_func_t f
             tb_size_t events = TB_POLLER_EVENT_NONE;
             if (poll_events & POLLIN) events |= TB_POLLER_EVENT_RECV;
             if (poll_events & POLLOUT) events |= TB_POLLER_EVENT_SEND;
-            if ((poll_events & POLLHUP) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND))) 
+            if ((poll_events & POLLHUP) && !(events & (TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND)))
                 events |= TB_POLLER_EVENT_RECV | TB_POLLER_EVENT_SEND;
 
             // call event function
@@ -343,7 +343,7 @@ tb_poller_t* tb_poller_poll_init()
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_SOCK;
         object.ref.sock = poller->pair[1];
-        if (!tb_poller_poll_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;  
+        if (!tb_poller_poll_insert((tb_poller_t*)poller, &object, TB_POLLER_EVENT_RECV, tb_null)) break;
 
         // ok
         ok = tb_true;

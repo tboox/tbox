@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -32,7 +32,7 @@
  */
 static tb_uint32_t tb_isqrti64_impl(tb_uint64_t x)
 {
-    // compute it fastly for uint32  
+    // compute it fastly for uint32
     if (!(x >> 32)) return tb_isqrti((tb_uint32_t)x);
     // compute it for uint64
     else
@@ -41,16 +41,16 @@ static tb_uint32_t tb_isqrti64_impl(tb_uint64_t x)
         tb_uint64_t t;
         tb_uint64_t n = 0;
         tb_uint64_t b = 0x80000000;
-        tb_uint32_t s = 31; 
-        do 
-        { 
-            if (x >= (t = (((n << 1) + b) << s--))) 
-            { 
-                n += b; 
-                x -= t; 
-            } 
-        } 
-        while (b >>= 1); 
+        tb_uint32_t s = 31;
+        do
+        {
+            if (x >= (t = (((n << 1) + b) << s--)))
+            {
+                n += b;
+                x -= t;
+            }
+        }
+        while (b >>= 1);
 
         // check
         tb_assert(!(n >> 32));
@@ -83,7 +83,7 @@ tb_uint32_t tb_isqrti64(tb_uint64_t x)
         tb_hong_t                   t1 = tb_uclock();
         __tb_volatile__ tb_size_t   n1 = 100;
         __tb_volatile__ tb_uint32_t v1; tb_used(&v1);
-        while (n1--) 
+        while (n1--)
         {
             v1 = tb_isqrti64_impl((1 << 4) + 3);
             v1 = tb_isqrti64_impl((1 << 12) + 3);
@@ -101,7 +101,7 @@ tb_uint32_t tb_isqrti64(tb_uint64_t x)
         tb_hong_t                   t2 = tb_uclock();
         __tb_volatile__ tb_size_t   n2 = 100;
         __tb_volatile__ tb_uint32_t v2; tb_used(&v2);
-        while (n2--) 
+        while (n2--)
         {
             v2 = tb_isqrti64_impl_using_sqrt((1 << 4) + 3);
             v2 = tb_isqrti64_impl_using_sqrt((1 << 12) + 3);
@@ -118,7 +118,7 @@ tb_uint32_t tb_isqrti64(tb_uint64_t x)
         // using sqrt?
         s_using_sqrt = t2 < t1? 1 : 0;
     }
-    
+
     // done
     return s_using_sqrt > 0? tb_isqrti64_impl_using_sqrt(x) : tb_isqrti64_impl(x);
 #else

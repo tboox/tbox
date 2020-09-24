@@ -142,7 +142,7 @@ tb_int_t tb_demo_libc_wchar_main(tb_int_t argc, tb_char_t** argv)
     tb_test_wcsncmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz", 10);
     tb_test_wcsncmp(L"1234", L"1234567890", 10);
     tb_test_wcsncmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz1234567890", 20);
-    
+
     tb_wprintf(L"\n");
     tb_test_wcsnicmp(L"", L"", 10);
     tb_test_wcsnicmp(L"1", L"1", 10);
@@ -181,7 +181,7 @@ tb_int_t tb_demo_libc_wchar_main(tb_int_t argc, tb_char_t** argv)
     tb_test_wcscpy(L"1234567890abcbefg");
     tb_test_wcscpy(L"abcdefghijklmnopqrstuvwxyz1234567890");
     tb_test_wcscpy(L"abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890");
-    
+
     tb_wprintf(L"\n");
     tb_test_wcsncpy(L"", 5);
     tb_test_wcsncpy(L"1", 5);

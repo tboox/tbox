@@ -2,7 +2,7 @@
 ;  Distributed under the Boost Software License, Version 1.0.
 ;     (See accompanying file LICENSE_1_0.txt or copy at
 ;           http://www.boost.org/LICENSE_1_0.txt)
-; 
+;
 
 ; Boost Software License - Version 1.0 - August 17th, 2003
 ;
@@ -124,7 +124,7 @@ _exit proto, value:sdword
 ;
 ;
 ;             -------------------------------------------------
-; context:   |  fiber  | dealloc |  limit  |  base   |   seh   | ---------------------------- 
+; context:   |  fiber  | dealloc |  limit  |  base   |   seh   | ----------------------------
 ;             -------------------------------------------------                              |
 ;            0         4         8         12        16                                      | seh chain for context function
 ;                                                                                            |
@@ -133,8 +133,8 @@ _exit proto, value:sdword
 ;             -----------------------------------------------------------------------------------------------------------------------------------------
 ;            |   edi   |   esi   |   ebx   |   ebp   |   eip   | context |  priv  |  unused  | seh.prev (0xffffffff) | seh.handler | padding |
 ;             -----------------------------------------------------------------------------------------------------------------------------------------
-;            20        24        28        32        36        40        44       48         52                     56             60                   
-;                                                              |         
+;            20        24        28        32        36        40        44       48         52                     56             60
+;                                                              |
 ;                                                              | 16-align
 ;                                                              |
 ;                                                   esp when jump to function
@@ -145,7 +145,7 @@ _exit proto, value:sdword
 ;
 ; @return              the context pointer (eax)
 ;;
-tb_context_make proc 
+tb_context_make proc
 
     ; save the stack top to eax
     mov eax, [esp + 4]
@@ -156,7 +156,7 @@ tb_context_make proc
     ; 5 * 4 = 20
     lea eax, [eax - 20]
 
-    ; 16-align of the stack top address 
+    ; 16-align of the stack top address
     and eax, -16
 
     ; reserve space for context-data on context-stack
@@ -196,7 +196,7 @@ tb_context_make proc
     ; the exception handler chain is tested for the presence of ntdll.dll!FinalExceptionHandler
     ; at its end by RaiseException all seh-handlers are disregarded if not present and the
     ; program is aborted
-    ; 
+    ;
     ; load the current seh chain from TIB
     assume fs:nothing
     mov ecx, fs:[0h]
@@ -215,7 +215,7 @@ __walkchain:
     jmp __walkchain
 
 __found:
-    
+
     ; context.seh.handler = sehitem.handler
     mov ecx, [ecx + 4]
     mov [eax + 60], ecx
@@ -229,7 +229,7 @@ __found:
     mov [eax + 16], ecx
 
     ; return pointer to context-data
-    ret 
+    ret
 
 __entry:
 
@@ -247,9 +247,9 @@ __entry:
     ;              ------------------------------------------
     ; context: .. |   end   | context |   priv   |    ...    |
     ;              ------------------------------------------
-    ;             0         4    arguments 
+    ;             0         4    arguments
     ;             |         |
-    ;            esp     16-align 
+    ;            esp     16-align
     ;           (now)
     ;;
     jmp ebx
@@ -262,11 +262,11 @@ __end:
     call _exit
     hlt
 
-tb_context_make endp 
+tb_context_make endp
 
 ; jump context (refer to boost.context)
 ;
-; optimzation (jump context faster 30% than boost.context): 
+; optimzation (jump context faster 30% than boost.context):
 ;    - adjust context stack layout (patch end behind eip)
 ;    - remove trampoline and jump to context function directly
 ;
@@ -275,10 +275,10 @@ tb_context_make endp
 ;
 ; @return              the from-context (context: eax, priv: edx)
 ;;
-tb_context_jump proc 
+tb_context_jump proc
 
     ; save registers and construct the current context
-    push ebp 
+    push ebp
     push ebx
     push esi
     push edi
@@ -341,18 +341,18 @@ tb_context_jump proc
     mov [edx], ecx
 
     ; restore registers of the new context
-    pop edi 
+    pop edi
     pop esi
-    pop ebx 
+    pop ebx
     pop ebp
 
     ; restore the return or function address(ecx)
     pop ecx
 
-    ; return from-context(context: eax, priv: edx) from jump 
-    ; 
+    ; return from-context(context: eax, priv: edx) from jump
+    ;
     ; edx = [eax + 44] = [esp_jump + 44] = jump.argument(priv)
-    ; 
+    ;
     mov edx, [eax + 44]
 
     ; jump to the return or function address(eip)
@@ -362,14 +362,14 @@ tb_context_jump proc
     ;              --------------------------------
     ; context: .. | context |   priv   |    ...    |
     ;              --------------------------------
-    ;             0     arguments 
-    ;             |         
-    ;            esp 
+    ;             0     arguments
+    ;             |
+    ;            esp
     ;           (now)
     ;;
     jmp ecx
 
-tb_context_jump endp 
+tb_context_jump endp
 
 end
 

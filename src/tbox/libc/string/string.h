@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@ __tb_extern_c_enter__
 // memset_ptr
 #if TB_CPU_BIT64
 #   define      tb_memset_ptr(s, p, n)      tb_memset_u64(s, (tb_uint64_t)(p), n)
-#else 
+#else
 #   define      tb_memset_ptr(s, p, n)      tb_memset_u32(s, (tb_uint32_t)(p), n)
 #endif
 

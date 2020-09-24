@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * implementation 
+ * implementation
  */
 #if defined(TB_CONFIG_LIBC_HAVE_STRLEN)
 static tb_size_t tb_strlen_impl(tb_char_t const* s)
@@ -57,7 +57,7 @@ static tb_size_t tb_strlen_impl(tb_char_t const* s)
     while (*p) p++;
     return (p - s);
 #else
-    while (1) 
+    while (1)
     {
         if (!p[0]) return (p - s + 0);
         if (!p[1]) return (p - s + 1);
@@ -71,14 +71,14 @@ static tb_size_t tb_strlen_impl(tb_char_t const* s)
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 tb_size_t tb_strlen(tb_char_t const* s)
 {
     // check
 #ifdef __tb_debug__
     {
-        // overflow? 
+        // overflow?
         tb_size_t size = tb_pool_data_size(s);
         if (size)
         {

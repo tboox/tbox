@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -57,7 +57,7 @@ typedef struct __tb_xml_writer_impl_t
 
     // is owner of the stream?
     tb_bool_t               bowner;
-    
+
     // the elements stack
     tb_stack_ref_t          elements;
 
@@ -147,7 +147,7 @@ tb_bool_t tb_xml_writer_open(tb_xml_writer_ref_t writer, tb_bool_t bformat, tb_s
         impl->stream = stream;
 
         // ctrl stream
-        if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE) 
+        if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
         {
             // ctrl mode
             if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) break;
@@ -175,7 +175,7 @@ tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer)
 
     // clos stream
     if (impl->stream) tb_stream_clos(impl->stream);
-    
+
     // exit stream
     if (impl->stream && impl->bowner) tb_stream_exit(impl->stream);
     impl->stream = tb_null;
@@ -183,7 +183,7 @@ tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer)
     // clear owner
     impl->bowner = tb_false;
 
-    // clear format 
+    // clear format
     impl->bformat = tb_false;
 
     // clear attributes

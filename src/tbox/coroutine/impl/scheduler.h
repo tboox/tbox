@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -58,7 +58,7 @@ struct __tb_co_scheduler_io_t;
 
 // the scheduler type
 typedef struct __tb_co_scheduler_t
-{   
+{
     /* the original coroutine (in main loop)
      *
      * coroutine->scheduler == (tb_co_scheduler_ref_t)coroutine
@@ -78,7 +78,7 @@ typedef struct __tb_co_scheduler_t
     tb_list_entry_head_t            coroutines_dead;
 
     /* the ready coroutines
-     * 
+     *
      * ready: head -> ready -> .. -> running -> .. -> ready -> ..->
      *         |                                                   |
      *          ---------------------------<-----------------------
@@ -94,7 +94,7 @@ typedef struct __tb_co_scheduler_t
  * interfaces
  */
 
-/* start the coroutine function 
+/* start the coroutine function
  *
  * @param scheduler         the scheduler, uses the default scheduler if be null
  * @param func              the coroutine function
@@ -126,7 +126,7 @@ tb_pointer_t                tb_co_scheduler_resume(tb_co_scheduler_t* scheduler,
 /* suspend the current coroutine
  *
  * @param scheduler         the scheduler
- * @param priv              the user private data as the return value of resume() 
+ * @param priv              the user private data as the return value of resume()
  *
  * @return                  the user private data from resume(priv)
  */
@@ -154,7 +154,7 @@ tb_pointer_t                tb_co_scheduler_sleep(tb_co_scheduler_t* scheduler, 
  */
 tb_void_t                   tb_co_scheduler_switch(tb_co_scheduler_t* scheduler, tb_coroutine_t* coroutine);
 
-/* wait io events 
+/* wait io events
  *
  * @param scheduler         the scheduler
  * @param object            the poller object
@@ -165,7 +165,7 @@ tb_void_t                   tb_co_scheduler_switch(tb_co_scheduler_t* scheduler,
  */
 tb_long_t                   tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, tb_poller_object_ref_t object, tb_size_t events, tb_long_t timeout);
 
-/* wait process status 
+/* wait process status
  *
  * @param scheduler         the scheduler
  * @param object            the process poller object

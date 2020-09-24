@@ -33,7 +33,7 @@ static tb_int_t tb_demo_ltimer_loop(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
 {
     // init timer
@@ -53,10 +53,10 @@ tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
 
         // add task: every
         tb_ltimer_task_post(timer, 1 * delay, tb_true, tb_demo_ltimer_task_func, "every");
-    
+
         // add task: one
         tb_ltimer_task_ref_t one = tb_ltimer_task_init(timer, 10 * delay, tb_false, tb_demo_ltimer_task_func, "one");
-        
+
         // add task: after
         tb_ltimer_task_ref_t after = tb_ltimer_task_init_after(timer, 10 * delay, 5 * delay, tb_true, tb_demo_ltimer_task_func, "after");
 

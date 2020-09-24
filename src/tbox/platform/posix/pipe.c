@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -67,7 +67,7 @@ static __tb_inline__ tb_char_t const* tb_pipe_file_name(tb_char_t const* name, t
     if (size && size < maxn)
     {
         if (data[size - 1] != '/') data[size++] = '/';
-        if (size < maxn) 
+        if (size < maxn)
         {
             tb_strlcpy(data + size, name, maxn - size);
             return data;
@@ -98,7 +98,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         // this pipe is not exists? we create it first
         if (access(pipename, F_OK) != 0)
         {
-            // 0644: -rw-r--r-- 
+            // 0644: -rw-r--r--
             if (mkfifo(pipename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0)
                 break;
         }
@@ -154,7 +154,7 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
         // save to file pair
         pair[0] = tb_fd2pipefile(pipefd[0]);
         pair[1] = tb_fd2pipefile(pipefd[1]);
-        
+
         // ok
         ok = tb_true;
 
@@ -249,7 +249,7 @@ tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine if timeout is non-zero
-    if (timeout && tb_coroutine_self()) 
+    if (timeout && tb_coroutine_self())
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_PIPE;

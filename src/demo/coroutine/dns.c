@@ -1,6 +1,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ static tb_void_t tb_demo_coroutine_dns(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_dns_main(tb_int_t argc, tb_char_t** argv)
 {
     // check
@@ -32,7 +32,7 @@ tb_int_t tb_demo_coroutine_dns_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start dns
-        tb_size_t n = argv[2]? (tb_size_t)tb_atoi(argv[2]) : 10; 
+        tb_size_t n = argv[2]? (tb_size_t)tb_atoi(argv[2]) : 10;
         while (n--)
         {
             // start it

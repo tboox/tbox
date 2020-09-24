@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -33,7 +33,7 @@
  */
 
 // get the poller object type from the private pointer
-#define tb_poller_priv_get_object_type(ptr) (((tb_size_t)(ptr) & ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK) 
+#define tb_poller_priv_get_object_type(ptr) (((tb_size_t)(ptr) & ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1)))? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK)
 
 // get the original private pointer
 #define tb_poller_priv_get_original(ptr)    ((tb_cpointer_t)((tb_size_t)(ptr) & ~((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1))))
@@ -58,7 +58,7 @@ typedef struct __tb_poller_t
     tb_uint16_t             supported_events;
 
 #ifndef TB_CONFIG_MICRO_ENABLE
-    // the process poller 
+    // the process poller
     tb_poller_process_ref_t process_poller;
 #endif
 
@@ -89,7 +89,7 @@ typedef struct __tb_poller_t
      * @return              > 0: the events number, 0: timeout, -1: failed
      */
     tb_long_t               (*wait)(struct __tb_poller_t* poller, tb_poller_event_func_t func, tb_long_t timeout);
-    
+
     /* insert socket to poller
      *
      * @param poller        the poller
@@ -136,7 +136,7 @@ typedef struct __tb_poller_t
 // set the object type to the private pointer
 static __tb_inline__ tb_cpointer_t tb_poller_priv_set_object_type(tb_poller_object_ref_t object, tb_cpointer_t ptr)
 {
-    // must be a valid pointer address 
+    // must be a valid pointer address
     tb_assert(!((tb_size_t)ptr & ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1))));
     return object->type == TB_POLLER_OBJECT_PIPE? (tb_cpointer_t)((tb_size_t)ptr | ((tb_size_t)0x1 << (TB_CPU_BITSIZE - 1))) : ptr;
 }

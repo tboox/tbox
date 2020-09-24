@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -79,7 +79,7 @@ tb_stdfile_ref_t tb_stdfile_init(tb_size_t type)
     } while (0);
 
     // failed? exit file
-    if (!ok) 
+    if (!ok)
     {
         if (file) tb_stdfile_exit((tb_stdfile_ref_t)file);
         file = tb_null;
@@ -143,10 +143,10 @@ tb_bool_t tb_stdfile_peek(tb_stdfile_ref_t self, tb_char_t* pch)
     // read character from stdin
     tb_int_t ch = fgetc(stdfile->fp);
     tb_check_return_val(ch != EOF, tb_false);
-        
+
     // unread character from stdin
     ungetc(ch, stdfile->fp);
- 
+
     // save result
     *pch = (tb_char_t)ch;
     return tb_true;
@@ -169,7 +169,7 @@ tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
     // read character from stdin
     tb_int_t ch = fgetc(stdfile->fp);
     tb_check_return_val(ch != EOF, tb_false);
-        
+
     // save result
     *pch = (tb_char_t)ch;
     return tb_true;

@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
-static tb_float_t tb_float_test_angle[360] = 
+ */
+static tb_float_t tb_float_test_angle[360] =
 {
     0.000000f
 ,   0.017453f
@@ -371,7 +371,7 @@ static tb_float_t tb_float_test_angle[360] =
 
 };
 
-static tb_float_t tb_float_test_arc[5][4] = 
+static tb_float_t tb_float_test_arc[5][4] =
 {
     {0.000000f, 0.000000f, 0.000000f, 0.000000f}
 ,   {1.000000f, 0.500000f, 0.333333f, 0.250000f}
@@ -381,7 +381,7 @@ static tb_float_t tb_float_test_arc[5][4] =
 
 };
 
-static tb_float_t tb_float_test_atan_a[] = 
+static tb_float_t tb_float_test_atan_a[] =
 {
     -10.000000f
 ,   -9.800000f
@@ -487,7 +487,7 @@ static tb_float_t tb_float_test_atan_a[] =
 };
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
- */ 
+ */
 static tb_void_t tb_float_test_constant()
 {
     tb_printf("[float]: max = %f\n", (tb_float_t)TB_MAF);
@@ -796,7 +796,7 @@ static tb_void_t tb_float_test_atan()
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_libm_float_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_float_test_constant();

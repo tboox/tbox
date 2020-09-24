@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -57,7 +57,7 @@ typedef struct __tb_process_t
     // the user private data
     tb_cpointer_t           priv;
 
-}tb_process_t; 
+}tb_process_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -107,12 +107,12 @@ tb_void_t tb_process_handle_close(tb_process_ref_t self)
     process->pi.hProcess = INVALID_HANDLE_VALUE;
 
     // exit stdout file
-    if (process->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdOutput && process->si.hStdOutput != INVALID_HANDLE_VALUE) 
+    if (process->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdOutput && process->si.hStdOutput != INVALID_HANDLE_VALUE)
         tb_file_exit((tb_file_ref_t)process->si.hStdOutput);
     process->si.hStdOutput = INVALID_HANDLE_VALUE;
 
     // exit stderr file
-    if (process->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdError && process->si.hStdError != INVALID_HANDLE_VALUE) 
+    if (process->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdError && process->si.hStdError != INVALID_HANDLE_VALUE)
         tb_file_exit((tb_file_ref_t)process->si.hStdError);
     process->si.hStdError = INVALID_HANDLE_VALUE;
 }
@@ -120,7 +120,7 @@ tb_bool_t tb_process_group_init()
 {
     if (!g_process_group)
     {
-        // create process job 
+        // create process job
         g_process_group = tb_kernel32()->CreateJobObjectW(tb_null, tb_null);
         tb_assert_and_check_return_val(g_process_group && g_process_group != INVALID_HANDLE_VALUE, tb_false);
 
@@ -151,7 +151,7 @@ static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const*
     while ((ch = *p) && n < m)
     {
         // escape '"'
-        if (ch == '\"') 
+        if (ch == '\"')
         {
             if (n < m) buff[n++] = '\\';
         }
@@ -163,7 +163,7 @@ static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const*
     buff[n] = '\0';
 
     // wrap "" if exists escape characters and spaces?
-    if (wrap_quote) 
+    if (wrap_quote)
     {
         tb_string_chrcat(result, '\"');
         tb_size_t i = 0;
@@ -200,7 +200,7 @@ tb_process_ref_t tb_process_init(tb_char_t const* pathname, tb_char_t const* arg
         {
             tb_bool_t first = tb_true;
             tb_char_t const* p = tb_null;
-            while ((p = *argv++)) 
+            while ((p = *argv++))
             {
                 if (first) first = tb_false;
                 else tb_string_chrcat(&args, ' ');
@@ -256,7 +256,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_size_t cmdn = tb_strlen(cmd);
         tb_assert_and_check_break(cmdn);
 
-        // init unicode command 
+        // init unicode command
         command = tb_nalloc_type(cmdn + 1, tb_wchar_t);
         tb_assert_and_check_break(command);
 
@@ -280,7 +280,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_size_t           maxn = 0;
         tb_char_t const**   envp = attr? attr->envp : tb_null;
 #ifdef TB_COMPILER_LIKE_UNIX
-        /* we use unix environments on msys/cygwin, 
+        /* we use unix environments on msys/cygwin,
          * because GetEnvironmentStringsW cannot get all envars
          *
          * TODO we need fix cmd path, stdout/stderr file handle and path to windows-style path for msys,cygwin/gcc
@@ -293,7 +293,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             tb_size_t n = tb_strlen(p);
 
             // ensure data space
-            if (!environment) 
+            if (!environment)
             {
                 maxn = n + 2 + TB_PATH_MAXN;
                 environment = (tb_char_t*)tb_malloc(maxn);
@@ -309,7 +309,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             tb_memcpy(environment + size, p, n);
 
             // fill '\0'
-            environment[size + n] = '\0'; 
+            environment[size + n] = '\0';
 
             // update size
             size += n + 1;
@@ -416,7 +416,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         if (!tb_kernel32()->CreateProcessW(tb_null, command, &sap, &sat, bInheritHandle, flags, (LPVOID)environment, attr && attr->curdir? curdir : tb_null, &process->si, &process->pi))
         {
             /* It maybe fails because inside some sessions all user processes belong to a system-created job object named like
-             * "\Sessions\x\BaseNamedObjects\Winlogon Job x-xxxxxxxx" (including rdpinit.exe and rdpshell.exe processes), 
+             * "\Sessions\x\BaseNamedObjects\Winlogon Job x-xxxxxxxx" (including rdpinit.exe and rdpshell.exe processes),
              * and this job doesn't allow their procceses to escape via CREATE_BREAKAWAY_FROM_JOB flag (it doesn't have the JOB_OBJECT_LIMIT_BREAKAWAY_OK limit/right set).
              *
              * we attempt to remove CREATE_BREAKAWAY_FROM_JOB flag and try to run it again
@@ -457,7 +457,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         environment = tb_null;
     }
 
-    // exit command 
+    // exit command
     if (command) tb_free(command);
     command = tb_null;
 
@@ -552,7 +552,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
     // attempt to wait it in coroutine if timeout is non-zero
-    if (timeout && tb_coroutine_self()) 
+    if (timeout && tb_coroutine_self())
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_PROC;
@@ -570,7 +570,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
         {
             // save exit code
             DWORD exitcode = 0;
-            if (pstatus) *pstatus = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;  
+            if (pstatus) *pstatus = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;
 
             // close process handles
             tb_process_handle_close(self);
@@ -579,7 +579,7 @@ tb_long_t tb_process_wait(tb_process_ref_t self, tb_long_t* pstatus, tb_long_t t
             ok = 1;
         }
         break;
-    case WAIT_TIMEOUT: // timeout 
+    case WAIT_TIMEOUT: // timeout
         ok = 0;
         break;
     case WAIT_FAILED: // failed
@@ -625,7 +625,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
             // save process info
             infolist[infosize].index    = (tb_int_t)index;
             infolist[infosize].process  = (tb_process_ref_t)process;
-            infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_int_t)exitcode : -1;  
+            infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_int_t)exitcode : -1;
             infosize++;
 
             // close process handles
@@ -657,7 +657,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
                         // save process info
                         infolist[infosize].index    = index;
                         infolist[infosize].process  = (tb_process_ref_t)process;
-                        infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;  
+                        infolist[infosize].status   = tb_kernel32()->GetExitCodeProcess(process->pi.hProcess, &exitcode)? (tb_long_t)exitcode : -1;
                         infosize++;
 
                         // close process handles

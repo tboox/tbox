@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -68,7 +68,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
     tb_assert_and_check_return_val(interfaces, tb_null);
 
     // uses the cached interfaces?
-    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces); 
+    tb_check_return_val(reload, (tb_iterator_ref_t)interfaces);
 
     // clear interfaces first
     tb_list_clear(interfaces);
@@ -114,7 +114,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
 
                     // save flags
                     interface->flags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
-                    if ((item->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr4)) 
+                    if ((item->ifa_flags & IFF_LOOPBACK) || tb_ipaddr_ip_is_loopback(&ipaddr4))
                         interface->flags |= TB_IFADDRS_INTERFACE_FLAG_IS_LOOPBACK;
 
 #if 0

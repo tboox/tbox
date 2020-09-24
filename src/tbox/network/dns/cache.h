@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -47,18 +47,18 @@ tb_bool_t           tb_dns_cache_init(tb_noarg_t);
 /// exit the cache list
 tb_void_t           tb_dns_cache_exit(tb_noarg_t);
 
-/*! get addr from cache 
+/*! get addr from cache
  *
- * @param name      the host name 
+ * @param name      the host name
  * @param addr      the host addr
  *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_dns_cache_get(tb_char_t const* name, tb_ipaddr_ref_t addr);
 
-/*! set addr to cache 
+/*! set addr to cache
  *
- * @param name      the host name 
+ * @param name      the host name
  * @param addr      the host addr
  */
 tb_void_t           tb_dns_cache_set(tb_char_t const* name, tb_ipaddr_ref_t addr);

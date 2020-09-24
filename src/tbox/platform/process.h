@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -51,7 +51,7 @@ typedef enum __tb_process_redirect_type_e
 {
     TB_PROCESS_REDIRECT_TYPE_NONE       = 0
 ,   TB_PROCESS_REDIRECT_TYPE_FILEPATH   = 1     //!< redirect to file path
-,   TB_PROCESS_REDIRECT_TYPE_FILE       = 2     //!< redirect to file 
+,   TB_PROCESS_REDIRECT_TYPE_FILE       = 2     //!< redirect to file
 ,   TB_PROCESS_REDIRECT_TYPE_PIPE       = 3     //!< redirect to pipe
 
 }tb_process_redirect_type_e;
@@ -68,13 +68,13 @@ typedef struct __tb_process_attr_t
     /*! the stdout file mode
      *
      * default: TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC
-     * 
+     *
      * support:
      *
      * - TB_FILE_MODE_WO
-     * - TB_FILE_MODE_RW 
-     * - TB_FILE_MODE_CREAT 
-     * - TB_FILE_MODE_APPEND 
+     * - TB_FILE_MODE_RW
+     * - TB_FILE_MODE_CREAT
+     * - TB_FILE_MODE_APPEND
      * - TB_FILE_MODE_TRUNC
      */
     tb_uint16_t             outmode;
@@ -92,7 +92,7 @@ typedef struct __tb_process_attr_t
         /// the stdout pipe
         tb_pipe_file_ref_t  outpipe;
 
-        /// the stdout file 
+        /// the stdout file
         tb_file_ref_t       outfile;
 
         /// the stdout filepath
@@ -102,7 +102,7 @@ typedef struct __tb_process_attr_t
 #endif
 
 #ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    union 
+    union
     {
 #endif
         /// the strerr pipe
@@ -120,8 +120,8 @@ typedef struct __tb_process_attr_t
     /*! the environment
      *
      * @code
-     
-        tb_char_t const* envp[] = 
+
+        tb_char_t const* envp[] =
         {
             "path=/usr/bin"
         ,   tb_null
@@ -134,7 +134,7 @@ typedef struct __tb_process_attr_t
      * the envp argument is an array of pointers to null-terminated strings
      * and must be terminated by a null pointer
      *
-     * if the value of envp is null, then the child process inherits 
+     * if the value of envp is null, then the child process inherits
      * the environment of the parent process.
      */
     tb_char_t const**       envp;
@@ -168,20 +168,20 @@ typedef struct __tb_process_waitinfo_t
  * interfaces
  */
 
-/*! run a given process 
+/*! run a given process
  *
  * @code
- 
+
     // init argv
-    tb_char_t const* argv[] = 
+    tb_char_t const* argv[] =
     {
         "echo"
     ,   "hello"
     ,   tb_null
     };
- 
+
     // init envp
-    tb_char_t const* envp[] = 
+    tb_char_t const* envp[] =
     {
         "path=/usr/bin"
     ,   tb_null
@@ -190,14 +190,14 @@ typedef struct __tb_process_waitinfo_t
     // init attr
     tb_process_attr_t attr = {0};
     attr.envp = envp;
-    
+
     // run bash
     if (tb_process_run("echo", argv, &attr) == 0)
     {
         // trace
         tb_trace_i("ok");
     }
- 
+
     // run bash
     if (tb_process_run("/bin/echo", tb_null, tb_null) == 0)
     {
@@ -206,7 +206,7 @@ typedef struct __tb_process_waitinfo_t
     }
 
  * @endcode
- * 
+ *
  * @param pathname      the process path or name
  * @param argv          the list of arguments must be terminated by a null pointer
  *                      and must be terminated by a null pointer
@@ -217,8 +217,8 @@ typedef struct __tb_process_waitinfo_t
  */
 tb_long_t               tb_process_run(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr);
 
-/*! run a given process from the command line 
- * 
+/*! run a given process from the command line
+ *
  * @param cmd           the command line
  * @param attr          the process attributes
  *
@@ -226,10 +226,10 @@ tb_long_t               tb_process_run(tb_char_t const* pathname, tb_char_t cons
  */
 tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr);
 
-/*! init a given process 
- * 
+/*! init a given process
+ *
  * @code
- 
+
     // init process
     tb_process_ref_t process = tb_process_init("/bin/echo", tb_null, tb_null);
     if (process)
@@ -242,7 +242,7 @@ tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_process_attr
             tb_trace_i("process exited: %ld", status);
         }
         // kill process
-        else 
+        else
         {
             // kill it
             tb_process_kill(process);
@@ -265,16 +265,16 @@ tb_long_t               tb_process_run_cmd(tb_char_t const* cmd, tb_process_attr
  *
  * @param attr          the process attributes
  *
- * @return              the process 
+ * @return              the process
  */
 tb_process_ref_t        tb_process_init(tb_char_t const* pathname, tb_char_t const* argv[], tb_process_attr_ref_t attr);
 
-/*! init a given process from the command line 
- * 
+/*! init a given process from the command line
+ *
  * @param cmd           the command line
  * @param attr          the process attributes
  *
- * @return              the process 
+ * @return              the process
  */
 tb_process_ref_t        tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t attr);
 
@@ -330,7 +330,7 @@ tb_long_t               tb_process_wait(tb_process_ref_t process, tb_long_t* pst
 /*! wait the process list
  *
  * @code
- 
+
     // init processes
     tb_size_t        count1 = 0;
     tb_process_ref_t processes1[5] = {0};
@@ -367,7 +367,7 @@ tb_long_t               tb_process_wait(tb_process_ref_t process, tb_long_t* pst
 
             // update processes
             tb_size_t count2 = 0;
-            for (i = 0; i < count1; i++) 
+            for (i = 0; i < count1; i++)
             {
                 if (processes1[i]) processes2[count2++] = processes1[i];
             }
@@ -379,7 +379,7 @@ tb_long_t               tb_process_wait(tb_process_ref_t process, tb_long_t* pst
 
  * @endcode
  *
- * @param processes     the null-terminated process list 
+ * @param processes     the null-terminated process list
  * @param infolist      the info list
  * @param infomaxn      the info maxn
  * @param timeout       the timeout (ms), infinity: -1

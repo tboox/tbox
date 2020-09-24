@@ -28,7 +28,7 @@ static tb_void_t tb_queue_put_and_pop_test()
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 10000;
     tb_hong_t t = tb_mclock();
-    for (i = 0; i < n; i++) 
+    for (i = 0; i < n; i++)
     {
         tb_queue_pop(queue);
         tb_queue_put(queue, (tb_pointer_t)0xf);

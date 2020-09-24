@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 #ifdef TB_CONFIG_MODULE_HAVE_ZIP
 tb_int_t tb_demo_stream_zip_main(tb_int_t argc, tb_char_t** argv)
 {
@@ -25,12 +25,12 @@ tb_int_t tb_demo_stream_zip_main(tb_int_t argc, tb_char_t** argv)
 //  tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 //  tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_DEFLATE);
 //  tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_INFLATE);
-    tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_DEFLATE);   
+    tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_DEFLATE);
 //  tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_INFLATE);
 //  tb_stream_ref_t fstream = tb_stream_init_filter_from_zip(iostream, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_DEFLATE);
 
     // done
-    if (istream && ostream && fstream) 
+    if (istream && ostream && fstream)
     {
         // save it
         tb_hong_t save = 0;

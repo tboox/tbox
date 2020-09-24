@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -27,7 +27,7 @@
  */
 #include "prefix.h"
 #include "../utils/bits.h"
-#if defined(TB_CONFIG_OS_WINDOWS) 
+#if defined(TB_CONFIG_OS_WINDOWS)
 #   include "windows/prefix.h"
 #elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
 #   include <sched.h>
@@ -38,7 +38,7 @@
  */
 
 // sched yield
-#if defined(TB_CONFIG_OS_WINDOWS) 
+#if defined(TB_CONFIG_OS_WINDOWS)
 #   define tb_sched_yield()             YieldProcessor()
 #elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
 #   define tb_sched_yield()             sched_yield()
@@ -84,7 +84,7 @@ __tb_extern_c_enter__
 /*! set cpu affinity for the given process id
  *
  * @param pid       the process id, set to the current process if be zero
- * @param cpuset    the cpu set 
+ * @param cpuset    the cpu set
  *
  * @return          tb_true or tb_false
  */
@@ -93,7 +93,7 @@ tb_bool_t           tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset);
 /*! get cpu affinity from the given process id
  *
  * @param pid       the process id, get the current process if be zero
- * @param cpuset    the cpu set 
+ * @param cpuset    the cpu set
  *
  * @return          tb_true or tb_false
  */

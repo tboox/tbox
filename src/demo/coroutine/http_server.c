@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // the port
 #define TB_DEMO_PORT        (8080)
@@ -21,7 +21,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
+ */
 
 // the http session type
 typedef struct __tb_demo_http_session_t
@@ -63,7 +63,7 @@ typedef struct __tb_demo_http_session_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
- */ 
+ */
 
 // the root directory
 static tb_char_t        g_rootdir[TB_PATH_MAXN];
@@ -73,13 +73,13 @@ static tb_bool_t        g_onlydata = tb_false;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_bool_t tb_demo_http_session_init(tb_demo_http_session_ref_t session, tb_socket_ref_t sock)
 {
     // check
     tb_assert(session && sock);
 
-    // init 
+    // init
     session->sock           = sock;
     session->file           = tb_null;
     session->line_size      = 0;
@@ -119,7 +119,7 @@ static tb_bool_t tb_demo_http_session_data_send(tb_socket_ref_t sock, tb_byte_t*
         tb_long_t real = tb_socket_send(sock, data + send, size - send);
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             send += real;
             wait = 0;
@@ -153,7 +153,7 @@ static tb_bool_t tb_demo_http_session_file_send(tb_socket_ref_t sock, tb_file_re
         tb_hong_t real = tb_socket_sendf(sock, file, send, size - send);
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             send += real;
             wait = 0;
@@ -233,7 +233,7 @@ static tb_void_t tb_demo_http_session_head_parse(tb_demo_http_session_ref_t sess
     // check
     tb_assert_and_check_return(session);
 
-    // the first line? 
+    // the first line?
     tb_char_t const* p = session->line;
     if (!session->line_index)
     {
@@ -320,7 +320,7 @@ static tb_long_t tb_demo_http_session_head_line(tb_demo_http_session_ref_t sessi
             else
             {
                 // line end? strip '\r\n'
-                if (session->line_size && session->line[session->line_size - 1] == '\r') 
+                if (session->line_size && session->line[session->line_size - 1] == '\r')
                 {
                     session->line_size--;
                     session->line[session->line_size] = '\0';
@@ -328,9 +328,9 @@ static tb_long_t tb_demo_http_session_head_line(tb_demo_http_session_ref_t sessi
 
                 // trace
                 tb_trace_d("head: %s", session->line);
-    
+
                 // end?
-                if (!session->line_size) 
+                if (!session->line_size)
                 {
                     // ok
                     ok = 1;
@@ -340,7 +340,7 @@ static tb_long_t tb_demo_http_session_head_line(tb_demo_http_session_ref_t sessi
                 // parse the header line
                 tb_demo_http_session_head_parse(session);
 
-                // clear line 
+                // clear line
                 session->line_size = 0;
 
                 // update line index
@@ -367,7 +367,7 @@ static tb_bool_t tb_demo_http_session_head_recv(tb_demo_http_session_ref_t sessi
         tb_long_t real = tb_socket_recv(session->sock, session->data, sizeof(session->data));
 
         // has data?
-        if (real > 0) 
+        if (real > 0)
         {
             // get the header line
             ok = tb_demo_http_session_head_line(session, session->data, real);
@@ -428,7 +428,7 @@ static tb_void_t tb_demo_coroutine_client(tb_cpointer_t priv)
             }
         }
 
-        // send the response 
+        // send the response
         if (!tb_demo_http_session_resp_send(&session, data)) break;
 
         // exit file
@@ -483,7 +483,7 @@ static tb_int_t tb_demo_coroutine_worker(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_http_server_main(tb_int_t argc, tb_char_t** argv)
 {
     // done

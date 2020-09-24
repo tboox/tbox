@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,7 +39,7 @@
 // select the implementation of mbstowcs
 #ifdef TB_CONFIG_FORCE_UTF8
 #   if defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-#       define TB_MBSTOWCS_IMPL_CHARSET 
+#       define TB_MBSTOWCS_IMPL_CHARSET
 #   elif defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
 #       define TB_MBSTOWCS_IMPL_LIBC
 #   endif
@@ -47,7 +47,7 @@
 #   if defined(TB_CONFIG_LIBC_HAVE_MBSTOWCS)
 #       define TB_MBSTOWCS_IMPL_LIBC
 #   elif defined(TB_CONFIG_MODULE_HAVE_CHARSET)
-#       define TB_MBSTOWCS_IMPL_CHARSET 
+#       define TB_MBSTOWCS_IMPL_CHARSET
 #   endif
 #endif
 

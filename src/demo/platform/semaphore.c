@@ -93,7 +93,7 @@ static tb_int_t tb_demo_loop(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_semaphore_main(tb_int_t argc, tb_char_t** argv)
 {
     // init loop
@@ -103,7 +103,7 @@ tb_int_t tb_demo_platform_semaphore_main(tb_int_t argc, tb_char_t** argv)
     for (i = 0; i < n; i++)
     {
         // init semaphore
-        loop[i].semaphore = tb_semaphore_init(0); 
+        loop[i].semaphore = tb_semaphore_init(0);
         tb_assert_and_check_break(loop[i].semaphore);
 
         // post semaphore
@@ -178,7 +178,7 @@ tb_int_t tb_demo_platform_semaphore_main(tb_int_t argc, tb_char_t** argv)
     for (i = 0; i < n; i++)
     {
         // exit loop
-        if (loop[i].loop) 
+        if (loop[i].loop)
         {
             // wait it
             if (!tb_thread_wait(loop[i].loop, 5000, tb_null))

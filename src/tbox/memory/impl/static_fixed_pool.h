@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -57,7 +57,7 @@ typedef __tb_typeref__(static_fixed_pool);
  * @param data              the data address
  * @param size              the data size
  * @param item_size         the item size
- * @param for_small         add data size field at head for the small allocator 
+ * @param for_small         add data size field at head for the small allocator
  *
  * @return                  the pool
  */
@@ -110,7 +110,7 @@ tb_void_t                   tb_static_fixed_pool_clear(tb_static_fixed_pool_ref_
 /*! malloc data
  *
  * @param pool              the pool
- * 
+ *
  * @return                  the data
  */
 tb_pointer_t                tb_static_fixed_pool_malloc(tb_static_fixed_pool_ref_t pool __tb_debug_decl__);

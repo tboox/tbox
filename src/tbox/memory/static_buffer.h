@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -149,7 +149,7 @@ tb_byte_t*          tb_static_buffer_memnset(tb_static_buffer_ref_t buffer, tb_b
  */
 tb_byte_t*          tb_static_buffer_memnsetp(tb_static_buffer_ref_t buffer, tb_size_t p, tb_byte_t b, tb_size_t n);
 
-/*! memcpy: b => 0 ... 
+/*! memcpy: b => 0 ...
  *
  * @param buffer    the static buffer
  * @param b         the copied buffer
@@ -158,7 +158,7 @@ tb_byte_t*          tb_static_buffer_memnsetp(tb_static_buffer_ref_t buffer, tb_
  */
 tb_byte_t*          tb_static_buffer_memcpy(tb_static_buffer_ref_t buffer, tb_static_buffer_ref_t b);
 
-/*! memcpy: b => p ... 
+/*! memcpy: b => p ...
  *
  * @param buffer    the static buffer
  * @param p         the start position
@@ -168,7 +168,7 @@ tb_byte_t*          tb_static_buffer_memcpy(tb_static_buffer_ref_t buffer, tb_st
  */
 tb_byte_t*          tb_static_buffer_memcpyp(tb_static_buffer_ref_t buffer, tb_size_t p, tb_static_buffer_ref_t b);
 
-/*! memcpy: b ... n => 0 ... 
+/*! memcpy: b ... n => 0 ...
  *
  * @param buffer    the static buffer
  * @param b         the copied buffer
@@ -178,7 +178,7 @@ tb_byte_t*          tb_static_buffer_memcpyp(tb_static_buffer_ref_t buffer, tb_s
  */
 tb_byte_t*          tb_static_buffer_memncpy(tb_static_buffer_ref_t buffer, tb_byte_t const* b, tb_size_t n);
 
-/*! memcpy: b ... n => p ... 
+/*! memcpy: b ... n => p ...
  *
  * @param buffer    the static buffer
  * @param p         the start position
@@ -189,7 +189,7 @@ tb_byte_t*          tb_static_buffer_memncpy(tb_static_buffer_ref_t buffer, tb_b
  */
 tb_byte_t*          tb_static_buffer_memncpyp(tb_static_buffer_ref_t buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n);
 
-/*! memmov: b ... e => 0 ... 
+/*! memmov: b ... e => 0 ...
  *
  * @param buffer    the static buffer
  * @param b         the moved start position
@@ -198,7 +198,7 @@ tb_byte_t*          tb_static_buffer_memncpyp(tb_static_buffer_ref_t buffer, tb_
  */
 tb_byte_t*          tb_static_buffer_memmov(tb_static_buffer_ref_t buffer, tb_size_t b);
 
-/*! memmov: b ... e => p ... 
+/*! memmov: b ... e => p ...
  *
  * @param buffer    the static buffer
  * @param p         the moved destination position
@@ -208,7 +208,7 @@ tb_byte_t*          tb_static_buffer_memmov(tb_static_buffer_ref_t buffer, tb_si
  */
 tb_byte_t*          tb_static_buffer_memmovp(tb_static_buffer_ref_t buffer, tb_size_t p, tb_size_t b);
 
-/*! memmov: b ... n => 0 ... 
+/*! memmov: b ... n => 0 ...
  *
  * @param buffer    the static buffer
  * @param b         the moved start position
@@ -218,7 +218,7 @@ tb_byte_t*          tb_static_buffer_memmovp(tb_static_buffer_ref_t buffer, tb_s
  */
 tb_byte_t*          tb_static_buffer_memnmov(tb_static_buffer_ref_t buffer, tb_size_t b, tb_size_t n);
 
-/*! memmov: b ... n => p ... 
+/*! memmov: b ... n => p ...
  *
  * @param buffer    the static buffer
  * @param p         the moved destination position
@@ -229,7 +229,7 @@ tb_byte_t*          tb_static_buffer_memnmov(tb_static_buffer_ref_t buffer, tb_s
  */
 tb_byte_t*          tb_static_buffer_memnmovp(tb_static_buffer_ref_t buffer, tb_size_t p, tb_size_t b, tb_size_t n);
 
-/*! memcat: b +=> e ... 
+/*! memcat: b +=> e ...
  *
  * @param buffer    the static buffer
  * @param b         the concated buffer
@@ -238,7 +238,7 @@ tb_byte_t*          tb_static_buffer_memnmovp(tb_static_buffer_ref_t buffer, tb_
  */
 tb_byte_t*          tb_static_buffer_memcat(tb_static_buffer_ref_t buffer, tb_static_buffer_ref_t b);
 
-/*! memcat: b ... n +=> e ... 
+/*! memcat: b ... n +=> e ...
  *
  * @param buffer    the static buffer
  * @param b         the concated buffer

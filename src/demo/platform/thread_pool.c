@@ -5,12 +5,12 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * test
- */ 
+ */
 static tb_void_t tb_demo_task_time_done(tb_thread_pool_worker_ref_t worker, tb_cpointer_t priv)
 {
     // trace
     tb_trace_i("done: %u ms", tb_p2u32(priv));
-    
+
     // wait some time
     tb_msleep(tb_p2u32(priv));
 }
@@ -22,7 +22,7 @@ static tb_void_t tb_demo_task_time_exit(tb_thread_pool_worker_ref_t worker, tb_c
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 #if 0
@@ -50,12 +50,12 @@ tb_int_t tb_demo_platform_thread_pool_main(tb_int_t argc, tb_char_t** argv)
 
         // trace
         tb_trace_i("post: %lu ms, total: %lu", time, total);
-    
+
         // post task: time ms
         tb_thread_pool_task_post(tb_thread_pool(), tb_null, tb_demo_task_time_done, tb_demo_task_time_exit, (tb_pointer_t)time, !(time & 15)? tb_true : tb_false);
 
         // finished? wait some time and update count
-        if (!count) 
+        if (!count)
         {
             // wait some time
             tb_msleep(100);

@@ -1,12 +1,12 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
- */ 
-typedef struct __tb_demo_args_t 
+ */
+typedef struct __tb_demo_args_t
 {
     tb_size_t   count;
     tb_char_t*  path;
@@ -15,14 +15,14 @@ typedef struct __tb_demo_args_t
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
- */ 
+ */
 
 // timeout
 #define TB_DEMO_TIMEOUT     (-1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 {
     // get args
@@ -49,7 +49,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 
         // connect socket
         tb_long_t ok;
-        while (!(ok = tb_socket_connect(sock, &addr))) 
+        while (!(ok = tb_socket_connect(sock, &addr)))
         {
             // wait it
             if (tb_socket_wait(sock, TB_SOCKET_EVENT_CONN, TB_DEMO_TIMEOUT) <= 0) break;
@@ -89,7 +89,7 @@ static tb_void_t tb_demo_coroutine_echo(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_unix_echo_client_main(tb_int_t argc, tb_char_t** argv)
 {
     // check

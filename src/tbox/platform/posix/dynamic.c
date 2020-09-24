@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -41,7 +41,7 @@ tb_dynamic_ref_t tb_dynamic_init(tb_char_t const* name)
     tb_handle_t dynamic = dlopen(name, RTLD_LAZY);
 
     // error?
-    if (dlerror()) 
+    if (dlerror())
     {
         if (dynamic) dlclose(dynamic);
         dynamic = tb_null;

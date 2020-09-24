@@ -138,7 +138,7 @@ for idx, require_name in ipairs({"zlib", "sqlite3", "mysql", "mbedtls 2.13.*", "
     end
 end
 
--- get function name 
+-- get function name
 --
 -- sigsetjmp
 -- sigsetjmp((void*)0, 0)
@@ -175,7 +175,7 @@ end
 function check_interfaces()
 
     -- check the interfaces for libc
-    check_module_cfuncs("libc", {"string.h", "stdlib.h"},           
+    check_module_cfuncs("libc", {"string.h", "stdlib.h"},
         "memcpy",
         "memset",
         "memmove",
@@ -196,7 +196,7 @@ function check_interfaces()
         "strcasecmp",
         "strncmp",
         "strncasecmp")
-    check_module_cfuncs("libc", {"wchar.h", "stdlib.h"},            
+    check_module_cfuncs("libc", {"wchar.h", "stdlib.h"},
         "wcscat",
         "wcsncat",
         "wcscpy",
@@ -221,14 +221,14 @@ function check_interfaces()
     check_module_cfuncs("libc", "stdlib.h",                         "srandom", "random")
 
     -- add the interfaces for libm
-    check_module_cfuncs("libm", "math.h", 
-        "sincos", 
-        "sincosf", 
-        "log2", 
+    check_module_cfuncs("libm", "math.h",
+        "sincos",
+        "sincosf",
+        "log2",
         "log2f",
         "sqrt",
         "sqrtf",
-        "acos", 
+        "acos",
         "acosf",
         "asin",
         "asinf",
@@ -253,14 +253,14 @@ function check_interfaces()
     if not is_plat("windows") then
         check_module_cfuncs("posix", {"poll.h", "sys/socket.h"},         "poll")
         check_module_cfuncs("posix", {"sys/select.h"},                   "select")
-        check_module_cfuncs("posix", "pthread.h",                        
+        check_module_cfuncs("posix", "pthread.h",
             "pthread_mutex_init",
-            "pthread_create", 
-            "pthread_setspecific", 
+            "pthread_create",
+            "pthread_setspecific",
             "pthread_getspecific",
             "pthread_key_create",
             "pthread_key_delete",
-            "pthread_setaffinity_np") -- need _GNU_SOURCE 
+            "pthread_setaffinity_np") -- need _GNU_SOURCE
         check_module_cfuncs("posix", {"sys/socket.h", "fcntl.h"},        "socket")
         check_module_cfuncs("posix", "dirent.h",                         "opendir")
         check_module_cfuncs("posix", "dlfcn.h",                          "dlopen")
@@ -269,7 +269,7 @@ function check_interfaces()
         check_module_cfuncs("posix", "ifaddrs.h",                        "getifaddrs")
         check_module_cfuncs("posix", "semaphore.h",                      "sem_init")
         check_module_cfuncs("posix", "unistd.h",                         "getpagesize", "sysconf")
-        check_module_cfuncs("posix", "sched.h",                          "sched_yield", "sched_setaffinity") -- need _GNU_SOURCE 
+        check_module_cfuncs("posix", "sched.h",                          "sched_yield", "sched_setaffinity") -- need _GNU_SOURCE
         check_module_cfuncs("posix", "regex.h",                          "regcomp", "regexec")
         check_module_cfuncs("posix", "sys/uio.h",                        "readv", "writev", "preadv", "pwritev")
         check_module_cfuncs("posix", "unistd.h",                         "pread64", "pwrite64")
@@ -359,7 +359,7 @@ function check_interfaces()
 end
 
 -- include project directories
-includes(format("tbox/%s.lua", (has_config("micro") and "micro" or "xmake"))) 
-if has_config("demo") then 
-    includes(format("demo/%s.lua", (has_config("micro") and "micro" or "xmake"))) 
+includes(format("tbox/%s.lua", (has_config("micro") and "micro" or "xmake")))
+if has_config("demo") then
+    includes(format("demo/%s.lua", (has_config("micro") and "micro" or "xmake")))
 end

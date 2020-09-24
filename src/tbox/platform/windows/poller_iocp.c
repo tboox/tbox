@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@ typedef struct __tb_iocp_func_t
 
     // the GetQueuedCompletionStatusEx func
     tb_kernel32_GetQueuedCompletionStatusEx_t   GetQueuedCompletionStatusEx;
- 
+
     // WSAGetLastError
     tb_ws2_32_WSAGetLastError_t                 WSAGetLastError;
 
@@ -96,7 +96,7 @@ static tb_thread_local_t g_poller_self = TB_THREAD_LOCAL_INIT;
  */
 static tb_size_t tb_poller_iocp_event_from_code(tb_size_t code)
 {
-    static tb_size_t s_events[] = 
+    static tb_size_t s_events[] =
     {
         TB_POLLER_EVENT_CONN
     ,   TB_POLLER_EVENT_ACPT
@@ -181,13 +181,13 @@ static tb_long_t tb_poller_iocp_event_spak_acpt(tb_poller_iocp_ref_t poller, tb_
 
             /* disable the nagle's algorithm to fix 40ms ack delay in some case (.e.g send-send-40ms-recv)
              *
-             * 40ms is the tcp ack delay, which indicates that you are likely 
-             * encountering a bad interaction between delayed acks and the nagle's algorithm. 
+             * 40ms is the tcp ack delay, which indicates that you are likely
+             * encountering a bad interaction between delayed acks and the nagle's algorithm.
              *
-             * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket, 
-             * whereas the other two must be set at the appropriate times during the life of the connection 
+             * TCP_NODELAY simply disables the nagle's algorithm and is a one-time setting on the socket,
+             * whereas the other two must be set at the appropriate times during the life of the connection
              * and can therefore be trickier to use.
-             * 
+             *
              * so we set TCP_NODELAY to reduce response delay for the accepted socket in the server by default
              */
             tb_int_t enable = 1;
@@ -276,21 +276,21 @@ static tb_long_t tb_poller_iocp_event_spak_iorw(tb_poller_iocp_ref_t poller, tb_
         tb_assert_static(tb_offsetof(tb_iocp_object_recv_t, result) == tb_offsetof(tb_iocp_object_sendf_t, result));
 
 
-        // save the result size, @note: hack the result offset 
+        // save the result size, @note: hack the result offset
         iocp_object->u.recv.result = real;
         return 1;
     }
 
-    // error? 
+    // error?
     switch (error)
-    {       
+    {
         // connection closed?
     case ERROR_SUCCESS:
     case WAIT_TIMEOUT:
     case ERROR_IO_PENDING:
         iocp_object->u.recv.result = -1;
         break;
-       // canceled? timeout 
+       // canceled? timeout
     case WSAEINTR:
     case ERROR_OPERATION_ABORTED:
         iocp_object->u.recv.result = 0;
@@ -325,7 +325,7 @@ static tb_long_t tb_poller_iocp_event_spak_pipe(tb_poller_iocp_ref_t poller, tb_
         // trace
         tb_trace_d("pipe(%p): code: %u, real: %lu", iocp_object->ref.pipe, iocp_object->code, real);
 
-        // save the result 
+        // save the result
         result = real;
     }
     else
@@ -394,7 +394,7 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
     tb_assert_and_check_return_val(iocp_object->state == TB_STATE_WAITING || iocp_object->state == TB_STATE_FINISHED, -1);
 
     // init spak
-    static tb_long_t (*s_spak[])(tb_poller_iocp_ref_t , tb_iocp_object_ref_t, tb_size_t , tb_size_t ) = 
+    static tb_long_t (*s_spak[])(tb_poller_iocp_ref_t , tb_iocp_object_ref_t, tb_size_t , tb_size_t ) =
     {
         tb_null
     ,   tb_poller_iocp_event_spak_acpt
@@ -417,10 +417,10 @@ static tb_long_t tb_poller_iocp_event_spak(tb_poller_iocp_ref_t poller, tb_polle
     // spank event
     tb_long_t ok = (s_spak[iocp_object->code])? s_spak[iocp_object->code](poller, iocp_object, real, error) : -1;
 
-    // finish to wait events    
+    // finish to wait events
     iocp_object->state = TB_STATE_FINISHED;
 
-    // do event handler 
+    // do event handler
     tb_poller_object_t object;
     object.type = tb_iocp_object_is_pipe(iocp_object)? TB_POLLER_OBJECT_PIPE : TB_POLLER_OBJECT_SOCK;
     object.ref.ptr = iocp_object->ref.ptr;
@@ -469,12 +469,12 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
     }
     tb_assert(events_count <= poller->events_count);
 
-    // limit 
+    // limit
     events_count = tb_min(events_count, (DWORD)poller->maxn);
 
     // handle events
     tb_size_t               i = 0;
-    tb_size_t               wait = 0; 
+    tb_size_t               wait = 0;
     tb_OVERLAPPED_ENTRY_t*  e = tb_null;
     for (i = 0; i < events_count; i++)
     {
@@ -484,7 +484,7 @@ static tb_long_t tb_poller_iocp_event_wait_ex(tb_poller_iocp_ref_t poller, tb_po
         // get iocp object
         tb_iocp_object_ref_t iocp_object = (tb_iocp_object_ref_t)e->lpOverlapped;
 
-        // spank notification? 
+        // spank notification?
         if (!iocp_object && tb_p2u32(e->lpCompletionKey) == 0x1)
             continue ;
 
@@ -539,10 +539,10 @@ static tb_long_t tb_poller_iocp_event_wait(tb_poller_iocp_ref_t poller, tb_polle
         tb_size_t error = (tb_size_t)GetLastError();
 
         // timeout?
-        if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED)) 
+        if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
             break;
 
-        // spank notification? 
+        // spank notification?
         if (!iocp_object && tb_p2u32(pkey) == 0x1)
             break ;
 
@@ -577,7 +577,7 @@ tb_bool_t tb_poller_iocp_bind_object(tb_poller_iocp_ref_t poller, tb_iocp_object
     tb_assert_and_check_return_val(poller, tb_false);
 
     // bind this iocp object to port
-    if (!iocp_object->port) 
+    if (!iocp_object->port)
     {
         // get the another iocp object with this socket
         HANDLE handle = tb_null;
@@ -634,7 +634,7 @@ static tb_void_t tb_poller_iocp_exit(tb_poller_t* self)
     tb_poller_iocp_ref_t poller = (tb_poller_iocp_ref_t)self;
     tb_assert_and_check_return(poller);
 
-    // detach poller 
+    // detach poller
     if (tb_poller_iocp_self() == poller)
         tb_thread_local_set(&g_poller_self, tb_null);
 
@@ -714,7 +714,7 @@ static tb_long_t tb_poller_iocp_wait(tb_poller_t* self, tb_poller_event_func_t f
     // trace
     tb_trace_d("waiting with timeout(%ld) ..", timeout);
 
-    /* we can use GetQueuedCompletionStatusEx() to increase performance, perhaps, 
+    /* we can use GetQueuedCompletionStatusEx() to increase performance, perhaps,
      * but we may end up lowering perf if you max out only one I/O thread.
      */
     tb_long_t wait = -1;
@@ -732,7 +732,7 @@ static tb_void_t tb_poller_iocp_attach(tb_poller_t* self)
 {
     // init self poller local
     if (!tb_thread_local_init(&g_poller_self, tb_null)) return ;
- 
+
     // update and overide the current scheduler
     tb_thread_local_set(&g_poller_self, self);
 }
@@ -771,7 +771,7 @@ tb_poller_t* tb_poller_iocp_init()
         poller->base.attach = tb_poller_iocp_attach;
         poller->base.supported_events = TB_POLLER_EVENT_EALL | TB_POLLER_EVENT_ONESHOT;
 
-        // init maxn 
+        // init maxn
         poller->maxn = 1 << 16;
 
         // init func

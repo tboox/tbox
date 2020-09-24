@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -74,9 +74,9 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
     // modes
     tb_size_t modes = 0;
-    if (mode & TB_FILE_MODE_CREAT) 
+    if (mode & TB_FILE_MODE_CREAT)
     {
-        // 0644: -rw-r--r-- 
+        // 0644: -rw-r--r--
         modes = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
     }
 
@@ -92,7 +92,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 #endif
     }
     tb_check_return_val(fd >= 0, tb_null);
- 
+
     // trace
     tb_trace_d("open: %p", tb_fd2file(fd));
 
@@ -109,7 +109,7 @@ tb_bool_t tb_file_exit(tb_file_ref_t file)
 
     // close it
     tb_bool_t ok = !close(tb_file2fd(file))? tb_true : tb_false;
-    
+
     // failed?
     if (!ok)
     {
@@ -329,7 +329,7 @@ tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
 #ifdef TB_CONFIG_POSIX_HAVE_PREADV
     return preadv(tb_file2fd(file), (struct iovec const*)list, size, offset);
 #else
- 
+
     // FIXME: lock it
 
     // save offset
@@ -455,8 +455,8 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
         tb_hize_t size = tb_file_size(tb_fd2file(ifd));
 
         // init write size
-        tb_hize_t writ = 0; 
-       
+        tb_hize_t writ = 0;
+
         // attempt to copy file using `sendfile`
 #ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
         while (writ < size)
@@ -467,11 +467,11 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
             else break;
         }
 
-        /* attempt to copy file directly if sendfile failed 
+        /* attempt to copy file directly if sendfile failed
          *
          * sendfile() supports regular file only after "since Linux 2.6.33".
          */
-        if (writ != size) 
+        if (writ != size)
         {
             lseek(ifd, 0, SEEK_SET);
             lseek(ofd, 0, SEEK_SET);

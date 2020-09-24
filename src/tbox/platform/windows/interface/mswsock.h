@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -35,19 +35,19 @@ __tb_extern_c_enter__
  * types
  */
 
-// the AcceptEx func type 
+// the AcceptEx func type
 typedef BOOL (WINAPI* tb_mswsock_AcceptEx_t)(SOCKET sListenSocket, SOCKET sAcceptSocket, PVOID lpOutputBuffer, DWORD dwReceiveDataLength, DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPDWORD lpdwBytesReceived, LPOVERLAPPED lpOverlapped);
 
-// the ConnectEx func type 
+// the ConnectEx func type
 typedef BOOL (WINAPI* tb_mswsock_ConnectEx_t)(SOCKET s, struct sockaddr const* name, tb_int_t namelen, PVOID lpSendBuffer, DWORD dwSendDataLength, LPDWORD lpdwBytesSent, LPOVERLAPPED lpOverlapped);
 
-// the DisconnectEx func type 
+// the DisconnectEx func type
 typedef BOOL (WINAPI* tb_mswsock_DisconnectEx_t)(SOCKET hSocket, LPOVERLAPPED lpOverlapped, DWORD dwFlags, DWORD reserved);
 
-// the TransmitFile func type 
+// the TransmitFile func type
 typedef BOOL (WINAPI* tb_mswsock_TransmitFile_t)(SOCKET hSocket, HANDLE hFile, DWORD nNumberOfBytesToWrite, DWORD nNumberOfBytesPerSend, LPOVERLAPPED lpOverlapped, LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers, DWORD dwReserved);
 
-// the GetAcceptExSockaddrs func type 
+// the GetAcceptExSockaddrs func type
 typedef tb_void_t (WINAPI* tb_mswsock_GetAcceptExSockaddrs_t)(PVOID lpOutputBuffer, DWORD dwReceiveDataLength, DWORD dwLocalAddressLength, DWORD dwRemoteAddressLength, LPSOCKADDR *LocalSockaddr, LPINT LocalSockaddrLength, LPSOCKADDR *RemoteSockaddr, LPINT RemoteSockaddrLength);
 
 // the mswsock interfaces type

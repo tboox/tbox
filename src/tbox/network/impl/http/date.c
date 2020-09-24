@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -56,7 +56,7 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
         else if ((p + 7 < e && !tb_strnicmp(p, "Tuesday", 7)) || (p + 3 < e && !tb_strnicmp(p, "Tue", 3)))
             tm.week = 2;
         else if ((p + 9 < e && !tb_strnicmp(p, "Wednesday", 9)) || (p + 3 < e && !tb_strnicmp(p, "Wed", 3)))
-            tm.week = 3;    
+            tm.week = 3;
         else if ((p + 8 < e && !tb_strnicmp(p, "Thursday", 8)) || (p + 3 < e && !tb_strnicmp(p, "Thu", 3)))
             tm.week = 4;
         else if ((p + 6 < e && !tb_strnicmp(p, "Friday", 6)) || (p + 3 < e && !tb_strnicmp(p, "Fri", 3)))
@@ -80,8 +80,8 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
         if (p < e && tb_isdigit(*p))
         {
             /* prefix year
-             * 
-             * .e.g 
+             *
+             * .e.g
              * year_suffix == false: Sun, 06-Nov-1994 08:49:37
              * year_suffix == true: Sun Nov 6 08:49:37 1994
              */
@@ -129,7 +129,7 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
 
         // year suffix?
         if (year_suffix)
-        {   
+        {
             // parse day
             tm.mday = tb_s10tou32(p);
         }
@@ -141,8 +141,8 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
         }
 
         // skip year or day
-        while (p < e && !tb_isspace(*p)) p++; 
-        while (p < e && tb_isspace(*p)) p++; 
+        while (p < e && !tb_isspace(*p)) p++;
+        while (p < e && tb_isspace(*p)) p++;
 
         // parse hour
         tm.hour = tb_s10tou32(p);
@@ -167,8 +167,8 @@ tb_time_t tb_http_date_from_cstr(tb_char_t const* cstr, tb_size_t size)
         if (year_suffix)
         {
             // skip time
-            while (p < e && !tb_isspace(*p)) p++; 
-            while (p < e && tb_isspace(*p)) p++; 
+            while (p < e && !tb_isspace(*p)) p++;
+            while (p < e && tb_isspace(*p)) p++;
 
             // parse year
             tm.year = tb_s10tou32(p);

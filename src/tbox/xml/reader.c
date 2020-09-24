@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -57,7 +57,7 @@ typedef struct __tb_xml_reader_impl_t
 
     // is bowner of the input stream?
     tb_bool_t               bowner;
-    
+
     // the input stream
     tb_stream_ref_t         istream;
 
@@ -234,8 +234,8 @@ tb_bool_t tb_xml_reader_open(tb_xml_reader_ref_t reader, tb_stream_ref_t stream,
 
         // init owner
         impl->bowner = bowner;
-        
-        // init the input stream 
+
+        // init the input stream
         impl->istream = stream;
 
         // init the reader stream
@@ -356,7 +356,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
         if (!tb_stream_need(impl->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
 
         // is element?
-        if (*pc == '<') 
+        if (*pc == '<')
         {
             // parse element: <...>
             tb_char_t const* element = tb_xml_reader_element_parse(impl);
@@ -370,7 +370,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                 impl->event = TB_XML_READER_EVENT_DOCUMENT;
 
                 // update version & charset
-                tb_xml_node_ref_t attr = (tb_xml_node_ref_t)tb_xml_reader_attributes(reader); 
+                tb_xml_node_ref_t attr = (tb_xml_node_ref_t)tb_xml_reader_attributes(reader);
                 for (; attr; attr = attr->next)
                 {
                     if (!tb_string_cstricmp(&attr->name, "version")) tb_string_strcpy(&impl->version, &attr->data);
@@ -382,7 +382,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
                 {
                     // charset
                     tb_size_t charset = TB_CHARSET_TYPE_UTF8;
-                    if (!tb_string_cstricmp(&impl->charset, "gb2312") || !tb_string_cstricmp(&impl->charset, "gbk")) 
+                    if (!tb_string_cstricmp(&impl->charset, "gb2312") || !tb_string_cstricmp(&impl->charset, "gbk"))
                         charset = TB_CHARSET_TYPE_GB2312;
                     else tb_trace_e("the charset: %s is not supported", tb_string_cstr(&impl->charset));
 
@@ -526,7 +526,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_ref_t reader)
             // trace
             tb_trace_d("%s", text);
         }
-        else 
+        else
         {
             // skip the invalid character
             if (!tb_stream_skip(impl->rstream, 1)) break;
@@ -567,37 +567,37 @@ tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
     {
         switch (event)
         {
-        case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+        case TB_XML_READER_EVENT_ELEMENT_EMPTY:
             {
                 // name
                 tb_char_t const* name = tb_xml_reader_element(reader);
                 tb_assert_and_check_break_state(name, leave, tb_true);
 
-                // append 
+                // append
                 tb_size_t n = tb_static_string_size(&s);
                 tb_static_string_chrcat(&s, '/');
                 tb_static_string_cstrcat(&s, name);
 
                 // ok?
                 if (!tb_static_string_cstricmp(&s, path)) ok = tb_true;
-                
+
                 // trace
                 tb_trace_d("path: %s", tb_static_string_cstr(&s));
 
-                // remove 
+                // remove
                 tb_static_string_strip(&s, n);
 
                 // restore
                 if (ok) if (!(ok = tb_stream_seek(impl->rstream, save))) leave = tb_true;
             }
             break;
-        case TB_XML_READER_EVENT_ELEMENT_BEG: 
+        case TB_XML_READER_EVENT_ELEMENT_BEG:
             {
                 // name
                 tb_char_t const* name = tb_xml_reader_element(reader);
                 tb_assert_and_check_break_state(name, leave, tb_true);
 
-                // append 
+                // append
                 tb_static_string_chrcat(&s, '/');
                 tb_static_string_cstrcat(&s, name);
 
@@ -611,9 +611,9 @@ tb_bool_t tb_xml_reader_goto(tb_xml_reader_ref_t reader, tb_char_t const* path)
                 if (ok) if (!(ok = tb_stream_seek(impl->rstream, save))) leave = tb_true;
             }
             break;
-        case TB_XML_READER_EVENT_ELEMENT_END: 
+        case TB_XML_READER_EVENT_ELEMENT_END:
             {
-                // remove 
+                // remove
                 tb_long_t p = tb_static_string_strrchr(&s, 0, '/');
                 if (p >= 0) tb_static_string_strip(&s, p);
 
@@ -674,29 +674,13 @@ tb_xml_node_ref_t tb_xml_reader_load(tb_xml_reader_ref_t reader)
                 // init
                 tb_xml_node_ref_t doctype = tb_xml_node_init_document_type(tb_xml_reader_doctype(reader));
                 tb_assert_and_check_break_state(doctype, ok, tb_false);
-                
+
                 // append
-                tb_xml_node_append_ctail(node, doctype); 
+                tb_xml_node_append_ctail(node, doctype);
                 tb_assert_and_check_break_state(doctype->parent, ok, tb_false);
             }
             break;
-        case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
-            {
-                // init
-                tb_xml_node_ref_t element = tb_xml_node_init_element(tb_xml_reader_element(reader));
-                tb_assert_and_check_break_state(element, ok, tb_false);
-                
-                // attributes
-                tb_xml_node_ref_t attr = tb_xml_reader_attributes(reader);
-                for (; attr; attr = attr->next)
-                    tb_xml_node_append_atail(element, tb_xml_node_init_attribute(tb_string_cstr(&attr->name), tb_string_cstr(&attr->data)));
-                
-                // append
-                tb_xml_node_append_ctail(node, element); 
-                tb_assert_and_check_break_state(element->parent, ok, tb_false);
-            }
-            break;
-        case TB_XML_READER_EVENT_ELEMENT_BEG: 
+        case TB_XML_READER_EVENT_ELEMENT_EMPTY:
             {
                 // init
                 tb_xml_node_ref_t element = tb_xml_node_init_element(tb_xml_reader_element(reader));
@@ -706,16 +690,32 @@ tb_xml_node_ref_t tb_xml_reader_load(tb_xml_reader_ref_t reader)
                 tb_xml_node_ref_t attr = tb_xml_reader_attributes(reader);
                 for (; attr; attr = attr->next)
                     tb_xml_node_append_atail(element, tb_xml_node_init_attribute(tb_string_cstr(&attr->name), tb_string_cstr(&attr->data)));
-                
+
                 // append
-                tb_xml_node_append_ctail(node, element); 
+                tb_xml_node_append_ctail(node, element);
+                tb_assert_and_check_break_state(element->parent, ok, tb_false);
+            }
+            break;
+        case TB_XML_READER_EVENT_ELEMENT_BEG:
+            {
+                // init
+                tb_xml_node_ref_t element = tb_xml_node_init_element(tb_xml_reader_element(reader));
+                tb_assert_and_check_break_state(element, ok, tb_false);
+
+                // attributes
+                tb_xml_node_ref_t attr = tb_xml_reader_attributes(reader);
+                for (; attr; attr = attr->next)
+                    tb_xml_node_append_atail(element, tb_xml_node_init_attribute(tb_string_cstr(&attr->name), tb_string_cstr(&attr->data)));
+
+                // append
+                tb_xml_node_append_ctail(node, element);
                 tb_assert_and_check_break_state(element->parent, ok, tb_false);
 
                 // enter
                 node = element;
             }
             break;
-        case TB_XML_READER_EVENT_ELEMENT_END: 
+        case TB_XML_READER_EVENT_ELEMENT_END:
             {
                 // check
                 tb_assert_and_check_break_state(node, ok, tb_false);
@@ -724,37 +724,37 @@ tb_xml_node_ref_t tb_xml_reader_load(tb_xml_reader_ref_t reader)
                 node = node->parent;
             }
             break;
-        case TB_XML_READER_EVENT_TEXT: 
+        case TB_XML_READER_EVENT_TEXT:
             {
                 // init
                 tb_xml_node_ref_t text = tb_xml_node_init_text(tb_xml_reader_text(reader));
                 tb_assert_and_check_break_state(text, ok, tb_false);
-                
+
                 // append
-                tb_xml_node_append_ctail(node, text); 
+                tb_xml_node_append_ctail(node, text);
                 tb_assert_and_check_break_state(text->parent, ok, tb_false);
             }
             break;
-        case TB_XML_READER_EVENT_CDATA: 
+        case TB_XML_READER_EVENT_CDATA:
             {
                 // init
                 tb_xml_node_ref_t cdata = tb_xml_node_init_cdata(tb_xml_reader_cdata(reader));
                 tb_assert_and_check_break_state(cdata, ok, tb_false);
-                
+
                 // append
-                tb_xml_node_append_ctail(node, cdata); 
+                tb_xml_node_append_ctail(node, cdata);
                 tb_assert_and_check_break_state(cdata->parent, ok, tb_false);
 
             }
             break;
-        case TB_XML_READER_EVENT_COMMENT: 
+        case TB_XML_READER_EVENT_COMMENT:
             {
                 // init
                 tb_xml_node_ref_t comment = tb_xml_node_init_comment(tb_xml_reader_comment(reader));
                 tb_assert_and_check_break_state(comment, ok, tb_false);
-                
+
                 // append
-                tb_xml_node_append_ctail(node, comment); 
+                tb_xml_node_append_ctail(node, comment);
                 tb_assert_and_check_break_state(comment->parent, ok, tb_false);
             }
             break;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@ __tb_extern_c_enter__
  * macros
  */
 
-// this iocp object is pipe? 
+// this iocp object is pipe?
 #define tb_iocp_object_is_pipe(iocp_object)     ((iocp_object)->code >= TB_IOCP_OBJECT_CODE_READ && (iocp_object)->code <= TB_IOCP_OBJECT_CODE_CONNPIPE)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ typedef struct __tb_iocp_object_read_t
 typedef struct __tb_iocp_object_write_t
 {
     // the result
-    tb_long_t                       result;  
+    tb_long_t                       result;
 
 }tb_iocp_object_write_t;
 
@@ -307,7 +307,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
 
     } ref;
 
-    /* the objects 
+    /* the objects
      *
      * tb_iovec_t must be aligned by cpu-bytes for WSABUF
      */
@@ -342,7 +342,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
      */
     tb_uint8_t                      state;
 
-    /* skip completion port on success? 
+    /* skip completion port on success?
      *
      * SetFileCompletionNotificationModes(fd, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS)
      */
@@ -358,7 +358,7 @@ typedef __tb_cpu_aligned__ struct __tb_iocp_object_t
  *
  * @note only init object once in every thread
  *
- * @param object            the poller object 
+ * @param object            the poller object
  * @param waitevent         the poller event which will be waited
  *
  * @return                  the iocp object
@@ -367,7 +367,7 @@ tb_iocp_object_ref_t        tb_iocp_object_get_or_new(tb_poller_object_ref_t obj
 
 /* get iocp object from the given poller object in local thread
  *
- * @param object            the poller object 
+ * @param object            the poller object
  * @param waitevent         the poller event which will be waited
  *
  * @return                  the iocp object
@@ -376,19 +376,19 @@ tb_iocp_object_ref_t        tb_iocp_object_get(tb_poller_object_ref_t object, tb
 
 /* remove iocp object for the given poller object in local thread
  *
- * @param object            the poller object 
+ * @param object            the poller object
  */
 tb_void_t                   tb_iocp_object_remove(tb_poller_object_ref_t object);
 
 /* clear iocp object state and buffer
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  */
 tb_void_t                   tb_iocp_object_clear(tb_iocp_object_ref_t object);
 
-/* read the pipe data 
+/* read the pipe data
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param data              the data
  * @param size              the size
  *
@@ -398,7 +398,7 @@ tb_long_t                   tb_iocp_object_read(tb_iocp_object_ref_t object, tb_
 
 /* write the pipe data
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param data              the data
  * @param size              the size
  *
@@ -408,7 +408,7 @@ tb_long_t                   tb_iocp_object_write(tb_iocp_object_ref_t object, tb
 
 /* connect to the pipe (server-side)
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  *
  * @return                  ok: 1, continue: 0; failed: -1
  */
@@ -416,16 +416,16 @@ tb_long_t                   tb_iocp_object_connect_pipe(tb_iocp_object_ref_t obj
 
 /*! accept socket
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param addr              the client address
  *
- * @return                  the client socket 
+ * @return                  the client socket
  */
 tb_socket_ref_t             tb_iocp_object_accept(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr);
 
 /* connect the given client address
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param addr              the client address
  *
  * @return                  ok: 1, continue: 0; failed: -1
@@ -434,7 +434,7 @@ tb_long_t                   tb_iocp_object_connect(tb_iocp_object_ref_t object, 
 
 /* recv the socket data for tcp
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param data              the data
  * @param size              the size
  *
@@ -444,7 +444,7 @@ tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_
 
 /* send the socket data for tcp
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param data              the data
  * @param size              the size
  *
@@ -453,8 +453,8 @@ tb_long_t                   tb_iocp_object_recv(tb_iocp_object_ref_t object, tb_
 tb_long_t                   tb_iocp_object_send(tb_iocp_object_ref_t object, tb_byte_t const* data, tb_size_t size);
 
 /*! recvv the socket data for tcp
- * 
- * @param object            the iocp object 
+ *
+ * @param object            the iocp object
  * @param list              the iovec list
  * @param size              the iovec size
  *
@@ -463,8 +463,8 @@ tb_long_t                   tb_iocp_object_send(tb_iocp_object_ref_t object, tb_
 tb_long_t                   tb_iocp_object_recvv(tb_iocp_object_ref_t object, tb_iovec_t const* list, tb_size_t size);
 
 /*! sendv the socket data for tcp
- * 
- * @param object            the iocp object 
+ *
+ * @param object            the iocp object
  * @param list              the iovec list
  * @param size              the iovec size
  *
@@ -474,7 +474,7 @@ tb_long_t                   tb_iocp_object_sendv(tb_iocp_object_ref_t object, tb
 
 /* recv the socket data for udp
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param addr              the peer address(output)
  * @param data              the data
  * @param size              the size
@@ -485,7 +485,7 @@ tb_long_t                   tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb
 
 /* send the socket data for udp
  *
- * @param object            the iocp object 
+ * @param object            the iocp object
  * @param addr              the address
  * @param data              the data
  * @param size              the size
@@ -495,8 +495,8 @@ tb_long_t                   tb_iocp_object_urecv(tb_iocp_object_ref_t object, tb
 tb_long_t                   tb_iocp_object_usend(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size);
 
 /*! urecvv the socket data for udp
- * 
- * @param object            the iocp object 
+ *
+ * @param object            the iocp object
  * @param addr              the peer address(output)
  * @param list              the iovec list
  * @param size              the iovec size
@@ -506,8 +506,8 @@ tb_long_t                   tb_iocp_object_usend(tb_iocp_object_ref_t object, tb
 tb_long_t                   tb_iocp_object_urecvv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
- * 
- * @param object            the iocp object 
+ *
+ * @param object            the iocp object
  * @param addr              the addr
  * @param list              the iovec list
  * @param size              the iovec size
@@ -515,11 +515,11 @@ tb_long_t                   tb_iocp_object_urecvv(tb_iocp_object_ref_t object, t
  * @return                  the real size or -1
  */
 tb_long_t                   tb_iocp_object_usendv(tb_iocp_object_ref_t object, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
-   
-/* send file data 
- * 
- * @param object            the iocp object 
- * @param file              the file 
+
+/* send file data
+ *
+ * @param object            the iocp object
+ * @param file              the file
  * @param offset            the offset
  * @param size              the size
  *

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -43,7 +43,7 @@ static tb_void_t tb_exception_stack_exit(tb_cpointer_t priv)
 static tb_void_t tb_exception_signal_func(tb_int_t sig)
 {
     tb_stack_ref_t stack = (tb_stack_ref_t)tb_thread_local_get(&g_exception_local);
-    if (stack && tb_stack_size(stack)) 
+    if (stack && tb_stack_size(stack))
     {
 #if defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP)
         sigjmp_buf* jmpbuf = (sigjmp_buf*)tb_stack_top(stack);
@@ -53,7 +53,7 @@ static tb_void_t tb_exception_signal_func(tb_int_t sig)
         if (jmpbuf) longjmp(*jmpbuf, 1);
 #endif
     }
-    else 
+    else
     {
         // trace
         tb_trace_e("exception: no handler for signal: %d", sig);
@@ -91,7 +91,7 @@ tb_bool_t tb_exception_init_env()
 
     // ok
     return tb_true;
-} 
+}
 tb_void_t tb_exception_exit_env()
 {
     // unregister signal handler

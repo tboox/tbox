@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -37,14 +37,14 @@ typedef __tb_typeref__(lo_coroutine);
 typedef __tb_typeref__(lo_scheduler);
 
 /*! the coroutine function type
- * 
+ *
  * @param coroutine     the coroutine self
  * @param priv          the user private data from start(.., priv)
  */
 typedef tb_void_t       (*tb_lo_coroutine_func_t)(tb_lo_coroutine_ref_t coroutine, tb_cpointer_t priv);
 
 /*! the user private data free function type
- * 
+ *
  * @param priv          the user private data from start(.., priv)
  */
 typedef tb_void_t       (*tb_lo_coroutine_free_t)(tb_cpointer_t priv);

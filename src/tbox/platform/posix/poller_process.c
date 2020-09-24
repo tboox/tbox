@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -75,10 +75,10 @@ typedef struct __tb_poller_process_t
     // the waited processes data, pid => process and user private data
     tb_hash_map_ref_t       processes_data;
 
-    // the processes status 
+    // the processes status
     tb_vector_ref_t         processes_status;
 
-    // the copied processes status 
+    // the copied processes status
     tb_vector_ref_t         processes_status_copied;
 
     // the semaphore
@@ -90,7 +90,7 @@ typedef struct __tb_poller_process_t
     // the lock
     tb_spinlock_t           lock;
 
-}tb_poller_process_t; 
+}tb_poller_process_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -125,7 +125,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
         tb_assert_and_check_break(wait >= 0);
 
         // interrupted? continue to wait
-        tb_check_continue(wait != 0); 
+        tb_check_continue(wait != 0);
 
         tb_int_t  result = -1;
         tb_bool_t has_exited = tb_false;
@@ -143,8 +143,8 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
             {
                 /* get status, only get 8bits retval
                  *
-                 * tt's limited to 8-bits, which means 1 byte, 
-                 * which means the int from WEXITSTATUS can only range from 0-255. 
+                 * tt's limited to 8-bits, which means 1 byte,
+                 * which means the int from WEXITSTATUS can only range from 0-255.
                  *
                  * in fact, any unix program will only ever return a max of 255.
                  */
@@ -192,7 +192,7 @@ static tb_void_t tb_poller_process_kill(tb_poller_process_ref_t self)
 
     // trace
     tb_trace_d("process: kill ..");
-    
+
     // stop thread and post it
     if (!tb_atomic32_fetch_and_set(&poller->is_stopped, 1))
         tb_semaphore_post(poller->semaphore, 1);
@@ -222,7 +222,7 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
         poller->thread = tb_null;
     }
 
-    // clear signal 
+    // clear signal
     signal(SIGCHLD, SIG_DFL);
     g_process_poller = tb_null;
 
@@ -291,7 +291,7 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
         poller->thread = tb_thread_init(tb_null, tb_poller_process_loop, poller, 0);
         tb_assert_and_check_break(poller->thread);
 
-        // register signal 
+        // register signal
         signal(SIGCHLD, tb_poller_process_signal_handler);
         g_process_poller = poller;
 
@@ -316,7 +316,7 @@ static tb_void_t tb_poller_process_spak(tb_poller_process_ref_t self)
 
     // trace
     tb_trace_d("process: spak ..");
-    
+
     // post it
     tb_semaphore_post(poller->semaphore, 1);
 }
@@ -416,7 +416,7 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     // trace
     tb_trace_d("process: poll %lu", tb_vector_size(poller->processes_status_copied));
 
-    // poll all waited processes status 
+    // poll all waited processes status
     tb_long_t wait = 0;
     tb_poller_object_t object;
     object.type = TB_POLLER_OBJECT_PROC;

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -41,9 +41,9 @@ tb_int32_t tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits)
     tb_int_t xbits = (tb_int_t)tb_bits_cl0_u32_be(x) - 1;
     tb_int_t ybits = (tb_int_t)tb_bits_cl0_u32_be(y) - 1;
     tb_int_t bits = nbits - xbits + ybits;
- 
+
     // underflow?
-    if (bits < 0) return 0; 
+    if (bits < 0) return 0;
 
     // overflow?
     if (bits > 31) return tb_int32_set_sign(TB_MAXS32, s);
@@ -55,13 +55,13 @@ tb_int32_t tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits)
     tb_int32_t r = 0;
     if ((x -= y) >= 0) r = 1;
     else x += y;
-    
+
     // now fall into our switch statement if there are more bits to compute
-    if (bits > 0) 
+    if (bits > 0)
     {
         // make room for the rest of the answer bits
         r <<= bits;
-        switch (bits) 
+        switch (bits)
         {
 #define TB_INT32_DIV_CASE(n) \
         case n: \

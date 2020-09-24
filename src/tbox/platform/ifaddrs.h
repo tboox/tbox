@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -108,7 +108,7 @@ tb_void_t                   tb_ifaddrs_exit(tb_ifaddrs_ref_t ifaddrs);
  * @param ifaddrs           the ifaddrs
  * @param reload            force to reload the ifaddrs list, will cache list if be false
  *
- * @return                  the interface iterator 
+ * @return                  the interface iterator
  */
 tb_iterator_ref_t           tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload);
 
@@ -138,7 +138,7 @@ tb_bool_t                   tb_ifaddrs_hwaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_
  * @param ifaddrs           the ifaddrs
  * @param name              the interface name, get the first ether address if be null
  * @param reload            force to reload the ifaddrs list, will cache list if be false
- * @param family            the address family 
+ * @param family            the address family
  * @param ipaddr            the ip address
  *
  * @return                  tb_true or tb_false

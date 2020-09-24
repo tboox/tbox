@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -123,7 +123,7 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     poller->process_poller = tb_null;
 #endif
 
-    // exit poller 
+    // exit poller
     if (poller->exit)
         poller->exit(poller);
 }
@@ -219,7 +219,7 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_poller_object_ref_t object)
     tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
 #endif
 
-    // remove the poller object 
+    // remove the poller object
     return poller->remove(poller, object);
 }
 tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_poller_object_ref_t object, tb_size_t events, tb_cpointer_t priv)
@@ -241,7 +241,7 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_poller_object_ref_t object, 
     tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
 #endif
 
-    // modify the poller object 
+    // modify the poller object
     return poller->modify(poller, object, events, priv);
 }
 tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_long_t timeout)

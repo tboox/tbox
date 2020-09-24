@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,19 +30,19 @@
  * macros
  */
 
-// no barriers or synchronization. 
+// no barriers or synchronization.
 #define TB_ATOMIC_RELAXED        (1)
 
-// data dependency only for both barrier and synchronization with another thread. 
+// data dependency only for both barrier and synchronization with another thread.
 #define TB_ATOMIC_CONSUME        (2)
 
-// barrier to hoisting of code and synchronizes with release (or stronger) semantic stores from another thread. 
+// barrier to hoisting of code and synchronizes with release (or stronger) semantic stores from another thread.
 #define TB_ATOMIC_ACQUIRE        (3)
 
-// barrier to sinking of code and synchronizes with acquire (or stronger) semantic loads from another thread. 
+// barrier to sinking of code and synchronizes with acquire (or stronger) semantic loads from another thread.
 #define TB_ATOMIC_RELEASE        (4)
 
-// full barrier in both directions and synchronizes with acquire loads and release stores in another thread. 
+// full barrier in both directions and synchronizes with acquire loads and release stores in another thread.
 #define TB_ATOMIC_ACQ_REL        (5)
 
 /// full barrier in both directions and synchronizes with acquire loads and release stores in all threads.

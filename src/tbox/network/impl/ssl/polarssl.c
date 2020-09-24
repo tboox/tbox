@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -132,7 +132,7 @@ static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, size_t size
     // recv it
     tb_long_t real = ssl->read(ssl->priv, data, (tb_size_t)size);
 
-    // trace 
+    // trace
     tb_trace_d("read: %ld", real);
 
     // ok? clear wait
@@ -156,7 +156,7 @@ static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, size_
     // send it
     tb_long_t real = ssl->writ(ssl->priv, data, (tb_size_t)size);
 
-    // trace 
+    // trace
     tb_trace_d("writ: %ld", real);
 
     // ok? clear wait
@@ -348,7 +348,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
 
         // done handshake
         tb_long_t error = ssl_handshake(&ssl->ssl);
-        
+
         // trace
         tb_trace_d("open: handshake: %ld", error);
 
@@ -388,7 +388,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
     if (ok > 0 && !ssl->bopened)
     {
         // done ssl verify
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__) 
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
         tb_long_t error = 0;
         if ((error = ssl_get_verify_result(&ssl->ssl)))
         {
@@ -627,7 +627,7 @@ tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t events, tb_long_t timeout)
     // check
     tb_ssl_t* ssl = (tb_ssl_t*)self;
     tb_assert_and_check_return_val(ssl && ssl->wait, -1);
-    
+
     // the ssl state
     switch (ssl->state)
     {

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,15 +39,15 @@ tb_size_t tb_distance(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail
     // the iterator mode
     tb_size_t mode = tb_iterator_mode(iterator);
 
-    // random access iterator? 
+    // random access iterator?
     tb_size_t distance = 0;
-    if (mode & TB_ITERATOR_MODE_RACCESS) 
+    if (mode & TB_ITERATOR_MODE_RACCESS)
     {
         // compute it fastly
         distance = tail - head;
     }
     // forward iterator?
-    else if (mode & TB_ITERATOR_MODE_FORWARD) 
+    else if (mode & TB_ITERATOR_MODE_FORWARD)
     {
         // whole container?
         if (tb_iterator_head(iterator) == head && tb_iterator_tail(iterator) == tail)
@@ -60,7 +60,7 @@ tb_size_t tb_distance(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail
         }
     }
     // reverse iterator?
-    else if (mode & TB_ITERATOR_MODE_REVERSE) 
+    else if (mode & TB_ITERATOR_MODE_REVERSE)
     {
         // whole container?
         if (tb_iterator_head(iterator) == head && tb_iterator_tail(iterator) == tail)
@@ -74,7 +74,7 @@ tb_size_t tb_distance(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail
                 // update the distance
                 distance++;
 
-                // the previous 
+                // the previous
                 itor = tb_iterator_prev(iterator, itor);
 
             } while (itor != head);

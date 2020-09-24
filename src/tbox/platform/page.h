@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -36,16 +36,16 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init page 
+/*! init page
  *
- * @note 
+ * @note
  * need support to be called repeatly
  *
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_page_init(tb_noarg_t);
 
-/*! exit page 
+/*! exit page
  *
  */
 tb_void_t               tb_page_exit(tb_noarg_t);

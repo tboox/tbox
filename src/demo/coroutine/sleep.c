@@ -1,11 +1,11 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
- */ 
+ */
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
- */ 
+ */
 static tb_void_t tb_demo_coroutine_sleep_func(tb_cpointer_t priv)
 {
     // the interval
@@ -31,7 +31,7 @@ static tb_void_t tb_demo_coroutine_sleep_func(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_coroutine_sleep_main(tb_int_t argc, tb_char_t** argv)
 {
     // init scheduler

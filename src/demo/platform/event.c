@@ -93,7 +93,7 @@ static tb_int_t tb_demo_loop(tb_cpointer_t priv)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
 {
     // init loop
@@ -103,7 +103,7 @@ tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
     for (i = 0; i < n; i++)
     {
         // init event
-        loop[i].event = tb_event_init(); 
+        loop[i].event = tb_event_init();
         tb_assert_and_check_break(loop[i].event);
 
         // post event
@@ -178,7 +178,7 @@ tb_int_t tb_demo_platform_event_main(tb_int_t argc, tb_char_t** argv)
     for (i = 0; i < n; i++)
     {
         // exit loop
-        if (loop[i].loop) 
+        if (loop[i].loop)
         {
             // wait it
             if (!tb_thread_wait(loop[i].loop, 5000, tb_null))

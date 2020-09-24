@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -44,27 +44,27 @@
 #   define TB_ATOMIC_FLAG_INIT      {0}
 #endif
 
-/// no barriers or synchronization. 
+/// no barriers or synchronization.
 #ifndef TB_ATOMIC_RELAXED
 #   define TB_ATOMIC_RELAXED        (1)
 #endif
 
-/// data dependency only for both barrier and synchronization with another thread. 
+/// data dependency only for both barrier and synchronization with another thread.
 #ifndef TB_ATOMIC_CONSUME
 #   define TB_ATOMIC_CONSUME        (2)
 #endif
 
-/// barrier to hoisting of code and synchronizes with release (or stronger) semantic stores from another thread. 
+/// barrier to hoisting of code and synchronizes with release (or stronger) semantic stores from another thread.
 #ifndef TB_ATOMIC_ACQUIRE
 #   define TB_ATOMIC_ACQUIRE        (3)
 #endif
 
-/// barrier to sinking of code and synchronizes with acquire (or stronger) semantic loads from another thread. 
+/// barrier to sinking of code and synchronizes with acquire (or stronger) semantic loads from another thread.
 #ifndef TB_ATOMIC_RELEASE
 #   define TB_ATOMIC_RELEASE        (4)
 #endif
 
-/// full barrier in both directions and synchronizes with acquire loads and release stores in another thread. 
+/// full barrier in both directions and synchronizes with acquire loads and release stores in another thread.
 #ifndef TB_ATOMIC_ACQ_REL
 #   define TB_ATOMIC_ACQ_REL        (5)
 #endif
@@ -76,7 +76,7 @@
 
 /// memory barrier (full barrier)
 #ifndef tb_memory_barrier
-#   define tb_memory_barrier()         
+#   define tb_memory_barrier()
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@
  * macros
  */
 
-/*! initializes the default-constructed atomic object obj with the value desired. 
+/*! initializes the default-constructed atomic object obj with the value desired.
  *
  * the function is not atomic: concurrent access from another thread, even through an atomic operation, is a data race.
  */
@@ -99,7 +99,7 @@
 #   define tb_atomic_init(a, v)                            tb_atomic32_init(a, (tb_int32_t)(v))
 #endif
 
-/*! atomically compares the contents of memory pointed to by obj with the contents of memory pointed to by expected, 
+/*! atomically compares the contents of memory pointed to by obj with the contents of memory pointed to by expected,
  * and if those are bitwise equal, replaces the former with desired (performs read-modify-write operation).
  *
  * otherwise, loads the actual contents of memory pointed to by obj into *p (performs load operation).
@@ -133,9 +133,9 @@
 #   define tb_atomic_compare_and_swap(a, p, v)          tb_atomic32_compare_and_swap(a, (tb_int32_t*)(p), (tb_int32_t)(v))
 #endif
 
-/*! like tb_atomic_compare_and_swap(), but it's allowed to fail spuriously, that is, act as if *obj != *p even if they are equal. 
+/*! like tb_atomic_compare_and_swap(), but it's allowed to fail spuriously, that is, act as if *obj != *p even if they are equal.
  *
- * when a compare-and-swap is in a loop, the weak version will yield better performance on some platforms. 
+ * when a compare-and-swap is in a loop, the weak version will yield better performance on some platforms.
  * when a weak compare-and-swap would require a loop and a strong one would not, the strong one is preferable.
  *
  * @param a     pointer to the atomic object to test and modify
@@ -239,7 +239,7 @@
 #   define tb_atomic_set(a, v)                          tb_atomic32_set(a, (tb_int32_t)(v))
 #endif
 
-/// sets an atomic_flag to true and returns the old value 
+/// sets an atomic_flag to true and returns the old value
 #ifndef tb_atomic_flag_test_and_set_explicit
 #   define tb_atomic_flag_test_and_set_explicit_generic_impl
 #   define tb_atomic_flag_test_and_set_explicit(a, mo)  tb_atomic_flag_test_and_set_explicit_generic(a, mo)
@@ -248,7 +248,7 @@
 #   define tb_atomic_flag_test_and_set(a)               tb_atomic_flag_test_and_set_explicit(a, TB_ATOMIC_SEQ_CST)
 #endif
 
-/// returns the test result of an atomic_flag 
+/// returns the test result of an atomic_flag
 #ifndef tb_atomic_flag_test_explicit
 #   define tb_atomic_flag_test_explicit_generic_impl
 #   define tb_atomic_flag_test_explicit(a, mo)          tb_atomic_flag_test_explicit_generic(a, mo)
@@ -257,7 +257,7 @@
 #   define tb_atomic_flag_test(a)                       tb_atomic_flag_test_explicit(a, TB_ATOMIC_SEQ_CST)
 #endif
 
-/// sets an atomic_flag to false 
+/// sets an atomic_flag to false
 #ifndef tb_atomic_flag_clear_explicit
 #   define tb_atomic_flag_clear_explicit_generic_impl
 #   define tb_atomic_flag_clear_explicit(a, mo)         tb_atomic_flag_clear_explicit_generic(a, mo)

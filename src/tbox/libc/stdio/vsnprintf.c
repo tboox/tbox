@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -84,7 +84,7 @@ typedef enum __tb_printf_flag_t
 ,   TB_PRINTF_FLAG_PLUS             = 1     // +: denote the sign '+' or '-' of a number
 ,   TB_PRINTF_FLAG_LEFT             = 2     // -: left-justified
 ,   TB_PRINTF_FLAG_ZERO             = 4     // 0: fill 0 instead of spaces
-,   TB_PRINTF_FLAG_PFIX             = 8     // #: add prefix 
+,   TB_PRINTF_FLAG_PFIX             = 8     // #: add prefix
 
 }tb_printf_flag_t;
 
@@ -94,7 +94,7 @@ typedef struct __tb_printf_entry_t
     // format type
     tb_uint8_t          type;
 
-    // extra info 
+    // extra info
     tb_uint8_t          extra;
 
     // flag
@@ -109,7 +109,7 @@ typedef struct __tb_printf_entry_t
     // precision
     tb_int_t            precision;
 
-    // base: 2 8 10 16 
+    // base: 2 8 10 16
     tb_int_t            base;
 
     // the object name
@@ -148,7 +148,7 @@ static tb_char_t* tb_printf_object(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
             if (pb < pe) *pb++ = 'd';
         }
     }
-    else 
+    else
     {
         // null
         if (pb < pe) *pb++ = 'n';
@@ -173,9 +173,9 @@ static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
         tb_long_t n = tb_strnlen(s, e.precision);
 
         // fill space at left side, e.g. "   abcd"
-        if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 
+        if (!(e.flags & TB_PRINTF_FLAG_LEFT))
         {
-            while (n < e.width--) 
+            while (n < e.width--)
                 if (pb < pe) *pb++ = ' ';
         }
 
@@ -185,10 +185,10 @@ static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
             if (pb < pe) *pb++ = *s++;
 
         // fill space at right side, e.g. "abcd    "
-        while (n < e.width--) 
+        while (n < e.width--)
             if (pb < pe) *pb++ = ' ';
     }
-    else 
+    else
     {
         // null
         if (pb < pe) *pb++ = 'n';
@@ -215,12 +215,12 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     tb_char_t sign = 0;
     if (e.extra & TB_PRINTF_EXTRA_SIGNED)
     {
-        if ((tb_int64_t)num < 0) 
+        if ((tb_int64_t)num < 0)
         {
             sign = '-';
             --e.width;
-    
-            num = (tb_uint64_t)(-(tb_int64_t)num); 
+
+            num = (tb_uint64_t)(-(tb_int64_t)num);
         }
         else if (e.flags & TB_PRINTF_FLAG_PLUS)
         {
@@ -231,10 +231,10 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
     // convert num => digits string in reverse order
     if (num == 0) digits[digit_i++] = '0';
-    else 
+    else
     {
 #if 0
-        do 
+        do
         {
             digits[digit_i++] = digits_table[num % e.base] | lomask;
             num /= e.base;
@@ -246,7 +246,7 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
             tb_int_t shift_bits = 4;
             if (e.base == 8) shift_bits--;
             else if (e.base == 2) shift_bits -= 3;
-            do 
+            do
             {
                 digits[digit_i++] = digits_table[(tb_uint8_t)num & (e.base - 1)] | lomask;
                 num >>= shift_bits;
@@ -255,7 +255,7 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
         }
         else
         {
-            do 
+            do
             {
                 digits[digit_i++] = digits_table[num % e.base] | lomask;
                 num /= e.base;
@@ -266,7 +266,7 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     }
 
     // adjust precision
-    if (digit_i > e.precision) 
+    if (digit_i > e.precision)
         e.precision = digit_i;
 
     // fill spaces at left side, e.g. "   0x0"
@@ -287,7 +287,7 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
         {
         case 16:
             {
-                if (pb + 1 < pe) 
+                if (pb + 1 < pe)
                 {
                     *pb++ = '0';
                     *pb++ = 'X' | lomask;
@@ -297,7 +297,7 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
             }
         case 8:
             {
-                if (pb < pe) 
+                if (pb < pe)
                 {
                     *pb++ = '0';
                     --e.width;
@@ -306,7 +306,7 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
             }
         case 2:
             {
-                if (pb + 1 < pe) 
+                if (pb + 1 < pe)
                 {
                     *pb++ = '0';
                     *pb++ = 'B' | lomask;
@@ -328,11 +328,11 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     }
 
     // fill 0 if precision is larger, e.g. "0x000ff"
-    while (digit_i <= --e.precision) 
+    while (digit_i <= --e.precision)
         if (pb < pe) *pb++ = '0';
 
     // append digits
-    while (--digit_i >= 0) 
+    while (--digit_i >= 0)
         if (pb < pe) *pb++ = digits[digit_i];
 
     // trailing space padding for left-justified flags, e.g. "0xff   "
@@ -357,11 +357,11 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     tb_char_t sign = 0;
     if (e.extra & TB_PRINTF_EXTRA_SIGNED)
     {
-        if ((tb_int32_t)num < 0) 
+        if ((tb_int32_t)num < 0)
         {
             sign = '-';
             --e.width;
-            num = (tb_uint32_t)(-(tb_int32_t)num); 
+            num = (tb_uint32_t)(-(tb_int32_t)num);
         }
         else if (e.flags & TB_PRINTF_FLAG_PLUS)
         {
@@ -372,10 +372,10 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
     // convert num => digits string in reverse order
     if (num == 0) digits[digit_i++] = '0';
-    else 
+    else
     {
 #if 0
-        do 
+        do
         {
             digits[digit_i++] = digits_table[num % e.base] | lomask;
             num /= e.base;
@@ -387,7 +387,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
             tb_int_t shift_bits = 4;
             if (e.base == 8) shift_bits--;
             else if (e.base == 2) shift_bits -= 3;
-            do 
+            do
             {
                 digits[digit_i++] = digits_table[(tb_uint8_t)num & (e.base - 1)] | lomask;
                 num >>= shift_bits;
@@ -396,7 +396,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
         }
         else
         {
-            do 
+            do
             {
                 digits[digit_i++] = digits_table[num % e.base] | lomask;
                 num /= e.base;
@@ -407,7 +407,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     }
 
     // adjust precision
-    if (digit_i > e.precision) 
+    if (digit_i > e.precision)
         e.precision = digit_i;
 
     // fill spaces at left side, e.g. "   0x0"
@@ -428,7 +428,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
         {
         case 16:
             {
-                if (pb + 1 < pe) 
+                if (pb + 1 < pe)
                 {
                     *pb++ = '0';
                     *pb++ = 'X' | lomask;
@@ -438,7 +438,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
             }
         case 8:
             {
-                if (pb < pe) 
+                if (pb < pe)
                 {
                     *pb++ = '0';
                     --e.width;
@@ -447,7 +447,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
             }
         case 2:
             {
-                if (pb + 1 < pe) 
+                if (pb + 1 < pe)
                 {
                     *pb++ = '0';
                     *pb++ = 'B' | lomask;
@@ -469,11 +469,11 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     }
 
     // fill 0 if precision is larger, e.g. "0x000ff"
-    while (digit_i <= --e.precision) 
+    while (digit_i <= --e.precision)
         if (pb < pe) *pb++ = '0';
 
     // append digits
-    while (--digit_i >= 0) 
+    while (--digit_i >= 0)
         if (pb < pe) *pb++ = digits[digit_i];
 
     // trailing space padding for left-justified flags, e.g. "0xff   "
@@ -511,7 +511,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     tb_char_t sign = 0;
     if (e.extra & TB_PRINTF_EXTRA_SIGNED)
     {
-        if (num < 0) 
+        if (num < 0)
         {
             sign = '-';
             --e.width;
@@ -533,7 +533,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     tb_uint32_t p = 1;
     tb_size_t   n = e.precision;
     while (n--) p *= 10;
-    if (((tb_uint32_t)(num * p * 10) % 10) > 4) 
+    if (((tb_uint32_t)(num * p * 10) % 10) > 4)
         num += 1.0f / (tb_float_t)p;
 
     // get integer & decimal
@@ -542,10 +542,10 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
     // convert integer => digits string in reverse order
     if (integer == 0) ints[ints_i++] = '0';
-    else 
+    else
     {
-        if (integer < 0) integer = -integer; 
-        do 
+        if (integer < 0) integer = -integer;
+        do
         {
             ints[ints_i++] = (integer % 10) + '0';
             integer /= 10;
@@ -555,10 +555,10 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
     // convert decimal => digits string in positive order
     if (decimal == 0) decs[decs_i++] = '0';
-    else 
+    else
     {
         tb_long_t d = (tb_long_t)(decimal * 10);
-        do 
+        do
         {
             decs[decs_i++] = (tb_char_t)(d + (tb_long_t)'0');
             decimal = decimal * 10 - d;
@@ -568,7 +568,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     }
 
     // adjust precision
-    if (decs_i > e.precision) 
+    if (decs_i > e.precision)
         decs_i = e.precision;
 
     // fill spaces at left side, e.g. "   0.31415926"
@@ -591,7 +591,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
     }
 
     // append integer
-    while (--ints_i >= 0) 
+    while (--ints_i >= 0)
         if (pb < pe) *pb++ = ints[ints_i];
 
     // append .
@@ -599,11 +599,11 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
     // append decimal
     tb_int_t decs_n = decs_i;
-    while (--decs_i >= 0) 
+    while (--decs_i >= 0)
         if (pb < pe) *pb++ = decs[decs_n - decs_i - 1];
 
     // fill 0 if precision is larger, e.g. "0.3140000"
-    while (decs_n <= --e.precision) 
+    while (decs_n <= --e.precision)
         if (pb < pe) *pb++ = '0';
 
     // trailing space padding for left-justified flags, e.g. "0.31415926   "
@@ -641,7 +641,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     tb_char_t sign = 0;
     if (e.extra & TB_PRINTF_EXTRA_SIGNED)
     {
-        if (num < 0) 
+        if (num < 0)
         {
             sign = '-';
             --e.width;
@@ -663,7 +663,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     tb_uint64_t p = 1;
     tb_size_t   n = e.precision;
     while (n--) p *= 10;
-    if (((tb_uint64_t)(num * p * 10) % 10) > 4) 
+    if (((tb_uint64_t)(num * p * 10) % 10) > 4)
         num += 1. / (tb_double_t)p;
 
     // get integer & decimal
@@ -672,10 +672,10 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 
     // convert integer => digits string in reverse order
     if (integer == 0) ints[ints_i++] = '0';
-    else 
+    else
     {
-        if (integer < 0) integer = -integer; 
-        do 
+        if (integer < 0) integer = -integer;
+        do
         {
             ints[ints_i++] = (integer % 10) + '0';
             integer /= 10;
@@ -685,10 +685,10 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 
     // convert decimal => digits string in positive order
     if (decimal == 0) decs[decs_i++] = '0';
-    else 
+    else
     {
         tb_long_t d = (tb_long_t)(decimal * 10);
-        do 
+        do
         {
             decs[decs_i++] = (tb_char_t)(d + (tb_long_t)'0');
             decimal = decimal * 10 - d;
@@ -698,7 +698,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     }
 
     // adjust precision
-    if (decs_i > e.precision) 
+    if (decs_i > e.precision)
         decs_i = e.precision;
 
     // fill spaces at left side, e.g. "   0.31415926"
@@ -721,7 +721,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
     }
 
     // append integer
-    while (--ints_i >= 0) 
+    while (--ints_i >= 0)
         if (pb < pe) *pb++ = ints[ints_i];
 
     // append .
@@ -729,11 +729,11 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 
     // append decimal
     tb_int_t decs_n = decs_i;
-    while (--decs_i >= 0) 
+    while (--decs_i >= 0)
         if (pb < pe) *pb++ = decs[decs_n - decs_i - 1];
 
     // fill 0 if precision is larger, e.g. "0.3140000"
-    while (decs_n <= --e.precision) 
+    while (decs_n <= --e.precision)
         if (pb < pe) *pb++ = '0';
 
     // trailing space padding for left-justified flags, e.g. "0.31415926   "
@@ -751,7 +751,7 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
     // get field width for *
     if (e->type == TB_PRINTF_TYPE_WIDTH)
     {
-        if (e->width < 0) 
+        if (e->width < 0)
         {
             e->width = -e->width;
             e->flags |= TB_PRINTF_FLAG_LEFT;
@@ -772,7 +772,7 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
     e->type = TB_PRINTF_TYPE_NONE;
 
     // goto %
-    for (; *p; ++p) 
+    for (; *p; ++p)
         if (*p == '%') break;
 
     // return non-format string
@@ -802,7 +802,7 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
     // get field width
     e->width = -1;
     if (tb_isdigit(*p)) e->width = tb_skip_atoi(&p);
-    else if (*p == '*') 
+    else if (*p == '*')
     {
         // it's the next argument
         e->type = TB_PRINTF_TYPE_WIDTH;
@@ -815,12 +815,12 @@ get_precision:
     if (*p == '.')
     {
         ++p;
-        if (tb_isdigit(*p)) 
+        if (tb_isdigit(*p))
         {
             e->precision = tb_skip_atoi(&p);
             if (e->precision < 0) e->precision = 0;
         }
-        else if (*p == '*') 
+        else if (*p == '*')
         {
             // it's the next argument
             e->type = TB_PRINTF_TYPE_PRECISION;
@@ -841,7 +841,7 @@ get_qualifier:
     case 'l':
         e->qual = TB_PRINTF_QUAL_L;
         ++p;
-        if (*p == 'l') 
+        if (*p == 'l')
         {
             e->qual = TB_PRINTF_QUAL_LL;
             ++p;
@@ -941,7 +941,7 @@ get_qualifier:
 #endif
     case '{':
         {
-#ifdef TB_CONFIG_MICRO_ENABLE 
+#ifdef TB_CONFIG_MICRO_ENABLE
             e->type = TB_PRINTF_TYPE_OBJECT;
 #else
             // get the object name
@@ -978,7 +978,7 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
 
 #if 0
     // pe must be larger than pb
-    if (pe < pb) 
+    if (pe < pb)
     {
         pe = ((tb_char_t*)-1);
         n = (tb_size_t)(pe - pb);
@@ -1002,7 +1002,7 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
         case TB_PRINTF_TYPE_NONE:
             {
                 tb_int_t copy_n = en;
-                if (pb < pe) 
+                if (pb < pe)
                 {
                     if (copy_n > pe - pb) copy_n = (tb_int_t)(pe - pb);
                     tb_memcpy(pb, ofmt, copy_n);
@@ -1022,9 +1022,9 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                 else
                 {
                     // fill space at left side, e.g. "   a"
-                    if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 
+                    if (!(e.flags & TB_PRINTF_FLAG_LEFT))
                     {
-                        while (--e.width > 0) 
+                        while (--e.width > 0)
                         {
                             if (pb < pe) *pb++ = ' ';
                         }
@@ -1033,7 +1033,7 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                     if (pb < pe) *pb++ = (tb_char_t)tb_va_arg(args, tb_int_t);
 
                     // fill space at right side, e.g. "a   "
-                    while (--e.width > 0) 
+                    while (--e.width > 0)
                     {
                         if (pb < pe) *pb++ = ' ';
                     }
@@ -1100,7 +1100,7 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
                     pb = tb_printf_double(pb, pe, e, num);
                 }
                 // float?
-                else 
+                else
                 {
                     tb_float_t num = (tb_float_t)tb_va_arg(args, tb_double_t);
                     pb = tb_printf_float(pb, pe, e, num);

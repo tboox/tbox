@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -59,7 +59,7 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
         tb_assert_and_check_break(protocol == TB_URL_PROTOCOL_SQL || protocol == TB_URL_PROTOCOL_FILE);
 
         // the probe func
-        static tb_size_t (*s_probe[])(tb_url_ref_t) = 
+        static tb_size_t (*s_probe[])(tb_url_ref_t) =
         {
             tb_null
 #ifdef TB_CONFIG_PACKAGE_HAVE_MYSQL
@@ -71,7 +71,7 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
         };
 
         // the init func
-        static tb_database_sql_ref_t (*s_init[])(tb_url_ref_t) = 
+        static tb_database_sql_ref_t (*s_init[])(tb_url_ref_t) =
         {
             tb_null
 #ifdef TB_CONFIG_PACKAGE_HAVE_MYSQL
@@ -89,11 +89,11 @@ tb_database_sql_ref_t tb_database_sql_init(tb_char_t const* url)
         tb_size_t m = 0;
         for (; i < n; i++)
         {
-            if (s_probe[i]) 
+            if (s_probe[i])
             {
                 // probe it
                 tb_size_t score = s_probe[i](&database_url);
-                if (score > s) 
+                if (score > s)
                 {
                     // save the max score
                     s = score;
@@ -140,7 +140,7 @@ tb_void_t tb_database_sql_exit(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return(impl);
-        
+
     // trace
     tb_trace_d("exit: ..");
 
@@ -164,10 +164,10 @@ tb_bool_t tb_database_sql_open(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->open, tb_false);
-    
+
     // opened?
     tb_check_return_val(!impl->bopened, tb_true);
-    
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
@@ -185,16 +185,16 @@ tb_void_t tb_database_sql_clos(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return(impl);
-            
+
     // opened?
     tb_check_return(impl->bopened);
 
     // clos it
     if (impl->clos) impl->clos(impl);
-    
+
     // closed
     impl->bopened = tb_false;
-    
+
     // clear state
     impl->state = TB_STATE_OK;
 }
@@ -203,7 +203,7 @@ tb_size_t tb_database_sql_state(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl, TB_STATE_UNKNOWN_ERROR);
-    
+
     // the state
     return impl->state;
 }
@@ -212,10 +212,10 @@ tb_bool_t tb_database_sql_begin(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->commit, tb_false);
-    
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
-        
+
     // opened?
     tb_assert_and_check_return_val(impl->bopened, tb_false);
 
@@ -233,10 +233,10 @@ tb_bool_t tb_database_sql_commit(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->commit, tb_false);
-    
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
-        
+
     // opened?
     tb_assert_and_check_return_val(impl->bopened, tb_false);
 
@@ -254,10 +254,10 @@ tb_bool_t tb_database_sql_rollback(tb_database_sql_ref_t database)
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->rollback, tb_false);
-    
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
-        
+
     // opened?
     tb_assert_and_check_return_val(impl->bopened, tb_false);
 
@@ -275,10 +275,10 @@ tb_bool_t tb_database_sql_done(tb_database_sql_ref_t database, tb_char_t const* 
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->done && sql, tb_false);
-    
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
-        
+
     // opened?
     tb_assert_and_check_return_val(impl->bopened, tb_false);
 
@@ -299,7 +299,7 @@ tb_iterator_ref_t tb_database_sql_result_load(tb_database_sql_ref_t database, tb
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->result_load, tb_null);
-        
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
@@ -320,7 +320,7 @@ tb_void_t tb_database_sql_result_exit(tb_database_sql_ref_t database, tb_iterato
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return(impl && impl->result_exit && result);
-            
+
     // opened?
     tb_assert_and_check_return(impl->bopened);
 
@@ -335,7 +335,7 @@ tb_database_sql_statement_ref_t tb_database_sql_statement_init(tb_database_sql_r
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->statement_init && sql, tb_null);
-        
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
@@ -344,7 +344,7 @@ tb_database_sql_statement_ref_t tb_database_sql_statement_init(tb_database_sql_r
 
     // init statement
     tb_database_sql_statement_ref_t statement = impl->statement_init(impl, sql);
-    
+
     // save state
     if (statement) impl->state = TB_STATE_OK;
 
@@ -356,7 +356,7 @@ tb_void_t tb_database_sql_statement_exit(tb_database_sql_ref_t database, tb_data
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return(impl && impl->statement_done && statement);
-    
+
     // opened?
     tb_assert_and_check_return(impl->bopened);
 
@@ -371,7 +371,7 @@ tb_bool_t tb_database_sql_statement_done(tb_database_sql_ref_t database, tb_data
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->statement_done && statement, tb_false);
-        
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
@@ -392,7 +392,7 @@ tb_bool_t tb_database_sql_statement_bind(tb_database_sql_ref_t database, tb_data
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;
     tb_assert_and_check_return_val(impl && impl->statement_bind && statement && list && size, tb_false);
-        
+
     // init state
     impl->state = TB_STATE_DATABASE_UNKNOWN_ERROR;
 
@@ -401,7 +401,7 @@ tb_bool_t tb_database_sql_statement_bind(tb_database_sql_ref_t database, tb_data
 
     // bind statement argument
     tb_bool_t ok = impl->statement_bind(impl, statement, list, size);
-    
+
     // save state
     if (ok) impl->state = TB_STATE_OK;
 

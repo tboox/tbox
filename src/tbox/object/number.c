@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -30,7 +30,7 @@
  * includes
  */
 #include "object.h"
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -49,36 +49,36 @@ typedef struct __tb_oc_number_t
     {
         // the uint8
         tb_uint8_t      u8;
-    
+
         // the sint8
         tb_sint8_t      s8;
-    
+
         // the uint16
         tb_uint16_t     u16;
-    
+
         // the sint16
         tb_sint16_t     s16;
-    
+
         // the uint32
         tb_uint32_t     u32;
-    
+
         // the sint32
         tb_sint32_t     s32;
-    
+
         // the uint64
         tb_uint64_t     u64;
-    
+
         // the sint64
         tb_sint64_t     s64;
-    
+
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
         // the float
         tb_float_t      f;
-    
+
         // the double
         tb_double_t     d;
 #endif
-    
+
     }v;
 
 }tb_oc_number_t;
@@ -198,7 +198,7 @@ static tb_oc_number_t* tb_oc_number_init_base()
         number->base.copy   = tb_oc_number_copy;
         number->base.exit   = tb_oc_number_exit;
         number->base.clear  = tb_oc_number_clear;
-        
+
         // ok
         ok = tb_true;
 
@@ -546,7 +546,7 @@ tb_double_t tb_oc_number_double(tb_object_ref_t object)
 }
 #endif
 tb_bool_t tb_oc_number_uint8_set(tb_object_ref_t object, tb_uint8_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -559,7 +559,7 @@ tb_bool_t tb_oc_number_uint8_set(tb_object_ref_t object, tb_uint8_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_sint8_set(tb_object_ref_t object, tb_sint8_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -572,7 +572,7 @@ tb_bool_t tb_oc_number_sint8_set(tb_object_ref_t object, tb_sint8_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_uint16_set(tb_object_ref_t object, tb_uint16_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -585,7 +585,7 @@ tb_bool_t tb_oc_number_uint16_set(tb_object_ref_t object, tb_uint16_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_sint16_set(tb_object_ref_t object, tb_sint16_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -598,7 +598,7 @@ tb_bool_t tb_oc_number_sint16_set(tb_object_ref_t object, tb_sint16_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_uint32_set(tb_object_ref_t object, tb_uint32_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -611,7 +611,7 @@ tb_bool_t tb_oc_number_uint32_set(tb_object_ref_t object, tb_uint32_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_sint32_set(tb_object_ref_t object, tb_sint32_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -624,7 +624,7 @@ tb_bool_t tb_oc_number_sint32_set(tb_object_ref_t object, tb_sint32_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_uint64_set(tb_object_ref_t object, tb_uint64_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -637,7 +637,7 @@ tb_bool_t tb_oc_number_uint64_set(tb_object_ref_t object, tb_uint64_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_sint64_set(tb_object_ref_t object, tb_sint64_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -651,7 +651,7 @@ tb_bool_t tb_oc_number_sint64_set(tb_object_ref_t object, tb_sint64_t value)
 }
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
 tb_bool_t tb_oc_number_float_set(tb_object_ref_t object, tb_float_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);
@@ -664,7 +664,7 @@ tb_bool_t tb_oc_number_float_set(tb_object_ref_t object, tb_float_t value)
     return tb_true;
 }
 tb_bool_t tb_oc_number_double_set(tb_object_ref_t object, tb_double_t value)
-{   
+{
     // check
     tb_oc_number_t* number = tb_oc_number_cast(object);
     tb_assert_and_check_return_val(number, tb_false);

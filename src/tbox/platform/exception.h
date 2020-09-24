@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -60,7 +60,7 @@ __tb_extern_c_enter__
 
 // end
 #ifndef __tb_end
-#   define __tb_end                 
+#   define __tb_end
 #endif
 
 // check
@@ -71,7 +71,7 @@ __tb_extern_c_enter__
 #   define tb_assert_leave(x)                           { if (!(x)) {tb_trace_a("expr: %s", #x); __tb_leave ; } }
 #   define tb_assert_and_check_leave(x)                 tb_assert_leave(x)
 #else
-#   define tb_assert_leave(x)                       
+#   define tb_assert_leave(x)
 #   define tb_assert_and_check_leave(x)                 tb_check_leave(x)
 #endif
 

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -84,7 +84,7 @@ static tb_fixed_pool_ref_t tb_small_allocator_find_fixed(tb_small_allocator_ref_
                 index = 5;
                 space = 192;
             }
-            else 
+            else
             {
                 index = 4;
                 space = 128;
@@ -102,7 +102,7 @@ static tb_fixed_pool_ref_t tb_small_allocator_find_fixed(tb_small_allocator_ref_
                 index = 8;
                 space = 512;
             }
-            else 
+            else
             {
                 index = 7;
                 space = 384;
@@ -120,13 +120,13 @@ static tb_fixed_pool_ref_t tb_small_allocator_find_fixed(tb_small_allocator_ref_
                 index = 2;
                 space = 64;
             }
-            else 
+            else
             {
                 index = 1;
                 space = 32;
             }
         }
-        else 
+        else
         {
             if (size < 1025)
             {
@@ -138,7 +138,7 @@ static tb_fixed_pool_ref_t tb_small_allocator_find_fixed(tb_small_allocator_ref_
                 index = 11;
                 space = 3072;
             }
-            else 
+            else
             {
                 index = 10;
                 space = 2048;
@@ -167,7 +167,7 @@ static tb_bool_t tb_small_allocator_item_check(tb_pointer_t data, tb_cpointer_t 
     tb_fixed_pool_ref_t fixed_pool = (tb_fixed_pool_ref_t)priv;
     tb_assert(fixed_pool && data);
 
-    // done 
+    // done
     tb_bool_t ok = tb_false;
     do
     {
@@ -304,7 +304,7 @@ static tb_pointer_t tb_small_allocator_ralloc(tb_allocator_ref_t self, tb_pointe
         tb_assert_and_check_break(fixed_pool_new);
 
         // same space?
-        if (fixed_pool_old == fixed_pool_new) 
+        if (fixed_pool_old == fixed_pool_new)
         {
 #ifdef __tb_debug__
             // fill the patch bytes
@@ -394,7 +394,7 @@ static tb_void_t tb_small_allocator_dump(tb_allocator_ref_t self)
     for (i = 0; i < n; i++)
     {
         // exists?
-        if (allocator->fixed_pool[i]) 
+        if (allocator->fixed_pool[i])
         {
             // check it
             tb_fixed_pool_walk(allocator->fixed_pool[i], tb_small_allocator_item_check, (tb_cpointer_t)allocator->fixed_pool[i]);

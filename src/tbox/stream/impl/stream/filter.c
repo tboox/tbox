@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -31,7 +31,7 @@
 // the stream filter type
 typedef struct __tb_stream_filter_t
 {
-    // the filter 
+    // the filter
     tb_filter_ref_t         filter;
 
     // the filter is referenced? need not exit it
@@ -57,7 +57,7 @@ typedef struct __tb_stream_filter_t
     tb_size_t               wsize;
 
 }tb_stream_filter_t;
- 
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -102,14 +102,14 @@ static tb_bool_t tb_stream_filter_clos(tb_stream_ref_t stream)
     // check
     tb_stream_filter_t* stream_filter = tb_stream_filter_cast(stream);
     tb_assert_and_check_return_val(stream_filter && stream_filter->stream, tb_false);
-    
+
     // sync the end filter data
     if (stream_filter->filter && stream_filter->mode == -1)
     {
         // flush the left data first
         if (stream_filter->wdata && stream_filter->wsize)
         {
-            if (!tb_stream_bwrit(stream_filter->stream, stream_filter->wdata, stream_filter->wsize)) 
+            if (!tb_stream_bwrit(stream_filter->stream, stream_filter->wdata, stream_filter->wsize))
                 return tb_false;
             stream_filter->wdata = tb_null;
             stream_filter->wsize = 0;
@@ -129,7 +129,7 @@ static tb_bool_t tb_stream_filter_clos(tb_stream_ref_t stream)
     tb_bool_t ok = tb_stream_clos(stream_filter->stream);
 
     // ok?
-    if (ok) 
+    if (ok)
     {
         // clear mode
         stream_filter->mode = 0;
@@ -155,7 +155,7 @@ static tb_bool_t tb_stream_filter_clos(tb_stream_ref_t stream)
     return ok;
 }
 static tb_void_t tb_stream_filter_exit(tb_stream_ref_t stream)
-{   
+{
     // check
     tb_stream_filter_t* stream_filter = tb_stream_filter_cast(stream);
     tb_assert_and_check_return(stream_filter);
@@ -166,7 +166,7 @@ static tb_void_t tb_stream_filter_exit(tb_stream_ref_t stream)
     stream_filter->bref = tb_false;
 }
 static tb_void_t tb_stream_filter_kill(tb_stream_ref_t stream)
-{   
+{
     // check
     tb_stream_filter_t* stream_filter = tb_stream_filter_cast(stream);
     tb_assert_and_check_return(stream_filter);
@@ -181,7 +181,7 @@ static tb_long_t tb_stream_filter_read(tb_stream_ref_t stream, tb_byte_t* data, 
     tb_assert_and_check_return_val(stream_filter && stream_filter->stream && data, -1);
     tb_check_return_val(size, 0);
 
-    // read 
+    // read
     tb_long_t real = tb_stream_read(stream_filter->stream, data, size);
 
     // done filter
@@ -215,7 +215,7 @@ static tb_long_t tb_stream_filter_read(tb_stream_ref_t stream, tb_byte_t* data, 
         if (stream_filter->beof && !real) real = -1;
     }
 
-    // ok? 
+    // ok?
     return real;
 }
 static tb_long_t tb_stream_filter_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
@@ -288,7 +288,7 @@ static tb_bool_t tb_stream_filter_sync(tb_stream_ref_t stream, tb_bool_t bclosin
         // flush the left data first
         if (stream_filter->wdata && stream_filter->wsize)
         {
-            if (!tb_stream_bwrit(stream_filter->stream, stream_filter->wdata, stream_filter->wsize)) 
+            if (!tb_stream_bwrit(stream_filter->stream, stream_filter->wdata, stream_filter->wsize))
                 return tb_false;
             stream_filter->wdata = tb_null;
             stream_filter->wsize = 0;
@@ -305,7 +305,7 @@ static tb_bool_t tb_stream_filter_sync(tb_stream_ref_t stream, tb_bool_t bclosin
         }
     }
 
-    // writ 
+    // writ
     return tb_stream_sync(stream_filter->stream, bclosing);
 }
 static tb_long_t tb_stream_filter_wait(tb_stream_ref_t stream, tb_size_t wait, tb_long_t timeout)
@@ -327,7 +327,7 @@ static tb_long_t tb_stream_filter_wait(tb_stream_ref_t stream, tb_size_t wait, t
             ok = tb_stream_wait(stream_filter->stream, wait, timeout);
 
             // eof?
-            if (!ok) 
+            if (!ok)
             {
                 // wait ok and continue to read or writ
                 ok = wait;
@@ -339,8 +339,8 @@ static tb_long_t tb_stream_filter_wait(tb_stream_ref_t stream, tb_size_t wait, t
             else stream_filter->wait = tb_true;
         }
         // eof
-        else 
-        {   
+        else
+        {
             // wait ok and continue to read or writ
             ok = wait;
 
@@ -494,7 +494,7 @@ tb_stream_ref_t tb_stream_init_filter_from_zip(tb_stream_ref_t stream, tb_size_t
         ((tb_stream_filter_t*)stream_filter)->bref = tb_false;
         ((tb_stream_filter_t*)stream_filter)->filter = tb_filter_init_from_zip(algo, action);
         tb_assert_and_check_break(((tb_stream_filter_t*)stream_filter)->filter);
- 
+
         // ok
         ok = tb_true;
 
@@ -533,7 +533,7 @@ tb_stream_ref_t tb_stream_init_filter_from_cache(tb_stream_ref_t stream, tb_size
         ((tb_stream_filter_t*)stream_filter)->bref = tb_false;
         ((tb_stream_filter_t*)stream_filter)->filter = tb_filter_init_from_cache(size);
         tb_assert_and_check_break(((tb_stream_filter_t*)stream_filter)->filter);
- 
+
         // ok
         ok = tb_true;
 
@@ -572,7 +572,7 @@ tb_stream_ref_t tb_stream_init_filter_from_charset(tb_stream_ref_t stream, tb_si
         ((tb_stream_filter_t*)stream_filter)->bref = tb_false;
         ((tb_stream_filter_t*)stream_filter)->filter = tb_filter_init_from_charset(fr, to);
         tb_assert_and_check_break(((tb_stream_filter_t*)stream_filter)->filter);
- 
+
         // ok
         ok = tb_true;
 
@@ -611,7 +611,7 @@ tb_stream_ref_t tb_stream_init_filter_from_chunked(tb_stream_ref_t stream, tb_bo
         ((tb_stream_filter_t*)stream_filter)->bref = tb_false;
         ((tb_stream_filter_t*)stream_filter)->filter = tb_filter_init_from_chunked(dechunked);
         tb_assert_and_check_break(((tb_stream_filter_t*)stream_filter)->filter);
- 
+
         // ok
         ok = tb_true;
 

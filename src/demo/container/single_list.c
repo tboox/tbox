@@ -338,7 +338,7 @@ static tb_void_t tb_single_list_int_test()
         tb_single_list_remove_next(list, i);
         tb_single_list_remove_next(list, i);
         tb_single_list_remove_next(list, i);
-        tb_single_list_remove_next(list, i);    
+        tb_single_list_remove_next(list, i);
 
         // dump
         tb_single_list_int_dump(list);
@@ -465,7 +465,7 @@ static tb_void_t tb_single_list_str_test()
         tb_single_list_remove_next(list, i);
         tb_single_list_remove_next(list, i);
         tb_single_list_remove_next(list, i);
-        tb_single_list_remove_next(list, i);    
+        tb_single_list_remove_next(list, i);
 
         // dump
         tb_single_list_str_dump(list);
@@ -596,7 +596,7 @@ static tb_void_t tb_single_list_mem_test()
         tb_single_list_remove_next(list, i);
         tb_single_list_remove_next(list, i);
         tb_single_list_remove_next(list, i);
-        tb_single_list_remove_next(list, i);    
+        tb_single_list_remove_next(list, i);
 
         // dump
         tb_single_list_mem_dump(list);
@@ -672,7 +672,7 @@ static tb_void_t tb_single_list_walk_perf()
 
     // make list
     __tb_volatile__ tb_size_t n = 100000;
-    while (n--) tb_single_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_value()); 
+    while (n--) tb_single_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_value());
 
     // done
     tb_hong_t t = tb_mclock();

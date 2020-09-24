@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -38,7 +38,7 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
     // table
     static tb_char_t const table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-    // check 
+    // check
     tb_assert_and_check_return_val(ib && ob && !(in >= TB_MAXU32 / 4 || on < TB_BASE64_OUTPUT_MIN(in)), 0);
 
     // done
@@ -46,17 +46,17 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
     tb_uint32_t     bits = 0;
     tb_long_t       left = in;
     tb_long_t       shift = 0;
-    while (left) 
+    while (left)
     {
         bits = (bits << 8) + *ib++;
         left--;
         shift += 8;
 
-        do 
+        do
         {
             *op++ = table[(bits << 6 >> shift) & 0x3f];
             shift -= 6;
-        } 
+        }
         while (shift > 6 || (left == 0 && shift > 0));
     }
 
@@ -92,13 +92,13 @@ tb_size_t tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_
     tb_int_t    v = 0;
     tb_byte_t*  op = ob;
     tb_size_t   tn = tb_arrayn(table);
-    for (i = 0; i < in && ib[i] && ib[i] != '='; i++) 
+    for (i = 0; i < in && ib[i] && ib[i] != '='; i++)
     {
         tb_uint32_t idx = ib[i] - 43;
         if (idx >= tn || table[idx] == 0xff) return 0;
 
         v = (v << 6) + table[idx];
-        if (i & 3) 
+        if (i & 3)
         {
             if (op - ob < on) *op++ = v >> (6 - 2 * (i & 3));
         }

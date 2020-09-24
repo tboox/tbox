@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -189,7 +189,7 @@ tb_bool_t tb_ipaddr_ip_is_any(tb_ipaddr_ref_t ipaddr)
     tb_assert_and_check_return_val(ipaddr, tb_true);
 
     // is empty? ok
-    tb_check_return_val(ipaddr->have_ip, tb_true); 
+    tb_check_return_val(ipaddr->have_ip, tb_true);
 
     // done
     tb_bool_t is_any = tb_true;
@@ -297,7 +297,7 @@ tb_char_t const* tb_ipaddr_ip_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t* data, tb_s
         {
             // make ipv4 cstr
             if (ipaddr->have_ip) cstr = tb_ipv4_cstr(&ipaddr->u.ipv4, data, maxn);
-            else 
+            else
             {
                 // check
                 tb_assert(maxn >= TB_IPV4_CSTR_MAXN);
@@ -411,7 +411,7 @@ tb_bool_t tb_ipaddr_ip_cstr_set(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr, t
     }
 
     // ok? save it
-    if (ok && ipaddr) 
+    if (ok && ipaddr)
     {
         // save port
         temp.port = ipaddr->port;

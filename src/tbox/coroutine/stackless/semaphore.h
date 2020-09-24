@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -39,13 +39,13 @@
 #define tb_lo_semaphore_init(sem, val)      (sem)->value = val
 
 /*! exit semaphore
- * 
+ *
  * @param sem           the semaphore pointer
  */
 #define tb_lo_semaphore_exit(sem)           (sem)->value = 0
 
 /*! get semaphore value
- * 
+ *
  * @param sem           the semaphore pointer
  *
  * @return              the semaphore value
@@ -53,7 +53,7 @@
 #define tb_lo_semaphore_value(sem)          ((sem)->value)
 
 /*! post semaphore
- * 
+ *
  * @param sem           the semaphore pointer
  * @param post          the post semaphore value
  */
@@ -66,7 +66,7 @@ do \
 } while (0)
 
 /*! wait semaphore
- * 
+ *
  * @param sem           the semaphore pointer
  */
 #define tb_lo_semaphore_wait(sem) \
@@ -78,7 +78,7 @@ do \
 } while(0)
 
 /*! try to wait semaphore
- * 
+ *
  * @param sem           the semaphore pointer
  *
  * @return              tb_true or tb_false

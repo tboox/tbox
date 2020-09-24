@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -71,7 +71,7 @@ typedef struct __tb_database_mysql_result_t
     // the fields
     MYSQL_FIELD*                        fields;
 
-    // the metadata 
+    // the metadata
     MYSQL_RES*                          metadata;
 
     // the row count
@@ -221,7 +221,7 @@ static tb_bool_t tb_database_mysql_stream_impl_clos(tb_stream_ref_t stream)
     // check
     tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
     tb_assert_and_check_return_val(impl, tb_false);
-    
+
     // ok
     return tb_true;
 }
@@ -247,10 +247,10 @@ static tb_long_t tb_database_mysql_stream_impl_read(tb_stream_ref_t stream, tb_b
     // read data
     size = tb_min3(size, (tb_size_t)impl->result->buffer_length, length - impl->offset);
     if (size) tb_memcpy(data, impl->result->buffer, size);
-    
+
     // update offset
     impl->offset += size;
-    
+
     // fetch column
     if (mysql_stmt_fetch_column(impl->statement, impl->result, impl->column, impl->offset))
     {
@@ -294,7 +294,7 @@ static tb_bool_t tb_database_mysql_stream_impl_ctrl(tb_stream_ref_t stream, tb_s
 
             // ok
             return tb_true;
-        }   
+        }
     default:
         break;
     }
@@ -337,7 +337,7 @@ static tb_bool_t tb_database_mysql_stream_impl_set_value(tb_database_sql_value_t
 {
     // check
     tb_assert_and_check_return_val(value && mysql && mysql->result.statement && result, tb_false);
-    
+
     // done
     tb_bool_t ok = tb_false;
     do
@@ -356,13 +356,13 @@ static tb_bool_t tb_database_mysql_stream_impl_set_value(tb_database_sql_value_t
         // set blob32
         tb_database_sql_value_set_blob32(value, tb_null, 0, mysql->result.stream);
 
-        // ok 
+        // ok
         ok = tb_true;
 
     } while (0);
 
-    // failed? 
-    if (!ok) 
+    // failed?
+    if (!ok)
     {
         // exit it
         if (mysql->result.stream) tb_stream_exit(mysql->result.stream);
@@ -406,7 +406,7 @@ static tb_size_t tb_database_mysql_result_row_iterator_prev(tb_iterator_ref_t it
     tb_assert(result);
     tb_assert_and_check_return_val(itor && itor <= result->count, result->count);
 
-    // load all? 
+    // load all?
     tb_assert_and_check_return_val(result->try_all, result->count);
 
     // prev
@@ -451,11 +451,11 @@ static tb_size_t tb_database_mysql_result_row_iterator_next(tb_iterator_ref_t it
             }
         }
         // fetch result
-        else 
+        else
         {
             // check
             tb_assert_and_check_return_val(result->result, result->count);
-            
+
             // fetch the row
             result->row.row = mysql_fetch_row(result->result);
             tb_check_return_val(result->row.row, result->count);
@@ -493,7 +493,7 @@ static tb_pointer_t tb_database_mysql_result_row_iterator_item(tb_iterator_ref_t
                 {
                     // error?
                     if (ok != MYSQL_NO_DATA)
-                    {   
+                    {
                         // the mysql
                         tb_database_mysql_t* mysql = (tb_database_mysql_t*)iterator->priv;
 
@@ -515,7 +515,7 @@ static tb_pointer_t tb_database_mysql_result_row_iterator_item(tb_iterator_ref_t
 
             // seek to the row number
             mysql_data_seek(result->result, itor);
-            
+
             // fetch the row
             result->row.row = mysql_fetch_row(result->result);
             tb_assert_and_check_return_val(result->row.row, tb_null);
@@ -657,7 +657,7 @@ static tb_pointer_t tb_database_mysql_result_col_iterator_item(tb_iterator_ref_t
                     }
                 }
             }
-            break;  
+            break;
         case MYSQL_TYPE_LONG_BLOB:
         case MYSQL_TYPE_MEDIUM_BLOB:
             tb_database_mysql_stream_impl_set_value(&row->value, mysql, result, itor);
@@ -760,7 +760,7 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
                 // save username
                 if (p < e) tb_strlcpy(username, p, tb_min((e - p) + 1, sizeof(username)));
             }
-    
+
             // the database password
             p = tb_stristr(args, "password=");
             if (p)
@@ -775,7 +775,7 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
                 // save password
                 if (p < e) tb_strlcpy(password, p, tb_min((e - p) + 1, sizeof(password)));
             }
-    
+
             // the database name
             p = tb_stristr(args, "database=");
             if (p)
@@ -842,7 +842,7 @@ static tb_void_t tb_database_mysql_clos(tb_database_sql_impl_t* database)
     tb_buffer_clear(&mysql->bind_data);
 
     // clear bind list
-    if (mysql->bind_list && mysql->bind_maxn) 
+    if (mysql->bind_list && mysql->bind_maxn)
         tb_memset(mysql->bind_list, 0, mysql->bind_maxn * sizeof(MYSQL_BIND));
 
     // close database
@@ -1039,7 +1039,7 @@ static tb_size_t tb_database_mysql_result_bind_maxn(tb_database_mysql_t* mysql)
 {
     // check
     tb_assert_and_check_return_val(mysql && mysql->result.statement && mysql->result.fields, 0);
-    
+
     // walk
     tb_size_t i = 0;
     tb_size_t m = 0;
@@ -1078,7 +1078,7 @@ static tb_bool_t tb_database_mysql_result_bind_data(tb_database_mysql_t* mysql)
 
         // clear data
         tb_memset(bind_data, 0, bind_maxn);
-    
+
         // bind data
         tb_size_t   i = 0;
         tb_size_t   n = mysql->result.row.count;
@@ -1092,7 +1092,7 @@ static tb_bool_t tb_database_mysql_result_bind_data(tb_database_mysql_t* mysql)
             // bind type
             bind->buffer_type = mysql->result.fields[i].type;
 
-            // bind buffer length   
+            // bind buffer length
             bind->buffer_length = (tb_ulong_t)tb_database_mysql_result_type_size(bind->buffer_type);
 
             // bind buffer
@@ -1102,12 +1102,12 @@ static tb_bool_t tb_database_mysql_result_bind_data(tb_database_mysql_t* mysql)
 
             // bind is_unsigned
             bind->is_unsigned = (mysql->result.fields[i].flags & UNSIGNED_FLAG)? 1 : 0;
-            
+
             // bind length
             tb_assert_and_check_break(p + sizeof(tb_ulong_t) < e);
             bind->length = (tb_ulong_t*)p;
             p += sizeof(tb_ulong_t);
-    
+
             // bind is_null
             tb_assert_and_check_break(p + sizeof(my_bool) < e);
             bind->is_null = (my_bool*)p;
@@ -1128,7 +1128,7 @@ static tb_bool_t tb_database_mysql_result_bind_data(tb_database_mysql_t* mysql)
             break;
         }
 
-        // ok 
+        // ok
         ok = tb_true;
 
     } while (0);
@@ -1229,7 +1229,7 @@ static tb_iterator_ref_t tb_database_mysql_result_load(tb_database_sql_impl_t* d
         {
             // bind result
             if (!tb_database_mysql_result_bind(mysql, try_all)) break;
-    
+
             // try fetching the first result
             if (!try_all)
             {
@@ -1318,7 +1318,7 @@ static tb_database_sql_statement_ref_t tb_database_mysql_statement_init(tb_datab
         // init statement
         statement = mysql_stmt_init(mysql->database);
         if (!statement)
-        {   
+        {
             // save state
             mysql->base.state = tb_database_mysql_state_from_errno(mysql_errno(mysql->database));
 
@@ -1436,76 +1436,76 @@ static tb_bool_t tb_database_mysql_statement_bind(tb_database_sql_impl_t* databa
             switch (value->type)
             {
             case TB_DATABASE_SQL_VALUE_TYPE_TEXT:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_STRING;   
-                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_text(value);   
-                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value) + 1;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_STRING;
+                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_text(value);
+                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value) + 1;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_INT64:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONGLONG;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONGLONG;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.i64;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_INT32:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONG;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONG;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.i32;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_INT16:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_SHORT;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_SHORT;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.i16;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_INT8:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_TINY;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_TINY;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.i8;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_UINT64:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONGLONG;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONGLONG;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.u64;
                 mysql->bind_list[i].is_unsigned     = 1;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_UINT32:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONG;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONG;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.u32;
                 mysql->bind_list[i].is_unsigned     = 1;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_UINT16:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_SHORT;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_SHORT;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.u16;
                 mysql->bind_list[i].is_unsigned     = 1;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_UINT8:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_TINY;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_TINY;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.u8;
                 mysql->bind_list[i].is_unsigned     = 1;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_BLOB32:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONG_BLOB;   
-                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_blob(value);   
-                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);   
-                mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length; 
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_LONG_BLOB;
+                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_blob(value);
+                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);
+                mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_BLOB16:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_BLOB;   
-                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_blob(value);   
-                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);   
-                mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length; 
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_BLOB;
+                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_blob(value);
+                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);
+                mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_BLOB8:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_TINY_BLOB;   
-                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_blob(value);   
-                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);   
-                mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length; 
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_TINY_BLOB;
+                mysql->bind_list[i].buffer          = (tb_char_t*)tb_database_sql_value_blob(value);
+                mysql->bind_list[i].buffer_length   = tb_database_sql_value_size(value);
+                mysql->bind_list[i].length          = &mysql->bind_list[i].buffer_length;
                 break;
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
             case TB_DATABASE_SQL_VALUE_TYPE_FLOAT:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_FLOAT;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_FLOAT;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.f;
                 break;
             case TB_DATABASE_SQL_VALUE_TYPE_DOUBLE:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_DOUBLE;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_DOUBLE;
                 mysql->bind_list[i].buffer          = (tb_char_t*)&value->u.d;
                 break;
 #endif
             case TB_DATABASE_SQL_VALUE_TYPE_NULL:
-                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_NULL;   
+                mysql->bind_list[i].buffer_type     = MYSQL_TYPE_NULL;
                 break;
             default:
                 tb_trace_e("statement: bind: unknown value type: %lu", value->type);
@@ -1523,7 +1523,7 @@ static tb_bool_t tb_database_mysql_statement_bind(tb_database_sql_impl_t* databa
             tb_trace_e("statement: bind failed, error[%d]: %s", mysql_stmt_errno((MYSQL_STMT*)statement), mysql_stmt_error((MYSQL_STMT*)statement));
             break;
         }
-        
+
         // send blob32 data
         tb_byte_t data[TB_STREAM_BLOCK_MAXN];
         for (i = 0; i < size; i++)
@@ -1555,7 +1555,7 @@ static tb_bool_t tb_database_mysql_statement_bind(tb_database_sql_impl_t* databa
                     }
                     else if (!real)
                     {
-                        // wait 
+                        // wait
                         tb_long_t wait = tb_stream_wait(value->u.blob.stream, TB_STREAM_WAIT_READ, tb_stream_timeout(value->u.blob.stream));
                         tb_assert_and_check_break(wait > 0);
                     }
@@ -1599,11 +1599,11 @@ tb_size_t tb_database_mysql_probe(tb_url_ref_t url)
             }
         }
 
-        // the database port, the default port: 3306 
+        // the database port, the default port: 3306
         if (tb_url_port(url) == 3306) score += 20;
 
-        // is sql url? 
-        if (tb_url_protocol(url) == TB_URL_PROTOCOL_SQL) 
+        // is sql url?
+        if (tb_url_protocol(url) == TB_URL_PROTOCOL_SQL)
             score += 5;
 
     } while (0);
@@ -1645,7 +1645,7 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
         mysql->base.statement_bind  = tb_database_mysql_statement_bind;
 
         // init row operation
-        static tb_iterator_op_t row_op = 
+        static tb_iterator_op_t row_op =
         {
             tb_database_mysql_result_row_iterator_size
         ,   tb_database_mysql_result_row_iterator_head
@@ -1661,7 +1661,7 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
         };
 
         // init col operation
-        static tb_iterator_op_t col_op = 
+        static tb_iterator_op_t col_op =
         {
             tb_database_mysql_result_col_iterator_size
         ,   tb_database_mysql_result_col_iterator_head
@@ -1697,7 +1697,7 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
         // init state
         mysql->base.state = TB_STATE_OK;
 
-        // init bind 
+        // init bind
         if (!tb_buffer_init(&mysql->bind_data)) break;
 
         // ok
@@ -1706,7 +1706,7 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
     } while (0);
 
     // failed?
-    if (!ok) 
+    if (!ok)
     {
         // exit database
         if (mysql) tb_database_mysql_exit((tb_database_sql_impl_t*)mysql);

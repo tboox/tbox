@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,8 +52,8 @@ tb_void_t tb_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t tail, tb
     // sort it
     tb_quick_sort(iterator, head, tail, comp);
 #else
-    // random access iterator? 
-    if (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS) 
+    // random access iterator?
+    if (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS)
     {
         if (tb_distance(iterator, head, tail) > 100000) tb_heap_sort(iterator, head, tail, comp);
         else tb_quick_sort(iterator, head, tail, comp); //!< @note the recursive stack size is limit

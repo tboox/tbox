@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -52,7 +52,7 @@ typedef enum __tb_socket_type_e
 ,   TB_SOCKET_TYPE_IPPROTO_UDP          = 2
 ,   TB_SOCKET_TYPE_IPPROTO_ICMP         = 3
 
-    // socket for tcp 
+    // socket for tcp
 ,   TB_SOCKET_TYPE_TCP                  = TB_SOCKET_TYPE_SOCK_STREAM | TB_SOCKET_TYPE_IPPROTO_TCP
 
     // socket for udp
@@ -100,7 +100,7 @@ typedef enum __tb_socket_event_e
     TB_SOCKET_EVENT_NONE                = 0x0000
 ,   TB_SOCKET_EVENT_RECV                = 0x0001
 ,   TB_SOCKET_EVENT_SEND                = 0x0002
-,   TB_SOCKET_EVENT_CONN                = TB_SOCKET_EVENT_SEND 
+,   TB_SOCKET_EVENT_CONN                = TB_SOCKET_EVENT_SEND
 ,   TB_SOCKET_EVENT_ACPT                = TB_SOCKET_EVENT_RECV
 ,   TB_SOCKET_EVENT_EALL                = TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND
 
@@ -115,13 +115,13 @@ typedef enum __tb_socket_event_e
  * @param type      the socket type
  * @param family    the address family, default: ipv4
  *
- * @return          the socket 
+ * @return          the socket
  */
 tb_socket_ref_t     tb_socket_init(tb_size_t type, tb_size_t family);
 
 /*! exit socket
  *
- * @param sock      the socket 
+ * @param sock      the socket
  *
  * @return          tb_true or tb_false
  */
@@ -136,16 +136,16 @@ tb_bool_t           tb_socket_exit(tb_socket_ref_t sock);
  */
 tb_bool_t           tb_socket_pair(tb_size_t type, tb_socket_ref_t pair[2]);
 
-/*! ctrl the socket 
+/*! ctrl the socket
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param ctrl      the ctrl code
  */
 tb_bool_t           tb_socket_ctrl(tb_socket_ref_t sock, tb_size_t ctrl, ...);
 
 /*! connect the given client address
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param addr      the client address
  *
  * @return          ok: 1, continue: 0; failed: -1
@@ -156,7 +156,7 @@ tb_long_t           tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr
  *
  * you can call tb_socket_local for the bound address
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param addr      the address
  *                  - bind any port if port == 0
  *                  - bind any ip address if ip is empty
@@ -167,7 +167,7 @@ tb_bool_t           tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! listen socket
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param backlog   the maximum length for the queue of pending connections
  *
  * @return          tb_true or tb_false
@@ -176,16 +176,16 @@ tb_bool_t           tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog);
 
 /*! accept socket
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param addr      the client address
  *
- * @return          the client socket 
+ * @return          the client socket
  */
 tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! get local address
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param addr      the local address
  *
  * @return          tb_true or tb_false
@@ -194,7 +194,7 @@ tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
 /*! kill socket
  *
- * @param sock      the socket 
+ * @param sock      the socket
  *
  * @return          tb_true or tb_false
  */
@@ -202,7 +202,7 @@ tb_bool_t           tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode);
 
 /*! recv the socket data for tcp
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param data      the data
  * @param size      the size
  *
@@ -212,7 +212,7 @@ tb_long_t           tb_socket_recv(tb_socket_ref_t sock, tb_byte_t* data, tb_siz
 
 /*! send the socket data for tcp
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param data      the data
  * @param size      the size
  *
@@ -222,7 +222,7 @@ tb_long_t           tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, 
 
 /*! recv the socket data for tcp with block mode
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param data      the data
  * @param size      the size
  *
@@ -232,7 +232,7 @@ tb_bool_t           tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_si
 
 /*! send the socket data for tcp with block mode
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param data      the data
  * @param size      the size
  *
@@ -241,8 +241,8 @@ tb_bool_t           tb_socket_brecv(tb_socket_ref_t sock, tb_byte_t* data, tb_si
 tb_bool_t           tb_socket_bsend(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t size);
 
 /*! recvv the socket data for tcp
- * 
- * @param sock      the socket 
+ *
+ * @param sock      the socket
  * @param list      the iovec list
  * @param size      the iovec size
  *
@@ -251,8 +251,8 @@ tb_bool_t           tb_socket_bsend(tb_socket_ref_t sock, tb_byte_t const* data,
 tb_long_t           tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size);
 
 /*! sendv the socket data for tcp
- * 
- * @param sock      the socket 
+ *
+ * @param sock      the socket
  * @param list      the iovec list
  * @param size      the iovec size
  *
@@ -260,9 +260,9 @@ tb_long_t           tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list
  */
 tb_long_t           tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size);
 
-/*! send file data 
- * 
- * @param sock      the socket 
+/*! send file data
+ *
+ * @param sock      the socket
  * @param file      the file
  * @param offset    the offset
  * @param size      the size
@@ -273,7 +273,7 @@ tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb
 
 /*! send the socket data for udp
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param addr      the address
  * @param data      the data
  * @param size      the size
@@ -281,10 +281,10 @@ tb_hong_t           tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb
  * @return          the real size or -1
  */
 tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t const* data, tb_size_t size);
-    
+
 /*! recv the socket data for udp
  *
- * @param sock      the socket 
+ * @param sock      the socket
  * @param addr      the peer address(output)
  * @param data      the data
  * @param size      the size
@@ -294,8 +294,8 @@ tb_long_t           tb_socket_usend(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, 
 tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_byte_t* data, tb_size_t size);
 
 /*! urecvv the socket data for udp
- * 
- * @param sock      the socket 
+ *
+ * @param sock      the socket
  * @param addr      the peer address(output)
  * @param list      the iovec list
  * @param size      the iovec size
@@ -305,8 +305,8 @@ tb_long_t           tb_socket_urecv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, 
 tb_long_t           tb_socket_urecvv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr, tb_iovec_t const* list, tb_size_t size);
 
 /*! usendv the socket data for udp
- * 
- * @param sock      the socket 
+ *
+ * @param sock      the socket
  * @param addr      the addr
  * @param list      the iovec list
  * @param size      the iovec size
@@ -319,7 +319,7 @@ tb_long_t           tb_socket_usendv(tb_socket_ref_t sock, tb_ipaddr_ref_t addr,
  *
  * @note we can wait for socket events in the coroutine
  *
- * @param sock      the sock 
+ * @param sock      the sock
  * @param events    the socket events
  * @param timeout   the timeout, infinity: -1
  *

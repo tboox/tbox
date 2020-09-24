@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -98,12 +98,12 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_char_t const* cs
 /*! match the given c-string by regex
  *
  * @code
-    
+
     // init regex
     tb_regex_ref_t regex = tb_regex_init("\\w+", 0);
     if (regex)
     {
-        // match single 
+        // match single
         //
         // results: "hello"
         //
@@ -118,7 +118,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_char_t const* cs
             }
         }
 
-        // match global 
+        // match global
         //
         // results: "hello"
         // results: "world"
@@ -142,7 +142,7 @@ tb_long_t               tb_regex_match(tb_regex_ref_t regex, tb_char_t const* cs
  * @endcode
  *
  * @param regex         the regex
- * @param cstr          the c-string 
+ * @param cstr          the c-string
  * @param start         the start position
  * @param plength       the matched length pointer, do not get it if be null
  * @param presults      the results pointer, only match it if be null
@@ -156,12 +156,12 @@ tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_char_t cons
  * @note only supports single match
  *
  * @code
-    
+
     // init regex
     tb_regex_ref_t regex = tb_regex_init("\\w+", 0);
     if (regex)
     {
-        // match single 
+        // match single
         //
         // results: "hello"
         //
@@ -182,7 +182,7 @@ tb_long_t               tb_regex_match_cstr(tb_regex_ref_t regex, tb_char_t cons
  * @endcode
  *
  * @param regex         the regex
- * @param cstr          the c-string 
+ * @param cstr          the c-string
  *
  * @return              the matched results
  */
@@ -215,14 +215,14 @@ tb_char_t const*        tb_regex_replace(tb_regex_ref_t regex, tb_char_t const* 
 tb_char_t const*        tb_regex_replace_cstr(tb_regex_ref_t regex, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength);
 
 /*! simply replace the given c-string by regex
- * 
+ *
  * @code
-    
+
     // init regex
     tb_regex_ref_t regex = tb_regex_init("\\w+", 0);
     if (regex)
     {
-        // match single 
+        // match single
         //
         // results: "hi world"
         //
@@ -262,10 +262,10 @@ tb_char_t const*        tb_regex_replace_simple(tb_regex_ref_t regex, tb_char_t 
 tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults);
 
 /*! match the given c-string by the given regex pattern
- * 
+ *
  * @code
 
-    // match single 
+    // match single
     //
     // results: "hello"
     //
@@ -278,12 +278,12 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
             // trace
             tb_trace_i("cstr: %s, size: %lu, start: %lu", entry->cstr, entry->size, entry->start);
         }
-        
+
         // exit results
         tb_vector_exit(results);
     }
 
-    // match global 
+    // match global
     //
     // results: "hello"
     // results: "world"
@@ -299,7 +299,7 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
             // trace
             tb_trace_i("cstr: %s, size: %lu, start: %lu", entry->cstr, entry->size, entry->start);
         }
- 
+
         // exit results
         tb_vector_exit(results);
     }
@@ -318,13 +318,13 @@ tb_long_t               tb_regex_match_done(tb_char_t const* pattern, tb_size_t 
  */
 tb_long_t               tb_regex_match_done_cstr(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_size_t* plength, tb_vector_ref_t* presults);
 
-/*! simply match the given c-string by the given regex pattern 
+/*! simply match the given c-string by the given regex pattern
  *
  * @note only supports single match
- * 
+ *
  * @code
 
-    // match single 
+    // match single
     //
     // results: "hello"
     //
@@ -337,7 +337,7 @@ tb_long_t               tb_regex_match_done_cstr(tb_char_t const* pattern, tb_si
             // trace
             tb_trace_i("cstr: %s, size: %lu, start: %lu", entry->cstr, entry->size, entry->start);
         }
-        
+
         // exit results
         tb_vector_exit(results);
     }
@@ -352,7 +352,7 @@ tb_long_t               tb_regex_match_done_cstr(tb_char_t const* pattern, tb_si
  */
 tb_vector_ref_t         tb_regex_match_done_simple(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr);
 
-/*! replace the given c-string and size by the given regex pattern 
+/*! replace the given c-string and size by the given regex pattern
  *
  * @param pattern       the regex pattern
  * @param mode          the regex mode, uses the default mode if be zero
@@ -367,7 +367,7 @@ tb_vector_ref_t         tb_regex_match_done_simple(tb_char_t const* pattern, tb_
  */
 tb_char_t const*        tb_regex_replace_done(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t size, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t replace_size, tb_size_t* plength);
 
-/*! replace the given c-string by the given regex pattern 
+/*! replace the given c-string by the given regex pattern
  *
  * @param pattern       the regex pattern
  * @param mode          the regex mode, uses the default mode if be zero
@@ -380,11 +380,11 @@ tb_char_t const*        tb_regex_replace_done(tb_char_t const* pattern, tb_size_
  */
 tb_char_t const*        tb_regex_replace_done_cstr(tb_char_t const* pattern, tb_size_t mode, tb_char_t const* cstr, tb_size_t start, tb_char_t const* replace_cstr, tb_size_t* plength);
 
-/*! simply replace the given c-string by the given regex pattern 
- * 
+/*! simply replace the given c-string by the given regex pattern
+ *
  * @code
-    
-    // replace single 
+
+    // replace single
     //
     // results: "hi world"
     //

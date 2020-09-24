@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -50,8 +50,8 @@ typedef __tb_pool_data_aligned__ struct __tb_static_large_data_head_t
     tb_uint32_t                     bfree : 1;
 
     /* patch 4 bytes for align(8) for tinycc/x86_64
-     * 
-     * __tb_aligned__(8) struct doesn't seem to work 
+     *
+     * __tb_aligned__(8) struct doesn't seem to work
      */
 #if defined(TB_COMPILER_IS_TINYC) && defined(TB_CPU_BIT64)
     tb_uint32_t                     padding;
@@ -98,7 +98,7 @@ typedef struct __tb_static_large_data_pred_t
  *        ------------------------------------------
  *       | tb_static_large_data_head_t | data space |
  *        ------------------------------------------
- *                                                
+ *
  *        --------------------------------------
  * pred: | >0KB :      4KB       | > 0*page     | 1
  *       |-----------------------|--------------
@@ -200,7 +200,7 @@ static tb_void_t tb_static_large_allocator_check_data(tb_static_large_allocator_
     } while (0);
 
     // failed? dump it
-    if (!ok) 
+    if (!ok)
     {
         // dump data
         tb_pool_data_dump(data, tb_true, "[static_large_allocator]: [error]: ");
@@ -216,7 +216,7 @@ static tb_void_t tb_static_large_allocator_check_next(tb_static_large_allocator_
 
     // check the next data
     tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)&(data_head[1]) + data_head->space);
-    if (next_head < allocator->data_tail && !next_head->bfree) 
+    if (next_head < allocator->data_tail && !next_head->bfree)
         tb_static_large_allocator_check_data(allocator, next_head);
 }
 #endif
@@ -233,7 +233,7 @@ static __tb_inline__ tb_size_t tb_static_large_allocator_pred_index(tb_static_la
 
     // the page count
     size /= allocator->page_size;
- 
+
     // the pred index
 #if 0
     tb_size_t indx = tb_ilog2i(tb_align_pow2(size));
@@ -284,7 +284,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
     tb_static_large_data_head_t* data_tail = allocator->data_tail;
     tb_check_return_val(data_head < data_tail, tb_null);
 
-    // find the free data 
+    // find the free data
     while ((data_head + 1) <= data_tail && walk_size)
     {
         // the data space size
@@ -292,7 +292,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
 
         // check the space size
         tb_assert(!((sizeof(tb_static_large_data_head_t) + data_space) & (allocator->page_size - 1)));
-            
+
 #ifdef __tb_debug__
         // check the data
         if (!data_head->bfree) tb_static_large_allocator_check_data(allocator, data_head);
@@ -301,7 +301,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
         // allocate if the data is free
         if (data_head->bfree)
         {
-            // is enough?           
+            // is enough?
             if (data_space >= space)
             {
                 // remove this free data from the pred cache
@@ -310,12 +310,12 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
                 // split it if this free data is too large
                 if (data_space > sizeof(tb_static_large_data_head_t) + space)
                 {
-                    // split this free data 
+                    // split this free data
                     tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + space);
                     next_head->space = data_space - space - sizeof(tb_static_large_data_head_t);
                     next_head->bfree = 1;
                     data_head->space = space;
- 
+
                     // add next free data to the pred cache
                     tb_static_large_allocator_pred_update(allocator, next_head);
                 }
@@ -323,7 +323,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
                 {
                     // the next data head
                     tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + data_space);
-            
+
                     // the next data is free?
                     if (next_head + 1 < data_tail && next_head->bfree)
                     {
@@ -332,7 +332,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
                     }
                 }
 
-                // allocate the data 
+                // allocate the data
                 data_head->bfree = 0;
 
                 // return the data head
@@ -342,7 +342,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
             {
                 // the next data head
                 tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + data_space);
-            
+
                 // break if doesn't exist next data
                 tb_check_break(next_head + 1 < data_tail);
 
@@ -364,7 +364,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
                     // add this free data to the pred cache
                     tb_static_large_allocator_pred_update(allocator, data_head);
 
-                    // continue handle this data 
+                    // continue handle this data
                     continue ;
                 }
             }
@@ -372,7 +372,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_find(tb_sta
 
         // walk_size--
         walk_size--;
-    
+
         // skip it if the data is non-free or too small
         data_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + data_space);
     }
@@ -395,9 +395,9 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_pred(tb_sta
     {
         // the pred data head
         pred_head = pred[indx].data_head;
-        if (pred_head) 
+        if (pred_head)
         {
-            // find the free data from the pred data head 
+            // find the free data from the pred data head
             data_head = tb_static_large_allocator_malloc_find(allocator, pred_head, 1, space);
 
 #ifdef __tb_debug__
@@ -409,7 +409,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_pred(tb_sta
 #endif
         }
     }
-   
+
     // trace
     tb_trace_d("malloc: pred: %lu: %s", space, data_head? "ok" : "no");
 
@@ -441,7 +441,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_done(tb_sta
         data_head = tb_static_large_allocator_malloc_pred(allocator, need_space);
         if (!data_head)
         {
-            // find the free data from the first data head 
+            // find the free data from the first data head
             data_head = tb_static_large_allocator_malloc_find(allocator, allocator->data_head, -1, need_space);
             tb_check_break(data_head);
         }
@@ -472,7 +472,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_malloc_done(tb_sta
 
         // make the dirty data and patch 0xcc for checking underflow
         tb_memset_((tb_pointer_t)&(data_head[1]), TB_POOL_DATA_PATCH, size_real + patch);
- 
+
         // update the real size
         allocator->real_size     += base_head->size;
 
@@ -540,7 +540,7 @@ static tb_static_large_data_head_t* tb_static_large_allocator_ralloc_fast(tb_sta
             // attempt to merge the next free data
             tb_static_large_data_head_t* data_tail = allocator->data_tail;
             tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)&(data_head[1]) + data_head->space);
-            while (next_head < data_tail && next_head->bfree) 
+            while (next_head < data_tail && next_head->bfree)
             {
                 // remove next free data from the pred cache
                 tb_static_large_allocator_pred_remove(allocator, next_head);
@@ -559,10 +559,10 @@ static tb_static_large_data_head_t* tb_static_large_allocator_ralloc_fast(tb_sta
         // enough?
         tb_check_break(need_space <= data_head->space);
 
-        // split it if this data is too large after merging 
+        // split it if this data is too large after merging
         if (data_head->space > sizeof(tb_static_large_data_head_t) + need_space)
         {
-            // split this free data 
+            // split this free data
             tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)(data_head + 1) + need_space);
             next_head->space = data_head->space - need_space - sizeof(tb_static_large_data_head_t);
             next_head->bfree = 1;
@@ -592,12 +592,12 @@ static tb_static_large_data_head_t* tb_static_large_allocator_ralloc_fast(tb_sta
         // save backtrace
         tb_pool_data_save_backtrace(&base_head->debug, skip_nframe);
 
-        // make the dirty data 
+        // make the dirty data
         if (size_real > prev_size) tb_memset_((tb_byte_t*)&(data_head[1]) + prev_size, TB_POOL_DATA_PATCH, size_real - prev_size);
 
         // patch 0xcc for checking underflow
         ((tb_byte_t*)&(data_head[1]))[size_real] = TB_POOL_DATA_PATCH;
- 
+
         // update the real size
         allocator->real_size     += size_real;
         allocator->real_size     -= prev_size;
@@ -669,7 +669,7 @@ static tb_bool_t tb_static_large_allocator_free(tb_allocator_ref_t self, tb_poin
 
         // attempt merge the next free data
         tb_static_large_data_head_t* next_head = (tb_static_large_data_head_t*)((tb_byte_t*)&(data_head[1]) + data_head->space);
-        if (next_head < allocator->data_tail && next_head->bfree) 
+        if (next_head < allocator->data_tail && next_head->bfree)
         {
             // remove next free data from the pred cache
             tb_static_large_allocator_pred_remove(allocator, next_head);
@@ -752,7 +752,7 @@ static tb_pointer_t tb_static_large_allocator_ralloc(tb_allocator_ref_t self, tb
             {
                 // copy the real data
                 tb_memcpy_((tb_pointer_t)&aloc_head[1], data, tb_min(size, (((tb_pool_data_head_t*)(data_head + 1))[-1]).size));
-                
+
                 // free the previous data
                 tb_static_large_allocator_free(self, data __tb_debug_args__);
             }
@@ -792,7 +792,7 @@ static tb_void_t tb_static_large_allocator_clear(tb_allocator_ref_t self)
 
     // clear the pred cache
     tb_memset_(allocator->data_pred, 0, sizeof(allocator->data_pred));
- 
+
     // add this free data to the pred cache
     tb_static_large_allocator_pred_update(allocator, allocator->data_head);
 
@@ -939,7 +939,7 @@ tb_allocator_ref_t tb_static_large_allocator_init(tb_byte_t* data, tb_size_t siz
     if (allocator->page_size < sizeof(tb_static_large_data_head_t))
         allocator->page_size += sizeof(tb_static_large_data_head_t);
 
-    // page_size must be aligned 
+    // page_size must be aligned
     allocator->page_size = tb_align_pow2(allocator->page_size);
     tb_assert_and_check_return_val(allocator->page_size, tb_null);
 
@@ -951,12 +951,12 @@ tb_allocator_ref_t tb_static_large_allocator_init(tb_byte_t* data, tb_size_t siz
     allocator->data_size = tb_align(allocator->data_size - allocator->page_size, allocator->page_size);
     tb_assert_and_check_return_val(allocator->data_size > sizeof(tb_static_large_data_head_t), tb_null);
 
-    // init data head 
+    // init data head
     allocator->data_head = (tb_static_large_data_head_t*)&allocator[1];
     allocator->data_head->bfree = 1;
     allocator->data_head->space = allocator->data_size - sizeof(tb_static_large_data_head_t);
     tb_assert_and_check_return_val(!((tb_size_t)allocator->data_head & (TB_POOL_DATA_ALIGN - 1)), tb_null);
- 
+
     // add this free data to the pred cache
     tb_static_large_allocator_pred_update(allocator, allocator->data_head);
 

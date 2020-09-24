@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -29,7 +29,7 @@
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
 #ifdef TB_CONFIG_LIBC_HAVE_WCSCMP
 tb_long_t tb_wcscmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
@@ -45,7 +45,7 @@ tb_long_t tb_wcscmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
     tb_check_return_val(s1 != s2, 0);
 
     // done
-    while (*((tb_wchar_t *)s1) == *((tb_wchar_t *)s2)) 
+    while (*((tb_wchar_t *)s1) == *((tb_wchar_t *)s2))
     {
         if (!*s1++) return 0;
         ++s2;

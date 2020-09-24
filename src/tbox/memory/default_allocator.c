@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -267,7 +267,7 @@ static tb_void_t tb_default_allocator_instance_exit(tb_handle_t self, tb_cpointe
     // dump allocator
     if (allocator) tb_allocator_dump((tb_allocator_ref_t)allocator);
 #endif
- 
+
     // exit allocator
     if (allocator) tb_allocator_exit((tb_allocator_ref_t)allocator);
     allocator = tb_null;

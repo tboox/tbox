@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -45,16 +45,16 @@ typedef struct __tb_filter_t
     // is opened?
     tb_bool_t           bopened;
 
-    // the input limit size 
+    // the input limit size
     tb_hong_t           limit;
-    
-    // the input offset 
+
+    // the input offset
     tb_hize_t           offset;
 
     // the input data
     tb_buffer_t         idata;
 
-    // the output data 
+    // the output data
     tb_queue_buffer_t   odata;
 
     // the open
@@ -81,7 +81,7 @@ static __tb_inline__ tb_bool_t tb_filter_init(tb_filter_t* filter, tb_size_t typ
 {
     // check
     tb_assert_and_check_return_val(filter, tb_false);
-    
+
     // init type
     filter->type = type;
 

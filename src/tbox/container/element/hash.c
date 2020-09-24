@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Copyright (C) 2009-2020, TBOOX Open Source Group.
  *
  * @author      ruki
@@ -145,23 +145,23 @@ static tb_size_t tb_element_hash_uint32_func_0(tb_uint32_t value)
 static tb_size_t tb_element_hash_uint32_func_1(tb_uint32_t value)
 {
     // Bob Jenkins' 32 bit integer hash function
-    value = (value + 0x7ed55d16) + (value << 12); 
-    value = (value ^ 0xc761c23c) ^ (value >> 19); 
-    value = (value + 0x165667b1) + (value << 5); 
-    value = (value + 0xd3a2646c) ^ (value << 9); 
+    value = (value + 0x7ed55d16) + (value << 12);
+    value = (value ^ 0xc761c23c) ^ (value >> 19);
+    value = (value + 0x165667b1) + (value << 5);
+    value = (value + 0xd3a2646c) ^ (value << 9);
     value = (value + 0xfd7046c5) + (value << 3);
-    value = (value ^ 0xb55a4f09) ^ (value >> 16);  
+    value = (value ^ 0xb55a4f09) ^ (value >> 16);
     return value;
 }
 static tb_size_t tb_element_hash_uint32_func_2(tb_uint32_t value)
 {
     // Tomas Wang
     value = ~value + (value << 15);
-    value = value ^ (value >> 12); 
-    value = value + (value << 2); 
-    value = value ^ (value >> 4); 
+    value = value ^ (value >> 12);
+    value = value + (value << 2);
+    value = value ^ (value >> 4);
     value = value * 2057;
-    value = value ^ (value >> 16); 
+    value = value ^ (value >> 16);
     return value;
 }
 
@@ -185,7 +185,7 @@ tb_size_t tb_element_hash_uint8(tb_uint8_t value, tb_size_t mask, tb_size_t inde
     if (index < 2)
     {
         // the func
-        static tb_size_t (*s_func[])(tb_uint8_t) = 
+        static tb_size_t (*s_func[])(tb_uint8_t) =
         {
             tb_element_hash_uint8_func_0
         ,   tb_element_hash_uint8_func_1
@@ -209,7 +209,7 @@ tb_size_t tb_element_hash_uint16(tb_uint16_t value, tb_size_t mask, tb_size_t in
     if (index < 1)
     {
         // the func
-        static tb_size_t (*s_func[])(tb_uint16_t) = 
+        static tb_size_t (*s_func[])(tb_uint16_t) =
         {
             tb_element_hash_uint16_func_0
         };
@@ -232,7 +232,7 @@ tb_size_t tb_element_hash_uint32(tb_uint32_t value, tb_size_t mask, tb_size_t in
     if (index < 3)
     {
         // the func
-        static tb_size_t (*s_func[])(tb_uint32_t) = 
+        static tb_size_t (*s_func[])(tb_uint32_t) =
         {
             tb_element_hash_uint32_func_0
         ,   tb_element_hash_uint32_func_1
@@ -253,7 +253,7 @@ tb_size_t tb_element_hash_uint64(tb_uint64_t value, tb_size_t mask, tb_size_t in
     if (index < 1)
     {
         // the func
-        static tb_size_t (*s_func[])(tb_uint64_t) = 
+        static tb_size_t (*s_func[])(tb_uint64_t) =
         {
             tb_element_hash_uint64_func_0
         };
@@ -274,7 +274,7 @@ tb_size_t tb_element_hash_data(tb_byte_t const* data, tb_size_t size, tb_size_t 
     tb_assert_and_check_return_val(data && size && mask, 0);
 
     // the func
-    static tb_size_t (*s_func[])(tb_byte_t const* , tb_size_t) = 
+    static tb_size_t (*s_func[])(tb_byte_t const* , tb_size_t) =
     {
         tb_element_hash_data_func_0
     ,   tb_element_hash_data_func_1
@@ -309,7 +309,7 @@ tb_size_t tb_element_hash_cstr(tb_char_t const* cstr, tb_size_t mask, tb_size_t 
     if (index < 2)
     {
         // the func
-        static tb_size_t (*s_func[])(tb_char_t const*) = 
+        static tb_size_t (*s_func[])(tb_char_t const*) =
         {
             tb_element_hash_cstr_func_0
         ,   tb_element_hash_cstr_func_1

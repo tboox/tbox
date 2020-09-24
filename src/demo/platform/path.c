@@ -5,7 +5,7 @@
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
- */ 
+ */
 tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
 {
     // the absolute path
