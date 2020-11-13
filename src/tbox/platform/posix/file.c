@@ -571,17 +571,13 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
 
-    // the full path
-    tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(path, tb_false);
-
     // the dest path
     tb_char_t full1[TB_PATH_MAXN];
     dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
     tb_assert_and_check_return_val(dest, tb_false);
 
     // attempt to link it directly
+    // @note we should not use absolute path, dest -> path (may be relative path)
     if (!symlink(path, dest)) return tb_true;
     else if (errno != EPERM && errno != EACCES)
     {

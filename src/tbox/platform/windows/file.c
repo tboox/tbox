@@ -514,9 +514,11 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     tb_file_info_t info = {0};
     if (!tb_file_info(path, &info)) return tb_false;
 
-    // the full path
-    tb_wchar_t full0[TB_PATH_MAXN];
-    if (!tb_path_absolute_w(path, full0, TB_PATH_MAXN)) return tb_false;
+    /* we only translate to wchar path
+     * @note we should not use absolute path, dest -> path (may be relative path)
+     */
+    tb_wchar_t path0[TB_PATH_MAXN];
+    if (tb_atow(path0, path, TB_PATH_MAXN) == (tb_size_t)-1) return tb_false;
 
     // the dest path
     tb_wchar_t full1[TB_PATH_MAXN];
@@ -527,9 +529,9 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 
     // attempt to link it directly without admin privilege.
     tb_bool_t isdir = (info.type == TB_FILE_TYPE_DIRECTORY);
-    if (pCreateSymbolicLinkW(full1, full0, (isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0) | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE))
+    if (pCreateSymbolicLinkW(full1, path0, (isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0) | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE))
         return tb_true;
 
     // attempt to link it directly with admin privilege
-    return (tb_bool_t)pCreateSymbolicLinkW(full1, full0, isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
+    return (tb_bool_t)pCreateSymbolicLinkW(full1, path0, isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
 }
