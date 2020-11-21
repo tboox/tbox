@@ -36,7 +36,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! init the platform envirnoment
+/*! init the platform environment
  *
  * @param priv      the platform private data
  *                  pass JavaVM* jvm for android
@@ -46,7 +46,7 @@ __tb_extern_c_enter__
  */
 tb_bool_t           tb_platform_init_env(tb_handle_t priv);
 
-/// exit the platform envirnoment
+/// exit the platform environment
 tb_void_t           tb_platform_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////

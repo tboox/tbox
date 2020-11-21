@@ -49,27 +49,27 @@ __tb_extern_c_leave__
 
 tb_bool_t tb_platform_init_env(tb_handle_t priv)
 {
-    // init the current platform envirnoment
+    // init the current platform environment
 #if defined(TB_CONFIG_OS_ANDROID)
     if (!tb_android_init_env(priv)) return tb_false;
 #elif defined(TB_CONFIG_OS_WINDOWS)
     if (!tb_windows_init_env()) return tb_false;
 #endif
 
-    // init socket envirnoment
+    // init socket environment
     if (!tb_socket_init_env()) return tb_false;
 
-    // init dns envirnoment
+    // init dns environment
 #ifndef TB_CONFIG_MICRO_ENABLE
     if (!tb_dns_init_env()) return tb_false;
 #endif
 
-    // init thread local envirnoment
+    // init thread local environment
 #ifndef TB_CONFIG_MICRO_ENABLE
     if (!tb_thread_local_init_env()) return tb_false;
 #endif
 
-    // init exception envirnoment
+    // init exception environment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
     if (!tb_exception_init_env()) return tb_false;
 #endif
@@ -94,25 +94,25 @@ tb_void_t tb_platform_exit_env()
     tb_process_group_exit();
 #endif
 
-    // exit exception envirnoment
+    // exit exception environment
 #ifdef TB_CONFIG_EXCEPTION_ENABLE
     tb_exception_exit_env();
 #endif
 
-    // exit thread local envirnoment
+    // exit thread local environment
 #ifndef TB_CONFIG_MICRO_ENABLE
     tb_thread_local_exit_env();
 #endif
 
-    // exit dns envirnoment
+    // exit dns environment
 #ifndef TB_CONFIG_MICRO_ENABLE
     tb_dns_exit_env();
 #endif
 
-    // exit socket envirnoment
+    // exit socket environment
     tb_socket_exit_env();
 
-    // exit the current platform envirnoment
+    // exit the current platform environment
 #if defined(TB_CONFIG_OS_ANDROID)
     tb_android_exit_env();
 #elif defined(TB_CONFIG_OS_WINDOWS)

@@ -36,13 +36,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init the thread local envirnoment
+/* init the thread local environment
  *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_thread_local_init_env(tb_noarg_t);
 
-// exit the thread local envirnoment
+// exit the thread local environment
 tb_void_t           tb_thread_local_exit_env(tb_noarg_t);
 
 /* walk all thread locals

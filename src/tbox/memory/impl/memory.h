@@ -36,7 +36,7 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init memory envirnoment
+/* init memory environment
  *
  * @param allocator     the allocator
  *
@@ -44,7 +44,7 @@ __tb_extern_c_enter__
  */
 tb_bool_t               tb_memory_init_env(tb_allocator_ref_t allocator);
 
-// exit memory envirnoment
+// exit memory environment
 tb_void_t               tb_memory_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
