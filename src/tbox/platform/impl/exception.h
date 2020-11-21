@@ -35,13 +35,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init the exception envirnoment
+/* init the exception environment
  *
  * @return          tb_true or tb_false
  */
 tb_bool_t           tb_exception_init_env(tb_noarg_t);
 
-// exit the exception envirnoment
+// exit the exception environment
 tb_void_t           tb_exception_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////

@@ -35,10 +35,10 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-// init socket envirnoment
+// init socket environment
 tb_bool_t   tb_socket_init_env(tb_noarg_t);
 
-// exit socket envirnoment
+// exit socket environment
 tb_void_t   tb_socket_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////

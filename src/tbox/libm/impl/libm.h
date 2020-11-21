@@ -36,13 +36,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init libm envirnoment
+/* init libm environment
  *
  * @return  tb_true or tb_false
  */
 tb_bool_t   tb_libm_init_env(tb_noarg_t);
 
-/* exit libm envirnoment
+/* exit libm environment
  */
 tb_void_t   tb_libm_exit_env(tb_noarg_t);
 

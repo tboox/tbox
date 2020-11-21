@@ -36,13 +36,13 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/* init dns envirnoment
+/* init dns environment
  *
  * @return  tb_true or tb_false
  */
 tb_bool_t   tb_dns_init_env(tb_noarg_t);
 
-// exit dns envirnoment
+// exit dns environment
 tb_void_t   tb_dns_exit_env(tb_noarg_t);
 
 /* //////////////////////////////////////////////////////////////////////////////////////

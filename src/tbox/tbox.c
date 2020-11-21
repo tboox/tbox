@@ -168,25 +168,25 @@ tb_bool_t tb_init_(tb_handle_t priv, tb_allocator_ref_t allocator, tb_size_t mod
     // init singleton
     if (!tb_singleton_init()) return tb_false;
 
-    // init memory envirnoment
+    // init memory environment
     if (!tb_memory_init_env(allocator)) return tb_false;
 
-    // init platform envirnoment
+    // init platform environment
     if (!tb_platform_init_env(priv)) return tb_false;
 
-    // init libc envirnoment
+    // init libc environment
     if (!tb_libc_init_env()) return tb_false;
 
-    // init math envirnoment
+    // init math environment
     if (!tb_math_init_env()) return tb_false;
 
-    // init libm envirnoment
+    // init libm environment
     if (!tb_libm_init_env()) return tb_false;
 
-    // init network envirnoment
+    // init network environment
     if (!tb_network_init_env()) return tb_false;
 
-    // init object envirnoment
+    // init object environment
 #ifdef TB_CONFIG_MODULE_HAVE_OBJECT
     if (!tb_object_init_env()) return tb_false;
 #endif
@@ -213,25 +213,25 @@ tb_void_t tb_exit()
     tb_object_exit_env();
 #endif
 
-    // exit network envirnoment
+    // exit network environment
     tb_network_exit_env();
 
-    // exit libm envirnoment
+    // exit libm environment
     tb_libm_exit_env();
 
-    // exit math envirnoment
+    // exit math environment
     tb_math_exit_env();
 
-    // exit libc envirnoment
+    // exit libc environment
     tb_libc_exit_env();
 
-    // exit platform envirnoment
+    // exit platform environment
     tb_platform_exit_env();
 
     // exit singleton
     tb_singleton_exit();
 
-    // exit memory envirnoment
+    // exit memory environment
     tb_memory_exit_env();
 
     // trace
