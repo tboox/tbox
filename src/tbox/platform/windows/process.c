@@ -48,10 +48,13 @@ typedef struct __tb_process_t
     // the process info
     PROCESS_INFORMATION     pi;
 
-    /// the stdout redirect type
+    // the stdin redirect type
+    tb_uint16_t             intype;
+
+    // the stdout redirect type
     tb_uint16_t             outtype;
 
-    /// the stderr redirect type
+    // the stderr redirect type
     tb_uint16_t             errtype;
 
     // the user private data
@@ -105,6 +108,11 @@ tb_void_t tb_process_handle_close(tb_process_ref_t self)
     if (process->pi.hProcess && process->pi.hProcess != INVALID_HANDLE_VALUE)
         CloseHandle(process->pi.hProcess);
     process->pi.hProcess = INVALID_HANDLE_VALUE;
+
+    // exit stdin file
+    if (process->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdInput && process->si.hStdInput != INVALID_HANDLE_VALUE)
+        tb_file_exit((tb_file_ref_t)process->si.hStdInput);
+    process->si.hStdInput = INVALID_HANDLE_VALUE;
 
     // exit stdout file
     if (process->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->si.hStdOutput && process->si.hStdOutput != INVALID_HANDLE_VALUE)
@@ -330,12 +338,45 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             userenv = tb_true;
         }
 
-        // redirect the stdout
+        // redirect
         BOOL bInheritHandle = FALSE;
         if (attr)
         {
+            // redirect from stdin
+            process->intype = attr->intype;
+            if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->inpath)
+            {
+                // the inmode
+                tb_size_t inmode = attr->inmode;
+
+                // no mode? uses the default mode
+                if (!inmode) inmode = TB_FILE_MODE_RO;
+
+                // enable handles
+                process->si.dwFlags |= STARTF_USESTDHANDLES;
+
+                // open file
+                process->si.hStdInput = (HANDLE)tb_file_init(attr->inpath, inmode);
+                tb_assertf_pass_and_check_break(process->si.hStdInput, "cannot redirect stdin to file: %s", attr->inpath);
+
+                // enable inherit
+                tb_kernel32()->SetHandleInformation(process->si.hStdInput, HANDLE_FLAG_INHERIT, TRUE);
+                bInheritHandle = TRUE;
+            }
+            else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->inpipe) ||
+                     (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->infile))
+            {
+                // enable handles
+                process->si.dwFlags |= STARTF_USESTDHANDLES;
+                process->si.hStdInput = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->inpipe) : (HANDLE)attr->infile;
+
+                // enable inherit
+                tb_kernel32()->SetHandleInformation(process->si.hStdInput, HANDLE_FLAG_INHERIT, TRUE);
+                bInheritHandle = TRUE;
+            }
+
+            // redirect to stdout
             process->outtype = attr->outtype;
-            process->errtype = attr->errtype;
             if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->outpath)
             {
                 // the outmode
@@ -367,7 +408,8 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 bInheritHandle = TRUE;
             }
 
-            // redirect the stderr
+            // redirect to stderr
+            process->errtype = attr->errtype;
             if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->errpath)
             {
                 // the errmode

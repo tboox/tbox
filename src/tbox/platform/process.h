@@ -62,6 +62,12 @@ typedef struct __tb_process_attr_t
     /// the flags
     tb_uint16_t             flags;
 
+    /// the stdin redirect type
+    tb_uint16_t             intype;
+
+    /// the stdin file mode
+    tb_uint16_t             inmode;
+
     /// the stdout redirect type
     tb_uint16_t             outtype;
 
@@ -84,6 +90,22 @@ typedef struct __tb_process_attr_t
 
     /// the stderr file mode
     tb_uint16_t             errmode;
+
+#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
+    union
+    {
+#endif
+        /// the stdin pipe
+        tb_pipe_file_ref_t  inpipe;
+
+        /// the stdint file
+        tb_file_ref_t       infile;
+
+        /// the stdin filepath
+        tb_char_t const*    inpath;
+#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
+    };
+#endif
 
 #ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
     union
