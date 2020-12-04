@@ -162,7 +162,12 @@ end
 function check_module_cfuncs(module, includes, ...)
     for _, func in ipairs({...}) do
         local funcname = get_function_name(func)
-        configvar_check_cfuncs(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), func, {name = module .. "_" .. funcname, includes = includes, defines = "_GNU_SOURCE=1", languages = stdc})
+        configvar_check_cfuncs(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), func,
+            {name = module .. "_" .. funcname,
+             includes = includes,
+             defines = "_GNU_SOURCE=1",
+             warnings = "error",
+             languages = stdc})
     end
 end
 
