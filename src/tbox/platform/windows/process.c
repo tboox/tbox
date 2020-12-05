@@ -442,6 +442,14 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             }
         }
 
+        // init default std handles
+        if (process->si.dwFlags & STARTF_USESTDHANDLES)
+        {
+            if (!process->si.hStdInput) process->si.hStdInput   = ::GetStdHandle(STD_INPUT_HANDLE);
+            if (!process->si.hStdOutput) process->si.hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
+            if (!process->si.hStdError) process->si.hStdError   = ::GetStdHandle(STD_ERROR_HANDLE);
+        }
+
         // init process security attributes
         SECURITY_ATTRIBUTES sap     = {0};
         sap.nLength                 = sizeof(SECURITY_ATTRIBUTES);
