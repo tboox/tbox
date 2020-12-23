@@ -5,17 +5,26 @@
   </a>
 
   <div>
-    <a href="https://github.com/tboox/tbox/actions?query=workflow%3Abuild">
-      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/build/master.svg?style=flat-square" alt="github-ci" />
+    <a href="https://github.com/tboox/tbox/actions?query=workflow%3AWindows">
+      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/Windows/dev.svg?style=flat-square&logo=windows" alt="github-ci" />
     </a>
-    <a href="https://github.com/tboox/tbox/blob/master/LICENSE.md">
-      <img src="https://img.shields.io/github/license/tboox/tbox.svg?colorB=f48041&style=flat-square" alt="license" />
+    <a href="https://github.com/tboox/tbox/actions?query=workflow%3ALinux">
+      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/Linux/dev.svg?style=flat-square&logo=linux" alt="github-ci" />
+    </a>
+    <a href="https://github.com/tboox/tbox/actions?query=workflow%3AmacOS">
+      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/macOS/dev.svg?style=flat-square&logo=apple" alt="github-ci" />
+    </a>
+    <a href="https://github.com/tboox/tbox/actions?query=workflow%3AAndroid">
+      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/Android/dev.svg?style=flat-square&logo=android" alt="github-ci" />
     </a>
     <a href="https://github.com/tboox/tbox/releases">
       <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
     </a>
   </div>
   <div>
+    <a href="https://github.com/tboox/tbox/blob/master/LICENSE.md">
+      <img src="https://img.shields.io/github/license/tboox/tbox.svg?colorB=f48041&style=flat-square" alt="license" />
+    </a>
     <a href="https://www.reddit.com/r/tboox/">
       <img src="https://img.shields.io/badge/chat-on%20reddit-ff3f34.svg?style=flat-square" alt="Reddit" />
     </a>

@@ -1,0 +1,24 @@
+name: iPhoneOS
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: branch@dev
+
+      - name: Tests
+        run: |
+          xmake f -p iphoneos
+          xmake

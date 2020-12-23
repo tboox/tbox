@@ -1,0 +1,48 @@
+name: MingW (Msys2)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: [
+            { msystem: MINGW64, arch: x86_64, prefix: /mingw64 },
+            { msystem: MINGW32, arch: i686,   prefix: /mingw32 }
+        ]
+
+    steps:
+
+      - uses: actions/checkout@v1
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          install: git base-devel unzip mingw-w64-${{ matrix.arch }}-toolchain
+          update: true
+
+      - name: Prepare
+        shell: msys2 {0}
+        run: |
+          git clone https://github.com/xmake-io/xmake.git --recurse-submodules -b dev
+          cd xmake
+          make build
+          make install PREFIX=${{ matrix.prefix }}
+          xmake --version
+          cd ..
+          git reset --hard HEAD
+          git clean -fdx
+
+      - name: Tests
+        shell: msys2 {0}
+        run: |
+          if [ "${{ matrix.arch }}" == "x86_64" ]; then
+            xmake f -p mingw -a x86_64
+          else
+            xmake f -p mingw -a i386
+          fi
+          xmake
+
