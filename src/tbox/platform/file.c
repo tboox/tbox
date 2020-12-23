@@ -143,4 +143,9 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     tb_trace_noimpl();
     return tb_false;
 }
+tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
 #endif

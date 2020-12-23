@@ -588,4 +588,26 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     }
     return tb_false;
 }
+tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
+{
+    // check
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the full path
+    tb_char_t full[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // flags
+    tb_size_t flags = 0;
+    if (mode & TB_FILE_MODE_RW) flags = R_OK | W_OK;
+    else
+    {
+        if (mode & TB_FILE_MODE_RO) flags |= R_OK;
+        if (mode & TB_FILE_MODE_WO) flags |= W_OK;
+    }
+    if (mode & TB_FILE_MODE_EXEC) flags |= X_OK;
+
+    return !access(full, flags);
+}
 #endif
