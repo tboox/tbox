@@ -26,6 +26,6 @@ jobs:
 
       - name: Tests
         run: |
-          xmake f -p cross --sdk=`pwd`/${{ matrix.cross }}-cross --syslinks="atomic"
+          xmake f -p cross --sdk=`pwd`/${{ matrix.cross }}-cross
           xmake
 
