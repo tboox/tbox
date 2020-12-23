@@ -544,6 +544,7 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
+    // init permission
     DWORD perm = FILE_TRAVERSE | SYNCHRONIZE;
     if (mode & TB_FILE_MODE_RW) perm = GENERIC_READ | GENERIC_WRITE;
     else
@@ -556,10 +557,8 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
      * For example, _access_s reports the folder "C:\System Volume Information" can be accessed.
      * So using the win32 API "CreateFile" here which works much better.
      */
-    HANDLE h = CreateFileW(full, perm, FILE_SHARE_READ | FILE_SHARE_WRITE,
-                           NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-    if (h == INVALID_HANDLE_VALUE)
-        return tb_false;
+    HANDLE h = CreateFileW(full, perm, FILE_SHARE_READ | FILE_SHARE_WRITE, tb_null, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, tb_null);
+    tb_check_return_val(h != INVALID_HANDLE_VALUE, tb_false);
     CloseHandle(h);
     return tb_true;
 }
