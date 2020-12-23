@@ -535,3 +535,31 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     // attempt to link it directly with admin privilege
     return (tb_bool_t)pCreateSymbolicLinkW(full1, path0, isdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
 }
+tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
+{
+    // check
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the full path
+    tb_wchar_t full[TB_PATH_MAXN];
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
+
+    DWORD perm = FILE_TRAVERSE | SYNCHRONIZE;
+    if (mode & TB_FILE_MODE_RW) perm = GENERIC_READ | GENERIC_WRITE;
+    else
+    {
+        if (mode & TB_FILE_MODE_RO) perm |= GENERIC_READ;
+        if (mode & TB_FILE_MODE_WO) perm |= GENERIC_WRITE;
+    }
+
+    /* The windows POSIX implementation: _access_s and _waccess_s don't work well.
+     * For example, _access_s reports the folder "C:\System Volume Information" can be accessed.
+     * So using the win32 API "CreateFile" here which works much better.
+     */
+    HANDLE h = CreateFileW(full, perm, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                           NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    if (h == INVALID_HANDLE_VALUE)
+        return tb_false;
+    CloseHandle(h);
+    return tb_true;
+}
