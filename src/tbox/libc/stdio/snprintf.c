@@ -1,4 +1,4 @@
-/*!The Treasure Arch Library
+/*!The Treasure Box Library
  *
  * TArch is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
