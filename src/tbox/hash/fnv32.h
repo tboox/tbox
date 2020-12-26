@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Copyright (C) 2009-2020, TBOOX Open Source Group.
+ * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      alexyer, ruki
  * @file        fnv32.h
