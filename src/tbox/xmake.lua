@@ -23,7 +23,12 @@ target("tbox")
     add_headerfiles("$(buildir)/$(plat)/$(arch)/$(mode)/tbox.config.h", {prefixdir = "tbox"})
 
     -- add packages
-    add_packages("mbedtls", "polarssl", "openssl", "pcre2", "pcre", "zlib", "mysql", "sqlite3")
+    for _, name in ipairs({"mbedtls", "polarssl", "openssl", "pcre2", "pcre", "zlib", "mysql", "sqlite3"}) do
+        add_packages(name)
+        if has_package(name) then
+            set_configvar("TB_CONFIG_PACKAGE_HAVE_" .. name:upper(), 1)
+        end
+    end
 
     -- add options
     add_options("info", "float", "wchar", "exception", "force-utf8", "deprecated")
