@@ -225,7 +225,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
     tb_bool_t       ok          = tb_false;
     tb_process_t*   process     = tb_null;
-    tb_char_t*      environment = tb_null;
+    tb_wchar_t*     environment = tb_null;
     tb_bool_t       userenv     = tb_false;
     tb_wchar_t*     command     = tb_null;
     do
@@ -244,10 +244,9 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_bool_t detach = attr && (attr->flags & TB_PROCESS_FLAG_DETACH);
 
         // init flags
-        DWORD flags = 0;
+        DWORD flags = CREATE_UNICODE_ENVIRONMENT;
         if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
         if (!detach) flags |= CREATE_BREAKAWAY_FROM_JOB; // create process with parent process group by default, need set JOB_OBJECT_LIMIT_BREAKAWAY_OK limit for job
-//        if (attr && attr->envp) flags |= CREATE_UNICODE_ENVIRONMENT;
 
         // get the cmd size
         tb_size_t cmdn = tb_strlen(cmd);
@@ -293,35 +292,32 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             if (!environment)
             {
                 maxn = n + 2 + TB_PATH_MAXN;
-                environment = (tb_char_t*)tb_malloc(maxn);
+                environment = (tb_wchar_t*)tb_malloc(maxn * sizeof(tb_wchar_t));
             }
             else if (size + n + 2 > maxn)
             {
                 maxn = size + n + 2 + TB_PATH_MAXN;
-                environment = (tb_char_t*)tb_ralloc(environment, maxn);
+                environment = (tb_wchar_t*)tb_ralloc(environment, maxn * sizeof(tb_wchar_t));
             }
             tb_assert_and_check_break(environment);
 
             // append it
-            tb_memcpy(environment + size, p, n);
+            tb_atow(environment + size, p, n);
 
             // fill '\0'
-            environment[size + n] = '\0';
+            environment[size + n] = L'\0';
 
             // update size
             size += n + 1;
         }
 
         // end
-        if (environment) environment[size++] = '\0';
+        if (environment) environment[size++] = L'\0';
         // uses the current user environment if be null
         else
         {
-            // uses the unicode environment
-            flags |= CREATE_UNICODE_ENVIRONMENT;
-
             // get user environment
-            environment = (tb_char_t*)tb_kernel32()->GetEnvironmentStringsW();
+            environment = (tb_wchar_t*)tb_kernel32()->GetEnvironmentStringsW();
 
             // mark as the user environment
             userenv = tb_true;
