@@ -289,27 +289,27 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             tb_size_t n = tb_strlen(p);
 
             // ensure data space
+            tb_size_t space = n * 3 / 2;
             if (!environment)
             {
-                maxn = n + 2 + TB_PATH_MAXN;
+                maxn = space + TB_PATH_MAXN;
                 environment = tb_nalloc_type(maxn + 1, tb_wchar_t);
             }
-            else if (size + n + 2 > maxn)
+            else if (size + space > maxn)
             {
-                maxn = size + n + 2 + TB_PATH_MAXN;
+                maxn = size + space + TB_PATH_MAXN;
                 environment = tb_ralloc_type(environment, maxn + 1, tb_wchar_t);
             }
             tb_assert_and_check_break(environment);
 
             // append it
-            tb_size_t real = tb_atow(environment + size, p, n + 1);
+            tb_size_t real = tb_atow(environment + size, p, maxn - size);
             tb_assert_and_check_break(real != -1);
 
-            // fill '\0'
-            environment[size + n] = L'\0';
-
-            // update size
-            size += n + 1;
+            // update size and fill '\0'
+            size += real;
+            environment[size] = L'\0';
+            size++;
         }
 
         // end
