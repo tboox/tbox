@@ -2,10 +2,10 @@
 set_project("tbox")
 
 -- set xmake minimum version
-set_xmakever("2.3.2")
+set_xmakever("2.5.1")
 
 -- set project version
-set_version("1.6.5", {build = "%Y%m%d%H%M"})
+set_version("1.6.6", {build = "%Y%m%d%H%M"})
 
 -- set warning all as error
 set_warnings("all", "error")
@@ -49,30 +49,14 @@ end
 
 -- for the windows platform (msvc)
 if is_plat("windows") then
-
-    -- add some defines only for windows
     add_defines("NOCRYPT", "NOGDI")
-
-    -- the release mode
-    if is_mode("release") then
-
-        -- link libcmt.lib
-        add_cxflags("-MT")
-
-    -- the debug mode
-    elseif is_mode("debug") then
-
-        -- enable some checkers
+    if is_mode("debug") then
         add_cxflags("-Gs", "-RTC1")
-
-        -- link libcmtd.lib
-        add_cxflags("-MTd")
+        set_runtimes("MTd")
+    else
+        set_runtimes("MT")
     end
-
-    -- no msvcrt.lib
-    add_ldflags("-nodefaultlib:msvcrt.lib")
     add_syslinks("ws2_32")
-
 elseif is_plat("android") then
     add_syslinks("m", "c")
 elseif is_plat("mingw", "msys", "cygwin") then

@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.6.6
+
 ### New features
 
 * Support *BSD system, e.g. FreeBSD ..
@@ -9,6 +11,8 @@
 ### Changes
 
 * Support to change the current directory for process
+* Support stdin for creating process
+* Fix some compilation errors for mingw
 
 ## v1.6.5
 
@@ -206,6 +210,8 @@
 
 ## master (开发中)
 
+## v1.6.6
+
 ### 新特性
 
 * 支持*BSD系统，例如：FreeBSD
@@ -213,6 +219,8 @@
 ### 改进
 
 * 创建进程支持修改处理当前工作目录
+* 创建禁止支持 stdin 重定向输入
+* 修复一些 mingw 上的编译错误
 
 ## v1.6.5
 
