@@ -229,10 +229,7 @@ typedef tb_long_t                   tb_suseconds_t;
 /// the timeval type
 typedef struct __tb_timeval_t
 {
-    /// the seconds
     tb_time_t                       tv_sec;
-
-    // the useconds
     tb_suseconds_t                  tv_usec;
 
 }tb_timeval_t;
@@ -240,10 +237,7 @@ typedef struct __tb_timeval_t
 /// the timezone type
 typedef struct __tb_timezone_t
 {
-    /// the minutes west of greenwich
     tb_int_t                        tz_minuteswest;
-
-    /// the type of dst correction
     tb_int_t                        tz_dsttime;
 
 }tb_timezone_t;
@@ -251,16 +245,9 @@ typedef struct __tb_timezone_t
 /// the version type
 typedef struct __tb_version_t
 {
-    /// the major
     tb_byte_t                       major;
-
-    /// the minor
     tb_byte_t                       minor;
-
-    /// the alter
     tb_byte_t                       alter;
-
-    /// the build
     tb_hize_t                       build;
 
 }tb_version_t;
@@ -268,95 +255,37 @@ typedef struct __tb_version_t
 /// the value type
 typedef union __tb_value_t
 {
-    /// uint8
     tb_uint8_t                      u8;
-
-    /// sint8
     tb_sint8_t                      s8;
-
-    /// char
     tb_char_t                       c;
-
-    /// wchar
     tb_wchar_t                      wc;
-
-    /// boolean
     tb_bool_t                       b;
-
-    /// uint16
     tb_uint16_t                     u16;
-
-    /// sint16
     tb_sint16_t                     s16;
-
-    /// uint32
     tb_uint32_t                     u32;
-
-    /// sint32
     tb_sint32_t                     s32;
-
-    /// uint64
     tb_uint64_t                     u64;
-
-    /// sint64
     tb_sint64_t                     s64;
-
-    /// size
     tb_size_t                       ul;
-
-    /// long
     tb_long_t                       l;
-
-    /// time
     tb_time_t                       t;
-
-    /// pointer
     tb_pointer_t                    ptr;
-
-    /// const pointer
     tb_cpointer_t                   cptr;
-
-    /// sock
     tb_socket_ref_t                 sock;
-
-    /// file
     tb_file_ref_t                   file;
-
-    /// handle
     tb_handle_t                     handle;
-
-    /// string
     tb_char_t*                      str;
-
-    /// const string
     tb_char_t const*                cstr;
-
-    /// wstring
     tb_wchar_t*                     wstr;
-
-    /// const wstring
     tb_wchar_t const*               wcstr;
-
-    /// atomic
     tb_atomic_t                     a;
-
-    /// atomic64
     tb_atomic_t                     a64;
-
-    /// spinlock
     tb_spinlock_t                   lock;
-
-    /// stream
     tb_stream_ref_t                 stream;
-
-    /// async stream
     tb_async_stream_ref_t           astream;
 
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-    /// float
     tb_float_t                      f;
-
-    /// double
     tb_double_t                     d;
 #endif
 
