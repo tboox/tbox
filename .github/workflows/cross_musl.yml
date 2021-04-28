@@ -21,8 +21,8 @@ jobs:
 
       - name: Installation
         run: |
-          wget https://musl.cc/${{ matrix.cross }}-cross.tgz
-          tar -xvf ${{ matrix.cross }}-cross.tgz
+          wget https://github.com/xmake-mirror/musl.cc/releases/download/20210202/${{ matrix.cross }}-cross.linux.tgz
+          tar -xvf ${{ matrix.cross }}-cross.linux.tgz
 
       - name: Tests
         run: |
