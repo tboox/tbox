@@ -1,0 +1,43 @@
+name: Fedora
+
+on:
+  pull_request:
+  push:
+  release:
+    types: [published]
+
+jobs:
+  build:
+
+    container: fedora:latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare build tools
+        run: |
+          uname -a
+          dnf -y install @development-tools @rpm-development-tools
+          dnf -y install copr-cli make gcc-c++
+          dnf -y install perl
+          dnf -y upgrade git
+      - uses: actions/checkout@v1
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: branch@dev
+
+      - name: Tests
+        env:
+          XMAKE_ROOT: y
+        run: |
+          xmake
+          xmake run demo
+          xmake f -m debug
+          xmake -r
+          xmake run demo
+          xmake f --micro=y
+          xmake -r
+          xmake run demo
+          xmake f --small=y -m debug
+          xmake -r
+          xmake run demo
+
