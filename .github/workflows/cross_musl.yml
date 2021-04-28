@@ -26,6 +26,6 @@ jobs:
 
       - name: Tests
         run: |
-          xmake f -p cross --toolchain=musl --sdk=`pwd`/${{ matrix.cross }}-cross
+          xmake f -p cross --toolchain=muslcc --sdk=`pwd`/${{ matrix.cross }}-cross
           xmake
 
