@@ -2,7 +2,15 @@
 target("tbox")
 
     -- make as a static library
-    set_kind("static")
+    set_kind("$(kind)")
+
+    -- export all symbols for windows/dll
+    if is_plat("windows") and is_kind("shared") then
+        if is_mode("release") then
+            set_optimize("fastest")
+        end
+        add_rules("utils.symbols.export_all")
+    end
 
     -- add defines
     add_defines("__tb_prefix__=\"tbox\"")
