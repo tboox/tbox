@@ -1,7 +1,6 @@
--- add target
 target("tbox")
 
-    -- make as a static library
+    -- make as a static/shared library
     set_kind("$(kind)")
 
     -- export all symbols for windows/dll
@@ -11,6 +10,10 @@ target("tbox")
         end
         add_rules("utils.symbols.export_all")
     end
+
+    -- install importfiles for pkg-config/cmake
+    add_rules("utils.install.cmake_importfiles")
+    add_rules("utils.install.pkgconfig_importfiles")
 
     -- add defines
     add_defines("__tb_prefix__=\"tbox\"")
