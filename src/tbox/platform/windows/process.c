@@ -330,7 +330,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         {
             // redirect from stdin
             process->intype = attr->intype;
-            if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->inpath)
+            if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->in.path)
             {
                 // the inmode
                 tb_size_t inmode = attr->inmode;
@@ -342,19 +342,19 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 process->si.dwFlags |= STARTF_USESTDHANDLES;
 
                 // open file
-                process->si.hStdInput = (HANDLE)tb_file_init(attr->inpath, inmode);
-                tb_assertf_pass_and_check_break(process->si.hStdInput, "cannot redirect stdin to file: %s", attr->inpath);
+                process->si.hStdInput = (HANDLE)tb_file_init(attr->in.path, inmode);
+                tb_assertf_pass_and_check_break(process->si.hStdInput, "cannot redirect stdin to file: %s", attr->in.path);
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(process->si.hStdInput, HANDLE_FLAG_INHERIT, TRUE);
                 bInheritHandle = TRUE;
             }
-            else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->inpipe) ||
-                     (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->infile))
+            else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->in.pipe) ||
+                     (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->in.file))
             {
                 // enable handles
                 process->si.dwFlags |= STARTF_USESTDHANDLES;
-                process->si.hStdInput = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->inpipe) : (HANDLE)attr->infile;
+                process->si.hStdInput = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->in.pipe) : (HANDLE)attr->in.file;
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(process->si.hStdInput, HANDLE_FLAG_INHERIT, TRUE);
@@ -363,7 +363,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
             // redirect to stdout
             process->outtype = attr->outtype;
-            if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->outpath)
+            if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->out.path)
             {
                 // the outmode
                 tb_size_t outmode = attr->outmode;
@@ -375,19 +375,19 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 process->si.dwFlags |= STARTF_USESTDHANDLES;
 
                 // open file
-                process->si.hStdOutput = (HANDLE)tb_file_init(attr->outpath, outmode);
-                tb_assertf_pass_and_check_break(process->si.hStdOutput, "cannot redirect stdout to file: %s", attr->outpath);
+                process->si.hStdOutput = (HANDLE)tb_file_init(attr->out.path, outmode);
+                tb_assertf_pass_and_check_break(process->si.hStdOutput, "cannot redirect stdout to file: %s", attr->out.path);
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(process->si.hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
                 bInheritHandle = TRUE;
             }
-            else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->outpipe) ||
-                     (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->outfile))
+            else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->out.pipe) ||
+                     (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->out.file))
             {
                 // enable handles
                 process->si.dwFlags |= STARTF_USESTDHANDLES;
-                process->si.hStdOutput = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->outpipe) : (HANDLE)attr->outfile;
+                process->si.hStdOutput = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->out.pipe) : (HANDLE)attr->out.file;
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(process->si.hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
@@ -396,7 +396,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
             // redirect to stderr
             process->errtype = attr->errtype;
-            if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->errpath)
+            if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->err.path)
             {
                 // the errmode
                 tb_size_t errmode = attr->errmode;
@@ -408,19 +408,19 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 process->si.dwFlags |= STARTF_USESTDHANDLES;
 
                 // open file
-                process->si.hStdError = (HANDLE)tb_file_init(attr->errpath, errmode);
-                tb_assertf_pass_and_check_break(process->si.hStdError, "cannot redirect stderr to file: %s", attr->errpath);
+                process->si.hStdError = (HANDLE)tb_file_init(attr->err.path, errmode);
+                tb_assertf_pass_and_check_break(process->si.hStdError, "cannot redirect stderr to file: %s", attr->err.path);
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(process->si.hStdError, HANDLE_FLAG_INHERIT, TRUE);
                 bInheritHandle = TRUE;
             }
-            else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->errpipe) ||
-                     (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->errfile))
+            else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->err.pipe) ||
+                     (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->err.file))
             {
                 // enable handles
                 process->si.dwFlags |= STARTF_USESTDHANDLES;
-                process->si.hStdError = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->errpipe) : (HANDLE)attr->errfile;
+                process->si.hStdError = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->err.pipe) : (HANDLE)attr->err.file;
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(process->si.hStdError, HANDLE_FLAG_INHERIT, TRUE);

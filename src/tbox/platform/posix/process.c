@@ -194,49 +194,49 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
         if (attr)
         {
             // redirect the stdin
-            if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->inpath)
+            if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->in.path)
             {
                 // open stdin
-                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDIN_FILENO, attr->inpath, tb_process_file_flags(attr->inmode), tb_process_file_modes(attr->inmode));
-                tb_assertf_pass_and_check_break(!result, "cannot redirect stdin to file: %s, error: %d", attr->inpath, result);
+                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDIN_FILENO, attr->in.path, tb_process_file_flags(attr->inmode), tb_process_file_modes(attr->inmode));
+                tb_assertf_pass_and_check_break(!result, "cannot redirect stdin to file: %s, error: %d", attr->in.path, result);
             }
-            else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->inpipe) ||
-                     (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->infile))
+            else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->in.pipe) ||
+                     (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->in.file))
             {
                 // duplicate inpipe/file fd to stdin in the child process
-                tb_int_t outfd = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->inpipe) : tb_file2fd(attr->infile);
+                tb_int_t outfd = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->in.pipe) : tb_file2fd(attr->in.file);
                 posix_spawn_file_actions_adddup2(&process->spawn_action, outfd, STDIN_FILENO);
                 posix_spawn_file_actions_addclose(&process->spawn_action, outfd);
             }
 
             // redirect the stdout
-            if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->outpath)
+            if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->out.path)
             {
                 // open stdout
-                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDOUT_FILENO, attr->outpath, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
-                tb_assertf_pass_and_check_break(!result, "cannot redirect stdout to file: %s, error: %d", attr->outpath, result);
+                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDOUT_FILENO, attr->out.path, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
+                tb_assertf_pass_and_check_break(!result, "cannot redirect stdout to file: %s, error: %d", attr->out.path, result);
             }
-            else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->outpipe) ||
-                     (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->outfile))
+            else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->out.pipe) ||
+                     (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->out.file))
             {
                 // duplicate outpipe/file fd to stdout in the child process
-                tb_int_t outfd = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->outpipe) : tb_file2fd(attr->outfile);
+                tb_int_t outfd = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->out.pipe) : tb_file2fd(attr->out.file);
                 posix_spawn_file_actions_adddup2(&process->spawn_action, outfd, STDOUT_FILENO);
                 posix_spawn_file_actions_addclose(&process->spawn_action, outfd);
             }
 
             // redirect the stderr
-            if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->errpath)
+            if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->err.path)
             {
                 // open stderr
-                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDERR_FILENO, attr->errpath, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
-                tb_assertf_pass_and_check_break(!result, "cannot redirect stderr to file: %s, error: %d", attr->errpath, result);
+                tb_int_t result = posix_spawn_file_actions_addopen(&process->spawn_action, STDERR_FILENO, attr->err.path, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
+                tb_assertf_pass_and_check_break(!result, "cannot redirect stderr to file: %s, error: %d", attr->err.path, result);
             }
-            else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->errpipe) ||
-                     (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->errfile))
+            else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->err.pipe) ||
+                     (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->err.file))
             {
                 // duplicate errpipe/file fd to stderr in the child process
-                tb_int_t errfd = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->errpipe) : tb_file2fd(attr->errfile);
+                tb_int_t errfd = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->err.pipe) : tb_file2fd(attr->err.file);
                 posix_spawn_file_actions_adddup2(&process->spawn_action, errfd, STDERR_FILENO);
                 posix_spawn_file_actions_addclose(&process->spawn_action, errfd);
             }
@@ -369,61 +369,61 @@ static tb_process_ref_t tb_process_init_fork(tb_char_t const* pathname, tb_char_
             if (attr)
             {
                 // redirect the stdin
-                if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->inpath)
+                if (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->in.path)
                 {
                     // open file
-                    tb_int_t infd = open(attr->inpath, tb_process_file_flags(attr->inmode), tb_process_file_modes(attr->inmode));
-                    tb_assertf_pass_and_check_break(infd, "cannot redirect stdin to file: %s, error: %d", attr->inpath, errno);
+                    tb_int_t infd = open(attr->in.path, tb_process_file_flags(attr->inmode), tb_process_file_modes(attr->inmode));
+                    tb_assertf_pass_and_check_break(infd, "cannot redirect stdin to file: %s, error: %d", attr->in.path, errno);
 
                     // redirect it
                     dup2(infd, STDIN_FILENO);
                     close(infd);
                 }
-                else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->inpipe) ||
-                         (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->infile))
+                else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->in.pipe) ||
+                         (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->in.file))
                 {
                     // duplicate inpipe fd to stdin in the child process
-                    tb_int_t infd = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->inpipe) : tb_file2fd(attr->infile);
+                    tb_int_t infd = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->in.pipe) : tb_file2fd(attr->in.file);
                     dup2(infd, STDIN_FILENO);
                     close(infd);
                 }
 
                 // redirect the stdout
-                if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->outpath)
+                if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->out.path)
                 {
                     // open file
-                    tb_int_t outfd = open(attr->outpath, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
-                    tb_assertf_pass_and_check_break(outfd, "cannot redirect stdout to file: %s, error: %d", attr->outpath, errno);
+                    tb_int_t outfd = open(attr->out.path, tb_process_file_flags(attr->outmode), tb_process_file_modes(attr->outmode));
+                    tb_assertf_pass_and_check_break(outfd, "cannot redirect stdout to file: %s, error: %d", attr->out.path, errno);
 
                     // redirect it
                     dup2(outfd, STDOUT_FILENO);
                     close(outfd);
                 }
-                else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->outpipe) ||
-                         (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->outfile))
+                else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->out.pipe) ||
+                         (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->out.file))
                 {
                     // duplicate outpipe fd to stdout in the child process
-                    tb_int_t outfd = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->outpipe) : tb_file2fd(attr->outfile);
+                    tb_int_t outfd = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->out.pipe) : tb_file2fd(attr->out.file);
                     dup2(outfd, STDOUT_FILENO);
                     close(outfd);
                 }
 
                 // redirect the stderr
-                if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->errpath)
+                if (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && attr->err.path)
                 {
                     // open file
-                    tb_int_t errfd = open(attr->errpath, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
-                    tb_assertf_pass_and_check_break(errfd, "cannot redirect stderr to file: %s, error: %d", attr->errpath, errno);
+                    tb_int_t errfd = open(attr->err.path, tb_process_file_flags(attr->errmode), tb_process_file_modes(attr->errmode));
+                    tb_assertf_pass_and_check_break(errfd, "cannot redirect stderr to file: %s, error: %d", attr->err.path, errno);
 
                     // redirect it
                     dup2(errfd, STDERR_FILENO);
                     close(errfd);
                 }
-                else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->errpipe) ||
-                         (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->errfile))
+                else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->err.pipe) ||
+                         (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->err.file))
                 {
                     // duplicate errpipe fd to stderr in the child process
-                    tb_int_t errfd = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->errpipe) : tb_file2fd(attr->errfile);
+                    tb_int_t errfd = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->err.pipe) : tb_file2fd(attr->err.file);
                     dup2(errfd, STDERR_FILENO);
                     close(errfd);
                 }

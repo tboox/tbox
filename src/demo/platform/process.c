@@ -8,11 +8,7 @@
  */
 static tb_void_t tb_demo_process_test_run(tb_char_t** argv)
 {
-    // run
     tb_long_t ok = tb_process_run(argv[1], (tb_char_t const**)(argv + 1), tb_null);
-    tb_process_run(argv[1], (tb_char_t const**)(argv + 1), tb_null);
-
-    // trace
     tb_trace_i("run: %s: %ld", argv[1], ok);
 }
 static tb_void_t tb_demo_process_test_pipe(tb_char_t** argv)
@@ -23,7 +19,7 @@ static tb_void_t tb_demo_process_test_pipe(tb_char_t** argv)
     {
         // init process
         tb_process_attr_t attr = {0};
-        attr.outpipe = file[1];
+        attr.out.pipe = file[1];
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
         tb_process_ref_t process = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
         if (process)

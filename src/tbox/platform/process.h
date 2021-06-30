@@ -56,20 +56,29 @@ typedef enum __tb_process_redirect_type_e
 
 }tb_process_redirect_type_e;
 
+/// the process redirect io type
+typedef union __tb_process_redirect_io_t
+{
+    tb_pipe_file_ref_t  pipe;
+    tb_file_ref_t       file;
+    tb_char_t const*    path;
+
+}tb_process_redirect_io_t;
+
 /// the process attribute type
 typedef struct __tb_process_attr_t
 {
     /// the flags
-    tb_uint16_t             flags;
+    tb_uint16_t                 flags;
 
     /// the stdin redirect type
-    tb_uint16_t             intype;
+    tb_uint16_t                 intype;
 
     /// the stdin file mode
-    tb_uint16_t             inmode;
+    tb_uint16_t                 inmode;
 
     /// the stdout redirect type
-    tb_uint16_t             outtype;
+    tb_uint16_t                 outtype;
 
     /*! the stdout file mode
      *
@@ -83,61 +92,22 @@ typedef struct __tb_process_attr_t
      * - TB_FILE_MODE_APPEND
      * - TB_FILE_MODE_TRUNC
      */
-    tb_uint16_t             outmode;
+    tb_uint16_t                 outmode;
 
     /// the stderr redirect type
-    tb_uint16_t             errtype;
+    tb_uint16_t                 errtype;
 
     /// the stderr file mode
-    tb_uint16_t             errmode;
+    tb_uint16_t                 errmode;
 
-#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    union
-    {
-#endif
-        /// the stdin pipe
-        tb_pipe_file_ref_t  inpipe;
+    /// the stdin
+    tb_process_redirect_io_t    in;
 
-        /// the stdint file
-        tb_file_ref_t       infile;
+    /// the stdout
+    tb_process_redirect_io_t    out;
 
-        /// the stdin filepath
-        tb_char_t const*    inpath;
-#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    };
-#endif
-
-#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    union
-    {
-#endif
-        /// the stdout pipe
-        tb_pipe_file_ref_t  outpipe;
-
-        /// the stdout file
-        tb_file_ref_t       outfile;
-
-        /// the stdout filepath
-        tb_char_t const*    outpath;
-#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    };
-#endif
-
-#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    union
-    {
-#endif
-        /// the strerr pipe
-        tb_pipe_file_ref_t  errpipe;
-
-        /// the stderr file
-        tb_file_ref_t       errfile;
-
-        /// the stderr filepath
-        tb_char_t const*    errpath;
-#ifdef TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION
-    };
-#endif
+    /// the stderr
+    tb_process_redirect_io_t    err;
 
     /*! the environment
      *
@@ -159,13 +129,13 @@ typedef struct __tb_process_attr_t
      * if the value of envp is null, then the child process inherits
      * the environment of the parent process.
      */
-    tb_char_t const**       envp;
+    tb_char_t const**           envp;
 
     // the given current working directory for child process
-    tb_char_t const*        curdir;
+    tb_char_t const*            curdir;
 
     /// the user private data
-    tb_cpointer_t           priv;
+    tb_cpointer_t               priv;
 
 }tb_process_attr_t, *tb_process_attr_ref_t;
 
@@ -176,13 +146,13 @@ typedef __tb_typeref__(process);
 typedef struct __tb_process_waitinfo_t
 {
     // the index of the processes
-    tb_int_t                index;
+    tb_int_t                    index;
 
     // the status
-    tb_int_t                status;
+    tb_int_t                    status;
 
     // the process
-    tb_process_ref_t        process;
+    tb_process_ref_t            process;
 
 }tb_process_waitinfo_t, *tb_process_waitinfo_ref_t;
 
