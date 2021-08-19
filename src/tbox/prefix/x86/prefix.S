@@ -43,7 +43,7 @@ name:
 #elif defined(_WIN64)
 #   define function(name) \
     .text ;\
-    .align CPU_BYTE_SIZE ; \
+    .align TB_CPU_BITBYTE; \
     .global name ;\
 name:
 

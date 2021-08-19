@@ -55,7 +55,7 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
         if (tb_pipe_file_init_pair(process->file, 0))
         {
             // init process
-            process->attr.outpipe = process->file[1];
+            process->attr.out.pipe = process->file[1];
             process->attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
             process->proc = tb_process_init(process->argv[1], (tb_char_t const**)(process->argv + 1), &process->attr);
             if (process->proc)

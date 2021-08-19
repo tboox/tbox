@@ -121,7 +121,7 @@ function(tb_context_jump)
     pushq %r12
 
     // load TIB
-    movq %gs:0x30, %r10
+    movq %gs:(0x30), %r10
 
     // save current stack base
     movq 0x08(%r10), %rax
@@ -146,7 +146,7 @@ function(tb_context_jump)
     movq %rdx, %rsp
 
     // load TIB
-    movq %gs:0x30, %r10
+    movq %gs:(0x30), %r10
 
     // restore fiber local storage
     popq %rax
