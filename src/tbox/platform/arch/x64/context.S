@@ -35,6 +35,165 @@
  * implementation
  */
 
+/**
+ * translated from x64/context.asm by Alvin
+ *
+ * - support mingw/cygwin on windows
+ */
+#ifdef _WIN32
+
+function(tb_context_make)
+
+    // save the stack top to rax
+    movq %rcx, %rax
+    addq %rdx, %rax
+
+    // reserve space for first argument(from) and retval(from) item of context-function
+    subq $32, %rax
+
+    // 16-align of the stack top address
+    andq $-16, %rax
+
+    // reserve space for context-data on context-stack
+    subq $112, %rax
+
+    // context.rbx = func
+    movq %r8, 80(%rax)
+
+    // save bottom address of context stack as 'limit'
+    movq %rcx, 16(%rax)
+
+    // save address of context stack limit as 'dealloction stack'
+    movq %rcx, 8(%rax)
+
+    // save top address of context stack as 'base'
+    addq %rdx, %rcx
+    movq %rcx, 24(%rax)
+
+    // init fiber-storage to zero
+    xorq %rcx, %rcx
+    movq %rcx, (%rax)
+
+    // init context.retval(saved) = a writeable space (unused)
+    // it will write context (unused) and priv (unused) when jump to a new context function entry first
+    leaq 128(%rax), %rcx
+    movq %rcx, 96(%rax)
+
+    // context.rip = the address of label __entry
+    leaq __entry(%rip), %rcx
+    movq %rcx, 104(%rax)
+
+    // context.end = the address of label __end
+    leaq __end(%rip), %rcx
+    movq %rcx, 88(%rax)
+
+    // return pointer to context-data
+    ret
+
+__entry:
+    // patch return address (__end) on stack
+    push %rbp
+
+    // jump to the context function entry(rip)
+    jmp *%rbx
+
+__end:
+    xorq %rcx, %rcx
+    call _exit
+    hlt
+
+endfunc
+
+
+function(tb_context_jump)
+    
+    // save the hidden argument: retval (from-context)
+    pushq %rcx
+
+    // save registers and construct the current context
+    pushq %rbp
+    pushq %rbx
+    pushq %rsi
+    pushq %rdi
+    pushq %r15
+    pushq %r14
+    pushq %r13
+    pushq %r12
+
+    // load TIB
+    movq %gs:(0x30), %r10
+
+    // save current stack base
+    movq 0x08(%r10), %rax
+    pushq %rax
+
+    // save current stack limit
+    movq 0x10(%r10), %rax
+    pushq %rax
+
+    // save current deallocation stack
+    movq 0x1478(%r10), %rax
+    pushq %rax
+
+    // save fiber local storage
+    movq 0x18(%r10), %rax
+    pushq %rax
+
+    // save the old context(esp) to r9
+    movq %rsp, %r9
+
+    // switch to the new context(esp) and stack
+    movq %rdx, %rsp
+
+    // load TIB
+    movq %gs:(0x30), %r10
+
+    // restore fiber local storage
+    popq %rax
+    movq %rax, 0x18(%r10)
+
+    // restore deallocation stack
+    popq %rax
+    movq %rax, 0x1478(%r10)
+
+    // restore stack limit
+    popq %rax
+    mov %rax, 0x10(%r10)
+
+    // restore stack base
+    popq %rax
+    movq %rax, 0x08(%r10)
+
+    // restore registers of the new context
+    popq %r12
+    popq %r13
+    popq %r14
+    popq %r15
+    popq %rdi
+    popq %rsi
+    popq %rbx
+    popq %rbp
+
+    // restore retval (saved) to rax
+    popq %rax
+
+    // restore the return or function address(r10)
+    popq %r10
+
+    // return from-context(retval: [rcx](context: r9, priv: r8)) from jump
+    // it will write context (unused) and priv (unused) when jump to a new context function entry first
+    movq %r9, (%rax)
+    movq %r8, 8(%rax)
+
+    movq %rax, %rcx
+
+    // jump to the return or function address(rip)
+    jmp *%r10
+
+endfunc
+
+#else
+
 /* make context (refer to boost.context)
  *
  *             ------------------------------------------------------------------------------------------
@@ -165,3 +324,4 @@ function(tb_context_jump)
 
 endfunc
 
+#endif

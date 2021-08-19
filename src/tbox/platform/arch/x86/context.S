@@ -41,7 +41,196 @@
  * implementation
  */
 
-#if defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
+/**
+ * translated from x86/context.asm by Alvin
+ *
+ * - support mingw/cygwin.. on windows
+ */
+#if defined(_WIN32)
+
+function(tb_context_make)
+
+    // save the stack top to eax
+    movl 4(%esp), %eax
+    addl 8(%esp), %eax
+    movl %eax, %ecx
+
+    // reserve space for first argument(from) and seh item of context-function
+    leal -20(%eax), %eax
+
+    // 16-align of the stack top address
+    andl $-16, %eax
+
+    // reserve space for context-data on context-stack
+    leal -40(%eax), %eax
+
+    // save top address of context stack as 'base'
+    movl %ecx, 12(%eax)
+
+    // save bottom address of context-stack as 'limit'
+    movl 4(%esp), %ecx
+    movl %ecx, 8(%eax)
+
+    // save bottom address of context-stack as 'dealloction stack'
+    movl %ecx, 4(%eax)
+
+    // set fiber-storage as zero
+    xorl %ecx, %ecx
+    movl %ecx, (%eax)
+
+    // context.ebx = func
+    movl 12(%esp), %ecx
+    movl %ecx, 28(%eax)
+
+    // context.eip = __entry
+    movl $__entry, %ecx
+    movl %ecx, 36(%eax)
+
+    // context.ebp = the address of label __end
+    movl $__end, %ecx
+    movl %ecx, 32(%eax)
+
+    // load the current seh chain from TIB
+    //assume fs:nothing
+    movl %fs:(0x0), %ecx
+    //assume fs:error
+
+__walkchain:
+
+    // if (sehitem.prev == 0xffffffff) (last?) goto __found
+    movl (%ecx), %edx
+    incl %edx
+    jz __found
+
+    // sehitem = sehitem.prev
+    decl %edx
+    xchgl %ecx, %edx
+    jmp __walkchain
+
+__found:
+    
+    // context.seh.handler = sehitem.handler
+    movl 4(%ecx), %ecx
+    movl %ecx, 60(%eax) 
+
+    // context.seh.prev = 0xffffffff
+    movl $0xffffffff, %ecx
+    movl %ecx, 56(%eax)
+
+    // context.seh = the address of context.seh.prev
+    leal 56(%eax), %ecx
+    movl %ecx, 16(%eax)
+
+    // return pointer to context-data
+    ret 
+
+__entry:
+
+    // pass old-context(context: eax, priv: edx) arguments to the context function
+    movl %eax, (%esp)
+    movl %edx, 4(%esp)
+
+    // patch return address: __end
+    pushl %ebp
+
+    // jump to the context function entry(eip)
+    jmp *%ebx
+
+__end:
+
+    // exit(0)
+    xorl %eax, %eax
+    movl %eax, (%esp)
+    call __exit
+    hlt
+
+endfunc
+
+
+function(tb_context_jump)
+
+    // save registers and construct the current context
+    pushl %ebp 
+    pushl %ebx
+    pushl %esi
+    pushl %edi
+
+    // load TIB to edx
+    //assume fs:nothing
+    movl %fs:(0x18), %edx
+    //assume fs:error
+
+    // load and save current seh exception list
+    movl (%edx), %eax
+    pushl %eax
+
+    // load and save current stack base
+    movl 0x04(%edx), %eax
+    pushl %eax
+
+    // load and save current stack limit
+    movl 0x08(%edx), %eax
+    pushl %eax
+
+    // load and save current deallocation stack
+    movl 0xe0c(%edx), %eax
+    pushl %eax
+
+    // load and save fiber local storage
+    movl 0x10(%edx), %eax
+    pushl %eax
+
+    // save the old context(esp) to eax
+    movl %esp, %eax
+
+    // switch to the new context(esp) and stack
+    movl 40(%esp), %ecx
+    movl %ecx, %esp
+
+    // load TIB to edx
+    //assume fs:nothing
+    movl %fs:(0x18), %edx
+    //assume fs:error
+
+    // restore fiber local storage (context.fiber)
+    popl %ecx
+    movl %ecx, 0x10(%edx)
+
+    // restore current deallocation stack (context.dealloc)
+    popl %ecx
+    movl %ecx, 0xe0c(%edx)
+
+    // restore current stack limit (context.limit)
+    popl %ecx
+    movl %ecx, 0x08(%edx)
+
+    // restore current stack base (context.base)
+    popl %ecx
+    movl %ecx, 0x04(%edx)
+
+    // restore current seh exception list (context.seh)
+    popl %ecx
+    movl %ecx, (%edx)
+
+    // restore registers of the new context
+    popl %edi 
+    popl %esi
+    popl %ebx 
+    popl %ebp
+
+    // restore the return or function address(ecx)
+    popl %ecx
+
+    // return from-context(context: eax, priv: edx) from jump 
+    // edx = [eax + 44] = [esp_jump + 44] = jump.argument(priv)
+    movl 44(%eax), %edx
+
+    // jump to the return or function address(eip)
+    jmp *%ecx
+
+endfunc
+
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
 
 /* make context
  *

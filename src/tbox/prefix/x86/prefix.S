@@ -39,6 +39,14 @@
     .type   name, %function; \
     .hidden name; \
 name:
+
+#elif defined(_WIN64)
+#   define function(name) \
+    .text ;\
+    .align TB_CPU_BITBYTE; \
+    .global name ;\
+name:
+
 #else
 #   define function(name) \
     .text ;\
