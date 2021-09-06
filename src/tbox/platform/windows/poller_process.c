@@ -66,8 +66,9 @@ typedef struct __tb_poller_process_t
     // the main poller
     tb_poller_t*            main_poller;
 
-    // the process poller thread
-    tb_thread_ref_t         thread;
+    // the process poller threads, max waited processes = 64 * 64 = 4096
+    tb_thread_ref_t         threads[64];
+    tb_size_t               threads_count;
 
     // the waited processes data
     tb_vector_ref_t         processes_data;
@@ -107,11 +108,13 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
     tb_assert_and_check_return_val(poller && poller->semaphore, -1);
 
     tb_size_t                   procsize = 0;
-    HANDLE                      proclist[512] = {0};
-    tb_poller_processes_data_t  procdata[512] = {0};
+    HANDLE                      proclist[MAXIMUM_WAIT_OBJECTS] = {0};
+    tb_poller_processes_data_t  procdata[MAXIMUM_WAIT_OBJECTS] = {0};
+    tb_bool_t                   is_mainloop = poller->threads_count == 1;
     while (!tb_atomic32_get(&poller->is_stopped))
     {
         // add semaphore first
+        tb_size_t processes_count = 0;
         proclist[0] = poller->semaphore;
         tb_spinlock_enter(&poller->lock);
         {
@@ -128,18 +131,42 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 
             // generate waited processes list
             procsize = 1;
-            if (tb_vector_size(poller->processes_data))
+            processes_count = tb_vector_size(poller->processes_data);
+            if (processes_count)
             {
+                tb_size_t removed_count = 0;
                 tb_for_all_if (tb_poller_processes_data_t*, proc_data, poller->processes_data, proc_data)
                 {
-                    tb_assert_and_check_continue(procsize < tb_arrayn(proclist));
-                    procdata[procsize]   = *proc_data;
-                    proclist[procsize++] = tb_process_handle(proc_data->process);
+                    if (procsize < MAXIMUM_WAIT_OBJECTS)
+                    {
+                        procdata[procsize]   = *proc_data;
+                        proclist[procsize++] = tb_process_handle(proc_data->process);
+                        removed_count++;
+                    }
+                    else break;
                 }
-                tb_vector_clear(poller->processes_data);
+                if (removed_count == tb_vector_size(poller->processes_data))
+                    tb_vector_clear(poller->processes_data);
+                else tb_vector_nremove_head(poller->processes_data, removed_count);
             }
         }
         tb_spinlock_leave(&poller->lock);
+
+        // grow loop threads if waited processes are too much
+        if (is_mainloop)
+        {
+            // processes count + semaphore(1) * threads_count
+            tb_size_t threads_count = poller->threads_count;
+            if (processes_count + threads_count >= threads_count * MAXIMUM_WAIT_OBJECTS - MAXIMUM_WAIT_OBJECTS / 2
+                && threads_count < tb_arrayn(poller->threads))
+            {
+                poller->threads[threads_count] = tb_thread_init(tb_null, tb_poller_process_loop, poller, 0);
+                if (poller->threads[threads_count])
+                    poller->threads_count++;
+                tb_msleep(100); // we need ensure this thread has beed loaded
+                tb_trace_i("process: grow loop threads to %lu", poller->threads_count);
+            }
+        }
 
         // trace
         tb_trace_d("process: wait %lu ..", procsize - 1);
@@ -284,19 +311,23 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
     tb_poller_process_kill(self);
 
     // exit the process poller thread
-    if (poller->thread)
+    if (poller->threads_count)
     {
-        // wait it
-        tb_long_t wait = 0;
-        if ((wait = tb_thread_wait(poller->thread, 5000, tb_null)) <= 0)
+        for (tb_size_t i = 0; i < poller->threads_count; i++)
         {
-            // trace
-            tb_trace_e("wait process poller thread failed: %ld!", wait);
+            if (poller->threads[i])
+            {
+                tb_long_t wait = 0;
+                if ((wait = tb_thread_wait(poller->threads[i], 5000, tb_null)) <= 0)
+                {
+                    // trace
+                    tb_trace_e("wait process poller thread[%lu] failed: %ld!", i, wait);
+                }
+                tb_thread_exit(poller->threads[i]);
+                poller->threads[i] = tb_null;
+            }
         }
-
-        // exit it
-        tb_thread_exit(poller->thread);
-        poller->thread = tb_null;
+        poller->threads_count = 0;
     }
 
     // exit the processes data
@@ -353,8 +384,9 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
         tb_assert_and_check_break(poller->processes_status_copied);
 
         // start the poller thread for processes first
-        poller->thread = tb_thread_init(tb_null, tb_poller_process_loop, poller, 0);
-        tb_assert_and_check_break(poller->thread);
+        poller->threads[0] = tb_thread_init(tb_null, tb_poller_process_loop, poller, 0);
+        tb_assert_and_check_break(poller->threads[0]);
+        poller->threads_count = 1;
 
         // ok
         ok = tb_true;
@@ -379,7 +411,7 @@ static tb_void_t tb_poller_process_spak(tb_poller_process_ref_t self)
     tb_trace_d("process: spak ..");
 
     // post it
-    ReleaseSemaphore(poller->semaphore, 1, tb_null);
+    ReleaseSemaphore(poller->semaphore, (LONG)poller->threads_count, tb_null);
 }
 static tb_bool_t tb_poller_process_insert(tb_poller_process_ref_t self, tb_process_ref_t process, tb_cpointer_t priv)
 {
