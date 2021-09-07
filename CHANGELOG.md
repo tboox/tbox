@@ -2,6 +2,11 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Support coroutine for mingw
+* Improve process poller to support to wait more processes on windows
+
 ## v1.6.6
 
 ### New features
@@ -209,6 +214,11 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 改进协程，增加对 mingw 支持
+* 改进 process poller 支持在 windows 上等待更多进程
 
 ## v1.6.6
 
