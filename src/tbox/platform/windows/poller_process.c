@@ -164,7 +164,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                 if (poller->threads[threads_count])
                     poller->threads_count++;
                 tb_msleep(100); // we need ensure this thread has beed loaded
-                tb_trace_i("process: grow loop threads to %lu", poller->threads_count);
+                tb_trace_d("process: grow loop threads to %lu", poller->threads_count);
             }
         }
 
