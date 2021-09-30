@@ -179,9 +179,9 @@
 #elif defined(__loongarch__)
 #   define TB_ARCH_LOONGARCH 
 #   if defined(__loongarch64)
-#       define TB_ARCH_STRING           "loongarch64"
+#       define TB_ARCH_STRING               "loongarch64"
 #   elif defined(__loongarch32)
-#       define TB_ARCH_STRING           "loongarch32"
+#       define TB_ARCH_STRING               "loongarch32"
 #   else
 #       error unknown version of LoongArch, please feedback to us.
 #   endif
