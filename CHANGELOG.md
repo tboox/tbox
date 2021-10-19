@@ -7,6 +7,10 @@
 * Support coroutine for mingw
 * Improve process poller to support to wait more processes on windows
 
+### Bugs Fixed
+
+* [#175](https://github.com/tboox/tbox/issues/175): Fix coroutine crash on windows
+
 ## v1.6.6
 
 ### New features
@@ -219,6 +223,10 @@
 
 * 改进协程，增加对 mingw 支持
 * 改进 process poller 支持在 windows 上等待更多进程
+
+### Bugs 修复
+
+* [#175](https://github.com/tboox/tbox/issues/175): 修复协程在 windows 上崩溃
 
 ## v1.6.6
 
