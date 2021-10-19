@@ -41,7 +41,11 @@ end
 if has_config("small", "micro") then
     add_defines("__tb_small__")
     set_configvar("TB_CONFIG_SMALL", 1)
-    if is_mode("release", "profile") then
+    if is_mode("release", "profile") and
+        -- coroutine maybe crash if we enable lto on windows, we disable small mode.
+        -- TODO we should fix it in context code later
+        -- https://github.com/tboox/tbox/issues/175
+        not is_config("coroutine") then
         set_optimize("smallest")
     end
     add_cxflags("-fno-stack-protector")
