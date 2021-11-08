@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.6.7
+
 ### Changes
 
 * Support coroutine for mingw
@@ -10,6 +12,7 @@
 ### Bugs Fixed
 
 * [#175](https://github.com/tboox/tbox/issues/175): Fix coroutine crash on windows
+* Fix some compilation errors
 
 ## v1.6.6
 
@@ -219,6 +222,8 @@
 
 ## master (开发中)
 
+## v1.6.7
+
 ### 改进
 
 * 改进协程，增加对 mingw 支持
@@ -227,6 +232,7 @@
 ### Bugs 修复
 
 * [#175](https://github.com/tboox/tbox/issues/175): 修复协程在 windows 上崩溃
+* 修复一些编译问题
 
 ## v1.6.6
 
