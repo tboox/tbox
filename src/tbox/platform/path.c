@@ -166,6 +166,9 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     // trace
     tb_trace_d("path: %s", path);
 
+    // empty path?
+    tb_check_return_val(path[0], tb_null);
+
 #ifdef TB_CONFIG_MICRO_ENABLE
 
     // the path is absolute?
