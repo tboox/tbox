@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Add riscv32/riscv64 support
+
 ## v1.6.7
 
 ### Changes
@@ -221,6 +225,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 添加 riscv32/riscv64 架构支持
 
 ## v1.6.7
 
