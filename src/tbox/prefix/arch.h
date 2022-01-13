@@ -177,13 +177,22 @@
 #       endif
 #   endif
 #elif defined(__loongarch__)
-#   define TB_ARCH_LOONGARCH 
+#   define TB_ARCH_LOONGARCH
 #   if defined(__loongarch64)
 #       define TB_ARCH_STRING               "loongarch64"
 #   elif defined(__loongarch32)
 #       define TB_ARCH_STRING               "loongarch32"
 #   else
 #       error unknown version of LoongArch, please feedback to us.
+#   endif
+#elif defined(__riscv)
+#   define TB_ARCH_RISCV
+#   if defined(__riscv_xlen) && __riscv_xlen == 64
+#       define TB_ARCH_STRING               "riscv64"
+#   elif defined(__loongarch32)
+#       define TB_ARCH_STRING               "riscv32"
+#   else
+#       error unknown version of RiscV, please feedback to us.
 #   endif
 #elif defined(TB_COMPILER_IS_TINYC)
 #   if defined(TCC_TARGET_I386)
