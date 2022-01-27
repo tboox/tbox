@@ -189,10 +189,8 @@
 #   define TB_ARCH_RISCV
 #   if defined(__riscv_xlen) && __riscv_xlen == 64
 #       define TB_ARCH_STRING               "riscv64"
-#   elif defined(__loongarch32)
-#       define TB_ARCH_STRING               "riscv32"
 #   else
-#       error unknown version of RiscV, please feedback to us.
+#       define TB_ARCH_STRING               "riscv32"
 #   endif
 #elif defined(__PPC__) || defined(_ARCH_PPC)
 #   define TB_ARCH_PPC
@@ -201,6 +199,9 @@
 #   else
 #       define TB_ARCH_STRING               "ppc"
 #   endif
+#elif defined(__s390__)
+#   define TB_ARCH_s390
+#   define TB_ARCH_STRING                   "s390"
 #elif defined(TB_COMPILER_IS_TINYC)
 #   if defined(TCC_TARGET_I386)
 #       define TB_ARCH_x86
