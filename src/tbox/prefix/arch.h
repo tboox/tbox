@@ -194,6 +194,13 @@
 #   else
 #       error unknown version of RiscV, please feedback to us.
 #   endif
+#elif defined(__PPC__) || defined(_ARCH_PPC)
+#   define TB_ARCH_PPC
+#   if (defined(__PPC64__) && __PPC64__ == 1) || defined(_ARCH_PPC64)
+#       define TB_ARCH_STRING               "ppc64"
+#   else
+#       define TB_ARCH_STRING               "ppc"
+#   endif
 #elif defined(TB_COMPILER_IS_TINYC)
 #   if defined(TCC_TARGET_I386)
 #       define TB_ARCH_x86
