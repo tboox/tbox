@@ -202,6 +202,29 @@
 #elif defined(__s390__)
 #   define TB_ARCH_s390
 #   define TB_ARCH_STRING                   "s390"
+#elif defined(__alpha__)
+#   define TB_ARCH_ALPHA
+#   define TB_ARCH_STRING                   "alpha"
+#elif defined(__sparc__) || defined(__sparc)
+#   define TB_ARCH_SPARC
+#   define TB_ARCH_STRING                   "sparc"
+#elif defined(__sh__)
+#   define TB_ARCH_SH
+#   if defined(__SH4__)
+#       define TB_ARCH_SH4
+#       define TB_ARCH_STRING               "SH4"
+#   elif defined(__SH3__)
+#       define TB_ARCH_SH4
+#       define TB_ARCH_STRING               "SH3"
+#   elif defined(__SH2__)
+#       define TB_ARCH_SH4
+#       define TB_ARCH_STRING               "SH2"
+#   elif defined(__SH1__)
+#       define TB_ARCH_SH1
+#       define TB_ARCH_STRING               "SH1"
+#   else
+#       define TB_ARCH_STRING               "SH"
+#   endif
 #elif defined(TB_COMPILER_IS_TINYC)
 #   if defined(TCC_TARGET_I386)
 #       define TB_ARCH_x86
@@ -216,9 +239,6 @@
 #       error unknown arch for tiny c, please define target like -DTCC_TARGET_I386
 #   endif
 #else
-//#     define TB_ARCH_SPARC
-//#     define TB_ARCH_PPC
-//#     define TB_ARCH_SH4
 #   error unknown arch
 #   define TB_ARCH_STRING                   "unknown_arch"
 #endif
