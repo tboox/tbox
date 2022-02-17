@@ -4,7 +4,11 @@
 
 ### Changes
 
-* Add riscv32/riscv64 support
+* Add riscv32/riscv64/sh4/sparc support
+
+### Bugs Fixed
+
+* [#178](https://github.com/tboox/tbox/issues/178): Fix coroutine on windows/x86
 
 ## v1.6.7
 
@@ -228,7 +232,11 @@
 
 ### 改进
 
-* 添加 riscv32/riscv64 架构支持
+* 添加 riscv32/riscv64/sh4/sparc 架构支持
+
+### Bugs 修复
+
+* [#178](https://github.com/tboox/tbox/issues/178): 修复协程在 windows/x86 上栈溢出问题
 
 ## v1.6.7
 
