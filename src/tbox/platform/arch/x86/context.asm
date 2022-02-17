@@ -218,14 +218,14 @@ __found:
 
     ; context.seh.handler = sehitem.handler
     mov ecx, [ecx + 4]
-    mov [eax + 60], ecx
+    mov [eax + 56], ecx
 
     ; context.seh.prev = 0xffffffff
     mov ecx, 0ffffffffh
-    mov [eax + 56], ecx
+    mov [eax + 52], ecx
 
     ; context.seh = the address of context.seh.prev
-    lea ecx, [eax + 56]
+    lea ecx, [eax + 52]
     mov [eax + 16], ecx
 
     ; return pointer to context-data
