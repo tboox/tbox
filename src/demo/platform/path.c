@@ -112,6 +112,25 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
     tb_trace_i("");
-    tb_demo_path_test_translate("", "");
+    tb_demo_path_test_translate("", tb_null);
+    tb_demo_path_test_translate(".", ".");
+    tb_demo_path_test_translate("././.", ".");
+#ifdef TB_CONFIG_OS_WINDOWS
+    tb_demo_path_test_translate("c:", "c:");
+    tb_demo_path_test_translate("c:\\", "c:");
+    tb_demo_path_test_translate("c:\\foo\\.\\.\\", "c:\\foo");
+    tb_demo_path_test_translate("c:\\foo\\\\\\", "c:\\foo");
+    tb_demo_path_test_translate("c:\\foo\\bar\\.\\..\\xyz", "c:\\foo\\xyz");
+    tb_demo_path_test_translate("c:\\foo\\..\\..", tb_null);
+#else
+    tb_demo_path_test_translate("/", "/");
+    tb_demo_path_test_translate("////", "/");
+    tb_demo_path_test_translate("/./././", "/");
+    tb_demo_path_test_translate("/foo/././", "/foo");
+    tb_demo_path_test_translate("/foo//////", "/foo");
+    tb_demo_path_test_translate("/foo/bar/.//..//xyz", "/foo/xyz");
+    tb_demo_path_test_translate("/foo/../..", tb_null);
+    tb_demo_path_test_translate("/foo/../../", tb_null);
+#endif
     return 0;
 }
