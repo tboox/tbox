@@ -318,8 +318,10 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
     tb_size_t path_size = 0;
     tb_char_t path_absolute[TB_PATH_MAXN];
     tb_size_t path_maxn = sizeof(path_absolute);
-    path        = tb_path_absolute(path, path_absolute, path_maxn);
-    path_size   = tb_strlen(path);
+    path = tb_path_absolute(path, path_absolute, path_maxn);
+    tb_check_return_val(path, tb_null);
+
+    path_size = tb_strlen(path);
     tb_assert_and_check_return_val(path && path_size && path_size < path_maxn, tb_null);
 
     // trace
