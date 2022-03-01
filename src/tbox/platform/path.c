@@ -444,29 +444,25 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
 #endif
 tb_char_t const* tb_path_directory(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
-    // check
     tb_assert_and_check_return_val(path && data && maxn, tb_null);
 
-    // find the last path separator
+    // find last separator
     tb_size_t n = tb_strlen(path);
-    tb_char_t const* p = path + n - 1;
-    while (p >= path && *p)
+    tb_char_t const* e = path + n;
+    tb_char_t const* p = e - 1;
+    while (p >= path && *p && tb_path_is_separator(*p)) p--;
+    while (p >= path && *p && !tb_path_is_separator(*p)) p--;
+    if (p >= path)
     {
-        // found
-        if (tb_path_is_separator(*p))
+        if ((p == path || !tb_path_is_separator(*p)) && p < e) p++;
+        n = p - path;
+        if (n && n < maxn)
         {
-            n = p - path;
-            if (n < maxn)
-            {
-                tb_strncpy(data, path, n);
-                data[n] = '\0';
-                return data;
-            }
-            else return tb_null;
+            tb_strncpy(data, path, n);
+            data[n] = '\0';
+            return data;
         }
-        p--;
+        else return tb_null;
     }
-
-    // end
-    return ".";
+    return tb_null;
 }
