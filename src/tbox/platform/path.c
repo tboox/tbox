@@ -83,39 +83,27 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
         path[home_size + path_size - 1] = '\0';
     }
 
-    // remove repeat separator
+    // remove repeat separators
     tb_char_t*  q = path;
     tb_size_t   repeat = 0;
     for (; *p; p++)
     {
         if (tb_path_is_separator(*p))
         {
-            // save the separator if not exists
             if (!repeat) *q++ = TB_PATH_SEPARATOR;
-
-            // repeat it
             repeat++;
         }
         else
         {
-            // save character
             *q++ = *p;
-
-            // clear repeat
             repeat = 0;
         }
     }
 
     // remove the tail separator and not root: '/'
     if (q > path + 1 && *(q - 1) == TB_PATH_SEPARATOR) q--;
-
-    // end
     *q = '\0';
-
-    // trace
     tb_trace_d("translate: %s", path);
-
-    // ok
     return q - path;
 }
 #endif
