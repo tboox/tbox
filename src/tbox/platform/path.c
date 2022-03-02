@@ -112,20 +112,6 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
     // end
     *q = '\0';
 
-    // is windows path?
-    if (q > path + 1 && tb_isalpha(path[0]) && path[1] == ':')
-    {
-        // get the upper drive prefix
-        path[0] = tb_toupper(path[0]);
-
-        // root? patch "x:" => "x:\"
-        if (q == path + 2 && q + 1 < path + maxn)
-        {
-            *q++ = TB_PATH_SEPARATOR;
-            *q = '\0';
-        }
-    }
-
     // trace
     tb_trace_d("translate: %s", path);
 
