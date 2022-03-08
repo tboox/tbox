@@ -85,19 +85,26 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
 
     // remove repeat separators
     tb_char_t*  q = path;
+    tb_char_t   prev = 0;
+    tb_char_t   ch = 0;
     tb_size_t   repeat = 0;
-    for (; *p; p++)
+    for (; (ch = *p); p++)
     {
-        if (tb_path_is_separator(*p))
+        if (tb_path_is_separator(ch))
         {
             if (!repeat) *q++ = TB_PATH_SEPARATOR;
             repeat++;
         }
+        else if (ch == '.' && tb_path_is_separator(prev) && (!p[1] || tb_path_is_separator(p[1])))
+        {
+            // skip "." in "/.\0" or "/./"
+        }
         else
         {
-            *q++ = *p;
+            *q++ = ch;
             repeat = 0;
         }
+        prev = ch;
     }
 
     // remove the tail separator and not root: '/'
