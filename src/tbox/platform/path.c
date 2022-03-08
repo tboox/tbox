@@ -94,6 +94,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
         {
             if (!repeat) *q++ = TB_PATH_SEPARATOR;
             repeat++;
+            prev = ch;
         }
         else if (ch == '.' && tb_path_is_separator(prev) && (!p[1] || tb_path_is_separator(p[1])))
         {
@@ -103,8 +104,8 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
         {
             *q++ = ch;
             repeat = 0;
+            prev = ch;
         }
-        prev = ch;
     }
 
     // remove the tail separator and not root: '/'

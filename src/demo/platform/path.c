@@ -53,9 +53,11 @@ static tb_void_t tb_demo_path_test_translate(tb_char_t const* path, tb_char_t co
 {
     tb_char_t data[TB_PATH_MAXN] = {0};
     tb_strcpy(data, path);
-    tb_path_translate(data, 0, sizeof(data));
-    if (excepted && !tb_compare_path(data, excepted))
+    tb_size_t size = tb_path_translate(data, 0, sizeof(data));
+    if (excepted && size && !tb_compare_path(data, excepted))
         tb_trace_i("translate(%s): %s passed!", path, data);
+    else if (!size && !excepted)
+        tb_trace_i("translate(%s): null passed!", path);
     else tb_trace_i("translate(%s): %s != %s", path, data, excepted);
 }
 
@@ -114,23 +116,25 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("");
     tb_demo_path_test_translate("", tb_null);
     tb_demo_path_test_translate(".", ".");
+    tb_demo_path_test_translate("..", "..");
+    tb_demo_path_test_translate("../..", "../..");
     tb_demo_path_test_translate("././.", ".");
 #ifdef TB_CONFIG_OS_WINDOWS
     tb_demo_path_test_translate("c:", "c:");
     tb_demo_path_test_translate("c:\\", "c:");
     tb_demo_path_test_translate("c:\\foo\\.\\.\\", "c:\\foo");
     tb_demo_path_test_translate("c:\\foo\\\\\\", "c:\\foo");
-    tb_demo_path_test_translate("c:\\foo\\bar\\.\\..\\xyz", "c:\\foo\\xyz");
-    tb_demo_path_test_translate("c:\\foo\\..\\..", tb_null);
+    tb_demo_path_test_translate("c:\\foo\\bar\\.\\..\\xyz", "c:\\foo\\bar\\..\\xyz");
+    tb_demo_path_test_translate("c:\\foo\\..\\..", "c:\\foo\\..\\..");
 #else
     tb_demo_path_test_translate("/", "/");
     tb_demo_path_test_translate("////", "/");
     tb_demo_path_test_translate("/./././", "/");
     tb_demo_path_test_translate("/foo/././", "/foo");
     tb_demo_path_test_translate("/foo//////", "/foo");
-    tb_demo_path_test_translate("/foo/bar/.//..//xyz", "/foo/xyz");
-    tb_demo_path_test_translate("/foo/../..", tb_null);
-    tb_demo_path_test_translate("/foo/../../", tb_null);
+    tb_demo_path_test_translate("/foo/bar/.//..//xyz", "/foo/bar/../xyz");
+    tb_demo_path_test_translate("/foo/../..", "/foo/../..");
+    tb_demo_path_test_translate("/foo/../../", "/foo/../..");
 #endif
     return 0;
 }
