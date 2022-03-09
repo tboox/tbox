@@ -473,7 +473,6 @@ tb_char_t const* tb_path_directory(tb_char_t const* path, tb_char_t* data, tb_si
 {
     tb_assert_and_check_return_val(path && data && maxn, tb_null);
 
-    // find last separator
     tb_size_t n = tb_strlen(path);
     tb_char_t const* e = path + n;
     tb_char_t const* p = e - 1;
@@ -491,5 +490,5 @@ tb_char_t const* tb_path_directory(tb_char_t const* path, tb_char_t* data, tb_si
         }
         else return tb_null;
     }
-    return tb_null;
+    return (n && path[0] != '.' && !tb_path_is_absolute(path))? "." : tb_null;
 }

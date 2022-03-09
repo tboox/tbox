@@ -68,6 +68,7 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
 {
     tb_demo_path_test_directory("", tb_null);
     tb_demo_path_test_directory(".", tb_null);
+    tb_demo_path_test_directory("foo", ".");
 #ifdef TB_CONFIG_OS_WINDOWS
     tb_demo_path_test_directory("c:", tb_null);
     tb_demo_path_test_directory("c:\\", tb_null);
