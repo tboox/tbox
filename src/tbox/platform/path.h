@@ -45,6 +45,17 @@ __tb_extern_c_enter__
 
 /*! translate and normalize the path
  *
+ * @param path          the path
+ * @param size          the path size, optional
+ * @param maxn          the path maxn
+ * @param mode          the translate mode
+ *
+ * @return              the real path size
+ */
+tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t reduce_dot2);
+
+/*! translate and normalize the path to the given destinate path
+ *
  * basic:
  * - transform the path separator
  * - expand the user directory with the prefix: ~
@@ -57,12 +68,13 @@ __tb_extern_c_enter__
  *
  * @param path          the path
  * @param size          the path size, optional
- * @param maxn          the path maxn
+ * @param data          the data
+ * @param maxn          the data maxn
  * @param mode          the translate mode
  *
  * @return              the real path size
  */
-tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t reduce_dot2);
+tb_size_t               tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t* data, tb_size_t maxn, tb_bool_t reduce_dot2);
 
 /*! the path is absolute?
  *
