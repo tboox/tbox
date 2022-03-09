@@ -85,28 +85,28 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_
     }
     if (!size) size = tb_strlen(path);
 
-	// copy root path, e.g. "C:/" or "/"
+    // copy root path, e.g. "C:/" or "/"
     tb_char_t* dst       = path;
     tb_char_t const* src = p;
 #ifdef TB_CONFIG_OS_WINDOWS
     if (tb_isalpha(p[0]) && p[1] == ':') p += 2;
-	if (tb_isalpha(src[0]) && src[1] == ':')
-	{
-		*(dst++) = src[0];
-		*(dst++) = ':';
-		src += 2;
-	}
+    if (tb_isalpha(src[0]) && src[1] == ':')
+    {
+        *(dst++) = src[0];
+        *(dst++) = ':';
+        src += 2;
+    }
 #endif
     tb_char_t const* src_root = src;
     tb_char_t const* dst_root = dst;
-	if (tb_path_is_sep(*src))
-	{
-		++src;
-		*(dst++) = TB_PATH_SEPARATOR;
-	}
+    if (tb_path_is_sep(*src))
+    {
+        ++src;
+        *(dst++) = TB_PATH_SEPARATOR;
+    }
 
-#define tb_path_is_end(__p)			(__p >= src_end || (*__p) == '\0')
-#define tb_path_is_sep_or_end(__p)	(tb_path_is_end(__p) || tb_path_is_sep(*__p))
+#define tb_path_is_end(__p)         (__p >= src_end || (*__p) == '\0')
+#define tb_path_is_sep_or_end(__p)  (tb_path_is_end(__p) || tb_path_is_sep(*__p))
     tb_char_t const* src_end  = path + size;
     tb_long_t folder_depth    = 0;
     while (!tb_path_is_end(src))
