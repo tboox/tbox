@@ -43,19 +43,26 @@ __tb_extern_c_enter__
  * interfaces
  */
 
-/*! translate the path to the native path
+/*! translate and normalize the path
  *
+ * basic:
  * - transform the path separator
- * - remove the repeat path separator
  * - expand the user directory with the prefix: ~
+ * - remove tail separator
+ * - reduce the repeat path separator, "////" => "/"
+ * - reduce "././" => "."
+ *
+ * reduce dot2:
+ * - reduce "/xxx/.." => "/"
  *
  * @param path          the path
  * @param size          the path size, optional
  * @param maxn          the path maxn
+ * @param mode          the translate mode
  *
- * @return              tb_true or tb_false
+ * @return              the real path size
  */
-tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn);
+tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t reduce_dot2);
 
 /*! the path is absolute?
  *
