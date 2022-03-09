@@ -46,91 +46,128 @@
 
 // is path separator?
 #if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
-#   define tb_path_is_separator(c)      ('/' == (c) || '\\' == (c))
+#   define tb_path_is_sep(c)      ('/' == (c) || '\\' == (c))
 #else
-#   define tb_path_is_separator(c)      ('/' == (c))
+#   define tb_path_is_sep(c)      ('/' == (c))
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifndef TB_CONFIG_MICRO_ENABLE
-tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn)
+tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t reduce_dot2)
+{
+    return tb_path_translate_to(path, size, path, maxn, reduce_dot2);
+}
+
+tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t* data, tb_size_t maxn, tb_bool_t reduce_dot2)
 {
     // check
     tb_assert_and_check_return_val(path, 0);
 
     // file://?
-    tb_char_t* p = path;
+    tb_char_t home[TB_PATH_MAXN];
+    tb_char_t const* p = path;
     if (!tb_strnicmp(p, "file:", 5)) p += 5;
     // is user directory?
     else if (path[0] == '~')
     {
         // get the home directory
-        tb_char_t home[TB_PATH_MAXN];
-        tb_size_t home_size = tb_directory_home(home, sizeof(home) - 1);
+        tb_size_t home_size = tb_directory_home(home, sizeof(home));
         tb_assert_and_check_return_val(home_size, 0);
 
         // check the path space
         tb_size_t path_size = size? size : tb_strlen(path);
         tb_assert_and_check_return_val(home_size + path_size - 1 < maxn, 0);
 
-        // move the path and ensure the enough space for the home directory
-        tb_memmov(path + home_size, path + 1, path_size - 1);
+        /* move the path and ensure the enough space for the home directory
+         *
+         * @note maybe path and data are same address
+         */
+        tb_memcpy(home + home_size, path + 1, path_size - 1);
+        home[home_size + path_size - 1] = '\0';
+        size = home_size + path_size - 1;
 
-        // copy the home directory
-        tb_memcpy(path, home, home_size);
-        path[home_size + path_size - 1] = '\0';
+        // switch home as path source
+        path = home;
+        p = home;
+    }
+    if (!size) size = tb_strlen(path);
+
+    // copy root path, e.g. "C:/" or "/"
+    tb_char_t* dst       = data;
+    tb_char_t const* src = p;
+#ifdef TB_CONFIG_OS_WINDOWS
+    if (tb_isalpha(src[0]) && src[1] == ':')
+    {
+        *(dst++) = src[0];
+        *(dst++) = ':';
+        src += 2;
+    }
+#endif
+    tb_char_t const* src_root = src;
+    tb_char_t const* dst_root = dst;
+    if (tb_path_is_sep(*src))
+    {
+        ++src;
+        *(dst++) = TB_PATH_SEPARATOR;
     }
 
-    // remove repeat separator
-    tb_char_t*  q = path;
-    tb_size_t   repeat = 0;
-    for (; *p; p++)
+#define tb_path_is_end(__p)         (__p >= src_end || (*__p) == '\0')
+#define tb_path_is_sep_or_end(__p)  (tb_path_is_end(__p) || tb_path_is_sep(*__p))
+    tb_char_t const* src_end  = path + size;
+    tb_long_t folder_depth    = 0;
+    while (!tb_path_is_end(src))
     {
-        if (tb_path_is_separator(*p))
-        {
-            // save the separator if not exists
-            if (!repeat) *q++ = TB_PATH_SEPARATOR;
+        // reduce repeat separators and "/./" => "/"
+        while (tb_path_is_sep(*src) ||
+            (&src[-1] >= src_root && tb_path_is_sep(src[-1]) && src[0] == '.' && tb_path_is_sep_or_end(&src[1])))
+            ++src;
 
-            // repeat it
-            repeat++;
+        if (tb_path_is_end(src))
+            break;
+
+        // reduce "foo/bar/../" => "foo"
+        if (reduce_dot2 && src[0] == '.' && src[1] == '.' && tb_path_is_sep_or_end(&src[2]))
+        {
+            if (folder_depth > 0)
+            {
+                while (--dst != dst_root && !tb_path_is_sep(dst[-1]));
+                --folder_depth;
+            }
+            else if (&dst[-1] != dst_root || !tb_path_is_sep(dst[-1]))
+            {
+                /* "/foo/../.." => "/"
+                 * "foo/../.." => "../"
+                 */
+                *(dst++) = '.';
+                *(dst++) = '.';
+                *(dst++) = TB_PATH_SEPARATOR;
+            }
+            src += 3;
         }
         else
         {
-            // save character
-            *q++ = *p;
+            while (!tb_path_is_sep_or_end(src))
+                *(dst++) = *(src++);
 
-            // clear repeat
-            repeat = 0;
+            if (tb_path_is_sep(*src))
+            {
+                *(dst++) = TB_PATH_SEPARATOR;
+                ++src;
+                ++folder_depth;
+            }
         }
     }
+#undef tb_path_is_end
+#undef tb_path_is_sep_or_end
 
     // remove the tail separator and not root: '/'
-    if (q > path + 1 && *(q - 1) == TB_PATH_SEPARATOR) q--;
-
-    // end
-    *q = '\0';
-
-    // is windows path?
-    if (q > path + 1 && tb_isalpha(path[0]) && path[1] == ':')
-    {
-        // get the upper drive prefix
-        path[0] = tb_toupper(path[0]);
-
-        // root? patch "x:" => "x:\"
-        if (q == path + 2 && q + 1 < path + maxn)
-        {
-            *q++ = TB_PATH_SEPARATOR;
-            *q = '\0';
-        }
-    }
-
-    // trace
-    tb_trace_d("translate: %s", path);
-
-    // ok
-    return q - path;
+    while (dst > data + 1 && tb_path_is_sep(dst[-1]))
+        --dst;
+    *dst = '\0';
+    tb_trace_d("translate: %s", data);
+    return dst - data;
 }
 #endif
 tb_bool_t tb_path_is_absolute(tb_char_t const* path)
@@ -181,13 +218,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
 
     // the path is absolute?
     if (tb_path_is_absolute(path))
-    {
-        // copy it
-        tb_strlcpy(data, path, maxn);
-
-        // translate it
-        return tb_path_translate(data, 0, maxn)? data : tb_null;
-    }
+        return tb_path_translate_to(path, 0, data, maxn, tb_false)? data : tb_null;
 
     // get the root directory
     tb_size_t size = 0;
@@ -204,7 +235,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     }
 
     // translate the root directory
-    size = tb_path_translate(data, size, maxn);
+    size = tb_path_translate(data, size, maxn, tb_false);
 
     // trace
     tb_trace_d("root: %s, size: %lu", data, size);
@@ -225,7 +256,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     tb_char_t const*    e = absolute + maxn - 1;
     while (1)
     {
-        if (tb_path_is_separator(*p) || !*p)
+        if (tb_path_is_sep(*p) || !*p)
         {
             // the item size
             tb_size_t n = p - t;
@@ -306,20 +337,16 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
 
     // the root is the current and the path is absolute? return path directly
     if (!root && !tb_path_is_absolute(path))
-    {
-        // copy it
-        tb_strlcpy(data, path, maxn);
-
-        // translate it
-        return tb_path_translate(data, 0, maxn)? data : tb_null;
-    }
+        return tb_path_translate_to(path, 0, data, maxn, tb_false)? data : tb_null;
 
     // get the absolute path
     tb_size_t path_size = 0;
     tb_char_t path_absolute[TB_PATH_MAXN];
     tb_size_t path_maxn = sizeof(path_absolute);
-    path        = tb_path_absolute(path, path_absolute, path_maxn);
-    path_size   = tb_strlen(path);
+    path = tb_path_absolute(path, path_absolute, path_maxn);
+    tb_check_return_val(path, tb_null);
+
+    path_size = tb_strlen(path);
     tb_assert_and_check_return_val(path && path_size && path_size < path_maxn, tb_null);
 
     // trace
@@ -341,7 +368,7 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
         if (!(root_size = tb_directory_current(root_absolute, root_maxn))) return tb_null;
 
         // translate it
-        if (!(root_size = tb_path_translate(root_absolute, root_size, root_maxn))) return tb_null;
+        if (!(root_size = tb_path_translate(root_absolute, root_size, root_maxn, tb_false))) return tb_null;
         root = root_absolute;
     }
     tb_assert_and_check_return_val(root && root_size && root_size < root_maxn, tb_null);
@@ -444,29 +471,24 @@ tb_char_t const* tb_path_relative_to(tb_char_t const* root, tb_char_t const* pat
 #endif
 tb_char_t const* tb_path_directory(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
-    // check
     tb_assert_and_check_return_val(path && data && maxn, tb_null);
 
-    // find the last path separator
     tb_size_t n = tb_strlen(path);
-    tb_char_t const* p = path + n - 1;
-    while (p >= path && *p)
+    tb_char_t const* e = path + n;
+    tb_char_t const* p = e - 1;
+    while (p >= path && *p && tb_path_is_sep(*p)) p--;
+    while (p >= path && *p && !tb_path_is_sep(*p)) p--;
+    if (p >= path)
     {
-        // found
-        if (tb_path_is_separator(*p))
+        if ((p == path || !tb_path_is_sep(*p)) && p < e) p++;
+        n = p - path;
+        if (n && n < maxn)
         {
-            n = p - path;
-            if (n < maxn)
-            {
-                tb_strncpy(data, path, n);
-                data[n] = '\0';
-                return data;
-            }
-            else return tb_null;
+            tb_strncpy(data, path, n);
+            data[n] = '\0';
+            return data;
         }
-        p--;
+        else return tb_null;
     }
-
-    // end
-    return ".";
+    return (n && path[0] != '.' && !tb_path_is_absolute(path))? "." : tb_null;
 }
