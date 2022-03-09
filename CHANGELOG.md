@@ -5,6 +5,7 @@
 ### Changes
 
 * Add riscv32/riscv64/sh4/sparc support
+* Improve path support
 
 ### Bugs Fixed
 
@@ -233,6 +234,7 @@
 ### 改进
 
 * 添加 riscv32/riscv64/sh4/sparc 架构支持
+* 改进路径支持
 
 ### Bugs 修复
 
