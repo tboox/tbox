@@ -66,26 +66,31 @@ tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t*
     tb_assert_and_check_return_val(path, 0);
 
     // file://?
+    tb_char_t home[TB_PATH_MAXN];
     tb_char_t const* p = path;
     if (!tb_strnicmp(p, "file:", 5)) p += 5;
     // is user directory?
     else if (path[0] == '~')
     {
         // get the home directory
-        tb_size_t home_size = tb_directory_home(data, sizeof(data) - 1);
+        tb_size_t home_size = tb_directory_home(home, sizeof(home));
         tb_assert_and_check_return_val(home_size, 0);
 
         // check the path space
         tb_size_t path_size = size? size : tb_strlen(path);
         tb_assert_and_check_return_val(home_size + path_size - 1 < maxn, 0);
 
-        // append path to home
-        tb_memcpy(data + home_size, path + 1, path_size - 1);
-        data[home_size + path_size - 1] = '\0';
+        /* move the path and ensure the enough space for the home directory
+         *
+         * @note maybe path and data are same address
+         */
+        tb_memcpy(home + home_size, path + 1, path_size - 1);
+        home[home_size + path_size - 1] = '\0';
         size = home_size + path_size - 1;
 
-        // switch data as path source
-        path = data;
+        // switch home as path source
+        path = home;
+        p = home;
     }
     if (!size) size = tb_strlen(path);
 
@@ -93,7 +98,6 @@ tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t*
     tb_char_t* dst       = data;
     tb_char_t const* src = p;
 #ifdef TB_CONFIG_OS_WINDOWS
-    if (tb_isalpha(p[0]) && p[1] == ':') p += 2;
     if (tb_isalpha(src[0]) && src[1] == ':')
     {
         *(dst++) = src[0];
