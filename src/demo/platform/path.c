@@ -117,13 +117,9 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_path_test_translate(tb_false, "", tb_null);
     tb_demo_path_test_translate(tb_false, ".", ".");
     tb_demo_path_test_translate(tb_false, "..", "..");
-    tb_demo_path_test_translate(tb_false, "../..", "../..");
     tb_demo_path_test_translate(tb_false, "././.", ".");
-    tb_demo_path_test_translate(tb_true, "../..", "../..");
     tb_demo_path_test_translate(tb_true, "../foo/..", "..");
-    tb_demo_path_test_translate(tb_true, "../foo/bar/..", "../foo");
     tb_demo_path_test_translate(tb_true, "../foo/bar/../..", "..");
-    tb_demo_path_test_translate(tb_true, "../foo/bar/../../..", "../..");
 #ifdef TB_CONFIG_OS_WINDOWS
     tb_demo_path_test_translate(tb_false, "c:", "c:");
     tb_demo_path_test_translate(tb_false, "c:\\", "c:");
@@ -132,6 +128,9 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_path_test_translate(tb_false, "c:\\foo\\..\\..", "c:\\foo\\..\\..");
     tb_demo_path_test_translate(tb_true, "c:\\foo\\bar\\.\\..\\xyz", "c:\\foo\\xyz");
     tb_demo_path_test_translate(tb_true, "c:\\foo\\..\\..", "c:");
+    tb_demo_path_test_translate(tb_true, "../..", "..\\..");
+    tb_demo_path_test_translate(tb_true, "../foo/bar/..", "..\\foo");
+    tb_demo_path_test_translate(tb_true, "../foo/bar/../../..", "..\\..");
 #else
     tb_demo_path_test_translate(tb_false, "/", "/");
     tb_demo_path_test_translate(tb_false, "////", "/");
@@ -143,6 +142,9 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_path_test_translate(tb_true, "/foo/bar/.//..//xyz", "/foo/xyz");
     tb_demo_path_test_translate(tb_true, "/foo/../..", "/");
     tb_demo_path_test_translate(tb_true, "/foo/bar../..", "/foo");
+    tb_demo_path_test_translate(tb_true, "../..", "../..");
+    tb_demo_path_test_translate(tb_true, "../foo/bar/..", "../foo");
+    tb_demo_path_test_translate(tb_true, "../foo/bar/../../..", "../..");
 #endif
     return 0;
 }

@@ -98,6 +98,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_
 	}
 #endif
     tb_char_t const* src_root = src;
+    tb_char_t const* dst_root = dst;
 	if (tb_path_is_sep(*src))
 	{
 		++src;
@@ -106,7 +107,6 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_
 
 #define tb_path_is_end(__p)			(__p >= src_end || (*__p) == '\0')
 #define tb_path_is_sep_or_end(__p)	(tb_path_is_end(__p) || tb_path_is_sep(*__p))
-    tb_char_t const* dst_root = dst;
     tb_char_t const* src_end  = path + size;
     tb_long_t folder_depth    = 0;
     while (!tb_path_is_end(src))
@@ -127,7 +127,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_
                 while (--dst != dst_root && !tb_path_is_sep(dst[-1]));
                 --folder_depth;
             }
-            else if (&src[-1] <= src_root || !tb_path_is_sep(src[-1]))
+            else if (&dst[-1] != dst_root || !tb_path_is_sep(dst[-1]))
             {
                 /* "/foo/../.." => "/"
                  * "foo/../.." => "../"
@@ -155,7 +155,7 @@ tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_
 #undef tb_path_is_sep_or_end
 
     // remove the tail separator and not root: '/'
-    while (dst != dst_root && tb_path_is_sep(dst[-1]))
+    while (dst > path + 1 && tb_path_is_sep(dst[-1]))
         --dst;
     *dst = '\0';
     tb_trace_d("translate: %s", path);
