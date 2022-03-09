@@ -52,7 +52,7 @@ __tb_extern_c_enter__
  *
  * @return              the real path size
  */
-tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t reduce_dot2);
+tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t normalize);
 
 /*! translate and normalize the path to the given destinate path
  *
@@ -61,9 +61,9 @@ tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_si
  * - expand the user directory with the prefix: ~
  * - remove tail separator
  * - reduce the repeat path separator, "////" => "/"
- * - reduce "././" => "."
  *
- * reduce dot2:
+ * normalize:
+ * - reduce "././" => "."
  * - reduce "/xxx/.." => "/"
  *
  * @param path          the path
@@ -74,7 +74,7 @@ tb_size_t               tb_path_translate(tb_char_t* path, tb_size_t size, tb_si
  *
  * @return              the real path size
  */
-tb_size_t               tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t* data, tb_size_t maxn, tb_bool_t reduce_dot2);
+tb_size_t               tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t* data, tb_size_t maxn, tb_bool_t normalize);
 
 /*! the path is absolute?
  *

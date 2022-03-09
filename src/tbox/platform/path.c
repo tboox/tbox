@@ -55,12 +55,12 @@
  * implementation
  */
 #ifndef TB_CONFIG_MICRO_ENABLE
-tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t reduce_dot2)
+tb_size_t tb_path_translate(tb_char_t* path, tb_size_t size, tb_size_t maxn, tb_bool_t normalize)
 {
-    return tb_path_translate_to(path, size, path, maxn, reduce_dot2);
+    return tb_path_translate_to(path, size, path, maxn, normalize);
 }
 
-tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t* data, tb_size_t maxn, tb_bool_t reduce_dot2)
+tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t* data, tb_size_t maxn, tb_bool_t normalize)
 {
     // check
     tb_assert_and_check_return_val(path, 0);
@@ -121,14 +121,14 @@ tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t*
     {
         // reduce repeat separators and "/./" => "/"
         while (tb_path_is_sep(*src) ||
-            (&src[-1] >= src_root && tb_path_is_sep(src[-1]) && src[0] == '.' && tb_path_is_sep_or_end(&src[1])))
+            (normalize && &src[-1] >= src_root && tb_path_is_sep(src[-1]) && src[0] == '.' && tb_path_is_sep_or_end(&src[1])))
             ++src;
 
         if (tb_path_is_end(src))
             break;
 
         // reduce "foo/bar/../" => "foo"
-        if (reduce_dot2 && src[0] == '.' && src[1] == '.' && tb_path_is_sep_or_end(&src[2]))
+        if (normalize && src[0] == '.' && src[1] == '.' && tb_path_is_sep_or_end(&src[2]))
         {
             if (folder_depth > 0)
             {
