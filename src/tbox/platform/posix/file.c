@@ -65,7 +65,7 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     if (mode & TB_FILE_MODE_TRUNC) flags |= O_TRUNC;
 
     // dma mode, no cache
-#ifdef TB_CONFIG_OS_LINUX
+#if defined(TB_CONFIG_OS_LINUX) && defined(O_DIRECT)
     if (mode & TB_FILE_MODE_DIRECT) flags |= O_DIRECT;
 #endif
 

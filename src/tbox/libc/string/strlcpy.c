@@ -30,8 +30,6 @@
 #       include "impl/x86/strlcpy.c"
 #   elif defined(TB_ARCH_ARM)
 #       include "impl/arm/strlcpy.c"
-#   elif defined(TB_ARCH_SH4)
-#       include "impl/sh4/strlcpy.c"
 #   endif
 #else
 #   include <string.h>

@@ -61,15 +61,16 @@
 #       define TB_ARCH_STRING               "x86"
 #   endif
 #elif defined(__x86_64) \
-    || defined(__amd64__) \
-    || defined(__amd64) \
-    || defined(_M_IA64) \
+    || defined(__amd64__) || defined(__amd64) \
+    || defined(__ia64__) || defined(__IA64__) || defined(__ia64) || defined(_M_IA64) \
     || defined(_M_X64)
 #   define TB_ARCH_x64
 #   if defined(__x86_64)
 #       define  TB_ARCH_STRING              "x86_64"
 #   elif defined(__amd64__) || defined(__amd64)
 #       define  TB_ARCH_STRING              "amd64"
+#   elif defined(__ia64__) || defined(__IA64__) || defined(__ia64) || defined(_M_IA64)
+#       define  TB_ARCH_STRING              "ia64"
 #   else
 #       define TB_ARCH_STRING               "x64"
 #   endif
@@ -192,6 +193,12 @@
 #   else
 #       define TB_ARCH_STRING               "riscv32"
 #   endif
+#elif defined(__hppa__) || defined(__HPPA__) || defined(__hppa)
+#   define TB_ARCH_HPPA
+#   define TB_ARCH_STRING                   "hppa"
+#elif defined(__m68k__) || defined(__MC68K__) || defined(M68000)
+#   define TB_ARCH_M68K
+#   define TB_ARCH_STRING                   "m68k"
 #elif defined(__PPC__) || defined(_ARCH_PPC)
 #   define TB_ARCH_PPC
 #   if (defined(__PPC64__) && __PPC64__ == 1) || defined(_ARCH_PPC64)
