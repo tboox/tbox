@@ -183,12 +183,6 @@ tb_bool_t tb_ifaddrs_ipaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_
     // reload it if the cached interfaces is empty
     if (!reload && !tb_iterator_size(iterator)) iterator = tb_ifaddrs_itor(ifaddrs, tb_true);
 
-    // the ipaddr flags
-    tb_uint32_t ipflags = 0;
-    if (family == TB_IPADDR_FAMILY_IPV4) ipflags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR4;
-    else if (family == TB_IPADDR_FAMILY_IPV6) ipflags |= TB_IFADDRS_INTERFACE_FLAG_HAVE_IPADDR6;
-
-    // done
     tb_bool_t ok = tb_false;
     tb_for_all_if (tb_ifaddrs_interface_ref_t, iface, iterator, iface)
     {
@@ -221,8 +215,6 @@ tb_bool_t tb_ifaddrs_ipaddr(tb_ifaddrs_ref_t ifaddrs, tb_char_t const* name, tb_
             }
         }
     }
-
-    // ok?
     return ok;
 }
 #ifdef __tb_debug__
