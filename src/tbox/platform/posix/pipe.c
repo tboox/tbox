@@ -84,7 +84,6 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
 {
     // check
     tb_assert_and_check_return_val(name, tb_null);
-    tb_assert_and_check_return_val(mode == TB_FILE_MODE_WO || mode == TB_FILE_MODE_RO, tb_null);
 
     tb_bool_t ok = tb_false;
     tb_int_t  fd = -1;
@@ -105,16 +104,17 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
 
         // init flags
         tb_size_t flags = 0;
-        if (mode == TB_FILE_MODE_RO) flags |= O_NONBLOCK | O_RDONLY;
-        else if (mode == TB_FILE_MODE_WO) flags |= O_WRONLY;
+        if (mode & TB_PIPE_MODE_RO) flags |= O_RDONLY;
+        else if (mode & TB_PIPE_MODE_WO) flags |= O_WRONLY;
         tb_assert_and_check_break(flags);
 
         // open pipe file
         fd = open(pipename, flags);
         tb_assert_and_check_break(fd >= 0);
 
-        // non-block
-        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+        // set block mode
+        if (mode & TB_PIPE_MODE_BLOCK) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
+        else fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
         // ok
         ok = tb_true;

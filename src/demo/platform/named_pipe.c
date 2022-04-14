@@ -22,7 +22,7 @@ tb_int_t tb_demo_platform_named_pipe_main(tb_int_t argc, tb_char_t** argv)
     tb_bool_t is_server = argc > 1 && !tb_strcmp(argv[1], "server");
     if (is_server)
     {
-        tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_FILE_MODE_WO, 0);
+        tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_PIPE_MODE_WO, 0);
         if (pipe)
         {
             // trace
@@ -49,7 +49,7 @@ tb_int_t tb_demo_platform_named_pipe_main(tb_int_t argc, tb_char_t** argv)
     }
     else
     {
-        tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_FILE_MODE_RO, 0);
+        tb_pipe_file_ref_t pipe = tb_pipe_file_init(TB_DEMO_PIPE_NAME, TB_PIPE_MODE_RO, 0);
         if (pipe)
         {
             // trace

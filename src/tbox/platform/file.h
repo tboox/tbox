@@ -54,8 +54,8 @@ __tb_extern_c_enter__
 typedef enum __tb_file_mode_t
 {
     TB_FILE_MODE_RO         = 1     //!< read only
-,   TB_FILE_MODE_WO         = 2     //!< writ only
-,   TB_FILE_MODE_RW         = 4     //!< read and writ
+,   TB_FILE_MODE_WO         = 2     //!< write only
+,   TB_FILE_MODE_RW         = 4     //!< read and write
 ,   TB_FILE_MODE_CREAT      = 8     //!< create
 ,   TB_FILE_MODE_APPEND     = 16    //!< append
 ,   TB_FILE_MODE_TRUNC      = 32    //!< truncate

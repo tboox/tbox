@@ -40,6 +40,15 @@ __tb_extern_c_enter__
 /// the pipe file ref type
 typedef __tb_typeref__(pipe_file);
 
+/// the pipe mode type
+typedef enum __tb_pipe_mode_t
+{
+    TB_PIPE_MODE_RO         = 1     //!< read only
+,   TB_PIPE_MODE_WO         = 2     //!< write only
+,   TB_PIPE_MODE_BLOCK      = 4     //!< block mode
+
+}tb_pipe_mode_t;
+
 /// the pipe file event enum
 typedef enum __tb_event_event_e
 {
@@ -59,7 +68,7 @@ typedef enum __tb_event_event_e
  * @note the pipe files will be inherited in child process and it will be blocked.
  *
  * @param name          the pipe name
- * @param mode          the file mode, only support TB_FILE_MODE_RO/TB_FILE_MODE_WO
+ * @param mode          the pipe mode
  * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
  *
  * @return              the pipe file

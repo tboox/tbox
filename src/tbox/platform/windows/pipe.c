@@ -157,7 +157,6 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
 {
     // check
     tb_assert_and_check_return_val(name, tb_null);
-    tb_assert_and_check_return_val(mode == TB_FILE_MODE_WO || mode == TB_FILE_MODE_RO, tb_null);
 
     tb_bool_t       ok = tb_false;
     tb_pipe_file_t* file = tb_null;
@@ -186,7 +185,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
         sattr.lpSecurityDescriptor = tb_null;
 
         // open or create named pipe
-        if (mode == TB_FILE_MODE_WO)
+        if (mode == TB_PIPE_MODE_WO)
         {
             file->pipe = CreateFileW(pipename, GENERIC_WRITE, 0, tb_null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, tb_null);
             if (file->pipe == INVALID_HANDLE_VALUE)
@@ -251,14 +250,14 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_si
         tb_assert_and_check_break(size > 0);
 
         // init the anonymous pipe for writing
-        pair[1] = tb_pipe_file_init(name, TB_FILE_MODE_WO, buffer_size);
+        pair[1] = tb_pipe_file_init(name, TB_PIPE_MODE_WO, buffer_size);
         tb_assert_and_check_break(pair[1]);
 
         // connect the writed pipe first
         tb_long_t connected = tb_pipe_file_connect_direct(pair[1]);
 
         // init the anonymous pipe for reading
-        pair[0] = tb_pipe_file_init(name, TB_FILE_MODE_RO, buffer_size);
+        pair[0] = tb_pipe_file_init(name, TB_PIPE_MODE_RO, buffer_size);
         tb_assert_and_check_break(pair[0]);
 
         // wait the connected result
