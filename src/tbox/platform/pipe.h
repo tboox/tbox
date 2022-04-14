@@ -80,11 +80,12 @@ tb_pipe_file_ref_t      tb_pipe_file_init(tb_char_t const* name, tb_size_t mode,
  * @note the pipe files will be inherited in child process.
  *
  * @param pair          the pipe file pair, read: pair[0], write: pair[1]
+ * @param mode          the pipe mode pair, only support TB_PIPE_MODE_BLOCK
  * @param buffer_size   the buffer size of pipe, it will use the default size if pass zero
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size);
+tb_bool_t               tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t mode[2], tb_size_t buffer_size);
 
 /*! exit the pipe file
  *

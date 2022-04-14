@@ -158,7 +158,7 @@ tb_int_t tb_demo_platform_poller_process_main(tb_int_t argc, tb_char_t** argv)
         while (count--)
         {
             tb_pipe_file_ref_t pipe[2] = {0};
-            if (tb_pipe_file_init_pair(pipe, 4096))
+            if (tb_pipe_file_init_pair(pipe, tb_null, 4096))
             {
                 tb_process_attr_t attr = {0};
                 attr.out.pipe = pipe[1];

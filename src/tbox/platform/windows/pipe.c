@@ -214,7 +214,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
     }
     return (tb_pipe_file_ref_t)file;
 }
-tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
+tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t mode[2], tb_size_t buffer_size)
 {
     // check
     tb_assert_and_check_return_val(pair, tb_false);

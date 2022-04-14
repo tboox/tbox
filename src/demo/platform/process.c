@@ -15,7 +15,7 @@ static tb_void_t tb_demo_process_test_pipe(tb_char_t** argv)
 {
     // init pipe files
     tb_pipe_file_ref_t file[2] = {0};
-    if (tb_pipe_file_init_pair(file, 0))
+    if (tb_pipe_file_init_pair(file, tb_null, 0))
     {
         // init process
         tb_process_attr_t attr = {0};

@@ -101,7 +101,7 @@ static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_pipe_file_ref_
 static tb_void_t tb_demo_poller_open(tb_poller_ref_t poller)
 {
     tb_pipe_file_ref_t pair[2];
-    if (tb_pipe_file_init_pair(pair, 4096))
+    if (tb_pipe_file_init_pair(pair, tb_null, 4096))
     {
         tb_demo_session_start(poller, pair[0]);
         tb_thread_init(tb_null, tb_demo_session_writ, pair[1], 0);

@@ -34,7 +34,7 @@ tb_int_t tb_demo_platform_pipe_pair_main(tb_int_t argc, tb_char_t** argv)
 {
     // test the anonymous pipe
     tb_pipe_file_ref_t file[2] = {};
-    if (tb_pipe_file_init_pair(file, 8192))
+    if (tb_pipe_file_init_pair(file, tb_null, 8192))
     {
         // start the read thread
         tb_thread_ref_t thread = tb_thread_init(tb_null, tb_demo_pipe_pair_read, file[0], 0);
