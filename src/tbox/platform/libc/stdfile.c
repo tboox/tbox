@@ -255,3 +255,4 @@ tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t self, tb_char_t const* str)
     return len? tb_stdfile_writ(self, (tb_byte_t const*)str, tb_strlen(str)) : tb_true;
 }
 #endif
+

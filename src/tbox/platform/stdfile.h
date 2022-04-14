@@ -121,6 +121,14 @@ tb_bool_t               tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, 
  */
 tb_bool_t               tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size);
 
+/*! has readable data for stdfile
+ *
+ * @param file          the stdfile
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_stdfile_readable(tb_stdfile_ref_t file);
+
 /*! peek an character from stdfile
  *
  * @param file          the stdfile

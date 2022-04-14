@@ -30,6 +30,13 @@
  */
 #include "stdfile.h"
 #include "../utils/utils.h"
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include <windows.h>
+#elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
+#   include <unistd.h>
+#   include <sys/select.h>
+#   include <errno.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
@@ -115,6 +122,41 @@ tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t file, tb_char_t* str, tb_size_t num)
     return tb_false;
 }
 tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t file, tb_char_t const* str)
+{
+    tb_trace_noimpl();
+    return tb_false;
+}
+#endif
+
+#if defined(TB_CONFIG_OS_WINDOWS)
+tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
+{
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
+
+    return WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 0) == WAIT_OBJECT_0;
+}
+#elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
+tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
+{
+    // check
+    tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
+    tb_assert_and_check_return_val(stdfile && stdfile->fp, tb_false);
+    tb_assert_and_check_return_val(stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
+
+    fd_set readfds;
+    FD_ZERO(&readfds);
+    FD_SET(STDIN_FILENO, &readfds);
+
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+
+    return select(1, &readfds, tb_null, tb_null, &timeout) > 0;
+}
+#else
+tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
 {
     tb_trace_noimpl();
     return tb_false;
