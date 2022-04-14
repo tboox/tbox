@@ -147,9 +147,9 @@ tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t mode[2], 
         if (pipe(pipefd) == -1) break;
 #endif
 
-        // set block mode
-        tb_size_t mode0 = mode? mode[0] : TB_PIPE_MODE_BLOCK;
-        tb_size_t mode1 = mode? mode[1] : TB_PIPE_MODE_BLOCK;
+        // set block mode (default: non-block mode)
+        tb_size_t mode0 = mode? mode[0] : 0;
+        tb_size_t mode1 = mode? mode[1] : 0;
         if (mode0 & TB_PIPE_MODE_BLOCK) fcntl(pipefd[0], F_SETFL, fcntl(pipefd[0], F_GETFL) & ~O_NONBLOCK);
         else fcntl(pipefd[0], F_SETFL, fcntl(pipefd[0], F_GETFL) | O_NONBLOCK);
 
