@@ -204,9 +204,9 @@ static tb_process_ref_t tb_process_init_spawn(tb_char_t const* pathname, tb_char
                      (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->in.file))
             {
                 // duplicate inpipe/file fd to stdin in the child process
-                tb_int_t outfd = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->in.pipe) : tb_file2fd(attr->in.file);
-                posix_spawn_file_actions_adddup2(&process->spawn_action, outfd, STDIN_FILENO);
-                posix_spawn_file_actions_addclose(&process->spawn_action, outfd);
+                tb_int_t infd = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipefile2fd(attr->in.pipe) : tb_file2fd(attr->in.file);
+                posix_spawn_file_actions_adddup2(&process->spawn_action, infd, STDIN_FILENO);
+                posix_spawn_file_actions_addclose(&process->spawn_action, infd);
             }
 
             // redirect the stdout
