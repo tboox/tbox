@@ -31,7 +31,7 @@
 #include "stdfile.h"
 #include "../utils/utils.h"
 #if defined(TB_CONFIG_OS_WINDOWS)
-#   include <windows.h>
+#   include "windows/interface/interface.h"
 #elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
 #   include <unistd.h>
 #   include <sys/select.h>
