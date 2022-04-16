@@ -37,15 +37,23 @@ __tb_extern_c_enter__
  * types
  */
 
+// the directory walk code
+typedef enum __tb_directory_walk_code_e
+{
+    TB_DIRECTORY_WALK_CODE_END            = 0
+,   TB_DIRECTORY_WALK_CODE_CONTINUE       = 1
+,   TB_DIRECTORY_WALK_CODE_SKIP_RECURSION = 2 //!< continue and skip sub-directory, only for prefix recursion mode
+}tb_directory_walk_code_e;
+
 /*! the directory walk func type
  *
  * @param path          the file path
  * @param info          the file info
  * @param priv          the user private data
  *
- * @return              continue: tb_true, break: tb_false
+ * @return              continue: 1 skip-recursion: 2, break: 0
  */
-typedef tb_bool_t       (*tb_directory_walk_func_t)(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv);
+typedef tb_long_t       (*tb_directory_walk_func_t)(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces

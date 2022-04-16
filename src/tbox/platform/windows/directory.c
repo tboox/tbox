@@ -32,33 +32,31 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_bool_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
+static tb_long_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(path && info, tb_false);
+    tb_assert_and_check_return_val(path && info, TB_DIRECTORY_WALK_CODE_END);
 
     // remove file
     if (info->type == TB_FILE_TYPE_FILE) tb_file_remove(path);
-    // remvoe directory
+    // remove directory
     else if (info->type == TB_FILE_TYPE_DIRECTORY)
     {
         tb_wchar_t temp[TB_PATH_MAXN];
         if (tb_atow(temp, path, TB_PATH_MAXN) != -1)
             RemoveDirectoryW(temp);
     }
-
-    // continue
-    return tb_true;
+    return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
-static tb_bool_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
+static tb_long_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
     // check
     tb_value_t* tuple = (tb_value_t*)priv;
-    tb_assert_and_check_return_val(path && info && tuple, tb_false);
+    tb_assert_and_check_return_val(path && info && tuple, TB_DIRECTORY_WALK_CODE_END);
 
     // the dest directory
     tb_char_t const* dest = tuple[0].cstr;
-    tb_assert_and_check_return_val(dest, tb_false);
+    tb_assert_and_check_return_val(dest, TB_DIRECTORY_WALK_CODE_END);
 
     // the file name
     tb_size_t size = tuple[1].ul;
@@ -90,18 +88,16 @@ static tb_bool_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
     default:
         break;
     }
-
-    // continue
-    return tb_true;
+    return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
-static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
+static tb_long_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
     // check
-    tb_assert_and_check_return_val(path && func, tb_false);
+    tb_assert_and_check_return_val(path && func, TB_DIRECTORY_WALK_CODE_END);
 
     // last
     tb_long_t           last = tb_wcslen(path) - 1;
-    tb_assert_and_check_return_val(last >= 0, tb_false);
+    tb_assert_and_check_return_val(last >= 0, TB_DIRECTORY_WALK_CODE_END);
 
     // add \*.*
     tb_wchar_t          temp_w[4096] = {0};
@@ -109,7 +105,7 @@ static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
     tb_swprintf(temp_w, 4095, L"%s%s*.*", path, path[last] == L'\\'? L"" : L"\\");
 
     // done
-    tb_bool_t           ok = tb_true;
+    tb_long_t           ok = TB_DIRECTORY_WALK_CODE_CONTINUE;
     WIN32_FIND_DATAW    find = {0};
     HANDLE              directory = INVALID_HANDLE_VALUE;
     if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp_w, &find)))
@@ -137,7 +133,8 @@ static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
                     tb_check_break(ok);
 
                     // walk to the next directory
-                    if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) ok = tb_directory_walk_impl(temp_w, recursion > 0? recursion - 1 : recursion, prefix, func, priv);
+                    if (info.type == TB_FILE_TYPE_DIRECTORY && recursion && ok != TB_DIRECTORY_WALK_CODE_SKIP_RECURSION)
+                        ok = tb_directory_walk_impl(temp_w, recursion > 0? recursion - 1 : recursion, prefix, func, priv);
                     tb_check_break(ok);
 
                     // do callback
@@ -151,8 +148,6 @@ static tb_bool_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
         // exit directory
         FindClose(directory);
     }
-
-    // continue?
     return ok;
 }
 
