@@ -1,7 +1,7 @@
 <div align="center">
 
-  <a href="https://tboox.io">
-    <img width="160" heigth="160" src="https://tboox.io/assets/img/logo_text.png">
+  <a href="https://docs.tboox.org">
+    <img width="160" heigth="160" src="https://docs.tboox.org/assets/img/logo_text.png">
   </a>
 
   <div>
@@ -47,7 +47,7 @@
 
 ## 项目支持
 
-通过成为赞助者来支持该项目。您的logo将显示在此处，并带有指向您网站的链接。🙏 [[成为赞助商](https://tboox.io/#/zh-cn/about/sponsor)]
+通过成为赞助者来支持该项目。您的logo将显示在此处，并带有指向您网站的链接。🙏 [[成为赞助商](https://docs.tboox.org/#/zh-cn/about/sponsor)]
 
 <a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
 
@@ -68,7 +68,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 * Small: 最小化编译，默认禁用所有扩展模块，启用编译器最小化优化
 * Micro: 针对嵌入式平台，仅仅编译tbox微内核，仅提供最基础的跨平台接口，生成库仅64K左右（内置轻量libc接口实现）
 
-如果你想了解更多，请参考：[在线文档](https://tboox.io/#/zh-cn/getting_started), [Github](https://github.com/tboox/tbox)以及[Gitee](https://gitee.com/tboox/tbox)
+如果你想了解更多，请参考：[在线文档](https://docs.tboox.org/#/zh-cn/getting_started), [Github](https://github.com/tboox/tbox)以及[Gitee](https://gitee.com/tboox/tbox)
 
 ## 特性
 
@@ -304,7 +304,7 @@ int main(int argc, char** argv)
 <img src="https://tboox.org/assets/img/tbox-xscode.png" width="650px" />
 </a>
 
-或者你也可以考虑赞助我们也获取技术支持服务，[[成为赞助商](https://tboox.io/#/zh-cn/about/sponsor)]
+或者你也可以考虑赞助我们也获取技术支持服务，[[成为赞助商](https://docs.tboox.org/#/zh-cn/about/sponsor)]
 
 ## 联系方式
 

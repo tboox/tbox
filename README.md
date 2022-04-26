@@ -1,7 +1,7 @@
 <div align="center">
 
-  <a href="https://tboox.io">
-    <img width="160" heigth="160" src="https://tboox.io/assets/img/logo_text.png">
+  <a href="https://docs.tboox.org">
+    <img width="160" heigth="160" src="https://docs.tboox.org/assets/img/logo_text.png">
   </a>
 
   <div>
@@ -47,7 +47,7 @@
 
 ## Supporting the project
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. 🙏 [[Become a sponsor](https://tboox.io/#/about/sponsor)]
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. 🙏 [[Become a sponsor](https://docs.tboox.org/#/about/sponsor)]
 
 <a href="https://opencollective.com/tbox#backers" target="_blank"><img src="https://opencollective.com/tbox/backers.svg?width=890"></a>
 
@@ -67,7 +67,7 @@ And it provides many compiling options using [xmake](https://github.com/xmake-io
 * Small: Disable all extensional modules and enable space optimization.
 * Micro: compiling micro library (~64K) for the embed system.
 
-If you want to know more, please refer to: [Documents](https://tboox.io/#/getting_started), [Github](https://github.com/tboox/tbox) and [Gitee](https://gitee.com/tboox/tbox)
+If you want to know more, please refer to: [Documents](https://docs.tboox.org/#/getting_started), [Github](https://github.com/tboox/tbox) and [Gitee](https://gitee.com/tboox/tbox)
 
 ## Features
 
@@ -297,7 +297,7 @@ We also provide paid technical support to help users quickly solve related probl
 <img src="https://tboox.org/assets/img/tbox-xscode.png" width="650px" />
 </a>
 
-Or you can also consider sponsoring us to get technical support services, [[Become a sponsor](https://tboox.io/#/about/sponsor)]
+Or you can also consider sponsoring us to get technical support services, [[Become a sponsor](https://docs.tboox.org/#/about/sponsor)]
 
 ## Contacts
 
