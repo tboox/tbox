@@ -108,6 +108,9 @@ typedef tb_int_t (WSAAPI* tb_ws2_32_shutdown_t)(SOCKET s, tb_int_t how);
 // the getsockname func type
 typedef tb_int_t (WSAAPI* tb_ws2_32_getsockname_t)(SOCKET s, struct sockaddr* name, tb_int_t* namelen);
 
+// the getpeername func type
+typedef tb_int_t (WSAAPI* tb_ws2_32_getpeername_t)(SOCKET s, struct sockaddr* name, tb_int_t* namelen);
+
 // the getsockopt func type
 typedef tb_int_t (WSAAPI* tb_ws2_32_getsockopt_t)(SOCKET s, tb_int_t level, tb_int_t optname, tb_char_t* optval, tb_int_t* optlen);
 
@@ -206,6 +209,9 @@ typedef struct __tb_ws2_32_t
 
     // getsockname
     tb_ws2_32_getsockname_t         getsockname;
+
+    // getpeername
+    tb_ws2_32_getpeername_t         getpeername;
 
     // getsockopt
     tb_ws2_32_getsockopt_t          getsockopt;

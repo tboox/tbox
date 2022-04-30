@@ -582,6 +582,22 @@ tb_bool_t tb_socket_local(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     // ok
     return tb_true;
 }
+tb_bool_t tb_socket_peer(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
+{
+    // check
+    tb_assert_and_check_return_val(sock, tb_false);
+
+    // get peer address
+    struct sockaddr_storage d = {0};
+    tb_int_t                n = sizeof(d);
+    if (tb_ws2_32()->getpeername(tb_sock2fd(sock), (struct sockaddr *)&d, &n) == -1) return tb_false;
+
+    // save address
+    if (addr) tb_sockaddr_save(addr, &d);
+
+    // ok
+    return tb_true;
+}
 tb_bool_t tb_socket_kill(tb_socket_ref_t sock, tb_size_t mode)
 {
     // check

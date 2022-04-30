@@ -67,6 +67,7 @@ static tb_bool_t tb_ws2_32_instance_init(tb_ws2_32_ref_t ws2_32)
     TB_INTERFACE_LOAD(ws2_32, select);
     TB_INTERFACE_LOAD(ws2_32, connect);
     TB_INTERFACE_LOAD(ws2_32, shutdown);
+    TB_INTERFACE_LOAD(ws2_32, getpeername);
     TB_INTERFACE_LOAD(ws2_32, getsockname);
     TB_INTERFACE_LOAD(ws2_32, getsockopt);
     TB_INTERFACE_LOAD(ws2_32, setsockopt);

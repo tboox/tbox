@@ -192,6 +192,15 @@ tb_socket_ref_t     tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
  */
 tb_bool_t           tb_socket_local(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
 
+/*! get peer address
+ *
+ * @param sock      the socket
+ * @param addr      the peer address
+ *
+ * @return          tb_true or tb_false
+ */
+tb_bool_t           tb_socket_peer(tb_socket_ref_t sock, tb_ipaddr_ref_t addr);
+
 /*! kill socket
  *
  * @param sock      the socket
