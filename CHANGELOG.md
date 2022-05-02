@@ -6,6 +6,7 @@
 
 * Add riscv32/riscv64/sh4/sparc support
 * Improve path support
+* Add peer name for socket
 
 ### Bugs Fixed
 
@@ -235,6 +236,7 @@
 
 * 添加 riscv32/riscv64/sh4/sparc 架构支持
 * 改进路径支持
+* 为 socket 添加 peer name 接口
 
 ### Bugs 修复
 
