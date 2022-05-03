@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.6.8
+
 ### Changes
 
 * Add riscv32/riscv64/sh4/sparc support
@@ -231,6 +233,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.6.8
 
 ### 改进
 
