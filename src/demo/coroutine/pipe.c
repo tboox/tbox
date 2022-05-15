@@ -45,7 +45,7 @@ tb_int_t tb_demo_coroutine_pipe_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         tb_pipe_file_ref_t pair[2];
-        if (tb_pipe_file_init_pair(pair, 4096))
+        if (tb_pipe_file_init_pair(pair, tb_null, 4096))
         {
             // start coroutines
             tb_coroutine_start(scheduler, tb_demo_coroutine_writ, pair[1], 0);

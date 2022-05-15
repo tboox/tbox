@@ -52,7 +52,7 @@ static tb_void_t tb_demo_lo_coroutine_func(tb_lo_coroutine_ref_t coroutine, tb_c
     tb_lo_coroutine_enter(coroutine)
     {
         // init pipe files
-        if (tb_pipe_file_init_pair(process->file, 0))
+        if (tb_pipe_file_init_pair(process->file, tb_null, 0))
         {
             // init process
             process->attr.out.pipe = process->file[1];
