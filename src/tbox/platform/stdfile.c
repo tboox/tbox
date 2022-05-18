@@ -131,9 +131,10 @@ tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t file, tb_char_t const* str)
 #if defined(TB_CONFIG_OS_WINDOWS)
 tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
 {
-    // check
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
     tb_assert_and_check_return_val(stdfile && stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
+#endif
 
     return WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 0) == WAIT_OBJECT_0;
 }
