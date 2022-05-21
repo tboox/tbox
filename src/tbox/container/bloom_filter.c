@@ -312,7 +312,7 @@ tb_bool_t tb_bloom_filter_data_set(tb_bloom_filter_ref_t self, tb_byte_t const* 
 {
     // check
     tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
-    tb_assert_and_check_return_val(filter && size, tb_false);
+    tb_assert_and_check_return_val(filter && data && size, tb_false);
 
     // ensure data space
     if (filter->data) filter->data = tb_ralloc_bytes(filter->data, size);
