@@ -292,4 +292,35 @@ tb_bool_t tb_bloom_filter_get(tb_bloom_filter_ref_t self, tb_cpointer_t data)
     // ok?
     return (i == n)? tb_true : tb_false;
 }
+tb_byte_t const* tb_bloom_filter_data(tb_bloom_filter_ref_t self)
+{
+    // check
+    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_assert_and_check_return_val(filter, tb_null);
 
+    return filter->data;
+}
+tb_size_t tb_bloom_filter_size(tb_bloom_filter_ref_t self)
+{
+    // check
+    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_assert_and_check_return_val(filter, 0);
+
+    return filter->size;
+}
+tb_bool_t tb_bloom_filter_data_set(tb_bloom_filter_ref_t self, tb_byte_t const* data, tb_size_t size)
+{
+    // check
+    tb_bloom_filter_t* filter = (tb_bloom_filter_t*)self;
+    tb_assert_and_check_return_val(filter && size, tb_false);
+
+    // ensure data space
+    if (filter->data) filter->data = tb_ralloc_bytes(filter->data, size);
+    else filter->data = tb_malloc_bytes(size);
+    tb_assert_and_check_return_val(filter->data, tb_false);
+
+    // copy data
+    tb_memcpy(filter->data, data, size);
+    filter->size = size;
+    return tb_true;
+}

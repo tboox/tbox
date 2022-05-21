@@ -196,6 +196,32 @@ tb_bool_t               tb_bloom_filter_set(tb_bloom_filter_ref_t bloom_filter, 
  */
 tb_bool_t               tb_bloom_filter_get(tb_bloom_filter_ref_t bloom_filter, tb_cpointer_t data);
 
+/* get data
+ *
+ * @param bloom_filter  the bloom filter
+ *
+ * @return              the bloom filter data
+ */
+tb_byte_t const*        tb_bloom_filter_data(tb_bloom_filter_ref_t bloom_filter);
+
+/* get data size
+ *
+ * @param bloom_filter  the bloom filter
+ *
+ * @return              the bloom filter data size
+ */
+tb_size_t               tb_bloom_filter_size(tb_bloom_filter_ref_t bloom_filter);
+
+/* set data, we can use this to copy data from another bloom filter
+ *
+ * @param bloom_filter  the bloom filter
+ * @param data          the bloom filter data
+ * @param size          the bloom filter size
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_bloom_filter_data_set(tb_bloom_filter_ref_t bloom_filter, tb_byte_t const* data, tb_size_t size);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
