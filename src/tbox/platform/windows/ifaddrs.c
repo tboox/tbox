@@ -73,9 +73,6 @@ static tb_void_t tb_ifaddrs_interface_load4(tb_list_ref_t interfaces)
         PIP_ADAPTER_INFO adapter = adapter_info;
         while (adapter)
         {
-            // check
-            tb_assert(adapter->AdapterName);
-
             /* attempt to get the interface from the cached interfaces
              * and make a new interface if no the cached interface
              */
