@@ -36,9 +36,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_LIBC_HAVE_RANDOM) && \
-        defined(TB_CONFIG_LIBC_HAVE_SRANDOM)
+#if defined(TB_CONFIG_LIBC_HAVE_RANDOM) && defined(TB_CONFIG_LIBC_HAVE_SRANDOM)
 #   include "../../platform/libc/random.c"
+#elif defined(TB_CONFIG_OS_WINDOWS)
+#   include "../../platform/windows/random.c"
 #else
 tb_void_t tb_random_seed(tb_size_t seed)
 {
