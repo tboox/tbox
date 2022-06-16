@@ -35,17 +35,23 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
     tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
     tb_check_return(head != tail);
 
-    // init, FIXME https://github.com/tboox/tbox/issues/187
-    tb_size_t       step = tb_iterator_step(iterator);
-    tb_pointer_t    key = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    // get flag
+    tb_size_t step = tb_iterator_step(iterator);
+    tb_size_t flag = tb_iterator_flag(iterator);
+    if (!flag && step > sizeof(tb_pointer_t))
+        flag |= TB_ITERATOR_FLAG_ITEM_REF;
+
+    // init key item
+    tb_pointer_t    key = (flag & TB_ITERATOR_FLAG_ITEM_REF)? tb_malloc(step) : tb_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || key);
 
     // the comparer
     if (!comp) comp = tb_iterator_comp;
 
     // hole => key
-    if (step <= sizeof(tb_pointer_t)) key = tb_iterator_item(iterator, head);
-    else tb_memcpy(key, tb_iterator_item(iterator, head), step);
+    if (flag & TB_ITERATOR_FLAG_ITEM_REF)
+        tb_memcpy(key, tb_iterator_item(iterator, head), step);
+    else key = tb_iterator_item(iterator, head);
 
     // quick_sort
     tb_size_t l = head;
@@ -80,8 +86,8 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
     // quick_sort [hole + 1, tail]
     tb_quick_sort(iterator, ++l, tail, comp);
 
-    // free
-    if (key && step > sizeof(tb_pointer_t)) tb_free(key);
+    // free key item
+    if (key && flag & TB_ITERATOR_FLAG_ITEM_REF) tb_free(key);
 }
 tb_void_t tb_quick_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {
