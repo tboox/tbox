@@ -35,7 +35,7 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
     tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_RACCESS));
     tb_check_return(head != tail);
 
-    // init
+    // init, FIXME https://github.com/tboox/tbox/issues/187
     tb_size_t       step = tb_iterator_step(iterator);
     tb_pointer_t    key = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || key);
