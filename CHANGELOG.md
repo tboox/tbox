@@ -2,6 +2,13 @@
 
 ## master (unreleased)
 
+## v1.6.9
+
+### Changes
+
+* Improve bloom filter
+* Improve random for msvc
+
 ## v1.6.8
 
 ### Changes
@@ -233,6 +240,13 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.6.9
+
+### 改进
+
+* 改进 bloom filter
+* 改进 windows/msvc 下 random 实现
 
 ## v1.6.8
 
