@@ -151,6 +151,7 @@ tb_void_t tb_single_list_entry_init_(tb_single_list_entry_head_ref_t list, tb_si
     list->itor.priv = tb_null;
     list->itor.step = entry_size;
     list->itor.mode = TB_ITERATOR_MODE_FORWARD;
+    list->itor.flag = TB_ITERATOR_FLAG_ITEM_REF;
     list->itor.op   = &op;
 }
 tb_void_t tb_single_list_entry_exit(tb_single_list_entry_head_ref_t list)

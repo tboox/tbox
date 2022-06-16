@@ -173,6 +173,7 @@ tb_iterator_ref_t tb_array_iterator_init_ptr(tb_array_iterator_ref_t iterator, t
     iterator->base.priv     = tb_null;
     iterator->base.step     = sizeof(tb_pointer_t);
     iterator->base.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+    iterator->base.flag     = TB_ITERATOR_FLAG_ITEM_VAL;
     iterator->base.op       = &op;
     iterator->items         = items;
     iterator->count         = count;
@@ -205,6 +206,7 @@ tb_iterator_ref_t tb_array_iterator_init_mem(tb_array_iterator_ref_t iterator, t
     iterator->base.priv     = tb_null;
     iterator->base.step     = size;
     iterator->base.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+    iterator->base.flag     = TB_ITERATOR_FLAG_ITEM_REF;
     iterator->base.op       = &op;
     iterator->items         = items;
     iterator->count         = count;
@@ -237,6 +239,7 @@ tb_iterator_ref_t tb_array_iterator_init_str(tb_array_iterator_ref_t iterator, t
     iterator->base.priv     = tb_null;
     iterator->base.step     = sizeof(tb_char_t const*);
     iterator->base.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+    iterator->base.flag     = TB_ITERATOR_FLAG_ITEM_VAL;
     iterator->base.op       = &op;
     iterator->items         = items;
     iterator->count         = count;
@@ -269,6 +272,7 @@ tb_iterator_ref_t tb_array_iterator_init_istr(tb_array_iterator_ref_t iterator, 
     iterator->base.priv     = tb_null;
     iterator->base.step     = sizeof(tb_char_t const*);
     iterator->base.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+    iterator->base.flag     = TB_ITERATOR_FLAG_ITEM_VAL;
     iterator->base.op       = &op;
     iterator->items         = items;
     iterator->count         = count;
@@ -306,6 +310,7 @@ tb_iterator_ref_t tb_array_iterator_init_long(tb_array_iterator_ref_t iterator, 
     iterator->base.priv     = tb_null;
     iterator->base.step     = sizeof(tb_long_t);
     iterator->base.mode     = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
+    iterator->base.flag     = TB_ITERATOR_FLAG_ITEM_VAL;
     iterator->base.op       = &op;
     iterator->items         = items;
     iterator->count         = count;

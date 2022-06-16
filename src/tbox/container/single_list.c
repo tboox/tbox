@@ -233,6 +233,8 @@ tb_single_list_ref_t tb_single_list_init(tb_size_t grow, tb_element_t element)
         list->itor.step = element.size;
         list->itor.mode = TB_ITERATOR_MODE_FORWARD;
         list->itor.op   = &op;
+        if (element.type == TB_ELEMENT_TYPE_MEM)
+            list->itor.flag = TB_ITERATOR_FLAG_ITEM_REF;
 
         // init pool, item = entry + data
         list->pool = tb_fixed_pool_init(tb_null, grow, sizeof(tb_single_list_entry_t) + element.size, tb_null, tb_single_list_item_exit, (tb_cpointer_t)list);

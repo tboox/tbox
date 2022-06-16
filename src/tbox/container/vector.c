@@ -227,6 +227,8 @@ tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_element_t element)
         vector->itor.step = element.size;
         vector->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
         vector->itor.op   = &op;
+        if (element.type == TB_ELEMENT_TYPE_MEM)
+            vector->itor.flag = TB_ITERATOR_FLAG_ITEM_REF;
 
         // make data
         vector->data = (tb_byte_t*)tb_nalloc0(vector->maxn, element.size);
@@ -244,8 +246,6 @@ tb_vector_ref_t tb_vector_init(tb_size_t grow, tb_element_t element)
         if (vector) tb_vector_exit((tb_vector_ref_t)vector);
         vector = tb_null;
     }
-
-    // ok?
     return (tb_vector_ref_t)vector;
 }
 tb_void_t tb_vector_exit(tb_vector_ref_t self)

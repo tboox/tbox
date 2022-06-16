@@ -36,8 +36,8 @@ __tb_extern_c_enter__
  * types
  */
 
-/// the iterator mode type
-typedef enum __tb_iterator_mode_t
+/// the iterator mode enum
+typedef enum __tb_iterator_mode_e
 {
     TB_ITERATOR_MODE_FORWARD        = 1     //!< forward iterator
 ,   TB_ITERATOR_MODE_REVERSE        = 2     //!< reverse iterator
@@ -45,7 +45,15 @@ typedef enum __tb_iterator_mode_t
 ,   TB_ITERATOR_MODE_MUTABLE        = 8     //!< mutable iterator, the item of the same iterator is mutable for removing and moving, .e.g vector, hash, ...
 ,   TB_ITERATOR_MODE_READONLY       = 16    //!< readonly iterator
 
-}tb_iterator_mode_t;
+}tb_iterator_mode_e;
+
+/// the iterator flag enum
+typedef enum __tb_iterator_flag_e
+{
+    TB_ITERATOR_FLAG_ITEM_VAL       = 1     //!< the value item: int, pointer, c-string
+,   TB_ITERATOR_FLAG_ITEM_REF       = 2     //!< the reference of value, &value
+
+}tb_iterator_flag_e;
 
 /// the iterator operation type
 struct __tb_iterator_t;
@@ -93,10 +101,13 @@ typedef tb_iterator_op_t const* tb_iterator_op_ref_t;
 typedef struct __tb_iterator_t
 {
     /// the iterator mode
-    tb_size_t               mode;
+    tb_uint32_t             mode : 8;
+
+    /// the iterator flag
+    tb_uint32_t             flag : 8;
 
     /// the iterator step
-    tb_size_t               step;
+    tb_uint32_t             step : 16;
 
     /// the iterator priv
     tb_pointer_t            priv;
@@ -120,6 +131,14 @@ typedef tb_long_t           (*tb_iterator_comp_t)(tb_iterator_ref_t iterator, tb
  * @return          the iterator mode
  */
 tb_size_t           tb_iterator_mode(tb_iterator_ref_t iterator);
+
+/*! the iterator flag
+ *
+ * @param iterator  the iterator
+ *
+ * @return          the iterator flag
+ */
+tb_size_t           tb_iterator_flag(tb_iterator_ref_t iterator);
 
 /*! the iterator step
  *

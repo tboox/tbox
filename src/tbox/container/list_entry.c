@@ -173,6 +173,7 @@ tb_void_t tb_list_entry_init_(tb_list_entry_head_ref_t list, tb_size_t entry_off
     list->itor.priv = tb_null;
     list->itor.step = entry_size;
     list->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
+    list->itor.flag = TB_ITERATOR_FLAG_ITEM_REF;
     list->itor.op   = &op;
 }
 tb_void_t tb_list_entry_exit(tb_list_entry_head_ref_t list)

@@ -200,6 +200,8 @@ tb_circle_queue_ref_t tb_circle_queue_init(tb_size_t maxn, tb_element_t element)
         queue->itor.step = element.size;
         queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_MUTABLE;
         queue->itor.op   = &op;
+        if (element.type == TB_ELEMENT_TYPE_MEM)
+            queue->itor.flag = TB_ITERATOR_FLAG_ITEM_REF;
 
         // make data
         queue->data = (tb_byte_t*)tb_nalloc0(queue->maxn, element.size);

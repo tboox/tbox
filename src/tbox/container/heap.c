@@ -514,6 +514,8 @@ tb_heap_ref_t tb_heap_init(tb_size_t grow, tb_element_t element)
         heap->itor.step = element.size;
         heap->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS | TB_ITERATOR_MODE_MUTABLE;
         heap->itor.op   = &op;
+        if (element.type == TB_ELEMENT_TYPE_MEM)
+            heap->itor.flag = TB_ITERATOR_FLAG_ITEM_REF;
 
         // make data
         heap->data = (tb_byte_t*)tb_nalloc0(heap->maxn, element.size);
