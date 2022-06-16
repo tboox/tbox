@@ -36,9 +36,14 @@ tb_void_t tb_bubble_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t t
     tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD));
     tb_check_return(head != tail);
 
-    // init
-    tb_size_t       step = tb_iterator_step(iterator);
-    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    // get flag
+    tb_size_t step = tb_iterator_step(iterator);
+    tb_size_t flag = tb_iterator_flag(iterator);
+    if (!flag && step > sizeof(tb_pointer_t))
+        flag |= TB_ITERATOR_FLAG_ITEM_REF;
+
+    // init temp item
+    tb_pointer_t temp = flag & TB_ITERATOR_FLAG_ITEM_REF? tb_malloc(step) : tb_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
     // the comparer
@@ -52,16 +57,17 @@ tb_void_t tb_bubble_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t t
         {
             if (comp(iterator, tb_iterator_item(iterator, itor2), tb_iterator_item(iterator, itor1)) < 0)
             {
-                if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, itor1);
-                else tb_memcpy(temp, tb_iterator_item(iterator, itor1), step);
+                if (flag & TB_ITERATOR_FLAG_ITEM_REF)
+                    tb_memcpy(temp, tb_iterator_item(iterator, itor1), step);
+                else temp = tb_iterator_item(iterator, itor1);
                 tb_iterator_copy(iterator, itor1, tb_iterator_item(iterator, itor2));
                 tb_iterator_copy(iterator, itor2, temp);
             }
         }
     }
 
-    // free
-    if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
+    // free temp item
+    if (temp && (flag & TB_ITERATOR_FLAG_ITEM_REF)) tb_free(temp);
 }
 tb_void_t tb_bubble_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {

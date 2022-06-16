@@ -42,7 +42,7 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
         flag |= TB_ITERATOR_FLAG_ITEM_REF;
 
     // init key item
-    tb_pointer_t    key = (flag & TB_ITERATOR_FLAG_ITEM_REF)? tb_malloc(step) : tb_null;
+    tb_pointer_t key = (flag & TB_ITERATOR_FLAG_ITEM_REF)? tb_malloc(step) : tb_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || key);
 
     // the comparer
@@ -87,7 +87,7 @@ tb_void_t tb_quick_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t ta
     tb_quick_sort(iterator, ++l, tail, comp);
 
     // free key item
-    if (key && flag & TB_ITERATOR_FLAG_ITEM_REF) tb_free(key);
+    if (key && (flag & TB_ITERATOR_FLAG_ITEM_REF)) tb_free(key);
 }
 tb_void_t tb_quick_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {

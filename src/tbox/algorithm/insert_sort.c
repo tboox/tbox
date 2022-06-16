@@ -72,9 +72,14 @@ tb_void_t tb_insert_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t t
     tb_assert_and_check_return((tb_iterator_mode(iterator) & TB_ITERATOR_MODE_REVERSE));
     tb_check_return(head != tail);
 
-    // init
-    tb_size_t       step = tb_iterator_step(iterator);
-    tb_pointer_t    temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
+    // get flag
+    tb_size_t step = tb_iterator_step(iterator);
+    tb_size_t flag = tb_iterator_flag(iterator);
+    if (!flag && step > sizeof(tb_pointer_t))
+        flag |= TB_ITERATOR_FLAG_ITEM_REF;
+
+    // init temp item
+    tb_pointer_t temp = flag & TB_ITERATOR_FLAG_ITEM_REF? tb_malloc(step) : tb_null;
     tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
     // the comparer
@@ -85,19 +90,20 @@ tb_void_t tb_insert_sort(tb_iterator_ref_t iterator, tb_size_t head, tb_size_t t
     for (next = tb_iterator_next(iterator, head); next != tail; next = tb_iterator_next(iterator, next))
     {
         // save next
-        if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, next);
-        else tb_memcpy(temp, tb_iterator_item(iterator, next), step);
+        if (flag & TB_ITERATOR_FLAG_ITEM_REF)
+            tb_memcpy(temp, tb_iterator_item(iterator, next), step);
+        else temp = tb_iterator_item(iterator, next);
 
         // look for hole and move elements[hole, next - 1] => [hole + 1, next]
         for (last = next; last != head && (last = tb_iterator_prev(iterator, last), comp(iterator, temp, tb_iterator_item(iterator, last)) < 0); next = last)
-                tb_iterator_copy(iterator, next, tb_iterator_item(iterator, last));
+            tb_iterator_copy(iterator, next, tb_iterator_item(iterator, last));
 
         // item => hole
         tb_iterator_copy(iterator, next, temp);
     }
 
-    // free
-    if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
+    // free temp item
+    if (temp && (flag & TB_ITERATOR_FLAG_ITEM_REF)) tb_free(temp);
 }
 tb_void_t tb_insert_sort_all(tb_iterator_ref_t iterator, tb_iterator_comp_t comp)
 {
