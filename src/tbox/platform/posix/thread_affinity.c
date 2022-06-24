@@ -26,6 +26,7 @@
 #include "../sched.h"
 #include "../thread.h"
 #include <pthread.h>
+#include <string.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
