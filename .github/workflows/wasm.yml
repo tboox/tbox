@@ -30,5 +30,6 @@ jobs:
 
       - name: Tests
         run: |
-          emcc -dM -E - < /dev/null
+          touch /tmp/a.c
+          emcc -dM -E /tmp/a.c
           xmake f -p wasm
