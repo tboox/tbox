@@ -25,6 +25,9 @@
  * includes
  */
 #include "../config.h"
+#ifdef TB_CONFIG_OS_WEB
+#   define TB_CONFIG_OS_LINUX
+#endif
 
 #endif
 
