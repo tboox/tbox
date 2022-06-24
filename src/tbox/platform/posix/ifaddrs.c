@@ -25,7 +25,7 @@
 #include "prefix.h"
 #include "../ifaddrs.h"
 #include <ifaddrs.h>
-#ifdef TB_CONFIG_OS_LINUX
+#if defined(TB_CONFIG_OS_LINUX) && !defined(TB_CONFIG_OS_WEB)
 #   include <linux/if.h>
 #else
 #   include <net/if.h>
