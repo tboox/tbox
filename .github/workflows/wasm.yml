@@ -30,4 +30,5 @@ jobs:
 
       - name: Tests
         run: |
+          emcc -dM -E - < /dev/null
           xmake f -p wasm
