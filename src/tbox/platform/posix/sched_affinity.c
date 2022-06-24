@@ -24,6 +24,7 @@
  * includes
  */
 #include "../sched.h"
+#include <string.h>
 #include <sched.h>
 #include <sys/types.h>
 
