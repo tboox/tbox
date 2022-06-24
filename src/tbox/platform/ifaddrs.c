@@ -72,7 +72,7 @@ static tb_ifaddrs_interface_ref_t tb_ifaddrs_interface_find(tb_iterator_ref_t it
 #ifdef TB_CONFIG_OS_WINDOWS
 #   include "windows/ifaddrs.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_GETIFADDRS)
-#   if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#   if (defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)) && !defined(TB_CONFIG_OS_WEB)
 #       include "linux/ifaddrs.c"
 #   else
 #       include "posix/ifaddrs.c"
