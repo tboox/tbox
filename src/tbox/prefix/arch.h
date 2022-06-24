@@ -245,6 +245,15 @@
 #   else
 #       error unknown arch for tiny c, please define target like -DTCC_TARGET_I386
 #   endif
+#elif defined(__asmjs__) || defined(__asmjs)
+#   define TB_ARCH_WASM
+#   ifdef __ILP32__
+#       define TB_ARCH_WASM32
+#       define TB_ARCH_STRING                   "wasm32"
+#   else
+#       define TB_ARCH_WASM64
+#       define TB_ARCH_STRING                   "wasm64"
+#   endif
 #else
 #   error unknown arch
 #   define TB_ARCH_STRING                   "unknown_arch"
