@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Support wasm
+
 ## v1.6.9
 
 ### Changes
@@ -244,6 +248,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 支持 wasm
 
 ## v1.6.9
 
