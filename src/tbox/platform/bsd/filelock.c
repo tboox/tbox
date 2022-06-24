@@ -24,7 +24,7 @@
  */
 #include "../filelock.h"
 #include "../file.h"
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID) || defined(TB_CONFIG_OS_WEB)
 #   include <sys/file.h>
 #else
 #   include <fcntl.h>
