@@ -123,7 +123,17 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && dir && events, tb_false);
     tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
 
-    tb_int_t wd = open(dir, O_EVTONLY);
+    tb_int_t o_flags = 0;
+#  ifdef O_SYMLINK
+    o_flags |= O_SYMLINK;
+#  endif
+#  ifdef O_EVTONLY
+    // The descriptor is requested for event notifications only.
+    o_flags |= O_EVTONLY;
+#  else
+    o_flags |= O_RDONLY;
+#  endif
+    tb_int_t wd = open(dir, o_flags);
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
     tb_size_t i = fwatcher->entries_size;
