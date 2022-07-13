@@ -30,7 +30,7 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-        && !defined(TB_CONFIG_MICRO_ENABLE)
+    && !defined(TB_CONFIG_MICRO_ENABLE)
 #   include "../../coroutine/coroutine.h"
 #   include "../../coroutine/impl/impl.h"
 #endif
@@ -136,9 +136,9 @@ tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t
 {
     // TODO
 #if 0/*defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-        && !defined(TB_CONFIG_MICRO_ENABLE)*/
+       && !defined(TB_CONFIG_MICRO_ENABLE)*/
     // attempt to wait it in coroutine if timeout is non-zero
-    if (timeout && tb_coroutine_self())
+        if (timeout && tb_coroutine_self())
     {
         tb_poller_object_t object;
         object.type = TB_POLLER_OBJECT_PIPE;
@@ -152,6 +152,30 @@ tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t
 
 tb_long_t tb_fwatcher_entry_read(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_char_t const* pfile)
 {
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && entry && pfile, -1);
+
+    tb_int_t real = read(tb_entry2fd(entry), fwatcher->buffer, sizeof(fwatcher->buffer));
+    tb_check_return_val(real >= 0, -1);
+
+    tb_int_t i = 0;
+    while (i < real)
+    {
+        struct inotify_event* event = (struct inotify_event*)&fwatcher->buffer[i];
+        if (event->mask & IN_CREATE)
+        {
+            tb_trace_i("The file %s was created.\n", event->name);
+        }
+        else if (event->mask & IN_DELETE)
+        {
+            tb_trace_i("The file %s was deleted.\n", event->name);
+        }
+        else if (event->mask & IN_MODIFY)
+        {
+            tb_trace_i("The file %s was modified.\n", event->name);
+        }
+        i += TB_FWATCHER_EVENT_SIZE + event->len;
+    }
     return -1;
 }
 
