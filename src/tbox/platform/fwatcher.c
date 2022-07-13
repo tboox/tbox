@@ -35,6 +35,8 @@
  */
 #if defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT)
 #   include "linux/fwatcher.c"
+#elif defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_BSD)
+#   include "bsd/fwatcher.c"
 #else
 tb_fwatcher_ref_t tb_fwatcher_init()
 {
