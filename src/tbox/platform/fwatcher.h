@@ -101,22 +101,20 @@ tb_bool_t               tb_fwatcher_entry_remove(tb_fwatcher_ref_t fwatcher, tb_
 /*! wait the fwatcher events
  *
  * @param fwatcher      the fwatcher
- * @param entry         the watched directory entry
  * @param timeout       the timeout, infinity: -1
  *
  * @return              > 0: has events, 0: timeout, -1: failed
  */
-tb_long_t               tb_fwatcher_entry_wait(tb_fwatcher_ref_t fwatcher, tb_fwatcher_entry_ref_t entry, tb_long_t timeout);
+tb_long_t               tb_fwatcher_entry_wait(tb_fwatcher_ref_t fwatcher, tb_long_t timeout);
 
 /*! get the events from the watched directory entry
  *
  * @param fwatcher      the fwatcher
- * @param entry         the watched directory entry
  * @param pfile         the file path pointer
  *
  * @return              the fwatcher events count
  */
-tb_size_t               tb_fwatcher_entry_events(tb_fwatcher_ref_t fwatcher, tb_fwatcher_entry_ref_t entry, tb_fwatcher_event_t* events, tb_size_t events_maxn);
+tb_size_t               tb_fwatcher_entry_events(tb_fwatcher_ref_t fwatcher, tb_fwatcher_event_t* events, tb_size_t events_maxn);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

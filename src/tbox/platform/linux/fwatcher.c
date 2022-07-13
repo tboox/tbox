@@ -136,8 +136,11 @@ tb_bool_t tb_fwatcher_entry_remove(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref
     return inotify_rm_watch(fwatcher->fd, tb_entry2fd(entry)) == 0;
 }
 
-tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_long_t timeout)
+tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_long_t timeout)
 {
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0, -1);
+
     // TODO
 #if 0/*defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
        && !defined(TB_CONFIG_MICRO_ENABLE)*/
@@ -151,15 +154,15 @@ tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t
     }
 #endif
     // we use poll/select to wait pipe/fd events
-    return tb_socket_wait_impl((tb_socket_ref_t)entry, TB_SOCKET_EVENT_RECV, timeout);
+    return tb_socket_wait_impl(tb_fd2sock(fwatcher->fd), TB_SOCKET_EVENT_RECV, timeout);
 }
 
-tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_fwatcher_event_t* events, tb_size_t events_maxn)
+tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && entry && events && events_maxn, 0);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && events && events_maxn, 0);
 
-    tb_int_t real = read(tb_entry2fd(entry), fwatcher->buffer, sizeof(fwatcher->buffer));
+    tb_int_t real = read(fwatcher->fd, fwatcher->buffer, sizeof(fwatcher->buffer));
     tb_check_return_val(real >= 0, -1);
 
     tb_int_t i = 0;
