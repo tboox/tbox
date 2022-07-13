@@ -175,6 +175,7 @@ static tb_demo_t g_demo[] =
 ,   TB_DEMO_MAIN_ITEM(platform_environment)
 ,   TB_DEMO_MAIN_ITEM(platform_pipe_pair)
 ,   TB_DEMO_MAIN_ITEM(platform_named_pipe)
+,   TB_DEMO_MAIN_ITEM(platform_fwatcher)
 ,   TB_DEMO_MAIN_ITEM(platform_lock)
 ,   TB_DEMO_MAIN_ITEM(platform_timer)
 ,   TB_DEMO_MAIN_ITEM(platform_ltimer)
