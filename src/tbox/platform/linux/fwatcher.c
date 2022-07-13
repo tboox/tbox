@@ -24,6 +24,7 @@
  */
 #include "../fwatcher.h"
 #include "../socket.h"
+#include "../poller.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -49,19 +50,21 @@
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
-    tb_int_t    fd;
-    tb_int_t    entries[TB_FWATCHER_ENTRIES_MAXN];
-    tb_size_t   entries_size;
-    tb_byte_t   buffer[TB_FWATCHER_BUFFER_SIZE];
+    tb_int_t        fd;
+    tb_int_t        entries[TB_FWATCHER_ENTRIES_MAXN];
+    tb_size_t       entries_size;
+    tb_byte_t       buffer[TB_FWATCHER_BUFFER_SIZE];
+    tb_poller_ref_t poller;
 
 }tb_fwatcher_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * declaration
+ * private implementation
  */
-__tb_extern_c_enter__
-tb_long_t tb_socket_wait_impl(tb_socket_ref_t sock, tb_size_t events, tb_long_t timeout);
-__tb_extern_c_leave__
+static tb_void_t tb_fwatcher_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
+{
+    // we need only an empty callback
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -77,6 +80,11 @@ tb_fwatcher_ref_t tb_fwatcher_init()
 
         fwatcher->fd = inotify_init();
         tb_assert_and_check_break(fwatcher->fd >= 0);
+
+        fwatcher->poller = tb_poller_init(tb_null);
+        tb_assert_and_check_break(fwatcher->poller);
+
+        tb_poller_insert_sock(fwatcher->poller, tb_fd2sock(fwatcher->fd), TB_POLLER_EVENT_RECV, tb_null);
 
         ok = tb_true;
     } while (0);
@@ -113,6 +121,8 @@ tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         }
         if (ok)
         {
+            if (fwatcher->poller)
+                tb_poller_exit(fwatcher->poller);
             tb_free(fwatcher);
             fwatcher = tb_null;
         }
@@ -137,13 +147,20 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     return tb_true;
 }
 
+tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
+{
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    if (fwatcher && fwatcher->poller)
+        tb_poller_spak(fwatcher->poller);
+}
+
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && events && events_maxn, -1);
 
-    // we use poll/select to wait pipe/fd events
-    tb_long_t wait = tb_socket_wait_impl(tb_fd2sock(fwatcher->fd), TB_SOCKET_EVENT_RECV, timeout);
+    // wait events
+    tb_long_t wait = tb_poller_wait(fwatcher->poller, tb_fwatcher_event, timeout);
     tb_assert_and_check_return_val(wait >= 0, -1);
     tb_check_return_val(wait > 0, 0);
 

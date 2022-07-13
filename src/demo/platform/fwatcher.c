@@ -21,8 +21,8 @@ tb_int_t tb_demo_platform_fwatcher_main(tb_int_t argc, tb_char_t** argv)
                 for (tb_size_t i = 0; i < count; i++)
                 {
                     tb_fwatcher_event_t const* event = &events[i];
-                    tb_char_t const* status = event->event == TB_FWATCHER_EVENT_CREATE? "create" :
-                        (event->event == TB_FWATCHER_EVENT_MODIFY? "modify" : "delete");
+                    tb_char_t const* status = event->event == TB_FWATCHER_EVENT_CREATE? "created" :
+                        (event->event == TB_FWATCHER_EVENT_MODIFY? "modified" : "deleted");
                     tb_trace_i("watch: %s %s", event->filepath, status);
                 }
             }

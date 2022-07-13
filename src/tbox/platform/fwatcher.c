@@ -53,7 +53,12 @@ tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
 {
     tb_trace_noimpl();
-    return tb_null;
+    return tb_false;
+}
+
+tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
+{
+    tb_trace_noimpl();
 }
 
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)

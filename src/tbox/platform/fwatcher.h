@@ -86,6 +86,12 @@ tb_bool_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
  */
 tb_bool_t               tb_fwatcher_register(tb_fwatcher_ref_t fwatcher, tb_char_t const* dir, tb_size_t events);
 
+/*! spank the fwatcher, break the tb_fwatcher_wait() and return all events
+ *
+ * @param fwatcher      the fwatcher
+ */
+tb_void_t               tb_fwatcher_spak(tb_fwatcher_ref_t fwatcher);
+
 /*! wait the fwatcher events
  *
  * @param fwatcher      the fwatcher

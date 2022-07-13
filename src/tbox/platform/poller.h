@@ -157,7 +157,7 @@ tb_cpointer_t       tb_poller_priv(tb_poller_ref_t poller);
  */
 tb_void_t           tb_poller_kill(tb_poller_ref_t poller);
 
-/*! spak the poller, break the tb_poller_wait() and return all events
+/*! spank the poller, break the tb_poller_wait() and return all events
  *
  * @param poller    the poller
  */
