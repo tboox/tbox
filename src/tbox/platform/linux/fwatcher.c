@@ -169,21 +169,20 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     while (i < real && events_count < events_maxn)
     {
         struct inotify_event* event = (struct inotify_event*)&fwatcher->buffer[i];
+
+        // get event code
+        tb_size_t event_code = 0;
         if (event->mask & IN_CREATE)
-        {
-            events[events_count].event = TB_FWATCHER_EVENT_CREATE;
-            events[events_count].filepath = event->name;
-            events_count++;
-        }
+            event_code = TB_FWATCHER_EVENT_CREATE;
         else if (event->mask & IN_DELETE)
-        {
-            events[events_count].event = TB_FWATCHER_EVENT_DELETE;
-            events[events_count].filepath = event->name;
-            events_count++;
-        }
+            event_code = TB_FWATCHER_EVENT_DELETE;
         else if (event->mask & IN_MODIFY)
+            event_code = TB_FWATCHER_EVENT_MODIFY;
+
+        // add event
+        if (event_code)
         {
-            events[events_count].event = TB_FWATCHER_EVENT_MODIFY;
+            events[events_count].event = event_code;
             events[events_count].filepath = event->name;
             events_count++;
         }
