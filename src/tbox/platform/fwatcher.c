@@ -44,10 +44,9 @@ tb_fwatcher_ref_t tb_fwatcher_init()
     return tb_null;
 }
 
-tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
+tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 {
     tb_trace_noimpl();
-    return tb_false;
 }
 
 tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)

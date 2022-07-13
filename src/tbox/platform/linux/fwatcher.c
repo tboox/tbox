@@ -98,12 +98,12 @@ tb_fwatcher_ref_t tb_fwatcher_init()
     return (tb_fwatcher_ref_t)fwatcher;
 }
 
-tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
+tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 {
-    tb_bool_t ok = tb_false;
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
+        // exit fd and entries
         if (fwatcher->fd >= 0)
         {
             for (tb_size_t i = 0; i < fwatcher->entries_size; i++)
@@ -113,21 +113,18 @@ tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             }
             fwatcher->entries_size = 0;
 
-            if (close(fwatcher->fd) == 0)
-            {
-                fwatcher->fd = -1;
-                ok = tb_true;
-            }
+            close(fwatcher->fd);
+            fwatcher->fd = -1;
         }
-        if (ok)
-        {
-            if (fwatcher->poller)
-                tb_poller_exit(fwatcher->poller);
-            tb_free(fwatcher);
-            fwatcher = tb_null;
-        }
+
+        // exit poller
+        if (fwatcher->poller)
+            tb_poller_exit(fwatcher->poller);
+
+        // exit watcher
+        tb_free(fwatcher);
+        fwatcher = tb_null;
     }
-    return ok;
 }
 
 tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)

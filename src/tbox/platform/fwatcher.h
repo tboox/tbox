@@ -71,10 +71,8 @@ tb_fwatcher_ref_t       tb_fwatcher_init(tb_noarg_t);
 /*! exit the fwatcher
  *
  * @param fwatcher      the fwatcher
- *
- * @return              tb_true or tb_false
  */
-tb_bool_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
+tb_void_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
 
 /*! register the watched directory
  *
