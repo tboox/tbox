@@ -125,8 +125,6 @@ tb_long_t               tb_pipe_file_write(tb_pipe_file_ref_t file, tb_byte_t co
 
 /*! wait the pipe file events
  *
- * @note it still don't support waiting in the coroutine.
- *
  * @param file          the file
  * @param events        the pipe file events
  * @param timeout       the timeout, infinity: -1

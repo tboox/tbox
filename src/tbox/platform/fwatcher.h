@@ -1,0 +1,97 @@
+/*!The Treasure Box Library
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (C) 2009-present, TBOOX Open Source Group.
+ *
+ * @author      ruki
+ * @file        fwatcher.h
+ * @ingroup     platform
+ *
+ */
+#ifndef TB_PLATFORM_FWATCHER_H
+#define TB_PLATFORM_FWATCHER_H
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * includes
+ */
+#include "prefix.h"
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the fwatcher ref type
+typedef __tb_typeref__(fwatcher);
+
+/// the fwatcher event enum
+typedef enum __tb_event_event_e
+{
+    TB_FWATCHER_EVENT_NONE   = 0
+,   TB_FWATCHER_EVENT_MODIFY = 1
+,   TB_FWATCHER_EVENT_CREATE = 2
+,   TB_FWATCHER_EVENT_DELETE = 4
+
+}tb_fwatcher_event_e;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init the fwatcher directory watcher
+ *
+ * @param dir           the watched directory
+ * @param events        the watched events
+ *
+ * @return              the fwatcher
+ */
+tb_fwatcher_ref_t       tb_fwatcher_init(tb_char_t const* dir, tb_size_t events);
+
+/*! exit the fwatcher
+ *
+ * @param fwatcher      the fwatcher
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
+
+/*! wait the fwatcher events
+ *
+ * @param fwatcher      the fwatcher
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              > 0: has events, 0: timeout, -1: failed
+ */
+tb_long_t               tb_fwatcher_wait(tb_fwatcher_ref_t fwatcher, tb_long_t timeout);
+
+/*! read the fwatcher event
+ *
+ * @param fwatcher      the fwatcher
+ * @param pfile         the file path pointer
+ *
+ * @return              the fwatcher event or -1
+ */
+tb_long_t               tb_fwatcher_read(tb_fwatcher_ref_t fwatcher, tb_char_t const* pfile);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
+
+
+#endif
