@@ -350,6 +350,11 @@ function check_interfaces()
         check_module_cfuncs("systemv", {"sys/sem.h", "sys/ipc.h"}, "semget", "semtimedop")
     end
 
+    -- add the interfaces for linux
+    if is_plat("linux", "android") then
+        check_module_cfuncs("linux", {"sys/inotify.h"}, "inotify_init")
+    end
+
     -- add the interfaces for valgrind
     check_module_cfuncs("valgrind", "valgrind/valgrind.h",  "VALGRIND_STACK_REGISTER(0, 0)")
 

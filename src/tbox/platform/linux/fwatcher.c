@@ -20,22 +20,35 @@
  */
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME                "fwatcher"
-#define TB_TRACE_MODULE_DEBUG               (1)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "fwatcher.h"
+#include "../fwatcher.h"
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/inotify.h>
+#include <unistd.h>
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_FWATCHER_EVENT_SIZE      (sizeof(struct inotify_event))
+#define TB_FWATCHER_BUFFER_SIZE     (1024 * (TB_FWATCHER_EVENT_SIZE + 16))
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the fwatcher type
+typedef struct __tb_fwatcher_t
+{
+    tb_int_t dummy;
+
+}tb_fwatcher_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT)
-#   include "linux/fwatcher.c"
-#else
 tb_fwatcher_ref_t tb_fwatcher_init()
 {
     tb_trace_noimpl();
@@ -72,4 +85,3 @@ tb_long_t tb_fwatcher_entry_read(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t
     return -1;
 }
 
-#endif
