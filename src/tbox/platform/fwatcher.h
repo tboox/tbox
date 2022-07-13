@@ -39,9 +39,6 @@ __tb_extern_c_enter__
 /// the fwatcher ref type
 typedef __tb_typeref__(fwatcher);
 
-/// the fwatcher entry ref type
-typedef __tb_typeref__(fwatcher_entry);
-
 /// the fwatcher event enum
 typedef enum __tb_fwatcher_event_e
 {
@@ -79,42 +76,26 @@ tb_fwatcher_ref_t       tb_fwatcher_init(tb_noarg_t);
  */
 tb_bool_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
 
-/*! add the watched directory to watcher
+/*! register the watched directory
  *
  * @param fwatcher      the fwatcher
  * @param dir           the watched directory
  * @param events        the watched events
  *
- * @return              the watched directory entry
- */
-tb_fwatcher_entry_ref_t tb_fwatcher_entry_add(tb_fwatcher_ref_t fwatcher, tb_char_t const* dir, tb_size_t events);
-
-/*! remove the watched directory from watcher
- *
- * @param fwatcher      the fwatcher
- * @param entry         the watched directory entry
- *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_fwatcher_entry_remove(tb_fwatcher_ref_t fwatcher, tb_fwatcher_entry_ref_t entry);
+tb_bool_t               tb_fwatcher_register(tb_fwatcher_ref_t fwatcher, tb_char_t const* dir, tb_size_t events);
 
 /*! wait the fwatcher events
  *
  * @param fwatcher      the fwatcher
+ * @param events        the events list
+ * @param events_maxn   the events max count
  * @param timeout       the timeout, infinity: -1
  *
- * @return              > 0: has events, 0: timeout, -1: failed
+ * @return              > 0: the events count, 0: timeout, -1: failed
  */
-tb_long_t               tb_fwatcher_entry_wait(tb_fwatcher_ref_t fwatcher, tb_long_t timeout);
-
-/*! get the events from the watched directory entry
- *
- * @param fwatcher      the fwatcher
- * @param pfile         the file path pointer
- *
- * @return              the fwatcher events count
- */
-tb_size_t               tb_fwatcher_entry_events(tb_fwatcher_ref_t fwatcher, tb_fwatcher_event_t* events, tb_size_t events_maxn);
+tb_long_t               tb_fwatcher_wait(tb_fwatcher_ref_t fwatcher, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -29,27 +29,18 @@
 #include <sys/types.h>
 #include <sys/inotify.h>
 #include <unistd.h>
-#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-    && !defined(TB_CONFIG_MICRO_ENABLE)
-#   include "../../coroutine/coroutine.h"
-#   include "../../coroutine/impl/impl.h"
-#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_FWATCHER_EVENT_SIZE      (sizeof(struct inotify_event))
+#define TB_FWATCHER_EVENT_SIZE          (sizeof(struct inotify_event))
 #ifdef TB_CONFIG_SMALL
-#   define TB_FWATCHER_BUFFER_SIZE  (4096 * (TB_FWATCHER_EVENT_SIZE + 16))
+#   define TB_FWATCHER_ENTRIES_MAXN     64
+#   define TB_FWATCHER_BUFFER_SIZE      (4096 * (TB_FWATCHER_EVENT_SIZE + 16))
 #else
-#   define TB_FWATCHER_BUFFER_SIZE  (8192 * (TB_FWATCHER_EVENT_SIZE + 16))
+#   define TB_FWATCHER_ENTRIES_MAXN     256
+#   define TB_FWATCHER_BUFFER_SIZE      (8192 * (TB_FWATCHER_EVENT_SIZE + 16))
 #endif
-
-// fd to fwatcher entry
-#define tb_fd2entry(fd)              ((fd) >= 0? (tb_fwatcher_entry_ref_t)((tb_long_t)(fd) + 1) : tb_null)
-
-// fwatcher entry to fd
-#define tb_entry2fd(file)            (tb_int_t)((file)? (((tb_long_t)(file)) - 1) : -1)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -59,6 +50,8 @@
 typedef struct __tb_fwatcher_t
 {
     tb_int_t    fd;
+    tb_int_t    entries[TB_FWATCHER_ENTRIES_MAXN];
+    tb_size_t   entries_size;
     tb_byte_t   buffer[TB_FWATCHER_BUFFER_SIZE];
 
 }tb_fwatcher_t;
@@ -103,64 +96,56 @@ tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
-        if (fwatcher->fd >= 0 && close(fwatcher->fd) == 0)
+        if (fwatcher->fd >= 0)
         {
-            fwatcher->fd = -1;
+            for (tb_size_t i = 0; i < fwatcher->entries_size; i++)
+            {
+                tb_int_t fd = fwatcher->entries[i];
+                if (fd >= 0) inotify_rm_watch(fwatcher->fd, fd);
+            }
+            fwatcher->entries_size = 0;
+
+            if (close(fwatcher->fd) == 0)
+            {
+                fwatcher->fd = -1;
+                ok = tb_true;
+            }
+        }
+        if (ok)
+        {
             tb_free(fwatcher);
-            ok = tb_true;
+            fwatcher = tb_null;
         }
     }
     return ok;
 }
 
-tb_fwatcher_entry_ref_t tb_fwatcher_entry_add(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
+tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && dir && events, tb_null);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && dir && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
 
     tb_uint32_t mask = 0;
     if (events & TB_FWATCHER_EVENT_MODIFY) mask |= IN_MODIFY;
     if (events & TB_FWATCHER_EVENT_CREATE) mask |= IN_CREATE;
     if (events & TB_FWATCHER_EVENT_DELETE) mask |= IN_DELETE;
     tb_int_t wd = inotify_add_watch(fwatcher->fd, dir, mask);
-    tb_assert_and_check_return_val(wd >= 0, tb_null);
+    tb_assert_and_check_return_val(wd >= 0, tb_false);
 
-    return tb_fd2entry(wd);
+    fwatcher->entries[fwatcher->entries_size++] = wd;
+    return tb_true;
 }
 
-tb_bool_t tb_fwatcher_entry_remove(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry)
+tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && entry, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && events && events_maxn, -1);
 
-    return inotify_rm_watch(fwatcher->fd, tb_entry2fd(entry)) == 0;
-}
-
-tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_long_t timeout)
-{
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0, -1);
-
-    // TODO
-#if 0/*defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-       && !defined(TB_CONFIG_MICRO_ENABLE)*/
-    // attempt to wait it in coroutine if timeout is non-zero
-        if (timeout && tb_coroutine_self())
-    {
-        tb_poller_object_t object;
-        object.type = TB_POLLER_OBJECT_PIPE;
-        object.ref.pipe = file;
-        return tb_coroutine_waitio(&object, TB_SOCKET_EVENT_RECV, timeout);
-    }
-#endif
     // we use poll/select to wait pipe/fd events
-    return tb_socket_wait_impl(tb_fd2sock(fwatcher->fd), TB_SOCKET_EVENT_RECV, timeout);
-}
-
-tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn)
-{
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && events && events_maxn, 0);
+    tb_long_t wait = tb_socket_wait_impl(tb_fd2sock(fwatcher->fd), TB_SOCKET_EVENT_RECV, timeout);
+    tb_assert_and_check_return_val(wait >= 0, -1);
+    tb_check_return_val(wait > 0, 0);
 
     tb_int_t real = read(fwatcher->fd, fwatcher->buffer, sizeof(fwatcher->buffer));
     tb_check_return_val(real >= 0, -1);
@@ -192,4 +177,3 @@ tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_event_t* 
     }
     return events_count;
 }
-

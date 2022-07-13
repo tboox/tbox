@@ -96,48 +96,14 @@ tb_bool_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     return ok;
 }
 
-tb_fwatcher_entry_ref_t tb_fwatcher_entry_add(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
+tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
 {
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && dir && events, tb_null);
-
+    tb_trace_noimpl();
     return tb_null;
 }
 
-tb_bool_t tb_fwatcher_entry_remove(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry)
+tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && entry, tb_false);
-
-    return tb_false;
+    tb_trace_noimpl();
+    return -1;
 }
-
-tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_long_t timeout)
-{
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0, -1);
-
-    // TODO
-#if 0/*defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
-       && !defined(TB_CONFIG_MICRO_ENABLE)*/
-    // attempt to wait it in coroutine if timeout is non-zero
-        if (timeout && tb_coroutine_self())
-    {
-        tb_poller_object_t object;
-        object.type = TB_POLLER_OBJECT_PIPE;
-        object.ref.pipe = file;
-        return tb_coroutine_waitio(&object, TB_SOCKET_EVENT_RECV, timeout);
-    }
-#endif
-    // we use poll/select to wait pipe/fd events
-    return tb_socket_wait_impl(tb_fd2sock(fwatcher->fd), TB_SOCKET_EVENT_RECV, timeout);
-}
-
-tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn)
-{
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && events && events_maxn, 0);
-
-    return 0;
-}
-
