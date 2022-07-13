@@ -53,6 +53,7 @@ typedef struct __tb_fwatcher_t
     tb_int_t        kqfd;
     tb_int_t        entries[TB_FWATCHER_ENTRIES_MAXN];
     tb_size_t       entries_size;
+    struct kevent   events_to_monitor[TB_FWATCHER_ENTRIES_MAXN];
     struct kevent*  events;
     tb_size_t       events_count;
 
@@ -126,8 +127,8 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
     tb_size_t i = fwatcher->entries_size;
-    tb_uint_t vnode_events = NOTE_DELETE |  NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
- //   EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_CLEAR, vnode_events, 0, tb_null);
+    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
+    EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, tb_null);
 
     fwatcher->entries[i] = wd;
     fwatcher->entries_size++;
@@ -142,7 +143,7 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->entries_size && events && events_maxn, -1);
 
     // init time
     struct timespec t = {0};
@@ -152,15 +153,61 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         t.tv_nsec = (timeout % 1000) * 1000000;
     }
 
-#if 0
-    struct timespec timeout;
-    int event_count = kevent(fwatcher->kqfd, fwatcher->events_to_monitor, tb_arrayn(fwatcher->events_to_monitor), fwatcher->event_data, num_files, timeout >= 0? &t : tb_null);
-    if ((event_count < 0) || (event_data[0].flags == EV_ERROR)) {
-        /* An error occurred. */
-        fprintf(stderr, "An error occurred (event count %d).  The error was %s.\n", event_count, strerror(errno));
-        break;
+    // init events
+    tb_size_t grow = 256;
+    if (!fwatcher->events)
+    {
+        fwatcher->events_count = grow;
+        fwatcher->events = tb_nalloc_type(fwatcher->events_count, struct kevent);
+        tb_assert_and_check_return_val(fwatcher->events, -1);
     }
-#endif
 
-    return -1;
+    // wait events
+    tb_long_t events_count = kevent(fwatcher->kqfd, fwatcher->events_to_monitor, fwatcher->entries_size,
+        fwatcher->events, fwatcher->events_count, timeout >= 0? &t : tb_null);
+
+    // timeout or interrupted?
+    if (!events_count || (events_count == -1 && errno == EINTR))
+        return 0;
+
+    // error?
+    tb_assert_and_check_return_val(events_count >= 0 && events_count <= fwatcher->events_count, -1);
+
+    // grow it if events is full
+    if (events_count == fwatcher->events_count)
+    {
+        // grow size
+        fwatcher->events_count += grow;
+
+        // grow data
+        fwatcher->events = (struct kevent*)tb_ralloc(fwatcher->events, fwatcher->events_count * sizeof(struct kevent));
+        tb_assert_and_check_return_val(fwatcher->events, -1);
+    }
+    tb_assert(events_count <= fwatcher->events_count);
+
+    // handle events
+    tb_size_t          i = 0;
+    tb_size_t          wait = 0;
+    struct kevent*     event = tb_null;
+    for (i = 0; i < events_count; i++)
+    {
+        // get event
+        event = fwatcher->events + i;
+        if (event->flags & EV_ERROR)
+            continue;
+
+        if (event->fflags & NOTE_DELETE)
+        {
+            events[wait].event = TB_FWATCHER_EVENT_DELETE;
+            events[wait].filepath = event->udata;
+            wait++;
+        }
+        else if ((event->fflags & NOTE_RENAME) || (event->fflags & NOTE_REVOKE) || (event->fflags & NOTE_WRITE))
+        {
+            events[wait].event = TB_FWATCHER_EVENT_MODIFY;
+            events[wait].filepath = event->udata;
+            wait++;
+        }
+    }
+    return wait;
 }
