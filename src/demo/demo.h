@@ -185,6 +185,7 @@ TB_DEMO_MAIN_DECL(platform_poller_client);
 TB_DEMO_MAIN_DECL(platform_poller_server);
 TB_DEMO_MAIN_DECL(platform_poller_process);
 TB_DEMO_MAIN_DECL(platform_context);
+TB_DEMO_MAIN_DECL(platform_fwatcher);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);
