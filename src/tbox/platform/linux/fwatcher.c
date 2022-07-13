@@ -39,7 +39,11 @@
  * macros
  */
 #define TB_FWATCHER_EVENT_SIZE      (sizeof(struct inotify_event))
-#define TB_FWATCHER_BUFFER_SIZE     (1024 * (TB_FWATCHER_EVENT_SIZE + 16))
+#ifdef TB_CONFIG_SMALL
+#   define TB_FWATCHER_BUFFER_SIZE  (4096 * (TB_FWATCHER_EVENT_SIZE + 16))
+#else
+#   define TB_FWATCHER_BUFFER_SIZE  (8192 * (TB_FWATCHER_EVENT_SIZE + 16))
+#endif
 
 // fd to fwatcher entry
 #define tb_fd2entry(fd)              ((fd) >= 0? (tb_fwatcher_entry_ref_t)((tb_long_t)(fd) + 1) : tb_null)
@@ -150,32 +154,39 @@ tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t
     return tb_socket_wait_impl((tb_socket_ref_t)entry, TB_SOCKET_EVENT_RECV, timeout);
 }
 
-tb_long_t tb_fwatcher_entry_read(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_char_t const* pfile)
+tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_fwatcher_event_t* events, tb_size_t events_maxn)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && entry && pfile, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && entry && events && events_maxn, 0);
 
     tb_int_t real = read(tb_entry2fd(entry), fwatcher->buffer, sizeof(fwatcher->buffer));
     tb_check_return_val(real >= 0, -1);
 
     tb_int_t i = 0;
-    while (i < real)
+    tb_size_t events_count = 0;
+    while (i < real && events_count < events_maxn)
     {
         struct inotify_event* event = (struct inotify_event*)&fwatcher->buffer[i];
         if (event->mask & IN_CREATE)
         {
-            tb_trace_i("The file %s was created.\n", event->name);
+            events[events_count].event = TB_FWATCHER_EVENT_CREATE;
+            events[events_count].filepath = event->name;
+            events_count++;
         }
         else if (event->mask & IN_DELETE)
         {
-            tb_trace_i("The file %s was deleted.\n", event->name);
+            events[events_count].event = TB_FWATCHER_EVENT_DELETE;
+            events[events_count].filepath = event->name;
+            events_count++;
         }
         else if (event->mask & IN_MODIFY)
         {
-            tb_trace_i("The file %s was modified.\n", event->name);
+            events[events_count].event = TB_FWATCHER_EVENT_MODIFY;
+            events[events_count].filepath = event->name;
+            events_count++;
         }
         i += TB_FWATCHER_EVENT_SIZE + event->len;
     }
-    return -1;
+    return events_count;
 }
 

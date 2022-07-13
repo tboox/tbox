@@ -43,7 +43,7 @@ typedef __tb_typeref__(fwatcher);
 typedef __tb_typeref__(fwatcher_entry);
 
 /// the fwatcher event enum
-typedef enum __tb_event_event_e
+typedef enum __tb_fwatcher_event_e
 {
     TB_FWATCHER_EVENT_NONE   = 0
 ,   TB_FWATCHER_EVENT_MODIFY = 1
@@ -51,6 +51,14 @@ typedef enum __tb_event_event_e
 ,   TB_FWATCHER_EVENT_DELETE = 4
 
 }tb_fwatcher_event_e;
+
+/// the fwatcher event item type
+typedef struct __tb_fwatcher_event_t
+{
+    tb_size_t           event;
+    tb_char_t const*    filepath;
+
+}tb_fwatcher_event_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -99,15 +107,15 @@ tb_bool_t               tb_fwatcher_entry_remove(tb_fwatcher_ref_t fwatcher, tb_
  */
 tb_long_t               tb_fwatcher_entry_wait(tb_fwatcher_ref_t fwatcher, tb_fwatcher_entry_ref_t entry, tb_long_t timeout);
 
-/*! read the event from the watched directory entry
+/*! get the events from the watched directory entry
  *
  * @param fwatcher      the fwatcher
  * @param entry         the watched directory entry
  * @param pfile         the file path pointer
  *
- * @return              the fwatcher event or -1
+ * @return              the fwatcher events count
  */
-tb_long_t               tb_fwatcher_entry_read(tb_fwatcher_ref_t fwatcher, tb_fwatcher_entry_ref_t entry, tb_char_t const* pfile);
+tb_size_t               tb_fwatcher_entry_events(tb_fwatcher_ref_t fwatcher, tb_fwatcher_entry_ref_t entry, tb_fwatcher_event_t* events, tb_size_t events_maxn);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

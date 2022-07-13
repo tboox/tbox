@@ -66,10 +66,10 @@ tb_long_t tb_fwatcher_entry_wait(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t
     return -1;
 }
 
-tb_long_t tb_fwatcher_entry_read(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_char_t const* pfile)
+tb_size_t tb_fwatcher_entry_events(tb_fwatcher_ref_t self, tb_fwatcher_entry_ref_t entry, tb_fwatcher_event_t* events, tb_size_t events_maxn)
 {
     tb_trace_noimpl();
-    return -1;
+    return 0;
 }
 
 #endif
