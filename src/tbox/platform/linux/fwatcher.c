@@ -28,6 +28,7 @@
 #include "../file.h"
 #include "../../libc/libc.h"
 #include "../impl/pollerdata.h"
+#include "../../memory/string_pool.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -53,12 +54,13 @@
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
-    tb_int_t        fd;
-    tb_int_t        entries[TB_FWATCHER_ENTRIES_MAXN];
-    tb_size_t       entries_size;
-    tb_byte_t       buffer[TB_FWATCHER_BUFFER_SIZE];
-    tb_poller_ref_t poller;
-    tb_pollerdata_t pollerdata;
+    tb_int_t             fd;
+    tb_int_t             entries[TB_FWATCHER_ENTRIES_MAXN];
+    tb_size_t            entries_size;
+    tb_byte_t            buffer[TB_FWATCHER_BUFFER_SIZE];
+    tb_poller_ref_t      poller;
+    tb_pollerdata_t      pollerdata;
+    tb_string_pool_ref_t string_pool;
 
 }tb_fwatcher_t;
 
@@ -95,6 +97,10 @@ tb_fwatcher_ref_t tb_fwatcher_init()
 
         // init pollerdata
         tb_pollerdata_init(&fwatcher->pollerdata);
+
+        // init string pool
+        fwatcher->string_pool = tb_string_pool_init(tb_true);
+        tb_assert_and_check_break(fwatcher->string_pool);
 
         ok = tb_true;
     } while (0);
@@ -134,6 +140,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         if (fwatcher->poller)
             tb_poller_exit(fwatcher->poller);
 
+        // exit string pool
+        if (fwatcher->string_pool)
+        {
+            tb_string_pool_exit(fwatcher->string_pool);
+            fwatcher->string_pool = tb_null;
+        }
+
         // exit watcher
         tb_free(fwatcher);
         fwatcher = tb_null;
@@ -143,7 +156,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && filepath && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && fwatcher->string_pool && filepath && events, tb_false);
     tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
 
     // file not found
@@ -158,13 +171,17 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath
     tb_int_t wd = inotify_add_watch(fwatcher->fd, filepath, mask);
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
+    // save file path
+    tb_char_t const* path = tb_string_pool_insert(fwatcher->string_pool, filepath);
+    tb_assert_and_check_return_val(path, tb_false);
+
     // add watch fd
     fwatcher->entries[fwatcher->entries_size++] = wd;
 
     // save watch file path
     tb_poller_object_t object;
     object.ref.sock = tb_fd2sock(wd); // we just wrap socket object as key
-    tb_pollerdata_set(&fwatcher->pollerdata, &object, filepath);
+    tb_pollerdata_set(&fwatcher->pollerdata, &object, path);
     return tb_true;
 }
 

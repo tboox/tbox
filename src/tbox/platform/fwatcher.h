@@ -78,7 +78,7 @@ tb_void_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
 /*! register the watched directory, we can just watch single-level directory
  *
  * @param fwatcher      the fwatcher
- * @param filepath      the watched file or directory path, @note we will only refer to it, so please keep it in memory for the duration of the watch.
+ * @param filepath      the watched file or directory path
  * @param events        the watched events
  *
  * @return              tb_true or tb_false
