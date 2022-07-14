@@ -77,9 +77,8 @@ static tb_bool_t tb_fwatcher_free_fd(tb_iterator_ref_t iterator, tb_pointer_t it
         close((tb_int_t)(tb_long_t)fd_item->data);
     return tb_true;
 }
-static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_size_t events)
 {
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->filepath_fds && filepath && events, tb_false);
 
     // this path has been added?
@@ -107,13 +106,50 @@ static tb_long_t tb_fwatcher_add_watch_files(tb_char_t const* path, tb_file_info
     tb_assert_and_check_return_val(path && info && values, TB_DIRECTORY_WALK_CODE_END);
 
     // get fwatcher
-    tb_fwatcher_ref_t fwatcher = values[0].ptr;
+    tb_fwatcher_t* fwatcher = values[0].ptr;
     tb_size_t events = values[1].ul;
     tb_assert_and_check_return_val(fwatcher, TB_DIRECTORY_WALK_CODE_END);
 
     // add file watch
     if (info->type == TB_FILE_TYPE_FILE)
         tb_fwatcher_add_watch(fwatcher, path, events);
+    return TB_DIRECTORY_WALK_CODE_CONTINUE;
+}
+static tb_bool_t tb_fwatcher_rm_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath)
+{
+    // check
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->filepath_fds && filepath, tb_false);
+
+    // remove file path and fd
+    tb_size_t itor = tb_hash_map_find(fwatcher->filepath_fds, filepath);
+    if (itor != tb_iterator_tail(fwatcher->filepath_fds))
+    {
+        // remove fd watch
+        tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(fwatcher->filepath_fds, itor);
+        if (item && item->data)
+        {
+            if (0 != close((tb_int_t)(tb_long_t)item->data))
+                return tb_false;
+        }
+
+        // remove it
+        tb_iterator_remove(fwatcher->filepath_fds, itor);
+    }
+    return tb_true;
+}
+static tb_long_t tb_fwatcher_rm_watch_files(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
+{
+    // check
+    tb_value_t* values = (tb_value_t*)priv;
+    tb_assert_and_check_return_val(path && info && values, TB_DIRECTORY_WALK_CODE_END);
+
+    // get fwatcher
+    tb_fwatcher_t* fwatcher = values[0].ptr;
+    tb_assert_and_check_return_val(fwatcher, TB_DIRECTORY_WALK_CODE_END);
+
+    // rm file watch
+    if (info->type == TB_FILE_TYPE_FILE)
+        tb_fwatcher_rm_watch(fwatcher, path);
     return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
 
@@ -196,27 +232,39 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 
 tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+
     // file not found
     tb_file_info_t info;
     if (!tb_file_info(filepath, &info))
         return tb_false;
 
-    // is directory? we need scan it and register all subfiles
+    // is directory? we need scan it and add all subfiles
     if (info.type == TB_FILE_TYPE_DIRECTORY)
     {
         tb_value_t values[2];
-        values[0].ptr = (tb_pointer_t)self;
+        values[0].ptr = (tb_pointer_t)fwatcher;
         values[1].ul  = events;
         tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_add_watch_files, values);
     }
-    return tb_fwatcher_add_watch(self, filepath, events);
+    return tb_fwatcher_add_watch(fwatcher, filepath, events);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
-    return tb_false;
+
+    // is directory? we need scan it and remove all subfiles
+    tb_file_info_t info;
+    if (tb_file_info(filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
+    {
+        tb_value_t values[1];
+        values[0].ptr = (tb_pointer_t)fwatcher;
+        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_rm_watch_files, values);
+    }
+    return tb_fwatcher_rm_watch(fwatcher, filepath);
 }
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
