@@ -23,6 +23,8 @@
  * includes
  */
 #include "../fwatcher.h"
+#include "../file.h"
+#include "../directory.h"
 #include "../../libc/libc.h"
 #include <unistd.h>
 #include <stdio.h>
@@ -97,7 +99,7 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
     o_flags |= O_RDONLY;
 #  endif
     tb_int_t wd = open(filepath, o_flags);
-    tb_assert_and_check_return_val(wd >= 0, tb_false);
+    tb_check_return_val(wd >= 0, tb_false);
 
     tb_size_t i = fwatcher->entries_size;
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
@@ -106,6 +108,22 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
     fwatcher->entries[i] = wd;
     fwatcher->entries_size++;
     return tb_true;
+}
+static tb_long_t tb_fwatcher_directory_walk(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
+{
+    // check
+    tb_value_t* values = (tb_value_t*)priv;
+    tb_assert_and_check_return_val(path && info && values, TB_DIRECTORY_WALK_CODE_END);
+
+    // get fwatcher
+    tb_fwatcher_ref_t fwatcher = values[0].ptr;
+    tb_size_t events = values[1].ul;
+    tb_assert_and_check_return_val(fwatcher, TB_DIRECTORY_WALK_CODE_END);
+
+    // add file watch
+    if (info->type == TB_FILE_TYPE_FILE)
+        tb_fwatcher_add_watch(fwatcher, path, events);
+    return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -176,6 +194,19 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 
 tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
+    // file not found
+    tb_file_info_t info;
+    if (!tb_file_info(filepath, &info))
+        return tb_false;
+
+    // is directory? we need scan it and register all subfiles
+    if (info.type == TB_FILE_TYPE_DIRECTORY)
+    {
+        tb_value_t values[2];
+        values[0].ptr = (tb_pointer_t)self;
+        values[1].ul  = events;
+        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_directory_walk, values);
+    }
     return tb_fwatcher_add_watch(self, filepath, events);
 }
 

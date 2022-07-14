@@ -25,6 +25,7 @@
 #include "../fwatcher.h"
 #include "../socket.h"
 #include "../poller.h"
+#include "../file.h"
 #include "../../libc/libc.h"
 #include "../impl/pollerdata.h"
 #include <stdlib.h>
@@ -144,6 +145,10 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && filepath && events, tb_false);
     tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
+
+    // file not found
+    if (!tb_file_info(filepath, tb_null))
+        return tb_false;
 
     // add watch
     tb_uint32_t mask = 0;
