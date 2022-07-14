@@ -78,12 +78,12 @@ tb_void_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
 /*! register the watched directory, we can just watch single-level directory
  *
  * @param fwatcher      the fwatcher
- * @param dir           the watched directory, @note we will only refer to it, so please keep it in memory for the duration of the watch.
+ * @param filepath      the watched file or directory path, @note we will only refer to it, so please keep it in memory for the duration of the watch.
  * @param events        the watched events
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_fwatcher_register(tb_fwatcher_ref_t fwatcher, tb_char_t const* dir, tb_size_t events);
+tb_bool_t               tb_fwatcher_register(tb_fwatcher_ref_t fwatcher, tb_char_t const* filepath, tb_size_t events);
 
 /*! spank the fwatcher, break the tb_fwatcher_wait() and return all events
  *

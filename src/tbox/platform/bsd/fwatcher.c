@@ -118,10 +118,10 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
+tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && dir && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && filepath && events, tb_false);
     tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
 
     tb_int_t o_flags = 0;
@@ -134,12 +134,12 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
 #  else
     o_flags |= O_RDONLY;
 #  endif
-    tb_int_t wd = open(dir, o_flags);
+    tb_int_t wd = open(filepath, o_flags);
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
     tb_size_t i = fwatcher->entries_size;
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)dir);
+    EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)filepath);
 
     fwatcher->entries[i] = wd;
     fwatcher->entries_size++;

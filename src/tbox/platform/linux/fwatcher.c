@@ -139,10 +139,10 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_size_t events)
+tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && dir && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && filepath && events, tb_false);
     tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
 
     // add watch
@@ -150,7 +150,7 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     if (events & TB_FWATCHER_EVENT_MODIFY) mask |= IN_MODIFY;
     if (events & TB_FWATCHER_EVENT_CREATE) mask |= IN_CREATE;
     if (events & TB_FWATCHER_EVENT_DELETE) mask |= IN_DELETE;
-    tb_int_t wd = inotify_add_watch(fwatcher->fd, dir, mask);
+    tb_int_t wd = inotify_add_watch(fwatcher->fd, filepath, mask);
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
     // add watch fd
@@ -159,7 +159,7 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     // save watch file path
     tb_poller_object_t object;
     object.ref.sock = tb_fd2sock(wd); // we just wrap socket object as key
-    tb_pollerdata_set(&fwatcher->pollerdata, &object, dir);
+    tb_pollerdata_set(&fwatcher->pollerdata, &object, filepath);
     return tb_true;
 }
 
@@ -203,9 +203,11 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         {
             tb_poller_object_t object;
             object.ref.sock = tb_fd2sock(event->wd); // we just wrap socket object as key
-            tb_char_t const* dir = tb_pollerdata_get(&fwatcher->pollerdata, &object);
-            if (dir && event->name && event->len)
-                tb_snprintf(events[events_count].filepath, TB_PATH_MAXN, "%s/%s", dir, event->name);
+            tb_char_t const* filepath = tb_pollerdata_get(&fwatcher->pollerdata, &object);
+            if (filepath && event->name && event->len)
+                tb_snprintf(events[events_count].filepath, TB_PATH_MAXN, "%s/%s", filepath, event->name);
+            else if (filepath)
+                tb_strlcpy(events[events_count].filepath, filepath, TB_PATH_MAXN);
             else events[events_count].filepath[0] = '\0';
             events[events_count].event = event_code;
             events_count++;
