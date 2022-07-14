@@ -28,7 +28,8 @@
 #include "../file.h"
 #include "../../libc/libc.h"
 #include "../impl/pollerdata.h"
-#include "../../memory/string_pool.h"
+#include "../../container/container.h"
+#include "../../algorithm/algorithm.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -40,10 +41,8 @@
  */
 #define TB_FWATCHER_EVENT_SIZE          (sizeof(struct inotify_event))
 #ifdef TB_CONFIG_SMALL
-#   define TB_FWATCHER_ENTRIES_MAXN     64
 #   define TB_FWATCHER_BUFFER_SIZE      (4096 * (TB_FWATCHER_EVENT_SIZE + 16))
 #else
-#   define TB_FWATCHER_ENTRIES_MAXN     256
 #   define TB_FWATCHER_BUFFER_SIZE      (8192 * (TB_FWATCHER_EVENT_SIZE + 16))
 #endif
 
@@ -55,12 +54,10 @@
 typedef struct __tb_fwatcher_t
 {
     tb_int_t             fd;
-    tb_int_t             entries[TB_FWATCHER_ENTRIES_MAXN];
-    tb_size_t            entries_size;
     tb_byte_t            buffer[TB_FWATCHER_BUFFER_SIZE];
     tb_poller_ref_t      poller;
     tb_pollerdata_t      pollerdata;
-    tb_string_pool_ref_t string_pool;
+    tb_hash_map_ref_t    filepath_fds;
 
 }tb_fwatcher_t;
 
@@ -70,6 +67,16 @@ typedef struct __tb_fwatcher_t
 static tb_void_t tb_fwatcher_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)
 {
     // we need only an empty callback
+}
+static tb_bool_t tb_fwatcher_free_fd(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+{
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
+    tb_hash_map_item_ref_t fd_item = (tb_hash_map_item_ref_t)item;
+    tb_assert_and_check_return_val(fwatcher && fd_item, tb_false);
+
+    // remove fd watch
+    inotify_rm_watch(fwatcher->fd, (tb_int_t)(tb_long_t)fd_item->data);
+    return tb_true;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -98,9 +105,9 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         // init pollerdata
         tb_pollerdata_init(&fwatcher->pollerdata);
 
-        // init string pool
-        fwatcher->string_pool = tb_string_pool_init(tb_true);
-        tb_assert_and_check_break(fwatcher->string_pool);
+        // init filepath fds
+        fwatcher->filepath_fds = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_uint32());
+        tb_assert_and_check_break(fwatcher->filepath_fds);
 
         ok = tb_true;
     } while (0);
@@ -119,20 +126,6 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
-        // exit fd and entries
-        if (fwatcher->fd >= 0)
-        {
-            for (tb_size_t i = 0; i < fwatcher->entries_size; i++)
-            {
-                tb_int_t fd = fwatcher->entries[i];
-                if (fd >= 0) inotify_rm_watch(fwatcher->fd, fd);
-            }
-            fwatcher->entries_size = 0;
-
-            close(fwatcher->fd);
-            fwatcher->fd = -1;
-        }
-
         // exit pollerdata
         tb_pollerdata_exit(&fwatcher->pollerdata);
 
@@ -140,11 +133,19 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         if (fwatcher->poller)
             tb_poller_exit(fwatcher->poller);
 
-        // exit string pool
-        if (fwatcher->string_pool)
+        // exit filepath fds
+        if (fwatcher->filepath_fds)
         {
-            tb_string_pool_exit(fwatcher->string_pool);
-            fwatcher->string_pool = tb_null;
+            tb_walk_all(fwatcher->filepath_fds, tb_fwatcher_free_fd, fwatcher);
+            tb_hash_map_exit(fwatcher->filepath_fds);
+            fwatcher->filepath_fds = tb_null;
+        }
+
+        // exit fd
+        if (fwatcher->fd >= 0)
+        {
+            close(fwatcher->fd);
+            fwatcher->fd = -1;
         }
 
         // exit watcher
@@ -153,18 +154,18 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && fwatcher->string_pool && filepath && events, tb_false);
-    tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && fwatcher->filepath_fds && filepath && events, tb_false);
 
     // file not found
     if (!tb_file_info(filepath, tb_null))
         return tb_false;
 
     // this path has been added?
-    if (tb_string_pool_has(fwatcher->string_pool, filepath))
+    tb_size_t itor = tb_hash_map_find(fwatcher->filepath_fds, filepath);
+    if (itor != tb_iterator_tail(fwatcher->filepath_fds))
         return tb_true;
 
     // add watch
@@ -176,16 +177,41 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
     // save file path
-    tb_char_t const* path = tb_string_pool_insert(fwatcher->string_pool, filepath);
+    tb_char_t const* path = tb_null;
+    if ((itor = tb_hash_map_insert(fwatcher->filepath_fds, filepath, tb_i2p(wd))) != tb_iterator_tail(fwatcher->filepath_fds))
+    {
+        tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(fwatcher->filepath_fds, itor);
+        if (item) path = item->name;
+    }
     tb_assert_and_check_return_val(path, tb_false);
-
-    // add watch fd
-    fwatcher->entries[fwatcher->entries_size++] = wd;
 
     // save watch file path
     tb_poller_object_t object;
     object.ref.sock = tb_fd2sock(wd); // we just wrap socket object as key
     tb_pollerdata_set(&fwatcher->pollerdata, &object, path);
+    return tb_true;
+}
+
+tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+{
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && fwatcher->filepath_fds && filepath, tb_false);
+
+    // remove file path and fd
+    tb_size_t itor = tb_hash_map_find(fwatcher->filepath_fds, filepath);
+    if (itor != tb_iterator_tail(fwatcher->filepath_fds))
+    {
+        // remove fd watch
+        tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(fwatcher->filepath_fds, itor);
+        if (item)
+        {
+            if (0 != inotify_rm_watch(fwatcher->fd, (tb_int_t)(tb_long_t)item->data))
+                return tb_false;
+        }
+
+        // remove it
+        tb_iterator_remove(fwatcher->filepath_fds, itor);
+    }
     return tb_true;
 }
 

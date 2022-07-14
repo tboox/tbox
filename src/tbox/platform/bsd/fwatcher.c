@@ -232,7 +232,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     // file not found
     tb_file_info_t info;
@@ -248,6 +248,12 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath
         tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_directory_walk, values);
     }
     return tb_fwatcher_add_watch(self, filepath, events);
+}
+
+tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+{
+    tb_trace_noimpl();
+    return tb_false;
 }
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
