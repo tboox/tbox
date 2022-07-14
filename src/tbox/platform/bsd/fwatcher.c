@@ -24,6 +24,7 @@
  */
 #include "../fwatcher.h"
 #include "../file.h"
+#include "../socket.h"
 #include "../directory.h"
 #include "../../libc/libc.h"
 #include "../../memory/string_pool.h"
@@ -47,6 +48,14 @@
 #   define TB_FWATCHER_ENTRIES_GROW     256
 #endif
 
+#ifndef EV_ENABLE
+#   define EV_ENABLE    (0)
+#endif
+
+#ifndef NOTE_EOF
+#   define NOTE_EOF     (0)
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -62,6 +71,7 @@ typedef struct __tb_fwatcher_t
     struct kevent*       events;
     tb_size_t            events_count;
     tb_string_pool_ref_t string_pool;
+    tb_socket_ref_t      pair[2];
 
 }tb_fwatcher_t;
 
@@ -83,20 +93,26 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
         tb_assert(!fwatcher->watchevents);
         fwatcher->entries_maxn = TB_FWATCHER_ENTRIES_GROW;
         fwatcher->entries = tb_nalloc_type(fwatcher->entries_maxn, tb_int_t);
-        fwatcher->watchevents = tb_nalloc_type(fwatcher->entries_maxn, struct kevent);
+        fwatcher->watchevents = tb_nalloc_type(fwatcher->entries_maxn + 1, struct kevent);
     }
     else if (fwatcher->entries_size >= fwatcher->entries_maxn)
     {
         tb_assert(fwatcher->watchevents);
         fwatcher->entries_maxn += TB_FWATCHER_ENTRIES_GROW;
         fwatcher->entries = tb_ralloc(fwatcher->entries, fwatcher->entries_maxn * sizeof(tb_int_t));
-        fwatcher->watchevents = tb_ralloc(fwatcher->watchevents, fwatcher->entries_maxn * sizeof(struct kevent));
+        fwatcher->watchevents = tb_ralloc(fwatcher->watchevents, (fwatcher->entries_maxn + 1) * sizeof(struct kevent));
     }
     tb_assert_and_check_return_val(fwatcher->entries && fwatcher->watchevents && fwatcher->entries_size < fwatcher->entries_maxn, tb_false);
 
     // save file path to pool
     tb_char_t const* path = tb_string_pool_insert(fwatcher->string_pool, filepath);
     tb_assert_and_check_return_val(path, tb_false);
+
+    // register pair1 to watchevents first
+    if (fwatcher->entries_size == 0)
+    {
+        EV_SET(&fwatcher->watchevents[0], tb_sock2fd(fwatcher->pair[1]), EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
+    }
 
     tb_int_t o_flags = 0;
 #  ifdef O_EVTONLY
@@ -109,7 +125,7 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
 
     tb_size_t i = fwatcher->entries_size;
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->watchevents[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
+    EV_SET(&fwatcher->watchevents[1 + i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
 
     fwatcher->entries[i] = wd;
     fwatcher->entries_size++;
@@ -150,6 +166,8 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         fwatcher->string_pool = tb_string_pool_init(tb_true);
         tb_assert_and_check_break(fwatcher->string_pool);
 
+        if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, fwatcher->pair)) break;
+
         ok = tb_true;
     } while (0);
 
@@ -167,6 +185,12 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
+        // exit pair sockets
+        if (fwatcher->pair[0]) tb_socket_exit(fwatcher->pair[0]);
+        if (fwatcher->pair[1]) tb_socket_exit(fwatcher->pair[1]);
+        fwatcher->pair[0] = tb_null;
+        fwatcher->pair[1] = tb_null;
+
         // exit events
         if (fwatcher->events) tb_free(fwatcher->events);
         fwatcher->events = tb_null;
@@ -228,7 +252,10 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 {
-    tb_trace_noimpl();
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return(fwatcher);
+
+    if (fwatcher->pair[0]) tb_socket_send(fwatcher->pair[0], (tb_byte_t const*)"p", 1);
 }
 
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
@@ -254,7 +281,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     }
 
     // wait events
-    tb_long_t events_count = kevent(fwatcher->kqfd, fwatcher->watchevents, fwatcher->entries_size,
+    tb_long_t events_count = kevent(fwatcher->kqfd, fwatcher->watchevents, 1 + fwatcher->entries_size,
         fwatcher->events, fwatcher->events_count, timeout >= 0? &t : tb_null);
 
     // timeout or interrupted?
@@ -279,6 +306,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     // handle events
     tb_size_t          i = 0;
     tb_size_t          wait = 0;
+    tb_socket_ref_t    pair = fwatcher->pair[1];
     struct kevent*     event = tb_null;
     for (i = 0; i < events_count; i++)
     {
@@ -286,6 +314,15 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         event = fwatcher->events + i;
         if (event->flags & EV_ERROR)
             continue;
+
+        // spank socket events?
+        tb_socket_ref_t sock = tb_fd2sock(event->ident);
+        if (sock == pair && event->filter == EVFILT_READ)
+        {
+            tb_char_t spak = '\0';
+            if (1 != tb_socket_recv(pair, (tb_byte_t*)&spak, 1)) return -1;
+            continue ;
+        }
 
         // get event code
         tb_size_t event_code = 0;
