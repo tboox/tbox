@@ -81,6 +81,15 @@ tb_char_t const*            tb_string_pool_insert(tb_string_pool_ref_t pool, tb_
  */
 tb_void_t                   tb_string_pool_remove(tb_string_pool_ref_t pool, tb_char_t const* data);
 
+/*! has this string?
+ *
+ * @param pool              the string pool
+ * @param data              the string data
+ *
+ * @return                  tb_true or tb_false
+ */
+tb_bool_t                   tb_string_pool_has(tb_string_pool_ref_t pool, tb_char_t const* data);
+
 #ifdef __tb_debug__
 /*! dump the string pool
  *

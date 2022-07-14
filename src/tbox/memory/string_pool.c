@@ -178,6 +178,19 @@ tb_void_t tb_string_pool_remove(tb_string_pool_ref_t self, tb_char_t const* data
         }
     }
 }
+tb_bool_t tb_string_pool_has(tb_string_pool_ref_t self, tb_char_t const* data)
+{
+    // check
+    tb_string_pool_t* pool = (tb_string_pool_t*)self;
+    tb_assert_and_check_return_val(pool && data, tb_false);
+
+    if (pool->cache)
+    {
+        tb_size_t itor = tb_hash_map_find(pool->cache, data);
+        return itor != tb_iterator_tail(pool->cache);
+    }
+    return tb_false;
+}
 #ifdef __tb_debug__
 tb_void_t tb_string_pool_dump(tb_string_pool_ref_t self)
 {

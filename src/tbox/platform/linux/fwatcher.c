@@ -163,6 +163,10 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath
     if (!tb_file_info(filepath, tb_null))
         return tb_false;
 
+    // this path has been added?
+    if (tb_string_pool_has(fwatcher->string_pool, filepath))
+        return tb_true;
+
     // add watch
     tb_uint32_t mask = 0;
     if (events & TB_FWATCHER_EVENT_MODIFY) mask |= IN_MODIFY;

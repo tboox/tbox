@@ -73,6 +73,10 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->string_pool && filepath && events, tb_false);
 
+    // this path has been added?
+    if (tb_string_pool_has(fwatcher->string_pool, filepath))
+        return tb_true;
+
     // grow entries and watchevents
     if (!fwatcher->entries)
     {
