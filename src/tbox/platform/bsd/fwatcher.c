@@ -230,7 +230,6 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         tb_fwatcher_exit((tb_fwatcher_ref_t)fwatcher);
         fwatcher = tb_null;
     }
-
     return (tb_fwatcher_ref_t)fwatcher;
 }
 
