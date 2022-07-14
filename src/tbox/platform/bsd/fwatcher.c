@@ -95,11 +95,7 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
     tb_assert_and_check_return_val(path, tb_false);
 
     tb_int_t o_flags = 0;
-#  ifdef O_SYMLINK
-    o_flags |= O_SYMLINK;
-#  endif
 #  ifdef O_EVTONLY
-    // The descriptor is requested for event notifications only.
     o_flags |= O_EVTONLY;
 #  else
     o_flags |= O_RDONLY;
