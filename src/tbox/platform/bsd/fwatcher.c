@@ -159,8 +159,42 @@ static tb_long_t tb_fwatcher_rm_watch_files(tb_char_t const* path, tb_file_info_
     return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
 
-static tb_bool_t tb_fwatcher_update_watchevents(tb_fwatcher_t* fwatcher)
+static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
 {
+    // check
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
+    tb_hash_map_item_ref_t fd_item = (tb_hash_map_item_ref_t)item;
+    tb_assert_and_check_return_val(fwatcher && fwatcher->filepath_fds && fd_item, tb_false);
+
+    // get watch fd and path
+    tb_int_t wd = (tb_int_t)(tb_long_t)fd_item->data;
+    tb_char_t const* path = (tb_char_t const*)fd_item->name;
+    tb_assert_and_check_return_val(wd >= 0 && path, tb_false);
+
+    // grow watchevents
+    tb_size_t watchsize = tb_hash_map_size(fwatcher->filepath_fds);
+    if (!fwatcher->watchevents)
+    {
+        fwatcher->watchevents_maxn = watchsize;
+        fwatcher->watchevents = tb_nalloc_type(1 + fwatcher->watchevents_maxn, struct kevent);
+    }
+    else if (fwatcher->watchevents_size >= fwatcher->watchevents_maxn)
+    {
+        fwatcher->watchevents_maxn = watchsize + 64;
+        fwatcher->watchevents = tb_ralloc(fwatcher->watchevents, (1 + fwatcher->watchevents_maxn) * sizeof(struct kevent));
+    }
+    tb_assert_and_check_return_val(fwatcher->watchevents && fwatcher->watchevents_size < fwatcher->watchevents_maxn, tb_false);
+
+    // register pair1 to watchevents first
+    if (!fwatcher->watchevents_size)
+    {
+        EV_SET(&fwatcher->watchevents[0], tb_sock2fd(fwatcher->pair[1]), EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
+    }
+
+    // add watch events
+    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
+    EV_SET(&fwatcher->watchevents[1 + fwatcher->watchevents_size], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
+    fwatcher->watchevents_size++;
     return tb_true;
 }
 
@@ -311,8 +345,8 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     }
 
     // update watch events
-    if (!tb_fwatcher_update_watchevents(fwatcher))
-        return -1;
+    fwatcher->watchevents_size = 0;
+    tb_walk_all(fwatcher->filepath_fds, tb_fwatcher_update_watchevents, fwatcher);
     tb_assert_and_check_return_val(fwatcher->watchevents && fwatcher->watchevents_size, -1);
 
     // wait events
