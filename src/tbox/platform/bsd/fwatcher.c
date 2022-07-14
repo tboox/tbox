@@ -27,7 +27,8 @@
 #include "../socket.h"
 #include "../directory.h"
 #include "../../libc/libc.h"
-#include "../../memory/string_pool.h"
+#include "../../container/container.h"
+#include "../../algorithm/algorithm.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,12 +43,6 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_SMALL
-#   define TB_FWATCHER_ENTRIES_GROW     64
-#else
-#   define TB_FWATCHER_ENTRIES_GROW     256
-#endif
-
 #ifndef EV_ENABLE
 #   define EV_ENABLE    (0)
 #endif
@@ -64,13 +59,10 @@
 typedef struct __tb_fwatcher_t
 {
     tb_int_t             kqfd;
-    tb_int_t*            entries;
-    tb_size_t            entries_size;
-    tb_size_t            entries_maxn;
     struct kevent*       watchevents;
     struct kevent*       events;
     tb_size_t            events_count;
-    tb_string_pool_ref_t string_pool;
+    tb_hash_map_ref_t    filepath_fds;
     tb_socket_ref_t      pair[2];
 
 }tb_fwatcher_t;
@@ -78,42 +70,24 @@ typedef struct __tb_fwatcher_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_bool_t tb_fwatcher_free_fd(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+{
+    tb_hash_map_item_ref_t fd_item = (tb_hash_map_item_ref_t)item;
+    if (fd_item && fd_item->data)
+        close((tb_int_t)(tb_long_t)fd_item->data);
+    return tb_true;
+}
 static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->string_pool && filepath && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->filepath_fds && filepath && events, tb_false);
 
     // this path has been added?
-    if (tb_string_pool_has(fwatcher->string_pool, filepath))
+    tb_size_t itor = tb_hash_map_find(fwatcher->filepath_fds, filepath);
+    if (itor != tb_iterator_tail(fwatcher->filepath_fds))
         return tb_true;
 
-    // grow entries and watchevents
-    if (!fwatcher->entries)
-    {
-        tb_assert(!fwatcher->watchevents);
-        fwatcher->entries_maxn = TB_FWATCHER_ENTRIES_GROW;
-        fwatcher->entries = tb_nalloc_type(fwatcher->entries_maxn, tb_int_t);
-        fwatcher->watchevents = tb_nalloc_type(fwatcher->entries_maxn + 1, struct kevent);
-    }
-    else if (fwatcher->entries_size >= fwatcher->entries_maxn)
-    {
-        tb_assert(fwatcher->watchevents);
-        fwatcher->entries_maxn += TB_FWATCHER_ENTRIES_GROW;
-        fwatcher->entries = tb_ralloc(fwatcher->entries, fwatcher->entries_maxn * sizeof(tb_int_t));
-        fwatcher->watchevents = tb_ralloc(fwatcher->watchevents, (fwatcher->entries_maxn + 1) * sizeof(struct kevent));
-    }
-    tb_assert_and_check_return_val(fwatcher->entries && fwatcher->watchevents && fwatcher->entries_size < fwatcher->entries_maxn, tb_false);
-
-    // save file path to pool
-    tb_char_t const* path = tb_string_pool_insert(fwatcher->string_pool, filepath);
-    tb_assert_and_check_return_val(path, tb_false);
-
-    // register pair1 to watchevents first
-    if (fwatcher->entries_size == 0)
-    {
-        EV_SET(&fwatcher->watchevents[0], tb_sock2fd(fwatcher->pair[1]), EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
-    }
-
+    // open watch fd
     tb_int_t o_flags = 0;
 #  ifdef O_EVTONLY
     o_flags |= O_EVTONLY;
@@ -121,17 +95,12 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
     o_flags |= O_RDONLY;
 #  endif
     tb_int_t wd = open(filepath, o_flags);
-    tb_check_return_val(wd >= 0, tb_false);
+    tb_assert_and_check_return_val(wd >= 0, tb_false);
 
-    tb_size_t i = fwatcher->entries_size;
-    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->watchevents[1 + i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
-
-    fwatcher->entries[i] = wd;
-    fwatcher->entries_size++;
-    return tb_true;
+    // save watch fd
+    return tb_hash_map_insert(fwatcher->filepath_fds, filepath, tb_i2p(wd)) != tb_iterator_tail(fwatcher->filepath_fds);
 }
-static tb_long_t tb_fwatcher_directory_walk(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
+static tb_long_t tb_fwatcher_add_watch_files(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
     // check
     tb_value_t* values = (tb_value_t*)priv;
@@ -157,16 +126,20 @@ tb_fwatcher_ref_t tb_fwatcher_init()
     tb_fwatcher_t* fwatcher = tb_null;
     do
     {
+        // init fwatcher
         fwatcher = tb_malloc0_type(tb_fwatcher_t);
         tb_assert_and_check_break(fwatcher);
 
+        // init kqueue
         fwatcher->kqfd = kqueue();
         tb_assert_and_check_break(fwatcher->kqfd >= 0);
 
-        fwatcher->string_pool = tb_string_pool_init(tb_true);
-        tb_assert_and_check_break(fwatcher->string_pool);
-
+        // init socket pair
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, fwatcher->pair)) break;
+
+        // init filepath fds
+        fwatcher->filepath_fds = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_uint32());
+        tb_assert_and_check_break(fwatcher->filepath_fds);
 
         ok = tb_true;
     } while (0);
@@ -200,23 +173,12 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         if (fwatcher->watchevents) tb_free(fwatcher->watchevents);
         fwatcher->watchevents = tb_null;
 
-        // exit entries
-        if (fwatcher->entries)
+        // exit filepath fds
+        if (fwatcher->filepath_fds)
         {
-            for (tb_size_t i = 0; i < fwatcher->entries_size; i++)
-            {
-                tb_int_t fd = fwatcher->entries[i];
-                if (fd >= 0) close(fd);
-            }
-            tb_free(fwatcher->entries);
-        }
-        fwatcher->entries_size = 0;
-
-        // exit string pool
-        if (fwatcher->string_pool)
-        {
-            tb_string_pool_exit(fwatcher->string_pool);
-            fwatcher->string_pool = tb_null;
+            tb_walk_all(fwatcher->filepath_fds, tb_fwatcher_free_fd, fwatcher);
+            tb_hash_map_exit(fwatcher->filepath_fds);
+            fwatcher->filepath_fds = tb_null;
         }
 
         // exit kqueue fd
@@ -245,14 +207,15 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_
         tb_value_t values[2];
         values[0].ptr = (tb_pointer_t)self;
         values[1].ul  = events;
-        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_directory_walk, values);
+        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_add_watch_files, values);
     }
     return tb_fwatcher_add_watch(self, filepath, events);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
-    tb_trace_noimpl();
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
     return tb_false;
 }
 
@@ -267,8 +230,9 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->entries && fwatcher->watchevents && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && events && events_maxn, -1);
 
+#if 0
     // init time
     struct timespec t = {0};
     if (timeout > 0)
@@ -348,4 +312,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         }
     }
     return wait;
+#else
+    return 0;
+#endif
 }
