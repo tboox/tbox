@@ -97,7 +97,7 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const*
     o_flags |= O_RDONLY;
 #  endif
     tb_int_t wd = open(filepath, o_flags);
-    tb_assert_and_check_return_val(wd >= 0, tb_false);
+    tb_check_return_val(wd >= 0, tb_false);
 
     // save watch fd
     return tb_hash_map_insert(fwatcher->filepath_fds, filepath, tb_i2p(wd)) != tb_iterator_tail(fwatcher->filepath_fds);
@@ -191,7 +191,6 @@ static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_p
         EV_SET(&fwatcher->watchevents[0], tb_sock2fd(fwatcher->pair[1]), EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
     }
 
-    // add watch events
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
     EV_SET(&fwatcher->watchevents[1 + fwatcher->watchevents_size], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
     fwatcher->watchevents_size++;
