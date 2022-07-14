@@ -26,6 +26,7 @@
 #include "../file.h"
 #include "../directory.h"
 #include "../../libc/libc.h"
+#include "../../memory/string_pool.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,13 +54,14 @@
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
-    tb_int_t        kqfd;
-    tb_int_t*       entries;
-    tb_size_t       entries_size;
-    tb_size_t       entries_maxn;
-    struct kevent*  watchevents;
-    struct kevent*  events;
-    tb_size_t       events_count;
+    tb_int_t             kqfd;
+    tb_int_t*            entries;
+    tb_size_t            entries_size;
+    tb_size_t            entries_maxn;
+    struct kevent*       watchevents;
+    struct kevent*       events;
+    tb_size_t            events_count;
+    tb_string_pool_ref_t string_pool;
 
 }tb_fwatcher_t;
 
@@ -69,7 +71,7 @@ typedef struct __tb_fwatcher_t
 static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && filepath && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->string_pool && filepath && events, tb_false);
 
     // grow entries and watchevents
     if (!fwatcher->entries)
@@ -88,6 +90,10 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
     }
     tb_assert_and_check_return_val(fwatcher->entries && fwatcher->watchevents && fwatcher->entries_size < fwatcher->entries_maxn, tb_false);
 
+    // save file path to pool
+    tb_char_t const* path = tb_string_pool_insert(fwatcher->string_pool, filepath);
+    tb_assert_and_check_return_val(path, tb_false);
+
     tb_int_t o_flags = 0;
 #  ifdef O_SYMLINK
     o_flags |= O_SYMLINK;
@@ -103,7 +109,7 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* 
 
     tb_size_t i = fwatcher->entries_size;
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->watchevents[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)filepath);
+    EV_SET(&fwatcher->watchevents[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
 
     fwatcher->entries[i] = wd;
     fwatcher->entries_size++;
@@ -140,6 +146,9 @@ tb_fwatcher_ref_t tb_fwatcher_init()
 
         fwatcher->kqfd = kqueue();
         tb_assert_and_check_break(fwatcher->kqfd >= 0);
+
+        fwatcher->string_pool = tb_string_pool_init(tb_true);
+        tb_assert_and_check_break(fwatcher->string_pool);
 
         ok = tb_true;
     } while (0);
@@ -178,6 +187,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             tb_free(fwatcher->entries);
         }
         fwatcher->entries_size = 0;
+
+        // exit string pool
+        if (fwatcher->string_pool)
+        {
+            tb_string_pool_exit(fwatcher->string_pool);
+            fwatcher->string_pool = tb_null;
+        }
 
         // exit kqueue fd
         if (fwatcher->kqfd >= 0)
