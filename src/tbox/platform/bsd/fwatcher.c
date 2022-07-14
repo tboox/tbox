@@ -60,6 +60,7 @@ typedef struct __tb_fwatcher_item_t
 {
     tb_int_t            wd;
     tb_size_t           events;
+    tb_char_t const*    filepath;
 
 }tb_fwatcher_item_t;
 
@@ -113,6 +114,7 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const*
     tb_fwatcher_item_t watchitem;
     watchitem.wd = wd;
     watchitem.events = events;
+    watchitem.filepath = tb_null;
     return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
@@ -192,9 +194,17 @@ static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_p
             EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
     }
 
-    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
+    // register watch events
+    tb_uint_t vnode_events = 0;
+    if (watchitem->events & TB_FWATCHER_EVENT_DELETE)
+        vnode_events |= NOTE_DELETE;
+    if (watchitem->events & TB_FWATCHER_EVENT_MODIFY)
+        vnode_events |= NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
+    tb_assert_and_check_return_val(vnode_events, tb_false);
+
+    watchitem->filepath = path;
     EV_SET(&fwatcher->watchevents[1 + fwatcher->watchevents_size], watchitem->wd,
-        EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
+        EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)watchitem);
     fwatcher->watchevents_size++;
     return tb_true;
 }
@@ -392,6 +402,10 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             continue ;
         }
 
+        // get watchitem
+        tb_fwatcher_item_t const* watchitem = (tb_fwatcher_item_t const*)event->udata;
+        tb_assert_and_check_break(watchitem);
+
         // get event code
         tb_size_t event_code = 0;
         if (event->fflags & NOTE_DELETE)
@@ -402,8 +416,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         // add event
         if (event_code)
         {
-            tb_char_t const* filepath = (tb_char_t const*)event->udata;
-            if (filepath) tb_strlcpy(events[wait].filepath, filepath, TB_PATH_MAXN);
+            if (watchitem->filepath) tb_strlcpy(events[wait].filepath, watchitem->filepath, TB_PATH_MAXN);
             else events[wait].filepath[0] = '\0';
             events[wait].event = event_code;
             wait++;
