@@ -25,6 +25,8 @@
 #include "../fwatcher.h"
 #include "../socket.h"
 #include "../poller.h"
+#include "../../libc/libc.h"
+#include "../impl/pollerdata.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -55,6 +57,7 @@ typedef struct __tb_fwatcher_t
     tb_size_t       entries_size;
     tb_byte_t       buffer[TB_FWATCHER_BUFFER_SIZE];
     tb_poller_ref_t poller;
+    tb_pollerdata_t pollerdata;
 
 }tb_fwatcher_t;
 
@@ -75,16 +78,22 @@ tb_fwatcher_ref_t tb_fwatcher_init()
     tb_fwatcher_t* fwatcher = tb_null;
     do
     {
+        // init fwatcher
         fwatcher = tb_malloc0_type(tb_fwatcher_t);
         tb_assert_and_check_break(fwatcher);
 
+        // init inotify
         fwatcher->fd = inotify_init();
         tb_assert_and_check_break(fwatcher->fd >= 0);
 
+        // init poller
         fwatcher->poller = tb_poller_init(tb_null);
         tb_assert_and_check_break(fwatcher->poller);
 
         tb_poller_insert_sock(fwatcher->poller, tb_fd2sock(fwatcher->fd), TB_POLLER_EVENT_RECV, tb_null);
+
+        // init pollerdata
+        tb_pollerdata_init(&fwatcher->pollerdata);
 
         ok = tb_true;
     } while (0);
@@ -117,6 +126,9 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             fwatcher->fd = -1;
         }
 
+        // exit pollerdata
+        tb_pollerdata_exit(&fwatcher->pollerdata);
+
         // exit poller
         if (fwatcher->poller)
             tb_poller_exit(fwatcher->poller);
@@ -133,6 +145,7 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && dir && events, tb_false);
     tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
 
+    // add watch
     tb_uint32_t mask = 0;
     if (events & TB_FWATCHER_EVENT_MODIFY) mask |= IN_MODIFY;
     if (events & TB_FWATCHER_EVENT_CREATE) mask |= IN_CREATE;
@@ -140,7 +153,13 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
     tb_int_t wd = inotify_add_watch(fwatcher->fd, dir, mask);
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
+    // add watch fd
     fwatcher->entries[fwatcher->entries_size++] = wd;
+
+    // save watch file path
+    tb_poller_object_t object;
+    object.ref.sock = tb_fd2sock(wd); // we just wrap socket object as key
+    tb_pollerdata_set(&fwatcher->pollerdata, &object, dir);
     return tb_true;
 }
 
@@ -182,8 +201,13 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         // add event
         if (event_code)
         {
+            tb_poller_object_t object;
+            object.ref.sock = tb_fd2sock(event->wd); // we just wrap socket object as key
+            tb_char_t const* dir = tb_pollerdata_get(&fwatcher->pollerdata, &object);
+            if (dir && event->name && event->len)
+                tb_snprintf(events[events_count].filepath, TB_PATH_MAXN, "%s/%s", dir, event->name);
+            else events[events_count].filepath[0] = '\0';
             events[events_count].event = event_code;
-            events[events_count].filepath = event->name;
             events_count++;
         }
         i += TB_FWATCHER_EVENT_SIZE + event->len;

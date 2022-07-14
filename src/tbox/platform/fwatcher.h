@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "path.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -54,7 +55,7 @@ typedef enum __tb_fwatcher_event_e
 typedef struct __tb_fwatcher_event_t
 {
     tb_size_t           event;
-    tb_char_t const*    filepath;
+    tb_char_t           filepath[TB_PATH_MAXN];
 
 }tb_fwatcher_event_t;
 
@@ -74,10 +75,10 @@ tb_fwatcher_ref_t       tb_fwatcher_init(tb_noarg_t);
  */
 tb_void_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
 
-/*! register the watched directory
+/*! register the watched directory, we can just watch single-level directory
  *
  * @param fwatcher      the fwatcher
- * @param dir           the watched directory
+ * @param dir           the watched directory, @note we will only refer to it, so please keep it in memory for the duration of the watch.
  * @param events        the watched events
  *
  * @return              tb_true or tb_false
