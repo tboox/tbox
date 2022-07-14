@@ -23,6 +23,7 @@
  * includes
  */
 #include "../fwatcher.h"
+#include "../../libc/libc.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -138,7 +139,7 @@ tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* dir, tb_
 
     tb_size_t i = fwatcher->entries_size;
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, tb_null);
+    EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)dir);
 
     fwatcher->entries[i] = wd;
     fwatcher->entries_size++;
@@ -206,16 +207,20 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         if (event->flags & EV_ERROR)
             continue;
 
+        // get event code
+        tb_size_t event_code = 0;
         if (event->fflags & NOTE_DELETE)
-        {
-            events[wait].event = TB_FWATCHER_EVENT_DELETE;
-            events[wait].filepath = event->udata;
-            wait++;
-        }
+            event_code = TB_FWATCHER_EVENT_DELETE;
         else if ((event->fflags & NOTE_RENAME) || (event->fflags & NOTE_REVOKE) || (event->fflags & NOTE_WRITE))
+            event_code = TB_FWATCHER_EVENT_MODIFY;
+
+        // add event
+        if (event_code)
         {
-            events[wait].event = TB_FWATCHER_EVENT_MODIFY;
-            events[wait].filepath = event->udata;
+            tb_char_t const* filepath = (tb_char_t const*)event->udata;
+            if (filepath) tb_strlcpy(events[wait].filepath, filepath, TB_PATH_MAXN);
+            else events[wait].filepath[0] = '\0';
+            events[wait].event = event_code;
             wait++;
         }
     }
