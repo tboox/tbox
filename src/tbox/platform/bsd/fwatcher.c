@@ -55,6 +55,14 @@
  * types
  */
 
+// the watch item type
+typedef struct __tb_fwatcher_item_t
+{
+    tb_int_t            wd;
+    tb_size_t           events;
+
+}tb_fwatcher_item_t;
+
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
@@ -64,7 +72,7 @@ typedef struct __tb_fwatcher_t
     tb_size_t            watchevents_maxn;
     struct kevent*       events;
     tb_size_t            events_count;
-    tb_hash_map_ref_t    filepath_fds;
+    tb_hash_map_ref_t    watchitems;
     tb_socket_ref_t      pair[2];
 
 }tb_fwatcher_t;
@@ -72,21 +80,23 @@ typedef struct __tb_fwatcher_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_bool_t tb_fwatcher_free_fd(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
+static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t buff)
 {
-    tb_hash_map_item_ref_t fd_item = (tb_hash_map_item_ref_t)item;
-    if (fd_item && fd_item->data)
-        close((tb_int_t)(tb_long_t)fd_item->data);
-    return tb_true;
+    tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)buff;
+    if (watchitem && watchitem->wd >= 0)
+    {
+        close((tb_int_t)(tb_long_t)watchitem->wd);
+        watchitem->wd = -1;
+    }
 }
 
 static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_size_t events)
 {
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->filepath_fds && filepath && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath && events, tb_false);
 
     // this path has been added?
-    tb_size_t itor = tb_hash_map_find(fwatcher->filepath_fds, filepath);
-    if (itor != tb_iterator_tail(fwatcher->filepath_fds))
+    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
+    if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
     // open watch fd
@@ -99,8 +109,11 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const*
     tb_int_t wd = open(filepath, o_flags);
     tb_check_return_val(wd >= 0, tb_false);
 
-    // save watch fd
-    return tb_hash_map_insert(fwatcher->filepath_fds, filepath, tb_i2p(wd)) != tb_iterator_tail(fwatcher->filepath_fds);
+    // save watch item
+    tb_fwatcher_item_t watchitem;
+    watchitem.wd = wd;
+    watchitem.events = events;
+    return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 static tb_long_t tb_fwatcher_add_watch_files(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
@@ -123,23 +136,10 @@ static tb_long_t tb_fwatcher_add_watch_files(tb_char_t const* path, tb_file_info
 static tb_bool_t tb_fwatcher_rm_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath)
 {
     // check
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->filepath_fds && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath, tb_false);
 
-    // remove file path and fd
-    tb_size_t itor = tb_hash_map_find(fwatcher->filepath_fds, filepath);
-    if (itor != tb_iterator_tail(fwatcher->filepath_fds))
-    {
-        // remove fd watch
-        tb_hash_map_item_ref_t item = (tb_hash_map_item_ref_t)tb_iterator_item(fwatcher->filepath_fds, itor);
-        if (item && item->data)
-        {
-            if (0 != close((tb_int_t)(tb_long_t)item->data))
-                return tb_false;
-        }
-
-        // remove it
-        tb_iterator_remove(fwatcher->filepath_fds, itor);
-    }
+    // remove the watchitem
+    tb_hash_map_remove(fwatcher->watchitems, filepath);
     return tb_true;
 }
 
@@ -163,16 +163,16 @@ static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_p
 {
     // check
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
-    tb_hash_map_item_ref_t fd_item = (tb_hash_map_item_ref_t)item;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->filepath_fds && fd_item, tb_false);
+    tb_hash_map_item_ref_t hashitem = (tb_hash_map_item_ref_t)item;
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && hashitem, tb_false);
 
-    // get watch fd and path
-    tb_int_t wd = (tb_int_t)(tb_long_t)fd_item->data;
-    tb_char_t const* path = (tb_char_t const*)fd_item->name;
-    tb_assert_and_check_return_val(wd >= 0 && path, tb_false);
+    // get watch item and path
+    tb_char_t const* path = (tb_char_t const*)hashitem->name;
+    tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)hashitem->data;
+    tb_assert_and_check_return_val(watchitem->wd >= 0 && path, tb_false);
 
     // grow watchevents
-    tb_size_t watchsize = tb_hash_map_size(fwatcher->filepath_fds);
+    tb_size_t watchsize = tb_hash_map_size(fwatcher->watchitems);
     if (!fwatcher->watchevents)
     {
         fwatcher->watchevents_maxn = watchsize;
@@ -188,11 +188,13 @@ static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_p
     // register pair1 to watchevents first
     if (!fwatcher->watchevents_size)
     {
-        EV_SET(&fwatcher->watchevents[0], tb_sock2fd(fwatcher->pair[1]), EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
+        EV_SET(&fwatcher->watchevents[0], tb_sock2fd(fwatcher->pair[1]),
+            EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_EOF, 0, tb_null);
     }
 
     tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->watchevents[1 + fwatcher->watchevents_size], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
+    EV_SET(&fwatcher->watchevents[1 + fwatcher->watchevents_size], watchitem->wd,
+        EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)path);
     fwatcher->watchevents_size++;
     return tb_true;
 }
@@ -217,9 +219,9 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         // init socket pair
         if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, fwatcher->pair)) break;
 
-        // init filepath fds
-        fwatcher->filepath_fds = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_uint32());
-        tb_assert_and_check_break(fwatcher->filepath_fds);
+        // init watch items
+        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_fwatcher_item_free, tb_null));
+        tb_assert_and_check_break(fwatcher->watchitems);
 
         ok = tb_true;
     } while (0);
@@ -254,12 +256,11 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         fwatcher->watchevents_size = 0;
         fwatcher->watchevents_maxn = 0;
 
-        // exit filepath fds
-        if (fwatcher->filepath_fds)
+        // exit watch items
+        if (fwatcher->watchitems)
         {
-            tb_walk_all(fwatcher->filepath_fds, tb_fwatcher_free_fd, fwatcher);
-            tb_hash_map_exit(fwatcher->filepath_fds);
-            fwatcher->filepath_fds = tb_null;
+            tb_hash_map_exit(fwatcher->watchitems);
+            fwatcher->watchitems = tb_null;
         }
 
         // exit kqueue fd
@@ -344,7 +345,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
 
     // update watch events
     fwatcher->watchevents_size = 0;
-    tb_walk_all(fwatcher->filepath_fds, tb_fwatcher_update_watchevents, fwatcher);
+    tb_walk_all(fwatcher->watchitems, tb_fwatcher_update_watchevents, fwatcher);
     tb_assert_and_check_return_val(fwatcher->watchevents && fwatcher->watchevents_size, -1);
 
     // wait events
@@ -407,6 +408,11 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             events[wait].event = event_code;
             wait++;
         }
+
+#if 0
+        if (event_code == TB_FWATCHER_EVENT_MODIFY)
+            tb_fwatcher_add_watch(self, (tb_char_t const*)event->udata);
+#endif
     }
     return wait;
 }
