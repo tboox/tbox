@@ -39,9 +39,9 @@
  * macros
  */
 #ifdef TB_CONFIG_SMALL
-#   define TB_FWATCHER_ENTRIES_MAXN     64
+#   define TB_FWATCHER_ENTRIES_GROW     64
 #else
-#   define TB_FWATCHER_ENTRIES_MAXN     256
+#   define TB_FWATCHER_ENTRIES_GROW     256
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -52,13 +52,61 @@
 typedef struct __tb_fwatcher_t
 {
     tb_int_t        kqfd;
-    tb_int_t        entries[TB_FWATCHER_ENTRIES_MAXN];
+    tb_int_t*       entries;
     tb_size_t       entries_size;
-    struct kevent   events_to_monitor[TB_FWATCHER_ENTRIES_MAXN];
+    tb_size_t       entries_maxn;
+    struct kevent*  watchevents;
     struct kevent*  events;
     tb_size_t       events_count;
 
 }tb_fwatcher_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+{
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && filepath && events, tb_false);
+
+    // grow entries and watchevents
+    if (!fwatcher->entries)
+    {
+        tb_assert(!fwatcher->watchevents);
+        fwatcher->entries_maxn = TB_FWATCHER_ENTRIES_GROW;
+        fwatcher->entries = tb_nalloc_type(fwatcher->entries_maxn, tb_int_t);
+        fwatcher->watchevents = tb_nalloc_type(fwatcher->entries_maxn, struct kevent);
+    }
+    else if (fwatcher->entries_size >= fwatcher->entries_maxn)
+    {
+        tb_assert(fwatcher->watchevents);
+        fwatcher->entries_maxn += TB_FWATCHER_ENTRIES_GROW;
+        fwatcher->entries = tb_ralloc(fwatcher->entries, fwatcher->entries_maxn * sizeof(tb_int_t));
+        fwatcher->watchevents = tb_ralloc(fwatcher->watchevents, fwatcher->entries_maxn * sizeof(struct kevent));
+    }
+    tb_assert_and_check_return_val(fwatcher->entries && fwatcher->watchevents && fwatcher->entries_size < fwatcher->entries_maxn, tb_false);
+
+    tb_int_t o_flags = 0;
+#  ifdef O_SYMLINK
+    o_flags |= O_SYMLINK;
+#  endif
+#  ifdef O_EVTONLY
+    // The descriptor is requested for event notifications only.
+    o_flags |= O_EVTONLY;
+#  else
+    o_flags |= O_RDONLY;
+#  endif
+    tb_int_t wd = open(filepath, o_flags);
+    tb_assert_and_check_return_val(wd >= 0, tb_false);
+
+    tb_size_t i = fwatcher->entries_size;
+    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
+    EV_SET(&fwatcher->watchevents[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)filepath);
+
+    fwatcher->entries[i] = wd;
+    fwatcher->entries_size++;
+    return tb_true;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -97,11 +145,19 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         fwatcher->events = tb_null;
         fwatcher->events_count = 0;
 
+        // exit watch events
+        if (fwatcher->watchevents) tb_free(fwatcher->watchevents);
+        fwatcher->watchevents = tb_null;
+
         // exit entries
-        for (tb_size_t i = 0; i < fwatcher->entries_size; i++)
+        if (fwatcher->entries)
         {
-            tb_int_t fd = fwatcher->entries[i];
-            if (fd >= 0) close(fd);
+            for (tb_size_t i = 0; i < fwatcher->entries_size; i++)
+            {
+                tb_int_t fd = fwatcher->entries[i];
+                if (fd >= 0) close(fd);
+            }
+            tb_free(fwatcher->entries);
         }
         fwatcher->entries_size = 0;
 
@@ -120,30 +176,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 
 tb_bool_t tb_fwatcher_register(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && filepath && events, tb_false);
-    tb_assert_and_check_return_val(fwatcher->entries_size < tb_arrayn(fwatcher->entries), tb_false);
-
-    tb_int_t o_flags = 0;
-#  ifdef O_SYMLINK
-    o_flags |= O_SYMLINK;
-#  endif
-#  ifdef O_EVTONLY
-    // The descriptor is requested for event notifications only.
-    o_flags |= O_EVTONLY;
-#  else
-    o_flags |= O_RDONLY;
-#  endif
-    tb_int_t wd = open(filepath, o_flags);
-    tb_assert_and_check_return_val(wd >= 0, tb_false);
-
-    tb_size_t i = fwatcher->entries_size;
-    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
-    EV_SET(&fwatcher->events_to_monitor[i], wd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, vnode_events, 0, (tb_pointer_t)filepath);
-
-    fwatcher->entries[i] = wd;
-    fwatcher->entries_size++;
-    return tb_true;
+    return tb_fwatcher_add_watch(self, filepath, events);
 }
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
@@ -154,7 +187,7 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->entries_size && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->entries && fwatcher->watchevents && events && events_maxn, -1);
 
     // init time
     struct timespec t = {0};
@@ -174,7 +207,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     }
 
     // wait events
-    tb_long_t events_count = kevent(fwatcher->kqfd, fwatcher->events_to_monitor, fwatcher->entries_size,
+    tb_long_t events_count = kevent(fwatcher->kqfd, fwatcher->watchevents, fwatcher->entries_size,
         fwatcher->events, fwatcher->events_count, timeout >= 0? &t : tb_null);
 
     // timeout or interrupted?
