@@ -422,10 +422,13 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             wait++;
         }
 
-#if 0
-        if (event_code == TB_FWATCHER_EVENT_MODIFY)
-            tb_fwatcher_add_watch(self, (tb_char_t const*)event->udata);
-#endif
+        // rescan the watch directory
+        tb_file_info_t info;
+        if (event_code == TB_FWATCHER_EVENT_MODIFY && watchitem->filepath &&
+            tb_file_info(watchitem->filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
+            tb_fwatcher_add(self, watchitem->filepath, watchitem->events);
+        else if (event_code == TB_FWATCHER_EVENT_DELETE)
+            tb_fwatcher_remove(self, watchitem->filepath);
     }
     return wait;
 }
