@@ -256,7 +256,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             tb_poller_object_t object;
             object.ref.sock = tb_fd2sock(event->wd); // we just wrap socket object as key
             tb_char_t const* filepath = tb_pollerdata_get(&fwatcher->pollerdata, &object);
-            if (filepath && event->name && event->len)
+            if (filepath && event->len)
                 tb_snprintf(events[events_count].filepath, TB_PATH_MAXN, "%s/%s", filepath, event->name);
             else if (filepath)
                 tb_strlcpy(events[events_count].filepath, filepath, TB_PATH_MAXN);
