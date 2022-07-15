@@ -15,7 +15,7 @@
  * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        fwatcher.c
+ * @file        fwatcher_inotify.c
  * @ingroup     platform
  */
 
