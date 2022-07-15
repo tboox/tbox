@@ -85,6 +85,7 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
 #endif
         tb_trace_i("tb_fwatcher_fsevent_stream_callback: %s, %x", filepath, event_flags[i]);
 
+        // TODO filter need events
         FSEventStreamEventFlags flags = event_flags[i];
         tb_fwatcher_event_t event;
         if (filepath) tb_strlcpy(event.filepath, filepath, TB_PATH_MAXN);
@@ -93,7 +94,7 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
             event.event = TB_FWATCHER_EVENT_CREATE;
         else if (flags & kFSEventStreamEventFlagItemRemoved)
             event.event = TB_FWATCHER_EVENT_DELETE;
-        else if (flags & kFSEventStreamEventFlagItemModified)
+        else if (flags & kFSEventStreamEventFlagItemModified) // TODO
             event.event = TB_FWATCHER_EVENT_MODIFY;
 
         // add event to queue
@@ -297,17 +298,31 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
         return -1;
 
+    tb_trace_i("wait ..");
     // wait events
     tb_long_t wait = tb_semaphore_wait(fwatcher->semaphore, timeout);
     tb_assert_and_check_return_val(wait >= 0, -1);
     tb_check_return_val(wait > 0, 0);
 
-#if 0
-    tb_spinlock_enter(&fwatcher->lock);
-    if (!tb_queue_full(fwatcher->events_queue))
-        tb_queue_put(fwatcher->events_queue, &event);
-    tb_spinlock_leave(&fwatcher->lock);
-#endif
-
-    return 0;
+    tb_trace_i("wait ok %lu", tb_queue_size(fwatcher->events_queue));
+    // get events
+    tb_size_t events_count = 0;
+    while (events_count < events_maxn)
+    {
+        tb_bool_t has_events = tb_false;
+        tb_spinlock_enter(&fwatcher->lock);
+        has_events = !tb_queue_null(fwatcher->events_queue);
+        if (has_events)
+        {
+            tb_fwatcher_event_t* event = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->events_queue);
+            if (event)
+            {
+                events[events_count++] = *event;
+                tb_queue_pop(fwatcher->events_queue);
+            }
+        }
+        tb_spinlock_leave(&fwatcher->lock);
+        tb_check_break(has_events);
+    }
+    return events_count;
 }
