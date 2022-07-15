@@ -26,7 +26,7 @@
 #include "../file.h"
 #include "../socket.h"
 #include "../directory.h"
-#include "../time.h"
+#include "../semaphore.h"
 #include "../../libc/libc.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
@@ -51,16 +51,23 @@ typedef struct __tb_fwatcher_t
     FSEventStreamRef        stream;
     dispatch_queue_t        fsevents_queue;
     tb_hash_map_ref_t       watchitems;
+    tb_semaphore_ref_t      semaphore;
 
 }tb_fwatcher_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef stream, tb_pointer_t client_cbinfo,
+static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef stream, tb_pointer_t priv,
     size_t events_count, tb_pointer_t event_paths, const FSEventStreamEventFlags event_flags[], FSEventStreamEventId const* event_id)
 {
+    // check
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
+    tb_assert_and_check_return(fwatcher && fwatcher->semaphore);
+
     tb_trace_i("tb_fwatcher_fsevent_stream_callback");
+
+    tb_semaphore_post(fwatcher->semaphore, 1);
 }
 
 static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
@@ -83,13 +90,21 @@ static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
     }
     CFArrayRef path_array = CFArrayCreate(tb_null, (tb_cpointer_t*)pathstrs, itemcount, &kCFTypeArrayCallBacks);
 
+    // init context
+    FSEventStreamContext* context = &fwatcher->context;
+    context->version = 0;
+    context->info = fwatcher;
+    context->retain = tb_null;
+    context->release = tb_null;
+    context->copyDescription = tb_null;
+
     // create fsevent stream
     FSEventStreamCreateFlags flags = kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer;
 #if defined (HAVE_MACOS_GE_10_13)
     flags |= kFSEventStreamCreateFlagUseExtendedData;
     flags |= kFSEventStreamCreateFlagUseCFTypes;
 #endif
-    fwatcher->stream = FSEventStreamCreate(tb_null, tb_fwatcher_fsevent_stream_callback, &fwatcher->context,
+    fwatcher->stream = FSEventStreamCreate(tb_null, tb_fwatcher_fsevent_stream_callback, context,
         path_array, kFSEventStreamEventIdSinceNow, 0, flags);
 
     // creating dispatch queue
@@ -128,6 +143,10 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_null, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
 
+        // init semaphore
+        fwatcher->semaphore = tb_semaphore_init(0);
+        tb_assert_and_check_break(fwatcher->semaphore);
+
         ok = tb_true;
     } while (0);
 
@@ -165,6 +184,10 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         // exit stream
         if (fwatcher->stream) CFRelease(fwatcher->stream);
         fwatcher->stream = tb_null;
+
+        // exit semaphore
+        if (fwatcher->semaphore) tb_semaphore_exit(fwatcher->semaphore);
+        fwatcher->semaphore = tb_null;
 
         // wait watcher
         tb_free(fwatcher);
@@ -206,8 +229,9 @@ tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return(fwatcher);
+    tb_assert_and_check_return(fwatcher && fwatcher->semaphore);
 
+    tb_semaphore_post(fwatcher->semaphore, 1);
 }
 
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
@@ -219,10 +243,10 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
         return -1;
 
-    while (1)
-    {
-        tb_msleep(1000);
-    }
+    // wait events
+    tb_long_t wait = tb_semaphore_wait(fwatcher->semaphore, timeout);
+    tb_assert_and_check_return_val(wait >= 0, -1);
+    tb_check_return_val(wait > 0, 0);
 
     return 0;
 }
