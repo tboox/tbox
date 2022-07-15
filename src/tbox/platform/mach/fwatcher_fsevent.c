@@ -65,9 +65,25 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
     tb_assert_and_check_return(fwatcher && fwatcher->semaphore);
 
-    tb_trace_i("tb_fwatcher_fsevent_stream_callback");
+    // get events
+    size_t i;
+    for (i = 0; i < events_count; ++i)
+    {
+#if defined(HAVE_MACOS_GE_10_13)
+        CFDictionaryRef path_info_dict = (CFDictionaryRef)CFArrayGetValueAtIndex((CFArrayRef)event_paths, i);
+        CFStringRef path = (CFStringRef)CFDictionaryGetValue(path_info_dict, kFSEventStreamEventExtendedDataPathKey);
+        CFNumberRef cf_inode = (CFNumberRef)CFDictionaryGetValue(path_info_dict, kFSEventStreamEventExtendedFileIDKey);
+        unsigned long inode;
+        CFNumberGetValue(cf_inode, kCFNumberLongType, &inode);
+        tb_char_t const* filepath = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
+#else
+        tb_char_t const* filepath = ((tb_char_t const**)event_paths)[i];
+#endif
+        tb_trace_i("tb_fwatcher_fsevent_stream_callback: %s, %x", filepath, event_flags[i]);
+    }
 
-    tb_semaphore_post(fwatcher->semaphore, 1);
+    // notify events
+    if (events_count) tb_semaphore_post(fwatcher->semaphore, 1);
 }
 
 static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
