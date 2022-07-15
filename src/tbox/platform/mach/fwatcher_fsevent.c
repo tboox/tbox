@@ -29,16 +29,7 @@
 #include "../../libc/libc.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/event.h>
-#include <sys/time.h>
-#include <errno.h>
-#include <string.h>
-#include <inttypes.h>
+#include <CoreServices/CoreServices.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -47,16 +38,17 @@
 // the watch item type
 typedef struct __tb_fwatcher_item_t
 {
-    tb_int_t            wd;
     tb_size_t           events;
-    tb_char_t const*    filepath;
 
 }tb_fwatcher_item_t;
+
 
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
-    tb_int_t dummy;
+    FSEventStreamContext    context;
+    FSEventStreamRef        stream;
+    tb_hash_map_ref_t       watchitems;
 
 }tb_fwatcher_t;
 
@@ -77,6 +69,9 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         fwatcher = tb_malloc0_type(tb_fwatcher_t);
         tb_assert_and_check_break(fwatcher);
 
+        // init watch items
+        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_null, tb_null));
+        tb_assert_and_check_break(fwatcher->watchitems);
 
         ok = tb_true;
     } while (0);
@@ -94,6 +89,10 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
+        // exit watchitems
+        if (fwatcher->watchitems) tb_hash_map_exit(fwatcher->watchitems);
+        fwatcher->watchitems = tb_null;
+
         // wait watcher
         tb_free(fwatcher);
         fwatcher = tb_null;
@@ -103,23 +102,32 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
 
     // file not found
     tb_file_info_t info;
     if (!tb_file_info(filepath, &info))
         return tb_false;
 
-    return tb_false;
+    // this path has been added?
+    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
+    if (itor != tb_iterator_tail(fwatcher->watchitems))
+        return tb_true;
+
+    // save watch item
+    tb_fwatcher_item_t watchitem;
+    watchitem.events = events;
+    return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
 
-
-    return tb_false;
+    // remove the watchitem
+    tb_hash_map_remove(fwatcher->watchitems, filepath);
+    return tb_true;
 }
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
