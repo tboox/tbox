@@ -26,6 +26,7 @@
 #include "../file.h"
 #include "../socket.h"
 #include "../directory.h"
+#include "../spinlock.h"
 #include "../semaphore.h"
 #include "../../libc/libc.h"
 #include "../../container/container.h"
@@ -52,6 +53,8 @@ typedef struct __tb_fwatcher_t
     dispatch_queue_t        fsevents_queue;
     tb_hash_map_ref_t       watchitems;
     tb_semaphore_ref_t      semaphore;
+    tb_queue_ref_t          events_queue;
+    tb_spinlock_t           lock;
 
 }tb_fwatcher_t;
 
@@ -63,12 +66,13 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
 {
     // check
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
-    tb_assert_and_check_return(fwatcher && fwatcher->semaphore);
+    tb_assert_and_check_return(fwatcher && fwatcher->semaphore && fwatcher->events_queue);
 
     // get events
     size_t i;
     for (i = 0; i < events_count; ++i)
     {
+        // get event
 #if defined(HAVE_MACOS_GE_10_13)
         CFDictionaryRef path_info_dict = (CFDictionaryRef)CFArrayGetValueAtIndex((CFArrayRef)event_paths, i);
         CFStringRef path = (CFStringRef)CFDictionaryGetValue(path_info_dict, kFSEventStreamEventExtendedDataPathKey);
@@ -80,6 +84,26 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
         tb_char_t const* filepath = ((tb_char_t const**)event_paths)[i];
 #endif
         tb_trace_i("tb_fwatcher_fsevent_stream_callback: %s, %x", filepath, event_flags[i]);
+
+        FSEventStreamEventFlags flags = event_flags[i];
+        tb_fwatcher_event_t event;
+        if (filepath) tb_strlcpy(event.filepath, filepath, TB_PATH_MAXN);
+        else event.filepath[0] = '\0';
+        if (flags & kFSEventStreamEventFlagItemCreated)
+            event.event = TB_FWATCHER_EVENT_CREATE;
+        else if (flags & kFSEventStreamEventFlagItemRemoved)
+            event.event = TB_FWATCHER_EVENT_DELETE;
+        else if (flags & kFSEventStreamEventFlagItemModified)
+            event.event = TB_FWATCHER_EVENT_MODIFY;
+
+        // add event to queue
+        if (event.event)
+        {
+            tb_spinlock_enter(&fwatcher->lock);
+            if (!tb_queue_full(fwatcher->events_queue))
+                tb_queue_put(fwatcher->events_queue, &event);
+            tb_spinlock_leave(&fwatcher->lock);
+        }
     }
 
     // notify events
@@ -159,9 +183,16 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_null, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
 
+        // init events queue
+        fwatcher->events_queue = tb_queue_init(0, tb_element_mem(sizeof(tb_fwatcher_event_t), tb_null, tb_null));
+        tb_assert_and_check_break(fwatcher->events_queue);
+
         // init semaphore
         fwatcher->semaphore = tb_semaphore_init(0);
         tb_assert_and_check_break(fwatcher->semaphore);
+
+        // init lock
+        tb_spinlock_init(&fwatcher->lock);
 
         ok = tb_true;
     } while (0);
@@ -204,6 +235,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         // exit semaphore
         if (fwatcher->semaphore) tb_semaphore_exit(fwatcher->semaphore);
         fwatcher->semaphore = tb_null;
+
+        // exit events queue
+        if (fwatcher->events_queue) tb_queue_exit(fwatcher->events_queue);
+        fwatcher->events_queue = tb_null;
+
+        // exit lock
+        tb_spinlock_exit(&fwatcher->lock);
 
         // wait watcher
         tb_free(fwatcher);
@@ -253,7 +291,7 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->semaphore && fwatcher->events_queue && events && events_maxn, -1);
 
     // we need init fsevent stream first
     if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
@@ -263,6 +301,13 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     tb_long_t wait = tb_semaphore_wait(fwatcher->semaphore, timeout);
     tb_assert_and_check_return_val(wait >= 0, -1);
     tb_check_return_val(wait > 0, 0);
+
+#if 0
+    tb_spinlock_enter(&fwatcher->lock);
+    if (!tb_queue_full(fwatcher->events_queue))
+        tb_queue_put(fwatcher->events_queue, &event);
+    tb_spinlock_leave(&fwatcher->lock);
+#endif
 
     return 0;
 }
