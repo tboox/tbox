@@ -26,6 +26,7 @@
 #include "../file.h"
 #include "../socket.h"
 #include "../directory.h"
+#include "../time.h"
 #include "../../libc/libc.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
@@ -48,6 +49,7 @@ typedef struct __tb_fwatcher_t
 {
     FSEventStreamContext    context;
     FSEventStreamRef        stream;
+    dispatch_queue_t        fsevents_queue;
     tb_hash_map_ref_t       watchitems;
 
 }tb_fwatcher_t;
@@ -55,6 +57,59 @@ typedef struct __tb_fwatcher_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef stream, tb_pointer_t client_cbinfo,
+    size_t events_count, tb_pointer_t event_paths, const FSEventStreamEventFlags event_flags[], FSEventStreamEventId const* event_id)
+{
+    tb_trace_i("tb_fwatcher_fsevent_stream_callback");
+}
+
+static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
+{
+    // check
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems, tb_false);
+
+    // get items count
+    tb_size_t itemcount = tb_hash_map_size(fwatcher->watchitems);
+    tb_assert_and_check_return_val(itemcount, tb_false);
+
+    // get path array
+    CFStringRef* pathstrs = tb_nalloc_type(itemcount, CFStringRef);
+    tb_assert_and_check_return_val(pathstrs, tb_false);
+
+    tb_size_t i = 0;
+    tb_for_all (tb_hash_map_item_ref_t, item, fwatcher->watchitems)
+    {
+        pathstrs[i++] = CFStringCreateWithCString(tb_null, item->name, kCFStringEncodingUTF8);
+    }
+    CFArrayRef path_array = CFArrayCreate(tb_null, (tb_cpointer_t*)pathstrs, itemcount, &kCFTypeArrayCallBacks);
+
+    // create fsevent stream
+    FSEventStreamCreateFlags flags = kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer;
+#if defined (HAVE_MACOS_GE_10_13)
+    flags |= kFSEventStreamCreateFlagUseExtendedData;
+    flags |= kFSEventStreamCreateFlagUseCFTypes;
+#endif
+    fwatcher->stream = FSEventStreamCreate(tb_null, tb_fwatcher_fsevent_stream_callback, &fwatcher->context,
+        path_array, kFSEventStreamEventIdSinceNow, 0, flags);
+
+    // creating dispatch queue
+    fwatcher->fsevents_queue = dispatch_queue_create("fswatch_event_queue", tb_null);
+    FSEventStreamSetDispatchQueue(fwatcher->stream, fwatcher->fsevents_queue);
+
+    // start stream
+    FSEventStreamStart(fwatcher->stream);
+
+    // free path array
+    for (i = 0; i < itemcount; i++)
+    {
+        if (pathstrs[i])
+            CFRelease(pathstrs[i]);
+        pathstrs[i] = tb_null;
+    }
+    tb_free(pathstrs);
+    CFRelease(path_array);
+    return tb_true;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -89,9 +144,27 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
+        // exit stream
+        if (fwatcher->stream)
+        {
+            FSEventStreamStop(fwatcher->stream);
+            FSEventStreamInvalidate(fwatcher->stream);
+            FSEventStreamRelease(fwatcher->stream);
+            fwatcher->stream = tb_null;
+        }
+
+        // exit dispatch queue
+        if (fwatcher->fsevents_queue)
+            dispatch_release(fwatcher->fsevents_queue);
+        fwatcher->fsevents_queue = tb_null;
+
         // exit watchitems
         if (fwatcher->watchitems) tb_hash_map_exit(fwatcher->watchitems);
         fwatcher->watchitems = tb_null;
+
+        // exit stream
+        if (fwatcher->stream) CFRelease(fwatcher->stream);
+        fwatcher->stream = tb_null;
 
         // wait watcher
         tb_free(fwatcher);
@@ -141,6 +214,15 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && events && events_maxn, -1);
+
+    // we need init fsevent stream first
+    if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
+        return -1;
+
+    while (1)
+    {
+        tb_msleep(1000);
+    }
 
     return 0;
 }
