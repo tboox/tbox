@@ -24,7 +24,7 @@
  */
 #include "../fwatcher.h"
 #include "../file.h"
-#include "../socket.h"
+#include "../event.h"
 #include "../directory.h"
 #include "../../libc/libc.h"
 #include "../../container/container.h"
@@ -65,6 +65,7 @@ typedef struct __tb_fwatcher_item_t
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
+    tb_event_ref_t       event;
     tb_hash_map_ref_t    watchitems;
 
 }tb_fwatcher_t;
@@ -97,6 +98,10 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         fwatcher = tb_malloc0_type(tb_fwatcher_t);
         tb_assert_and_check_break(fwatcher);
 
+        // init event
+        fwatcher->event = tb_event_init();
+        tb_assert_and_check_break(fwatcher->event);
+
         // init watch items
         fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_fwatcher_item_free, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
@@ -124,6 +129,10 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             fwatcher->watchitems = tb_null;
         }
 
+        // exit event
+        if (fwatcher->event) tb_event_exit(fwatcher->event);
+        fwatcher->event = tb_null;
+
         // wait watcher
         tb_free(fwatcher);
         fwatcher = tb_null;
@@ -139,6 +148,11 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
     tb_file_info_t info;
     if (!tb_file_info(filepath, &info))
         return tb_false;
+
+    // this path has been added?
+    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
+    if (itor != tb_iterator_tail(fwatcher->watchitems))
+        return tb_true;
 
     // create event
     HANDLE event = CreateEvent(tb_null, TRUE, FALSE, tb_null);
@@ -163,14 +177,29 @@ tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return(fwatcher);
+    tb_assert_and_check_return(fwatcher && fwatcher->event);
 
+    tb_event_post(fwatcher->event);
 }
 
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->event && events && events_maxn, -1);
 
-    return 0;
+    tb_long_t events_count = 0;
+    tb_bool_t stop = tb_false;
+    tb_hong_t time = tb_mclock();
+    while (!events_count && !stop && (timeout < 0 || tb_mclock() < time + timeout))
+    {
+        // wait some time
+        tb_long_t wait = tb_event_wait(fwatcher->event, 500);
+        tb_assert_and_check_return_val(wait >= 0, -1);
+
+        // has spark event? we need break the current loop
+        if (wait > 0) break;
+
+        // TODO
+    }
+    return events_count;
 }
