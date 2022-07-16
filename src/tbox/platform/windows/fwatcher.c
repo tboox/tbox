@@ -55,16 +55,34 @@
  * types
  */
 
+// the watch item type
+typedef struct __tb_fwatcher_item_t
+{
+    HANDLE              event;
+
+}tb_fwatcher_item_t;
+
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
-    tb_int_t    dummy;
+    tb_hash_map_ref_t    watchitems;
 
 }tb_fwatcher_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t buff)
+{
+    tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)buff;
+    tb_assert_and_check_return(watchitem);
+
+    if (watchitem->event != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(watchitem->event);
+        watchitem->event = INVALID_HANDLE_VALUE;
+    }
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -78,6 +96,10 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         // init fwatcher
         fwatcher = tb_malloc0_type(tb_fwatcher_t);
         tb_assert_and_check_break(fwatcher);
+
+        // init watch items
+        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_fwatcher_item_free, tb_null));
+        tb_assert_and_check_break(fwatcher->watchitems);
 
         ok = tb_true;
     } while (0);
@@ -95,6 +117,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
+        // exit watch items
+        if (fwatcher->watchitems)
+        {
+            tb_hash_map_exit(fwatcher->watchitems);
+            fwatcher->watchitems = tb_null;
+        }
+
         // wait watcher
         tb_free(fwatcher);
         fwatcher = tb_null;
@@ -104,22 +133,31 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
 tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
 
     // file not found
     tb_file_info_t info;
     if (!tb_file_info(filepath, &info))
         return tb_false;
 
-    return tb_false;
+    // create event
+    HANDLE event = CreateEvent(tb_null, TRUE, FALSE, tb_null);
+    tb_assert_and_check_return_val(event, tb_false);
+
+    // save watch item
+    tb_fwatcher_item_t watchitem;
+    watchitem.event = event;
+    return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
 
-    return tb_false;
+    // remove the watchitem
+    tb_hash_map_remove(fwatcher->watchitems, filepath);
+    return tb_true;
 }
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
