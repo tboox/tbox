@@ -85,6 +85,31 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     }
 }
 
+static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_fwatcher_item_t* watchitem)
+{
+    tb_assert_and_check_return_val(fwatcher && watchitem && !watchitem->event, tb_false);
+
+    // create event
+    watchitem->event = CreateEvent(tb_null, TRUE, FALSE, tb_null);
+    tb_assert_and_check_return_val(watchitem->event && watchitem->event != INVALID_HANDLE_VALUE, tb_false);
+
+    // create file
+    // TODO
+
+    return tb_true;
+}
+
+static tb_bool_t tb_fwatcher_process_path(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_fwatcher_item_t* watchitem)
+{
+    tb_assert_and_check_return_val(fwatcher && filepath && watchitem, tb_false);
+
+    // init watch item first
+    if (!watchitem->event && tb_fwatcher_item_init(fwatcher, watchitem))
+        return tb_false;
+
+    return tb_true;
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -154,13 +179,8 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
     if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
-    // create event
-    HANDLE event = CreateEvent(tb_null, TRUE, FALSE, tb_null);
-    tb_assert_and_check_return_val(event, tb_false);
-
     // save watch item
-    tb_fwatcher_item_t watchitem;
-    watchitem.event = event;
+    tb_fwatcher_item_t watchitem = {0};
     return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
@@ -199,7 +219,12 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         // has spark event? we need break the current loop
         if (wait > 0) break;
 
-        // TODO
+        // poll fs events for file paths
+        tb_for_all(tb_hash_map_item_ref_t, item, fwatcher->watchitems)
+        {
+            if (!tb_fwatcher_process_path(fwatcher, (tb_char_t const*)item->name, (tb_fwatcher_item_t*)item->data))
+                return -1;
+        }
     }
     return events_count;
 }
