@@ -12,7 +12,7 @@ tb_int_t tb_demo_platform_fwatcher_main(tb_int_t argc, tb_char_t** argv)
     if (fwatcher)
     {
         tb_trace_i("watching %s", argv[1]);
-        if (tb_fwatcher_add(fwatcher, argv[1], TB_FWATCHER_EVENT_ALL))
+        if (tb_fwatcher_add(fwatcher, argv[1]))
         {
             tb_bool_t eof = tb_false;
             tb_long_t count = 0;

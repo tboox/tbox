@@ -35,9 +35,9 @@
  */
 #if defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT)
 #   include "linux/fwatcher_inotify.c"
-#elif defined(TB_CONFIG_OS_MACOSX)
+#elif 0//defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/fwatcher_fsevent.c"
-#elif defined(TB_CONFIG_OS_BSD)
+#elif 1//defined(TB_CONFIG_OS_BSD)
 #   include "bsd/fwatcher_kqueue.c"
 #else
 tb_fwatcher_ref_t tb_fwatcher_init()
@@ -51,7 +51,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_trace_noimpl();
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_trace_noimpl();
     return tb_false;

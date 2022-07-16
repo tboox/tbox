@@ -59,7 +59,6 @@
 typedef struct __tb_fwatcher_item_t
 {
     tb_int_t            wd;
-    tb_size_t           events;
     tb_char_t const*    filepath;
 
 }tb_fwatcher_item_t;
@@ -91,9 +90,9 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     }
 }
 
-static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_size_t events)
+static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath)
 {
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath, tb_false);
 
     // this path has been added?
     tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
@@ -113,7 +112,6 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const*
     // save watch item
     tb_fwatcher_item_t watchitem;
     watchitem.wd = wd;
-    watchitem.events = events;
     watchitem.filepath = tb_null;
     return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
@@ -121,17 +119,12 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const*
 static tb_long_t tb_fwatcher_add_watch_files(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
 {
     // check
-    tb_value_t* values = (tb_value_t*)priv;
-    tb_assert_and_check_return_val(path && info && values, TB_DIRECTORY_WALK_CODE_END);
-
-    // get fwatcher
-    tb_fwatcher_t* fwatcher = values[0].ptr;
-    tb_size_t events = values[1].ul;
-    tb_assert_and_check_return_val(fwatcher, TB_DIRECTORY_WALK_CODE_END);
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
+    tb_assert_and_check_return_val(path && info && fwatcher, TB_DIRECTORY_WALK_CODE_END);
 
     // add file watch
     if (info->type == TB_FILE_TYPE_FILE)
-        tb_fwatcher_add_watch(fwatcher, path, events);
+        tb_fwatcher_add_watch(fwatcher, path);
     return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
 
@@ -195,11 +188,7 @@ static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_p
     }
 
     // register watch events
-    tb_uint_t vnode_events = 0;
-    if (watchitem->events & TB_FWATCHER_EVENT_DELETE)
-        vnode_events |= NOTE_DELETE;
-    if (watchitem->events & TB_FWATCHER_EVENT_MODIFY)
-        vnode_events |= NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
+    tb_uint_t vnode_events = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE;
     tb_assert_and_check_return_val(vnode_events, tb_false);
 
     watchitem->filepath = path;
@@ -286,7 +275,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
@@ -298,13 +287,8 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_
 
     // is directory? we need scan it and add all subfiles
     if (info.type == TB_FILE_TYPE_DIRECTORY)
-    {
-        tb_value_t values[2];
-        values[0].ptr = (tb_pointer_t)fwatcher;
-        values[1].ul  = events;
-        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_add_watch_files, values);
-    }
-    return tb_fwatcher_add_watch(fwatcher, filepath, events);
+        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_add_watch_files, fwatcher);
+    return tb_fwatcher_add_watch(fwatcher, filepath);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
@@ -426,7 +410,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         tb_file_info_t info;
         if (event_code == TB_FWATCHER_EVENT_MODIFY && watchitem->filepath &&
             tb_file_info(watchitem->filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
-            tb_fwatcher_add(self, watchitem->filepath, watchitem->events);
+            tb_fwatcher_add(self, watchitem->filepath);
         else if (event_code == TB_FWATCHER_EVENT_DELETE)
             tb_fwatcher_remove(self, watchitem->filepath);
     }

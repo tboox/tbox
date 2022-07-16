@@ -47,7 +47,6 @@ typedef enum __tb_fwatcher_event_e
 ,   TB_FWATCHER_EVENT_MODIFY = 1
 ,   TB_FWATCHER_EVENT_CREATE = 2
 ,   TB_FWATCHER_EVENT_DELETE = 4
-,   TB_FWATCHER_EVENT_ALL    = TB_FWATCHER_EVENT_CREATE | TB_FWATCHER_EVENT_MODIFY | TB_FWATCHER_EVENT_DELETE
 
 }tb_fwatcher_event_e;
 
@@ -79,11 +78,10 @@ tb_void_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
  *
  * @param fwatcher      the fwatcher
  * @param filepath      the watched file or directory path
- * @param events        the watched events
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_fwatcher_add(tb_fwatcher_ref_t fwatcher, tb_char_t const* filepath, tb_size_t events);
+tb_bool_t               tb_fwatcher_add(tb_fwatcher_ref_t fwatcher, tb_char_t const* filepath);
 
 /*! remove the watched directory, we can just watch single-level directory
  *
