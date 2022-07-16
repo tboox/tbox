@@ -92,6 +92,7 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
 
 static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath)
 {
+    // check
     tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath, tb_false);
 
     // this path has been added?
@@ -405,12 +406,15 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         }
 
         // rescan the watch directory
-        tb_file_info_t info;
-        if (event_code == TB_FWATCHER_EVENT_MODIFY && watchitem->filepath &&
-            tb_file_info(watchitem->filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
-            tb_fwatcher_add(self, watchitem->filepath);
-        else if (event_code == TB_FWATCHER_EVENT_DELETE)
-            tb_fwatcher_remove(self, watchitem->filepath);
+        if (watchitem->filepath)
+        {
+            tb_file_info_t info;
+            if ((event_code == TB_FWATCHER_EVENT_MODIFY || event_code == TB_FWATCHER_EVENT_CREATE) &&
+                tb_file_info(watchitem->filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
+                tb_fwatcher_add(self, watchitem->filepath);
+            else if (event_code == TB_FWATCHER_EVENT_DELETE)
+                tb_fwatcher_remove(self, watchitem->filepath);
+        }
     }
     return wait;
 }
