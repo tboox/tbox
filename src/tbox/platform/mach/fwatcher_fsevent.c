@@ -37,21 +37,13 @@
  * types
  */
 
-// the watch item type
-typedef struct __tb_fwatcher_item_t
-{
-    tb_size_t           events;
-
-}tb_fwatcher_item_t;
-
-
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
     FSEventStreamContext    context;
     FSEventStreamRef        stream;
     dispatch_queue_t        fsevents_queue;
-    tb_hash_map_ref_t       watchitems;
+    tb_hash_set_ref_t       watchitems;
     tb_semaphore_ref_t      semaphore;
     tb_queue_ref_t          events_queue;
     tb_spinlock_t           lock;
@@ -66,7 +58,7 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
 {
     // check
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
-    tb_assert_and_check_return(fwatcher && fwatcher->semaphore && fwatcher->events_queue);
+    tb_assert_and_check_return(fwatcher && fwatcher->semaphore && fwatcher->events_queue && fwatcher->watchitems);
 
     // get events
     size_t i;
@@ -83,9 +75,8 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
 #else
         tb_char_t const* filepath = ((tb_char_t const**)event_paths)[i];
 #endif
-        tb_trace_i("tb_fwatcher_fsevent_stream_callback: %s, %x", filepath, event_flags[i]);
 
-        // TODO filter need events
+        // filter need events
         FSEventStreamEventFlags flags = event_flags[i];
         tb_fwatcher_event_t event;
         if (filepath) tb_strlcpy(event.filepath, filepath, TB_PATH_MAXN);
@@ -94,8 +85,14 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
             event.event = TB_FWATCHER_EVENT_CREATE;
         else if (flags & kFSEventStreamEventFlagItemRemoved)
             event.event = TB_FWATCHER_EVENT_DELETE;
-        else if (flags & kFSEventStreamEventFlagItemModified) // TODO
+        else if (flags & kFSEventStreamEventFlagItemModified)
             event.event = TB_FWATCHER_EVENT_MODIFY;
+        else if (flags & kFSEventStreamEventFlagItemRenamed)
+        {
+            // the parent directory is changed
+            event.event = TB_FWATCHER_EVENT_MODIFY;
+            tb_path_directory(filepath, event.filepath, TB_PATH_MAXN);
+        }
 
         // add event to queue
         if (event.event)
@@ -117,7 +114,7 @@ static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
     tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems, tb_false);
 
     // get items count
-    tb_size_t itemcount = tb_hash_map_size(fwatcher->watchitems);
+    tb_size_t itemcount = tb_hash_set_size(fwatcher->watchitems);
     tb_assert_and_check_return_val(itemcount, tb_false);
 
     // get path array
@@ -125,9 +122,9 @@ static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
     tb_assert_and_check_return_val(pathstrs, tb_false);
 
     tb_size_t i = 0;
-    tb_for_all (tb_hash_map_item_ref_t, item, fwatcher->watchitems)
+    tb_for_all (tb_char_t const*, filepath, fwatcher->watchitems)
     {
-        pathstrs[i++] = CFStringCreateWithCString(tb_null, item->name, kCFStringEncodingUTF8);
+        pathstrs[i++] = CFStringCreateWithCString(tb_null, filepath, kCFStringEncodingUTF8);
     }
     CFArrayRef path_array = CFArrayCreate(tb_null, (tb_cpointer_t*)pathstrs, itemcount, &kCFTypeArrayCallBacks);
 
@@ -181,7 +178,7 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         tb_assert_and_check_break(fwatcher);
 
         // init watch items
-        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_null, tb_null));
+        fwatcher->watchitems = tb_hash_set_init(0, tb_element_str(tb_true));
         tb_assert_and_check_break(fwatcher->watchitems);
 
         // init events queue
@@ -226,7 +223,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         fwatcher->fsevents_queue = tb_null;
 
         // exit watchitems
-        if (fwatcher->watchitems) tb_hash_map_exit(fwatcher->watchitems);
+        if (fwatcher->watchitems) tb_hash_set_exit(fwatcher->watchitems);
         fwatcher->watchitems = tb_null;
 
         // exit stream
@@ -261,14 +258,12 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_
         return tb_false;
 
     // this path has been added?
-    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
+    tb_size_t itor = tb_hash_set_find(fwatcher->watchitems, filepath);
     if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
     // save watch item
-    tb_fwatcher_item_t watchitem;
-    watchitem.events = events;
-    return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
+    return tb_hash_set_insert(fwatcher->watchitems, filepath) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
@@ -277,7 +272,7 @@ tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
     tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
 
     // remove the watchitem
-    tb_hash_map_remove(fwatcher->watchitems, filepath);
+    tb_hash_set_remove(fwatcher->watchitems, filepath);
     return tb_true;
 }
 
@@ -298,13 +293,11 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
         return -1;
 
-    tb_trace_i("wait ..");
     // wait events
     tb_long_t wait = tb_semaphore_wait(fwatcher->semaphore, timeout);
     tb_assert_and_check_return_val(wait >= 0, -1);
     tb_check_return_val(wait > 0, 0);
 
-    tb_trace_i("wait ok %lu", tb_queue_size(fwatcher->events_queue));
     // get events
     tb_size_t events_count = 0;
     while (events_count < events_maxn)
