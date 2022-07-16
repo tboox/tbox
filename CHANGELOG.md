@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* [#190](https://github.com/tboox/tbox/pull/190): Add fs watcher
+
 ### Changes
 
 * Support wasm
@@ -248,6 +252,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* [#190](https://github.com/tboox/tbox/pull/190): 添加文件系统状态监视器
 
 ### 改进
 
