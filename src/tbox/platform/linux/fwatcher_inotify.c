@@ -154,10 +154,10 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_size_t events)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && fwatcher->filepath_fds && filepath && events, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->fd >= 0 && fwatcher->filepath_fds && filepath, tb_false);
 
     // file not found
     if (!tb_file_info(filepath, tb_null))
@@ -169,11 +169,7 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath, tb_
         return tb_true;
 
     // add watch
-    tb_uint32_t mask = 0;
-    if (events & TB_FWATCHER_EVENT_MODIFY) mask |= IN_MODIFY;
-    if (events & TB_FWATCHER_EVENT_CREATE) mask |= IN_CREATE;
-    if (events & TB_FWATCHER_EVENT_DELETE) mask |= IN_DELETE;
-    tb_int_t wd = inotify_add_watch(fwatcher->fd, filepath, mask);
+    tb_int_t wd = inotify_add_watch(fwatcher->fd, filepath, IN_MODIFY | IN_CREATE | IN_DELETE);
     tb_assert_and_check_return_val(wd >= 0, tb_false);
 
     // save file path

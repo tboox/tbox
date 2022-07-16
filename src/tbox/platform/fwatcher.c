@@ -35,9 +35,9 @@
  */
 #if defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT)
 #   include "linux/fwatcher_inotify.c"
-#elif 0//defined(TB_CONFIG_OS_MACOSX)
+#elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/fwatcher_fsevent.c"
-#elif 1//defined(TB_CONFIG_OS_BSD)
+#elif defined(TB_CONFIG_OS_BSD)
 #   include "bsd/fwatcher_kqueue.c"
 #else
 tb_fwatcher_ref_t tb_fwatcher_init()
