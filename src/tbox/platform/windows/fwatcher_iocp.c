@@ -39,6 +39,13 @@
 typedef struct __tb_fwatcher_item_t
 {
     HANDLE              handle;
+    OVERLAPPED          overlapped;
+    /* ReadDirectoryChangesW fails with ERROR_INVALID_PARAMETER when
+     * the buffer length is greater than 64 KB and the application is monitoring a directory over the network.
+     *
+     * http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx)
+     */
+    BYTE                buffer[63 * 1024];
 
 }tb_fwatcher_item_t;
 
@@ -84,7 +91,11 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
     if (!CreateIoCompletionPort(watchitem->handle, fwatcher->port, 0, 1))
         return tb_false;
 
-    return tb_true;
+    // refresh directory watching
+    return ReadDirectoryChangesW(watchitem->handle,
+        watchitem->buffer, sizeof(watchitem->buffer), TRUE,
+        FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE,
+        tb_null, &watchitem->overlapped, tb_null);
 }
 
 static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
