@@ -24,6 +24,7 @@
  */
 #include "../fwatcher.h"
 #include "../file.h"
+#include "../time.h"
 #include "../directory.h"
 #include "../../libc/libc.h"
 #include "../../container/container.h"
@@ -40,6 +41,7 @@ typedef struct __tb_fwatcher_item_t
 {
     HANDLE              handle;
     OVERLAPPED          overlapped;
+    tb_bool_t           stop;
     /* ReadDirectoryChangesW fails with ERROR_INVALID_PARAMETER when
      * the buffer length is greater than 64 KB and the application is monitoring a directory over the network.
      *
@@ -65,8 +67,10 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)buff;
     tb_assert_and_check_return(watchitem);
 
+    watchitem->stop = tb_true;
     if (watchitem->handle && watchitem->handle != INVALID_HANDLE_VALUE)
     {
+        CancelIoEx(watchitem->handle, &watchitem->overlapped);
         CloseHandle(watchitem->handle);
         watchitem->handle = INVALID_HANDLE_VALUE;
     }
@@ -96,25 +100,6 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
         watchitem->buffer, sizeof(watchitem->buffer), TRUE,
         FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE,
         tb_null, &watchitem->overlapped, tb_null);
-}
-
-static tb_bool_t tb_fwatcher_update_watchevents(tb_iterator_ref_t iterator, tb_pointer_t item, tb_cpointer_t priv)
-{
-    // check
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
-    tb_hash_map_item_ref_t hashitem = (tb_hash_map_item_ref_t)item;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && hashitem, tb_false);
-
-    // get watch item and path
-    tb_char_t const* path = (tb_char_t const*)hashitem->name;
-    tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)hashitem->data;
-    tb_assert_and_check_return_val(watchitem && path, tb_false);
-
-    // init watch item first
-    if (!watchitem->handle && tb_fwatcher_item_init(fwatcher, path, watchitem))
-        return tb_false;
-
-    return tb_true;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +172,8 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
         return tb_true;
 
     // save watch item
-    tb_fwatcher_item_t watchitem = {0};
+    tb_fwatcher_item_t watchitem;
+    tb_memset(&watchitem, 0, sizeof(tb_fwatcher_item_t));
     return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
@@ -211,10 +197,63 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->port && fwatcher->watchitems && events && events_maxn, -1);
 
-    // update watch events
-    tb_walk_all(fwatcher->watchitems, tb_fwatcher_update_watchevents, fwatcher);
+    // init watch items
+    tb_for_all(tb_hash_map_item_ref_t, item, fwatcher->watchitems)
+    {
+        // get watch item and path
+        tb_char_t const* path = (tb_char_t const*)item->name;
+        tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)item->data;
+        tb_assert_and_check_return_val(watchitem && path, -1);
+
+        // init watch item first
+        if (!watchitem->handle && tb_fwatcher_item_init(fwatcher, path, watchitem))
+            return -1;
+    }
+
+    // wait watch items
+    if (tb_hash_map_size(fwatcher->watchitems))
+    {
+        tb_size_t wait = 0;
+        while (1)
+        {
+            // compute the timeout
+            if (wait) timeout = 0;
+
+            // clear error first
+            SetLastError(ERROR_SUCCESS);
+
+            // wait event
+            DWORD           real = 0;
+            tb_pointer_t    pkey = tb_null;
+            OVERLAPPED*     ov = tb_null;
+            BOOL            wait_ok = GetQueuedCompletionStatus(fwatcher->port,
+                (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&ov, (DWORD)(timeout < 0? INFINITE : timeout));
+
+            // the last error
+            tb_size_t error = (tb_size_t)GetLastError();
+
+            // timeout?
+            if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
+                break;
+
+            // is spank?
+            // TODO pkey
+
+            // handle event
+            tb_trace_i("real: %d, ov: %p", real, ov);
+        }
+    }
+    else
+    {
+        // TODO use event
+        tb_hong_t time = tb_mclock();
+        while (timeout < 0 || tb_mclock() < time + timeout)
+        {
+            tb_msleep(100);
+        }
+    }
 
     return 0;
 }
