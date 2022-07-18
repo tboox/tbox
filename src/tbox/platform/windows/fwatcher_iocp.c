@@ -48,6 +48,7 @@ typedef struct __tb_fwatcher_item_t
      * http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx)
      */
     BYTE                buffer[10 * 1024];
+    tb_char_t const*    filepath;
 
 }tb_fwatcher_item_t;
 
@@ -104,13 +105,16 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
     if (!CreateIoCompletionPort(watchitem->handle, fwatcher->port, 0, 1))
         return tb_false;
 
+    // save file path
+    watchitem->filepath = filepath;
+
     // refresh directory watching
     return tb_fwatcher_item_refresh(watchitem);
 }
 
 static tb_long_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item_t* watchitem, tb_fwatcher_event_t* events, tb_size_t events_maxn)
 {
-    tb_assert_and_check_return_val(fwatcher && watchitem && watchitem->handle && fwatcher->port && events, -1);
+    tb_assert_and_check_return_val(fwatcher && watchitem && watchitem->handle && watchitem->filepath && events, -1);
 
     tb_size_t offset = 0;
     tb_size_t events_count = 0;
@@ -125,9 +129,11 @@ static tb_long_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item
         tb_fwatcher_event_t* event = &events[events_count++];
 
         // get file path
+        tb_char_t filename[TB_PATH_MAXN];
 		tb_int_t count = WideCharToMultiByte(CP_UTF8, 0, notify->FileName, notify->FileNameLength / sizeof(WCHAR),
-            event->filepath, sizeof(event->filepath) - 1, tb_null, tb_null);
-		event->filepath[count] = '\0';
+            filename, sizeof(filename) - 1, tb_null, tb_null);
+		filename[count] = '\0';
+        tb_snprintf(event->filepath, TB_PATH_MAXN, "%s/%s", watchitem->filepath, filename);
 
         // get event code
         if (notify->Action == FILE_ACTION_ADDED)
@@ -140,8 +146,7 @@ static tb_long_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item
         {
             // the parent directory is changed
             event->event = TB_FWATCHER_EVENT_MODIFY;
-            // @note getting a directory in-place is safe, but it's a bit hacky. we will improve it later
-            tb_path_directory(event->filepath, event->filepath, TB_PATH_MAXN);
+            tb_strlcpy(event->filepath, watchitem->filepath, sizeof(event->filepath));
         }
 
     } while (notify->NextEntryOffset);
