@@ -47,7 +47,7 @@ typedef struct __tb_fwatcher_item_t
      *
      * http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx)
      */
-    BYTE                buffer[63 * 1024];
+    BYTE                buffer[10 * 1024];
 
 }tb_fwatcher_item_t;
 
@@ -208,8 +208,11 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         tb_assert_and_check_return_val(watchitem && path, -1);
 
         // init watch item first
-        if (!watchitem->handle && tb_fwatcher_item_init(fwatcher, path, watchitem))
+        if (!watchitem->handle && !tb_fwatcher_item_init(fwatcher, path, watchitem))
+        {
+            tb_trace_d("watch %s failed", path);
             return -1;
+        }
     }
 
     // wait watch items
