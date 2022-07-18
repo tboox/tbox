@@ -247,6 +247,7 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return(fwatcher && fwatcher->port);
 
+    PostQueuedCompletionStatus(fwatcher->port, 0, (ULONG_PTR)tb_u2p(1), tb_null);
 }
 
 tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
@@ -296,8 +297,9 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
                 break;
 
-            // is spank?
-            // TODO pkey
+            // spank notification?
+            if (tb_p2u32(pkey) == 0x1)
+                break ;
 
             // handle event
             if (real && overlapped)
