@@ -273,49 +273,37 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
 
     // wait watch items
     tb_size_t events_count = 0;
-    if (tb_hash_map_size(fwatcher->watchitems))
+    while (events_count < events_maxn)
     {
-        while (events_count < events_maxn)
+        // compute the timeout
+        if (events_count) timeout = 0;
+
+        // clear error first
+        SetLastError(ERROR_SUCCESS);
+
+        // wait event
+        DWORD           real = 0;
+        tb_pointer_t    pkey = tb_null;
+        OVERLAPPED*     overlapped = tb_null;
+        BOOL            wait_ok = GetQueuedCompletionStatus(fwatcher->port,
+            (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&overlapped, (DWORD)(timeout < 0? INFINITE : timeout));
+
+        // the last error
+        tb_size_t error = (tb_size_t)GetLastError();
+
+        // timeout?
+        if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
+            break;
+
+        // spank notification?
+        if (tb_p2u32(pkey) == 0x1)
+            break ;
+
+        // handle event
+        if (real && overlapped)
         {
-            // compute the timeout
-            if (events_count) timeout = 0;
-
-            // clear error first
-            SetLastError(ERROR_SUCCESS);
-
-            // wait event
-            DWORD           real = 0;
-            tb_pointer_t    pkey = tb_null;
-            OVERLAPPED*     overlapped = tb_null;
-            BOOL            wait_ok = GetQueuedCompletionStatus(fwatcher->port,
-                (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&overlapped, (DWORD)(timeout < 0? INFINITE : timeout));
-
-            // the last error
-            tb_size_t error = (tb_size_t)GetLastError();
-
-            // timeout?
-            if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
-                break;
-
-            // spank notification?
-            if (tb_p2u32(pkey) == 0x1)
-                break ;
-
-            // handle event
-            if (real && overlapped)
-            {
-                tb_long_t count = tb_fwatcher_item_spak(fwatcher, (tb_fwatcher_item_t*)overlapped, events + events_count, events_maxn - events_count);
-                if (count > 0) events_count += count;
-            }
-        }
-    }
-    else
-    {
-        // TODO use event
-        tb_hong_t time = tb_mclock();
-        while (timeout < 0 || tb_mclock() < time + timeout)
-        {
-            tb_msleep(100);
+            tb_long_t count = tb_fwatcher_item_spak(fwatcher, (tb_fwatcher_item_t*)overlapped, events + events_count, events_maxn - events_count);
+            if (count > 0) events_count += count;
         }
     }
     return events_count;
