@@ -39,8 +39,8 @@
 // the watch item type
 typedef struct __tb_fwatcher_item_t
 {
-    HANDLE              handle;
     OVERLAPPED          overlapped;
+    HANDLE              handle;
     tb_bool_t           stop;
     /* ReadDirectoryChangesW fails with ERROR_INVALID_PARAMETER when
      * the buffer length is greater than 64 KB and the application is monitoring a directory over the network.
@@ -76,6 +76,15 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     }
 }
 
+static tb_bool_t tb_fwatcher_item_refresh(tb_fwatcher_item_t* watchitem)
+{
+    // refresh directory watching
+    return ReadDirectoryChangesW(watchitem->handle,
+        watchitem->buffer, sizeof(watchitem->buffer), TRUE,
+        FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE,
+        tb_null, &watchitem->overlapped, tb_null);
+}
+
 static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_fwatcher_item_t* watchitem)
 {
     tb_assert_and_check_return_val(fwatcher && watchitem && filepath && !watchitem->handle && fwatcher->port, tb_false);
@@ -96,10 +105,51 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
         return tb_false;
 
     // refresh directory watching
-    return ReadDirectoryChangesW(watchitem->handle,
-        watchitem->buffer, sizeof(watchitem->buffer), TRUE,
-        FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE,
-        tb_null, &watchitem->overlapped, tb_null);
+    return tb_fwatcher_item_refresh(watchitem);
+}
+
+static tb_long_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item_t* watchitem, tb_fwatcher_event_t* events, tb_size_t events_maxn)
+{
+    tb_assert_and_check_return_val(fwatcher && watchitem && watchitem->handle && fwatcher->port && events, -1);
+
+    tb_size_t offset = 0;
+    tb_size_t events_count = 0;
+	PFILE_NOTIFY_INFORMATION notify;
+    do
+    {
+		notify = (PFILE_NOTIFY_INFORMATION)&watchitem->buffer[offset];
+		offset += notify->NextEntryOffset;
+
+        // get event
+        tb_check_break(events_count < events_maxn);
+        tb_fwatcher_event_t* event = &events[events_count++];
+
+        // get file path
+		tb_int_t count = WideCharToMultiByte(CP_UTF8, 0, notify->FileName, notify->FileNameLength / sizeof(WCHAR),
+            event->filepath, sizeof(event->filepath) - 1, tb_null, tb_null);
+		event->filepath[count] = '\0';
+
+        // get event code
+        if (notify->Action == FILE_ACTION_ADDED)
+            event->event = TB_FWATCHER_EVENT_CREATE;
+        else if (notify->Action == FILE_ACTION_MODIFIED)
+            event->event = TB_FWATCHER_EVENT_MODIFY;
+        else if (notify->Action == FILE_ACTION_REMOVED)
+            event->event = TB_FWATCHER_EVENT_DELETE;
+        else if (notify->Action == FILE_ACTION_RENAMED_NEW_NAME)
+        {
+            // the parent directory is changed
+            event->event = TB_FWATCHER_EVENT_MODIFY;
+            // @note getting a directory in-place is safe, but it's a bit hacky. we will improve it later
+            tb_path_directory(event->filepath, event->filepath, TB_PATH_MAXN);
+        }
+
+    } while (notify->NextEntryOffset);
+
+    // continue to refresh directory watching
+	if (!watchitem->stop)
+        tb_fwatcher_item_refresh(watchitem);
+    return events_count;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -216,13 +266,13 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     }
 
     // wait watch items
+    tb_size_t events_count = 0;
     if (tb_hash_map_size(fwatcher->watchitems))
     {
-        tb_size_t wait = 0;
-        while (1)
+        while (events_count < events_maxn)
         {
             // compute the timeout
-            if (wait) timeout = 0;
+            if (events_count) timeout = 0;
 
             // clear error first
             SetLastError(ERROR_SUCCESS);
@@ -230,9 +280,9 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             // wait event
             DWORD           real = 0;
             tb_pointer_t    pkey = tb_null;
-            OVERLAPPED*     ov = tb_null;
+            OVERLAPPED*     overlapped = tb_null;
             BOOL            wait_ok = GetQueuedCompletionStatus(fwatcher->port,
-                (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&ov, (DWORD)(timeout < 0? INFINITE : timeout));
+                (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&overlapped, (DWORD)(timeout < 0? INFINITE : timeout));
 
             // the last error
             tb_size_t error = (tb_size_t)GetLastError();
@@ -245,7 +295,11 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             // TODO pkey
 
             // handle event
-            tb_trace_i("real: %d, ov: %p", real, ov);
+            if (real && overlapped)
+            {
+                tb_long_t count = tb_fwatcher_item_spak(fwatcher, (tb_fwatcher_item_t*)overlapped, events + events_count, events_maxn - events_count);
+                if (count > 0) events_count += count;
+            }
         }
     }
     else
@@ -257,6 +311,5 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
             tb_msleep(100);
         }
     }
-
-    return 0;
+    return events_count;
 }

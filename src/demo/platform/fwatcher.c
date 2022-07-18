@@ -3,6 +3,7 @@
  */
 #include "../demo.h"
 
+#include <stdio.h>
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */
@@ -16,7 +17,7 @@ tb_int_t tb_demo_platform_fwatcher_main(tb_int_t argc, tb_char_t** argv)
         {
             tb_bool_t eof = tb_false;
             tb_long_t count = 0;
-            tb_fwatcher_event_t events[256];
+            tb_fwatcher_event_t events[64];
             while (!eof && (count = tb_fwatcher_wait(fwatcher, events, tb_arrayn(events), -1)) >= 0)
             {
                 for (tb_size_t i = 0; i < count && !eof; i++)
