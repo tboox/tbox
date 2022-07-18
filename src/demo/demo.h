@@ -185,6 +185,7 @@ TB_DEMO_MAIN_DECL(platform_poller_client);
 TB_DEMO_MAIN_DECL(platform_poller_server);
 TB_DEMO_MAIN_DECL(platform_poller_process);
 TB_DEMO_MAIN_DECL(platform_context);
+TB_DEMO_MAIN_DECL(platform_fwatcher);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);
@@ -219,6 +220,7 @@ TB_DEMO_MAIN_DECL(coroutine_thread);
 TB_DEMO_MAIN_DECL(coroutine_pipe);
 TB_DEMO_MAIN_DECL(coroutine_process);
 TB_DEMO_MAIN_DECL(coroutine_process_pipe);
+TB_DEMO_MAIN_DECL(coroutine_fwatcher);
 TB_DEMO_MAIN_DECL(coroutine_echo_client);
 TB_DEMO_MAIN_DECL(coroutine_echo_server);
 TB_DEMO_MAIN_DECL(coroutine_unix_echo_client);
