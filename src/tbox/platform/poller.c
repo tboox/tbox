@@ -69,6 +69,16 @@
 #   endif
 #endif
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+#   if defined(TB_CONFIG_OS_WINDOWS) || \
+        defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT) || \
+        defined(TB_CONFIG_OS_MACOSX) || \
+        defined(TB_CONFIG_OS_BSD)
+#       include "impl/poller_fwatcher.c"
+#       define TB_POLLER_ENABLE_FWATCHER
+#   endif
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
