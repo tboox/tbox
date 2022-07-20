@@ -44,17 +44,100 @@ typedef struct __tb_poller_fwatcher_t
     // the fwatcher poller thread
     tb_thread_ref_t         thread;
 
+    // the semaphore
+    tb_semaphore_ref_t      semaphore;
+
+    // is stopped?
+    tb_atomic32_t           is_stopped;
+
+    // the lock
+    tb_spinlock_t           lock;
+
+    // the fwatcher
+    tb_fwatcher_ref_t       fwatcher;
+
 }tb_poller_fwatcher_t;
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_int_t tb_poller_fwatcher_loop(tb_cpointer_t priv)
+{
+    // check
+    tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)priv;
+    tb_assert_and_check_return_val(poller && poller->semaphore, -1);
+
+    while (!tb_atomic32_get(&poller->is_stopped))
+    {
+        // TODO
+        tb_fwatcher_event_t events[64];
+        tb_fwatcher_wait(poller->fwatcher, events, tb_arrayn(events), -1);
+
+        // has waited events? notify the main poller to poll them
+        tb_bool_t has_events = tb_false;
+        if (has_events)
+        {
+            tb_poller_t* main_poller = poller->main_poller;
+            if (main_poller && main_poller->spak)
+                main_poller->spak(main_poller);
+        }
+    }
+
+    // mark this thread is stopped
+    tb_atomic32_set(&poller->is_stopped, 1);
+    return 0;
+}
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_void_t tb_poller_fwatcher_kill(tb_poller_fwatcher_ref_t self)
 {
+    // check
+    tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)self;
+    tb_assert_and_check_return(poller && poller->semaphore);
+
+    // trace
+    tb_trace_d("fwatcher: kill ..");
+
+    // stop thread and post it
+    if (!tb_atomic32_fetch_and_set(&poller->is_stopped, 1))
+        tb_semaphore_post(poller->semaphore, 1);
 }
 static tb_void_t tb_poller_fwatcher_exit(tb_poller_fwatcher_ref_t self)
 {
+    // check
+    tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)self;
+    tb_assert_and_check_return(poller);
+
+    // kill the fwatcher poller first
+    tb_poller_fwatcher_kill(self);
+
+    // exit the fwatcher poller thread
+    if (poller->thread)
+    {
+        // wait it
+        tb_long_t wait = 0;
+        if ((wait = tb_thread_wait(poller->thread, 5000, tb_null)) <= 0)
+        {
+            // trace
+            tb_trace_e("wait fwatcher poller thread failed: %ld!", wait);
+        }
+
+        // exit it
+        tb_thread_exit(poller->thread);
+        poller->thread = tb_null;
+    }
+
+    // exit semaphore
+    if (poller->semaphore) tb_semaphore_exit(poller->semaphore);
+    poller->semaphore = tb_null;
+
+    // exit lock
+    tb_spinlock_exit(&poller->lock);
+
+    // exit poller
+    tb_free(poller);
 }
 static tb_poller_fwatcher_ref_t tb_poller_fwatcher_init(tb_poller_t* main_poller)
 {
@@ -76,6 +159,17 @@ static tb_poller_fwatcher_ref_t tb_poller_fwatcher_init(tb_poller_t* main_poller
 
         // save the main poller
         poller->main_poller = main_poller;
+
+        // init semaphore
+        poller->semaphore = tb_semaphore_init(0);
+        tb_assert_and_check_break(poller->semaphore);
+
+        // init lock
+        tb_spinlock_init(&poller->lock);
+
+        // start the poller thread for fwatchers first
+        poller->thread = tb_thread_init(tb_null, tb_poller_fwatcher_loop, poller, 0);
+        tb_assert_and_check_break(poller->thread);
 
         // ok
         ok = tb_true;
