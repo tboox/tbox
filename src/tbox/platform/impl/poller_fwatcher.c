@@ -56,8 +56,11 @@ typedef struct __tb_poller_fwatcher_t
     // the fwatcher
     tb_fwatcher_ref_t       fwatcher;
 
-    // the userdata
+    // the user data
     tb_cpointer_t           udata;
+
+    // the fwatcher events
+//    tb_fwatcher_event_t     events[64];
 
 }tb_poller_fwatcher_t;
 
@@ -250,7 +253,12 @@ static tb_bool_t tb_poller_fwatcher_remove(tb_poller_fwatcher_ref_t self, tb_fwa
 }
 static tb_bool_t tb_poller_fwatcher_wait_prepare(tb_poller_fwatcher_ref_t self)
 {
-    return 0;
+    // check
+    tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)self;
+    tb_assert_and_check_return_val(poller && poller->semaphore, tb_false);
+
+    // is stopped?
+    return !tb_atomic32_get(&poller->is_stopped) && poller->fwatcher;
 }
 static tb_long_t tb_poller_fwatcher_wait_poll(tb_poller_fwatcher_ref_t self, tb_poller_event_func_t func)
 {
