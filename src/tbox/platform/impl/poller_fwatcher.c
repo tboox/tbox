@@ -56,6 +56,9 @@ typedef struct __tb_poller_fwatcher_t
     // the fwatcher
     tb_fwatcher_ref_t       fwatcher;
 
+    // the userdata
+    tb_cpointer_t           udata;
+
 }tb_poller_fwatcher_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +141,7 @@ static tb_void_t tb_poller_fwatcher_exit(tb_poller_fwatcher_ref_t self)
 
     // reset fwatcher
     poller->fwatcher = tb_null;
+    poller->udata = tb_null;
 
     // exit poller
     tb_free(poller);
@@ -189,6 +193,15 @@ static tb_poller_fwatcher_ref_t tb_poller_fwatcher_init(tb_poller_t* main_poller
 }
 static tb_void_t tb_poller_fwatcher_spak(tb_poller_fwatcher_ref_t self)
 {
+    // check
+    tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)self;
+    tb_assert_and_check_return(poller && poller->semaphore);
+
+    // trace
+    tb_trace_d("fwatcher: spak ..");
+
+    // post it
+    tb_semaphore_post(poller->semaphore, 1);
 }
 static tb_bool_t tb_poller_fwatcher_insert(tb_poller_fwatcher_ref_t self, tb_fwatcher_ref_t fwatcher, tb_cpointer_t priv)
 {
@@ -198,11 +211,18 @@ static tb_bool_t tb_poller_fwatcher_insert(tb_poller_fwatcher_ref_t self, tb_fwa
 
     // attach fwatcher
     if (!poller->fwatcher)
+    {
         poller->fwatcher = fwatcher;
+        poller->udata = priv;
+        return tb_true;
+    }
+    else if (poller->fwatcher == fwatcher)
+    {
+        poller->udata = priv;
+        return tb_true;
+    }
     // we can insert only one fwatcher
-    else if (poller->fwatcher != fwatcher)
-        return tb_false;
-    return tb_true;
+    return tb_false;
 }
 static tb_bool_t tb_poller_fwatcher_modify(tb_poller_fwatcher_ref_t self, tb_fwatcher_ref_t fwatcher, tb_cpointer_t priv)
 {
@@ -211,6 +231,7 @@ static tb_bool_t tb_poller_fwatcher_modify(tb_poller_fwatcher_ref_t self, tb_fwa
     tb_assert_and_check_return_val(poller && fwatcher, tb_false);
 
     poller->fwatcher = fwatcher;
+    poller->udata = priv;
     return tb_true;
 }
 static tb_bool_t tb_poller_fwatcher_remove(tb_poller_fwatcher_ref_t self, tb_fwatcher_ref_t fwatcher)
@@ -222,6 +243,7 @@ static tb_bool_t tb_poller_fwatcher_remove(tb_poller_fwatcher_ref_t self, tb_fwa
     if (poller->fwatcher == fwatcher)
     {
         poller->fwatcher = tb_null;
+        poller->udata = tb_null;
         return tb_true;
     }
     return tb_false;
