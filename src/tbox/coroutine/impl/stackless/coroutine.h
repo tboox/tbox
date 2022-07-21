@@ -49,13 +49,13 @@ typedef struct __tb_lo_coroutine_rs_wait_t
     tb_sint32_t                 is_ltimer     : 1;
 
     // the process status
-    tb_int_t                    proc_status;
+    tb_long_t                   object_event;
 
     // has pending process status?
-    tb_uint16_t                 proc_pending  : 1;
+    tb_uint16_t                 object_pending  : 1;
 
     // waiting process?
-    tb_uint16_t                 proc_waiting  : 1;
+    tb_uint16_t                 object_waiting  : 1;
 #endif
 
     // the waited result

@@ -176,7 +176,7 @@ tb_long_t tb_lo_coroutine_proc_status_(tb_lo_coroutine_ref_t self)
     tb_assert(coroutine);
 
     // get process status
-    return coroutine->rs.wait.proc_status;
+    return coroutine->rs.wait.object_event;
 }
 #endif
 tb_long_t tb_lo_coroutine_waitret_(tb_lo_coroutine_ref_t self)

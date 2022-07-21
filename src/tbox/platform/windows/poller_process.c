@@ -181,7 +181,7 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 
         // has exited processes?
         tb_bool_t has_exited = tb_false;
-        tb_poller_processes_status_t proc_status;
+        tb_poller_processes_status_t object_event;
         if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + procsize)
         {
             // the process index
@@ -195,23 +195,23 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
             if (proc_handle != poller->semaphore)
             {
                 exitcode = 0;
-                proc_status.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;
-                proc_status.process = procdata[index].process;
-                proc_status.priv    = procdata[index].priv;
-                tb_assert(proc_status.process);
+                object_event.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;
+                object_event.process = procdata[index].process;
+                object_event.priv    = procdata[index].priv;
+                tb_assert(object_event.process);
 
                 // mark as finished
                 procdata[index].process = tb_null;
 
                 // trace
-                tb_trace_d("process: finished: %p, status: %d", proc_status.process, proc_status.status);
+                tb_trace_d("process: finished: %p, status: %d", object_event.process, object_event.status);
 
                 // close process handles first
-                tb_process_handle_close(proc_status.process);
+                tb_process_handle_close(object_event.process);
 
                 // save the process status
                 tb_spinlock_enter(&poller->lock);
-                tb_vector_insert_tail(poller->processes_status, &proc_status);
+                tb_vector_insert_tail(poller->processes_status, &object_event);
                 tb_spinlock_leave(&poller->lock);
                 has_exited = tb_true;
             }
@@ -236,23 +236,23 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 
                     // get process status
                     exitcode = 0;
-                    proc_status.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;
-                    proc_status.process = procdata[index].process;
-                    proc_status.priv    = procdata[index].priv;
-                    tb_assert(proc_status.process);
+                    object_event.status = tb_kernel32()->GetExitCodeProcess(proc_handle, &exitcode)? (tb_int_t)exitcode : -1;
+                    object_event.process = procdata[index].process;
+                    object_event.priv    = procdata[index].priv;
+                    tb_assert(object_event.process);
 
                     // mark as finished
                     procdata[index].process = tb_null;
 
                     // trace
-                    tb_trace_d("process: finished: %p, status: %d", proc_status.process, proc_status.status);
+                    tb_trace_d("process: finished: %p, status: %d", object_event.process, object_event.status);
 
                     // close process handles first
-                    tb_process_handle_close(proc_status.process);
+                    tb_process_handle_close(object_event.process);
 
                     // save the process status
                     tb_spinlock_enter(&poller->lock);
-                    tb_vector_insert_tail(poller->processes_status, &proc_status);
+                    tb_vector_insert_tail(poller->processes_status, &object_event);
                     tb_spinlock_leave(&poller->lock);
                     has_exited = tb_true;
 
@@ -524,14 +524,14 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     tb_long_t     wait = 0;
     tb_poller_object_t object;
     object.type = TB_POLLER_OBJECT_PROC;
-    tb_for_all_if (tb_poller_processes_status_t*, proc_status, poller->processes_status_copied, proc_status)
+    tb_for_all_if (tb_poller_processes_status_t*, object_event, poller->processes_status_copied, object_event)
     {
         // trace
-        tb_trace_d("process: %p, status: %d", proc_status->process, proc_status->status);
+        tb_trace_d("process: %p, status: %d", object_event->process, object_event->status);
 
         // do callback
-        object.ref.proc = proc_status->process;
-        func((tb_poller_ref_t)poller->main_poller, &object, proc_status->status, proc_status->priv);
+        object.ref.proc = object_event->process;
+        func((tb_poller_ref_t)poller->main_poller, &object, object_event->status, object_event->priv);
         wait++;
     }
 
