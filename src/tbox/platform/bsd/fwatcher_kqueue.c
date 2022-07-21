@@ -266,7 +266,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             fwatcher->watchitems = tb_null;
         }
 
-        // wait waited events
+        // exit waited events
         if (fwatcher->waited_events)
         {
             tb_queue_exit(fwatcher->waited_events);
