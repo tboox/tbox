@@ -98,7 +98,7 @@ static tb_int_t tb_poller_fwatcher_loop(tb_cpointer_t priv)
             // save waited events
             tb_spinlock_enter(&poller->lock);
             for (tb_size_t i = 0; i < events_count; i++)
-                tb_vector_insert_tail(poller->waited_events, &poller->waited_events[i]);
+                tb_vector_insert_tail(poller->waited_events, &poller->waiting_events[i]);
             tb_spinlock_leave(&poller->lock);
 
             // notify the main poller to poll them
