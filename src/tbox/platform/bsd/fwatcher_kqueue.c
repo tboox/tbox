@@ -74,6 +74,7 @@ typedef struct __tb_fwatcher_t
     tb_size_t            events_count;
     tb_hash_map_ref_t    watchitems;
     tb_socket_ref_t      pair[2];
+    tb_queue_ref_t       waited_events;
 
 }tb_fwatcher_t;
 
@@ -90,13 +91,13 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     }
 }
 
-static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath)
+static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const* watchdir)
 {
     // check
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && watchdir, tb_false);
 
     // this path has been added?
-    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
+    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, watchdir);
     if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
@@ -107,14 +108,14 @@ static tb_bool_t tb_fwatcher_add_watch(tb_fwatcher_t* fwatcher, tb_char_t const*
 #  else
     o_flags |= O_RDONLY;
 #  endif
-    tb_int_t wd = open(filepath, o_flags);
+    tb_int_t wd = open(watchdir, o_flags);
     tb_check_return_val(wd >= 0, tb_false);
 
     // save watch item
     tb_fwatcher_item_t watchitem;
     watchitem.wd = wd;
     watchitem.filepath = tb_null;
-    return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
+    return tb_hash_map_insert(fwatcher->watchitems, watchdir, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 static tb_long_t tb_fwatcher_add_watch_filedirs(tb_char_t const* path, tb_file_info_t const* info, tb_cpointer_t priv)
@@ -128,13 +129,13 @@ static tb_long_t tb_fwatcher_add_watch_filedirs(tb_char_t const* path, tb_file_i
     return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
 
-static tb_bool_t tb_fwatcher_rm_watch(tb_fwatcher_t* fwatcher, tb_char_t const* filepath)
+static tb_bool_t tb_fwatcher_rm_watch(tb_fwatcher_t* fwatcher, tb_char_t const* watchdir)
 {
     // check
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->watchitems && watchdir, tb_false);
 
     // remove the watchitem
-    tb_hash_map_remove(fwatcher->watchitems, filepath);
+    tb_hash_map_remove(fwatcher->watchitems, watchdir);
     return tb_true;
 }
 
@@ -221,6 +222,10 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_fwatcher_item_free, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
 
+        // init waited events
+        fwatcher->waited_events = tb_queue_init(0, tb_element_mem(sizeof(tb_fwatcher_event_t), tb_null, tb_null));
+        tb_assert_and_check_break(fwatcher->waited_events);
+
         ok = tb_true;
     } while (0);
 
@@ -261,6 +266,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             fwatcher->watchitems = tb_null;
         }
 
+        // wait waited events
+        if (fwatcher->waited_events)
+        {
+            tb_queue_exit(fwatcher->waited_events);
+            fwatcher->waited_events = tb_null;
+        }
+
         // exit kqueue fd
         if (fwatcher->kqfd >= 0)
         {
@@ -274,36 +286,36 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && watchdir, tb_false);
 
     // file not found
     tb_file_info_t info;
-    if (!tb_file_info(filepath, &info))
+    if (!tb_file_info(watchdir, &info) || info.type != TB_FILE_TYPE_DIRECTORY)
         return tb_false;
 
     // is directory? we need scan it and add all subfiles
     if (info.type == TB_FILE_TYPE_DIRECTORY)
-        tb_directory_walk(filepath, 0, tb_true, tb_fwatcher_add_watch_filedirs, fwatcher);
-    return tb_fwatcher_add_watch(fwatcher, filepath);
+        tb_directory_walk(watchdir, 0, tb_true, tb_fwatcher_add_watch_filedirs, fwatcher);
+    return tb_fwatcher_add_watch(fwatcher, watchdir);
 }
 
-tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && watchdir, tb_false);
 
     // is directory? we need scan it and remove all subfiles
     tb_file_info_t info;
-    if (tb_file_info(filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
+    if (tb_file_info(watchdir, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
     {
         tb_value_t values[1];
         values[0].ptr = (tb_pointer_t)fwatcher;
-        tb_directory_walk(filepath, 0, tb_false, tb_fwatcher_rm_watch_filedirs, values);
+        tb_directory_walk(watchdir, 0, tb_false, tb_fwatcher_rm_watch_filedirs, values);
     }
-    return tb_fwatcher_rm_watch(fwatcher, filepath);
+    return tb_fwatcher_rm_watch(fwatcher, watchdir);
 }
 
 tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
@@ -314,10 +326,24 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
     if (fwatcher->pair[0]) tb_socket_send(fwatcher->pair[0], (tb_byte_t const*)"p", 1);
 }
 
-tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
+tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->kqfd >= 0 && fwatcher->waited_events && event, -1);
+
+    // get it if has events
+    tb_bool_t has_events = tb_false;
+    if (!tb_queue_null(fwatcher->waited_events))
+    {
+        tb_fwatcher_event_t* e = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->waited_events);
+        if (e)
+        {
+            *event = *e;
+            tb_queue_pop(fwatcher->waited_events);
+            has_events = tb_true;
+        }
+    }
+    tb_check_return_val(!has_events, 1);
 
     // init time
     struct timespec t = {0};
@@ -366,19 +392,18 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
 
     // handle events
     tb_size_t          i = 0;
-    tb_size_t          wait = 0;
     tb_socket_ref_t    pair = fwatcher->pair[1];
-    struct kevent*     event = tb_null;
+    struct kevent*     kevt = tb_null;
     for (i = 0; i < events_count; i++)
     {
         // get event
-        event = fwatcher->events + i;
-        if (event->flags & EV_ERROR)
+        kevt = fwatcher->events + i;
+        if (kevt->flags & EV_ERROR)
             continue;
 
         // spank socket events?
-        tb_socket_ref_t sock = tb_fd2sock(event->ident);
-        if (sock == pair && event->filter == EVFILT_READ)
+        tb_socket_ref_t sock = tb_fd2sock(kevt->ident);
+        if (sock == pair && kevt->filter == EVFILT_READ)
         {
             tb_char_t spak = '\0';
             if (1 != tb_socket_recv(pair, (tb_byte_t*)&spak, 1)) return -1;
@@ -386,23 +411,24 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
         }
 
         // get watchitem
-        tb_fwatcher_item_t const* watchitem = (tb_fwatcher_item_t const*)event->udata;
+        tb_fwatcher_item_t const* watchitem = (tb_fwatcher_item_t const*)kevt->udata;
         tb_assert_and_check_break(watchitem);
 
         // get event code
         tb_size_t event_code = 0;
-        if (event->fflags & NOTE_DELETE)
+        if (kevt->fflags & NOTE_DELETE)
             event_code = TB_FWATCHER_EVENT_DELETE;
-        else if ((event->fflags & NOTE_RENAME) || (event->fflags & NOTE_REVOKE) || (event->fflags & NOTE_WRITE))
+        else if ((kevt->fflags & NOTE_RENAME) || (kevt->fflags & NOTE_REVOKE) || (kevt->fflags & NOTE_WRITE))
             event_code = TB_FWATCHER_EVENT_MODIFY;
 
         // add event
         if (event_code)
         {
-            if (watchitem->filepath) tb_strlcpy(events[wait].filepath, watchitem->filepath, TB_PATH_MAXN);
-            else events[wait].filepath[0] = '\0';
-            events[wait].event = event_code;
-            wait++;
+            tb_fwatcher_event_t evt;
+            if (watchitem->filepath) tb_strlcpy(evt.filepath, watchitem->filepath, TB_PATH_MAXN);
+            else evt.filepath[0] = '\0';
+            evt.event = event_code;
+            tb_queue_put(fwatcher->waited_events, &evt);
         }
 
         // rescan the watch directory
@@ -416,5 +442,17 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
                 tb_fwatcher_remove(self, watchitem->filepath);
         }
     }
-    return wait;
+
+    // get event
+    if (!tb_queue_null(fwatcher->waited_events))
+    {
+        tb_fwatcher_event_t* e = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->waited_events);
+        if (e)
+        {
+            *event = *e;
+            tb_queue_pop(fwatcher->waited_events);
+            has_events = tb_true;
+        }
+    }
+    return has_events? 1 : 0;
 }
