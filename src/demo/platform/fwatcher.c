@@ -16,7 +16,7 @@ static tb_int_t tb_demo_watcher(tb_cpointer_t priv)
     {
         g_fwatcher = fwatcher;
         tb_trace_i("watching %s", path);
-        if (tb_fwatcher_add(fwatcher, path, tb_false))
+        if (tb_fwatcher_add(fwatcher, path, tb_true))
         {
             tb_bool_t eof = tb_false;
             tb_fwatcher_event_t event;
