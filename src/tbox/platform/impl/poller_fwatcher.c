@@ -59,8 +59,12 @@ typedef struct __tb_poller_fwatcher_t
     // the semaphore
     tb_semaphore_ref_t      semaphore;
 
-    // the fwatcher events
-    tb_fwatcher_event_t     events[64];
+    // the waiting events
+    tb_fwatcher_event_t     waiting_events[64];
+
+    // the waited events
+    tb_vector_ref_t         waited_events;
+    tb_vector_ref_t         waited_events_copied;
 
 }tb_poller_fwatcher_t;
 
@@ -71,7 +75,7 @@ static tb_int_t tb_poller_fwatcher_loop(tb_cpointer_t priv)
 {
     // check
     tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)priv;
-    tb_assert_and_check_return_val(poller && poller->semaphore, -1);
+    tb_assert_and_check_return_val(poller && poller->semaphore && poller->waited_events, -1);
 
     // do loop
     tb_cpointer_t udata = tb_null;
@@ -84,19 +88,23 @@ static tb_int_t tb_poller_fwatcher_loop(tb_cpointer_t priv)
         udata = poller->udata;
         tb_spinlock_leave(&poller->lock);
 
-        // wait events
         if (fwatcher)
         {
-            tb_fwatcher_wait(fwatcher, poller->events, tb_arrayn(poller->events), -1);
+            // wait events
+            tb_long_t events_count = tb_fwatcher_wait(fwatcher, poller->waiting_events, tb_arrayn(poller->waiting_events), -1);
+            tb_assert_and_check_break(events_count >= 0);
+            tb_check_continue(events_count > 0);
 
-            // has waited events? notify the main poller to poll them
-            tb_bool_t has_events = tb_false;
-            if (has_events)
-            {
-                tb_poller_t* main_poller = poller->main_poller;
-                if (main_poller && main_poller->spak)
-                    main_poller->spak(main_poller);
-            }
+            // save waited events
+            tb_spinlock_enter(&poller->lock);
+            for (tb_size_t i = 0; i < events_count; i++)
+                tb_vector_insert_tail(poller->waited_events, &poller->waited_events[i]);
+            tb_spinlock_leave(&poller->lock);
+
+            // notify the main poller to poll them
+            tb_poller_t* main_poller = poller->main_poller;
+            if (main_poller && main_poller->spak)
+                main_poller->spak(main_poller);
         }
         else
         {
@@ -159,6 +167,12 @@ static tb_void_t tb_poller_fwatcher_exit(tb_poller_fwatcher_ref_t self)
         poller->thread = tb_null;
     }
 
+    // exit waited events
+    if (poller->waited_events) tb_vector_exit(poller->waited_events);
+    if (poller->waited_events_copied) tb_vector_exit(poller->waited_events_copied);
+    poller->waited_events = tb_null;
+    poller->waited_events_copied = tb_null;
+
     // exit semaphore
     if (poller->semaphore) tb_semaphore_exit(poller->semaphore);
     poller->semaphore = tb_null;
@@ -200,6 +214,11 @@ static tb_poller_fwatcher_ref_t tb_poller_fwatcher_init(tb_poller_t* main_poller
         // init semaphore
         poller->semaphore = tb_semaphore_init(0);
         tb_assert_and_check_break(poller->semaphore);
+
+        // init waited events
+        poller->waited_events = tb_vector_init(0, tb_element_mem(sizeof(tb_fwatcher_event_t), tb_null, tb_null));
+        poller->waited_events_copied = tb_vector_init(0, tb_element_mem(sizeof(tb_fwatcher_event_t), tb_null, tb_null));
+        tb_assert_and_check_break(poller->waited_events && poller->waited_events_copied);
 
         // start the poller thread for fwatchers first
         poller->thread = tb_thread_init(tb_null, tb_poller_fwatcher_loop, poller, 0);
@@ -327,5 +346,36 @@ static tb_bool_t tb_poller_fwatcher_wait_prepare(tb_poller_fwatcher_ref_t self)
 }
 static tb_long_t tb_poller_fwatcher_wait_poll(tb_poller_fwatcher_ref_t self, tb_poller_event_func_t func)
 {
-    return -1;
+    // check
+    tb_poller_fwatcher_t* poller = (tb_poller_fwatcher_t*)self;
+    tb_assert_and_check_return_val(poller && func, -1);
+    tb_assert_and_check_return_val(poller->waited_events && poller->waited_events_copied, -1);
+
+    // get all waited events
+    tb_vector_clear(poller->waited_events_copied);
+    tb_spinlock_enter(&poller->lock);
+    if (tb_vector_size(poller->waited_events))
+    {
+        tb_vector_copy(poller->waited_events_copied, poller->waited_events);
+        tb_vector_clear(poller->waited_events);
+    }
+    tb_spinlock_leave(&poller->lock);
+
+    // trace
+    tb_trace_d("fwatcher: poll %lu", tb_vector_size(poller->waited_events_copied));
+
+    // poll all waited events
+    tb_long_t wait = 0;
+    tb_poller_object_t object;
+    object.type = TB_POLLER_OBJECT_FWATCHER;
+    object.ref.fwatcher = poller->fwatcher;
+    tb_for_all_if (tb_fwatcher_event_t*, event, poller->waited_events_copied, event)
+    {
+        func((tb_poller_ref_t)poller->main_poller, &object, (tb_long_t)event, poller->udata);
+        wait++;
+    }
+
+    // trace
+    tb_trace_d("fwatcher: poll wait %ld", wait);
+    return wait;
 }
