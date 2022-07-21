@@ -78,14 +78,12 @@ static tb_int_t tb_poller_fwatcher_loop(tb_cpointer_t priv)
     tb_assert_and_check_return_val(poller && poller->semaphore && poller->waited_events, -1);
 
     // do loop
-    tb_cpointer_t udata = tb_null;
     tb_fwatcher_ref_t fwatcher = tb_null;
     while (!tb_atomic32_get(&poller->is_stopped))
     {
-        // get fwatcher and udata
+        // get fwatcher
         tb_spinlock_enter(&poller->lock);
         fwatcher = poller->fwatcher;
-        udata = poller->udata;
         tb_spinlock_leave(&poller->lock);
 
         if (fwatcher)
