@@ -4,32 +4,6 @@
 #include "../demo.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-#define COUNT   (50)
-
-/* //////////////////////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the client type
-typedef struct __tb_demo_client_t
-{
-    // the pipe file
-    tb_pipe_file_ref_t  pipe[2];
-
-    // the read size
-    tb_hize_t           size;
-
-    // the read data
-    tb_byte_t           data[8192];
-
-    // wait event
-    tb_bool_t           wait;
-
-}tb_demo_client_t, *tb_demo_client_ref_t;
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)

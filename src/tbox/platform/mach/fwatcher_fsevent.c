@@ -247,32 +247,32 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && watchdir, tb_false);
 
     // file not found
     tb_file_info_t info;
-    if (!tb_file_info(filepath, &info))
+    if (!tb_file_info(watchdir, &info) || info.type != TB_FILE_TYPE_DIRECTORY)
         return tb_false;
 
     // this path has been added?
-    tb_size_t itor = tb_hash_set_find(fwatcher->watchitems, filepath);
+    tb_size_t itor = tb_hash_set_find(fwatcher->watchitems, watchdir);
     if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
     // save watch item
-    return tb_hash_set_insert(fwatcher->watchitems, filepath) != tb_iterator_tail(fwatcher->watchitems);
+    return tb_hash_set_insert(fwatcher->watchitems, watchdir) != tb_iterator_tail(fwatcher->watchitems);
 }
 
-tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && watchdir, tb_false);
 
     // remove the watchitem
-    tb_hash_set_remove(fwatcher->watchitems, filepath);
+    tb_hash_set_remove(fwatcher->watchitems, watchdir);
     return tb_true;
 }
 
@@ -284,10 +284,26 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
     tb_semaphore_post(fwatcher->semaphore, 1);
 }
 
-tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
+tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->semaphore && fwatcher->events_queue && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->semaphore && fwatcher->events_queue && event, -1);
+
+    // get it if has events
+    tb_bool_t has_events = tb_false;
+    tb_spinlock_enter(&fwatcher->lock);
+    if (!tb_queue_null(fwatcher->events_queue))
+    {
+        tb_fwatcher_event_t* e = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->events_queue);
+        if (e)
+        {
+            *event = *e;
+            tb_queue_pop(fwatcher->events_queue);
+            has_events = tb_true;
+        }
+    }
+    tb_spinlock_leave(&fwatcher->lock);
+    tb_check_return_val(!has_events, 1);
 
     // we need init fsevent stream first
     if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
@@ -298,24 +314,18 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, 
     tb_assert_and_check_return_val(wait >= 0, -1);
     tb_check_return_val(wait > 0, 0);
 
-    // get events
-    tb_size_t events_count = 0;
-    while (events_count < events_maxn)
+    // get event
+    tb_spinlock_enter(&fwatcher->lock);
+    if (!tb_queue_null(fwatcher->events_queue))
     {
-        tb_bool_t has_events = tb_false;
-        tb_spinlock_enter(&fwatcher->lock);
-        has_events = !tb_queue_null(fwatcher->events_queue);
-        if (has_events)
+        tb_fwatcher_event_t* e = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->events_queue);
+        if (e)
         {
-            tb_fwatcher_event_t* event = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->events_queue);
-            if (event)
-            {
-                events[events_count++] = *event;
-                tb_queue_pop(fwatcher->events_queue);
-            }
+            *event = *e;
+            tb_queue_pop(fwatcher->events_queue);
+            has_events = tb_true;
         }
-        tb_spinlock_leave(&fwatcher->lock);
-        tb_check_break(has_events);
     }
-    return events_count;
+    tb_spinlock_leave(&fwatcher->lock);
+    return has_events? 1 : 0;
 }

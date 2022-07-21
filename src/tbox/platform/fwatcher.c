@@ -53,13 +53,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_trace_noimpl();
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_trace_noimpl();
     return tb_false;
 }
 
-tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_trace_noimpl();
     return tb_false;
@@ -70,7 +70,7 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
     tb_trace_noimpl();
 }
 
-tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
+tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, tb_long_t timeout)
 {
     tb_trace_noimpl();
     return -1;

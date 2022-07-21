@@ -16,19 +16,14 @@ static tb_void_t tb_demo_coroutine_watch(tb_cpointer_t priv)
         if (tb_fwatcher_add(fwatcher, path))
         {
             tb_bool_t eof = tb_false;
-            tb_long_t count = 0;
-            tb_fwatcher_event_t events[64];
-            while (!eof && (count = tb_fwatcher_wait(fwatcher, events, tb_arrayn(events), -1)) >= 0)
+            tb_fwatcher_event_t event;
+            while (!eof && tb_fwatcher_wait(fwatcher, &event, -1) >= 0)
             {
-                for (tb_size_t i = 0; i < count && !eof; i++)
-                {
-                    tb_fwatcher_event_t const* event = &events[i];
-                    tb_char_t const* status = event->event == TB_FWATCHER_EVENT_CREATE? "created" :
-                        (event->event == TB_FWATCHER_EVENT_MODIFY? "modified" : "deleted");
-                    tb_trace_i("watch: %s %s", event->filepath, status);
-                    if (tb_strstr(event->filepath, "eof"))
-                        eof = tb_true;
-                }
+                tb_char_t const* status = event.event == TB_FWATCHER_EVENT_CREATE? "created" :
+                    (event.event == TB_FWATCHER_EVENT_MODIFY? "modified" : "deleted");
+                tb_trace_i("watch: %s %s", event.filepath, status);
+                if (tb_strstr(event.filepath, "eof"))
+                    eof = tb_true;
             }
         }
         tb_fwatcher_exit(fwatcher);
@@ -53,7 +48,7 @@ tb_int_t tb_demo_coroutine_fwatcher_main(tb_int_t argc, tb_char_t** argv)
     if (scheduler)
     {
         // start coroutines
-        tb_coroutine_start(scheduler, tb_demo_coroutine_watch, argv[1], 1024 * 1024);
+        tb_coroutine_start(scheduler, tb_demo_coroutine_watch, argv[1], 0);
         tb_coroutine_start(scheduler, tb_demo_coroutine_sleep, tb_null, 0);
 
         // do loop

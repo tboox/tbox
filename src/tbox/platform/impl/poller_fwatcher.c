@@ -59,8 +59,8 @@ typedef struct __tb_poller_fwatcher_t
     // the semaphore
     tb_semaphore_ref_t      semaphore;
 
-    // the waiting events
-    tb_fwatcher_event_t     waiting_events[64];
+    // the waiting event
+    tb_fwatcher_event_t     waiting_event;
 
     // the waited events
     tb_vector_ref_t         waited_events;
@@ -89,14 +89,13 @@ static tb_int_t tb_poller_fwatcher_loop(tb_cpointer_t priv)
         if (fwatcher)
         {
             // wait events
-            tb_long_t events_count = tb_fwatcher_wait(fwatcher, poller->waiting_events, tb_arrayn(poller->waiting_events), -1);
-            tb_assert_and_check_break(events_count >= 0);
-            tb_check_continue(events_count > 0);
+            tb_long_t wait = tb_fwatcher_wait(fwatcher, &poller->waiting_event, -1);
+            tb_assert_and_check_break(wait >= 0);
+            tb_check_continue(wait > 0);
 
-            // save waited events
+            // save waited event
             tb_spinlock_enter(&poller->lock);
-            for (tb_size_t i = 0; i < events_count; i++)
-                tb_vector_insert_tail(poller->waited_events, &poller->waiting_events[i]);
+            tb_vector_insert_tail(poller->waited_events, &poller->waiting_event);
             tb_spinlock_leave(&poller->lock);
 
             // notify the main poller to poll them
