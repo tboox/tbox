@@ -48,7 +48,8 @@ typedef struct __tb_fwatcher_item_t
      * http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx)
      */
     BYTE                buffer[10 * 1024];
-    tb_char_t const*    filepath;
+    tb_char_t const*    watchdir;
+    tb_bool_t           recursion;
 
 }tb_fwatcher_item_t;
 
@@ -82,22 +83,22 @@ static tb_bool_t tb_fwatcher_item_refresh(tb_fwatcher_item_t* watchitem)
 {
     // refresh directory watching
     return ReadDirectoryChangesW(watchitem->handle,
-        watchitem->buffer, sizeof(watchitem->buffer), TRUE,
+        watchitem->buffer, sizeof(watchitem->buffer), watchitem->recursion? TRUE : FALSE,
         FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE,
         tb_null, &watchitem->overlapped, tb_null);
 }
 
-static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_fwatcher_item_t* watchitem)
+static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const* watchdir, tb_fwatcher_item_t* watchitem)
 {
-    tb_assert_and_check_return_val(fwatcher && watchitem && filepath && !watchitem->handle && fwatcher->port, tb_false);
+    tb_assert_and_check_return_val(fwatcher && watchitem && watchdir && !watchitem->handle && fwatcher->port, tb_false);
 
     // get the absolute path
-    tb_wchar_t filepath_w[TB_PATH_MAXN];
-    if (!tb_path_absolute_w(filepath, filepath_w, TB_PATH_MAXN))
+    tb_wchar_t watchdir_w[TB_PATH_MAXN];
+    if (!tb_path_absolute_w(watchdir, watchdir_w, TB_PATH_MAXN))
         return tb_false;
 
     // create file
-    watchitem->handle = CreateFileW(filepath_w, GENERIC_READ,
+    watchitem->handle = CreateFileW(watchdir_w, GENERIC_READ,
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, tb_null,
 		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, tb_null);
     tb_assert_and_check_return_val(watchitem->handle, tb_false);
@@ -107,7 +108,7 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
         return tb_false;
 
     // save file path
-    watchitem->filepath = filepath;
+    watchitem->watchdir = watchdir;
 
     // refresh directory watching
     return tb_fwatcher_item_refresh(watchitem);
@@ -115,7 +116,7 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
 
 static tb_void_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item_t* watchitem)
 {
-    tb_assert_and_check_return(fwatcher && watchitem && watchitem->handle && watchitem->filepath);
+    tb_assert_and_check_return(fwatcher && watchitem && watchitem->handle && watchitem->watchdir);
 
     tb_size_t offset = 0;
     tb_fwatcher_event_t event;
@@ -130,7 +131,7 @@ static tb_void_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item
 		tb_int_t count = WideCharToMultiByte(CP_UTF8, 0, notify->FileName, notify->FileNameLength / sizeof(WCHAR),
             filename, sizeof(filename) - 1, tb_null, tb_null);
 		filename[count] = '\0';
-        tb_snprintf(event.filepath, TB_PATH_MAXN, "%s/%s", watchitem->filepath, filename);
+        tb_snprintf(event.filepath, TB_PATH_MAXN, "%s/%s", watchitem->watchdir, filename);
 
         // get event code
         if (notify->Action == FILE_ACTION_ADDED)
@@ -143,7 +144,7 @@ static tb_void_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item
         {
             // the parent directory is changed
             event.event = TB_FWATCHER_EVENT_MODIFY;
-            tb_strlcpy(event.filepath, watchitem->filepath, sizeof(event.filepath));
+            tb_strlcpy(event.filepath, watchitem->watchdir, sizeof(event.filepath));
         }
 
         // save event
@@ -221,7 +222,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir, tb_bool_t recursion)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && watchdir, tb_false);
@@ -239,6 +240,7 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
     // save watch item
     tb_fwatcher_item_t watchitem;
     tb_memset(&watchitem, 0, sizeof(tb_fwatcher_item_t));
+    watchitem.recursion = recursion;
     return tb_hash_map_insert(fwatcher->watchitems, watchdir, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
@@ -283,14 +285,14 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, t
     tb_for_all(tb_hash_map_item_ref_t, item, fwatcher->watchitems)
     {
         // get watch item and path
-        tb_char_t const* path = (tb_char_t const*)item->name;
+        tb_char_t const* watchdir = (tb_char_t const*)item->name;
         tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)item->data;
-        tb_assert_and_check_return_val(watchitem && path, -1);
+        tb_assert_and_check_return_val(watchitem && watchdir, -1);
 
         // init watch item first
-        if (!watchitem->handle && !tb_fwatcher_item_init(fwatcher, path, watchitem))
+        if (!watchitem->handle && !tb_fwatcher_item_init(fwatcher, watchdir, watchitem))
         {
-            tb_trace_d("watch %s failed", path);
+            tb_trace_d("watch %s failed", watchdir);
             return -1;
         }
     }

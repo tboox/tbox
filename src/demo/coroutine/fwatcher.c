@@ -13,7 +13,7 @@ static tb_void_t tb_demo_coroutine_watch(tb_cpointer_t priv)
     if (fwatcher)
     {
         tb_trace_i("watching %s", path);
-        if (tb_fwatcher_add(fwatcher, path))
+        if (tb_fwatcher_add(fwatcher, path, tb_true))
         {
             tb_bool_t eof = tb_false;
             tb_fwatcher_event_t event;

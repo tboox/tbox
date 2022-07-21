@@ -78,10 +78,11 @@ tb_void_t               tb_fwatcher_exit(tb_fwatcher_ref_t fwatcher);
  *
  * @param fwatcher      the fwatcher
  * @param watchdir      the watched directory
+ * @param recursion     is recursion?
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_fwatcher_add(tb_fwatcher_ref_t fwatcher, tb_char_t const* watchdir);
+tb_bool_t               tb_fwatcher_add(tb_fwatcher_ref_t fwatcher, tb_char_t const* watchdir, tb_bool_t recursion);
 
 /*! remove the watched directory, we can just watch single-level directory
  *

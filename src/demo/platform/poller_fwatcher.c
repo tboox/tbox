@@ -46,7 +46,7 @@ tb_int_t tb_demo_platform_poller_fwatcher_main(tb_int_t argc, tb_char_t** argv)
         tb_assert_and_check_break(fwatcher);
 
         // add watch directory
-        tb_fwatcher_add(fwatcher, argv[1]);
+        tb_fwatcher_add(fwatcher, argv[1], tb_true);
 
         // insert fwatcher
         tb_poller_object_t object;
