@@ -43,7 +43,7 @@ typedef struct __tb_fwatcher_t
     FSEventStreamContext    context;
     FSEventStreamRef        stream;
     dispatch_queue_t        fsevents_queue;
-    tb_hash_set_ref_t       watchitems;
+    tb_hash_map_ref_t       watchitems;
     tb_semaphore_ref_t      semaphore;
     tb_queue_ref_t          events_queue;
     tb_spinlock_t           lock;
@@ -114,7 +114,7 @@ static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
     tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems, tb_false);
 
     // get items count
-    tb_size_t itemcount = tb_hash_set_size(fwatcher->watchitems);
+    tb_size_t itemcount = tb_hash_map_size(fwatcher->watchitems);
     tb_assert_and_check_return_val(itemcount, tb_false);
 
     // get path array
@@ -122,9 +122,9 @@ static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
     tb_assert_and_check_return_val(pathstrs, tb_false);
 
     tb_size_t i = 0;
-    tb_for_all (tb_char_t const*, filepath, fwatcher->watchitems)
+    tb_for_all (tb_hash_map_item_ref_t, item, fwatcher->watchitems)
     {
-        pathstrs[i++] = CFStringCreateWithCString(tb_null, filepath, kCFStringEncodingUTF8);
+        pathstrs[i++] = CFStringCreateWithCString(tb_null, item->name, kCFStringEncodingUTF8);
     }
     CFArrayRef path_array = CFArrayCreate(tb_null, (tb_cpointer_t*)pathstrs, itemcount, &kCFTypeArrayCallBacks);
 
@@ -178,7 +178,7 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         tb_assert_and_check_break(fwatcher);
 
         // init watch items
-        fwatcher->watchitems = tb_hash_set_init(0, tb_element_str(tb_true));
+        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_uint8());
         tb_assert_and_check_break(fwatcher->watchitems);
 
         // init events queue
@@ -223,7 +223,7 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
         fwatcher->fsevents_queue = tb_null;
 
         // exit watchitems
-        if (fwatcher->watchitems) tb_hash_set_exit(fwatcher->watchitems);
+        if (fwatcher->watchitems) tb_hash_map_exit(fwatcher->watchitems);
         fwatcher->watchitems = tb_null;
 
         // exit stream
@@ -257,13 +257,18 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir, tb_
     if (!tb_file_info(watchdir, &info) || info.type != TB_FILE_TYPE_DIRECTORY)
         return tb_false;
 
+    // get real path, we need match file path from event callback
+    tb_char_t data[PATH_MAX];
+    tb_char_t const* watchdir_real = realpath(watchdir, data);
+    if (!watchdir_real) watchdir_real = watchdir;
+
     // this path has been added?
-    tb_size_t itor = tb_hash_set_find(fwatcher->watchitems, watchdir);
+    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, watchdir_real);
     if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
     // save watch item
-    return tb_hash_set_insert(fwatcher->watchitems, watchdir) != tb_iterator_tail(fwatcher->watchitems);
+    return tb_hash_map_insert(fwatcher->watchitems, watchdir_real, tb_i2p(recursion)) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
@@ -271,8 +276,13 @@ tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && watchdir, tb_false);
 
+    // get real path, we need match file path from event callback
+    tb_char_t data[PATH_MAX];
+    tb_char_t const* watchdir_real = realpath(watchdir, data);
+    if (!watchdir_real) watchdir_real = watchdir;
+
     // remove the watchitem
-    tb_hash_set_remove(fwatcher->watchitems, watchdir);
+    tb_hash_map_remove(fwatcher->watchitems, watchdir_real);
     return tb_true;
 }
 
