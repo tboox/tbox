@@ -40,16 +40,18 @@
 // the watch item type
 typedef struct __tb_fwatcher_item_t
 {
-    tb_bool_t           recursion;
+    FSEventStreamContext    context;
+    FSEventStreamRef        stream;
+    dispatch_queue_t        fsevents_queue;
+    tb_char_t const*        watchdir;
+    tb_bool_t               recursion;
+    tb_fwatcher_ref_t       fwatcher;
 
 }tb_fwatcher_item_t;
 
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
-    FSEventStreamContext    context;
-    FSEventStreamRef        stream;
-    dispatch_queue_t        fsevents_queue;
     tb_hash_map_ref_t       watchitems;
     tb_semaphore_ref_t      semaphore;
     tb_queue_ref_t          events_queue;
@@ -60,15 +62,45 @@ typedef struct __tb_fwatcher_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef stream, tb_pointer_t priv,
+
+static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t buff)
+{
+    tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)buff;
+    if (watchitem)
+    {
+        // exit stream
+        if (watchitem->stream)
+        {
+            FSEventStreamStop(watchitem->stream);
+            FSEventStreamInvalidate(watchitem->stream);
+            FSEventStreamRelease(watchitem->stream);
+            watchitem->stream = tb_null;
+        }
+
+        // exit dispatch queue
+        if (watchitem->fsevents_queue)
+            dispatch_release(watchitem->fsevents_queue);
+        watchitem->fsevents_queue = tb_null;
+
+        // reset watchdir
+        watchitem->watchdir = tb_null;
+    }
+}
+
+static tb_void_t tb_fwatcher_item_callback(ConstFSEventStreamRef stream, tb_pointer_t priv,
     size_t events_count, tb_pointer_t event_paths, const FSEventStreamEventFlags event_flags[], FSEventStreamEventId const* event_id)
 {
     // check
-    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)priv;
-    tb_assert_and_check_return(fwatcher && fwatcher->semaphore && fwatcher->events_queue && fwatcher->watchitems);
+    tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)priv;
+    tb_assert_and_check_return(watchitem && watchitem->stream && watchitem->watchdir);
+
+    // get fwatcher
+    tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)watchitem->fwatcher;
+    tb_assert_and_check_return(fwatcher && fwatcher->semaphore && fwatcher->events_queue);
 
     // get events
     size_t i;
+    tb_bool_t has_events = tb_false;
     for (i = 0; i < events_count; ++i)
     {
         // get event
@@ -88,6 +120,18 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
         tb_fwatcher_event_t event;
         if (filepath) tb_strlcpy(event.filepath, filepath, TB_PATH_MAXN);
         else event.filepath[0] = '\0';
+
+        // we need filter file path if not recursion
+        tb_bool_t matched = tb_false;
+        if (watchitem->recursion)
+            matched = tb_true;
+        else
+        {
+            tb_char_t const* p = tb_strrchr(event.filepath, '/');
+            if (p && p - event.filepath == tb_strlen(watchitem->watchdir))
+                matched = tb_true;
+        }
+        tb_check_continue(matched);
 
         // filter need events
         if (flags & kFSEventStreamEventFlagItemCreated)
@@ -110,40 +154,34 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
             if (!tb_queue_full(fwatcher->events_queue))
                 tb_queue_put(fwatcher->events_queue, &event);
             tb_spinlock_leave(&fwatcher->lock);
+            has_events = tb_true;
         }
     }
 
     // notify events
-    if (events_count) tb_semaphore_post(fwatcher->semaphore, 1);
+    if (has_events) tb_semaphore_post(fwatcher->semaphore, 1);
 }
 
-static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
+static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const* watchdir, tb_fwatcher_item_t* watchitem)
 {
     // check
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems, tb_false);
-
-    // get items count
-    tb_size_t itemcount = tb_hash_map_size(fwatcher->watchitems);
-    tb_assert_and_check_return_val(itemcount, tb_false);
+    tb_assert_and_check_return_val(fwatcher && watchdir && watchitem, tb_false);
 
     // get path array
-    CFStringRef* pathstrs = tb_nalloc_type(itemcount, CFStringRef);
-    tb_assert_and_check_return_val(pathstrs, tb_false);
-
-    tb_size_t i = 0;
-    tb_for_all (tb_hash_map_item_ref_t, item, fwatcher->watchitems)
-    {
-        pathstrs[i++] = CFStringCreateWithCString(tb_null, item->name, kCFStringEncodingUTF8);
-    }
-    CFArrayRef path_array = CFArrayCreate(tb_null, (tb_cpointer_t*)pathstrs, itemcount, &kCFTypeArrayCallBacks);
+    CFStringRef pathstr = CFStringCreateWithCString(tb_null, watchdir, kCFStringEncodingUTF8);
+    CFArrayRef path_array = CFArrayCreate(tb_null, (tb_cpointer_t*)&pathstr, 1, &kCFTypeArrayCallBacks);
 
     // init context
-    FSEventStreamContext* context = &fwatcher->context;
+    FSEventStreamContext* context = &watchitem->context;
     context->version = 0;
-    context->info = fwatcher;
+    context->info = watchitem;
     context->retain = tb_null;
     context->release = tb_null;
     context->copyDescription = tb_null;
+
+    // attach watchdir
+    watchitem->fwatcher = (tb_fwatcher_ref_t)fwatcher;
+    watchitem->watchdir = watchdir;
 
     // create fsevent stream
     FSEventStreamCreateFlags flags = kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer;
@@ -151,24 +189,18 @@ static tb_bool_t tb_fwatcher_fsevent_stream_init(tb_fwatcher_t* fwatcher)
     flags |= kFSEventStreamCreateFlagUseExtendedData;
     flags |= kFSEventStreamCreateFlagUseCFTypes;
 #endif
-    fwatcher->stream = FSEventStreamCreate(tb_null, tb_fwatcher_fsevent_stream_callback, context,
+    watchitem->stream = FSEventStreamCreate(tb_null, tb_fwatcher_item_callback, context,
         path_array, kFSEventStreamEventIdSinceNow, 0, flags);
 
     // creating dispatch queue
-    fwatcher->fsevents_queue = dispatch_queue_create("fswatch_event_queue", tb_null);
-    FSEventStreamSetDispatchQueue(fwatcher->stream, fwatcher->fsevents_queue);
+    watchitem->fsevents_queue = dispatch_queue_create("fswatch_event_queue", tb_null);
+    FSEventStreamSetDispatchQueue(watchitem->stream, watchitem->fsevents_queue);
 
     // start stream
-    FSEventStreamStart(fwatcher->stream);
+    FSEventStreamStart(watchitem->stream);
 
     // free path array
-    for (i = 0; i < itemcount; i++)
-    {
-        if (pathstrs[i])
-            CFRelease(pathstrs[i]);
-        pathstrs[i] = tb_null;
-    }
-    tb_free(pathstrs);
+    CFRelease(pathstr);
     CFRelease(path_array);
     return tb_true;
 }
@@ -187,7 +219,7 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         tb_assert_and_check_break(fwatcher);
 
         // init watch items
-        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_null, tb_null));
+        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_fwatcher_item_free, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
 
         // init events queue
@@ -217,27 +249,9 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     if (fwatcher)
     {
-        // exit stream
-        if (fwatcher->stream)
-        {
-            FSEventStreamStop(fwatcher->stream);
-            FSEventStreamInvalidate(fwatcher->stream);
-            FSEventStreamRelease(fwatcher->stream);
-            fwatcher->stream = tb_null;
-        }
-
-        // exit dispatch queue
-        if (fwatcher->fsevents_queue)
-            dispatch_release(fwatcher->fsevents_queue);
-        fwatcher->fsevents_queue = tb_null;
-
         // exit watchitems
         if (fwatcher->watchitems) tb_hash_map_exit(fwatcher->watchitems);
         fwatcher->watchitems = tb_null;
-
-        // exit stream
-        if (fwatcher->stream) CFRelease(fwatcher->stream);
-        fwatcher->stream = tb_null;
 
         // exit semaphore
         if (fwatcher->semaphore) tb_semaphore_exit(fwatcher->semaphore);
@@ -326,9 +340,21 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, t
     tb_spinlock_leave(&fwatcher->lock);
     tb_check_return_val(!has_events, 1);
 
-    // we need init fsevent stream first
-    if (!fwatcher->stream && !tb_fwatcher_fsevent_stream_init(fwatcher))
-        return -1;
+    // init watch items
+    tb_for_all(tb_hash_map_item_ref_t, item, fwatcher->watchitems)
+    {
+        // get watch item and path
+        tb_char_t const* watchdir = (tb_char_t const*)item->name;
+        tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)item->data;
+        tb_assert_and_check_return_val(watchitem && watchdir, -1);
+
+        // init watch item first
+        if (!watchitem->stream && !tb_fwatcher_item_init(fwatcher, watchdir, watchitem))
+        {
+            tb_trace_d("watch %s failed", watchdir);
+            return -1;
+        }
+    }
 
     // wait events
     tb_long_t wait = tb_semaphore_wait(fwatcher->semaphore, timeout);
