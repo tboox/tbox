@@ -37,6 +37,13 @@
  * types
  */
 
+// the watch item type
+typedef struct __tb_fwatcher_item_t
+{
+    tb_bool_t           recursion;
+
+}tb_fwatcher_item_t;
+
 // the fwatcher type
 typedef struct __tb_fwatcher_t
 {
@@ -76,11 +83,13 @@ static tb_void_t tb_fwatcher_fsevent_stream_callback(ConstFSEventStreamRef strea
         tb_char_t const* filepath = ((tb_char_t const**)event_paths)[i];
 #endif
 
-        // filter need events
+        // get file path
         FSEventStreamEventFlags flags = event_flags[i];
         tb_fwatcher_event_t event;
         if (filepath) tb_strlcpy(event.filepath, filepath, TB_PATH_MAXN);
         else event.filepath[0] = '\0';
+
+        // filter need events
         if (flags & kFSEventStreamEventFlagItemCreated)
             event.event = TB_FWATCHER_EVENT_CREATE;
         else if (flags & kFSEventStreamEventFlagItemRemoved)
@@ -178,7 +187,7 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         tb_assert_and_check_break(fwatcher);
 
         // init watch items
-        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_uint8());
+        fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_null, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
 
         // init events queue
@@ -268,7 +277,9 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir, tb_
         return tb_true;
 
     // save watch item
-    return tb_hash_map_insert(fwatcher->watchitems, watchdir_real, tb_i2p(recursion)) != tb_iterator_tail(fwatcher->watchitems);
+    tb_fwatcher_item_t watchitem;
+    watchitem.recursion = recursion;
+    return tb_hash_map_insert(fwatcher->watchitems, watchdir_real, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
 tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
