@@ -92,6 +92,14 @@ tb_long_t tb_coroutine_waitproc(tb_poller_object_ref_t object, tb_long_t* pstatu
     // wait process status
     return scheduler? tb_co_scheduler_wait_proc(scheduler, object, pstatus, timeout) : -1;
 }
+tb_long_t tb_coroutine_waitfs(tb_poller_object_ref_t object, tb_fwatcher_event_t* pevent, tb_long_t timeout)
+{
+    // get current scheduler
+    tb_co_scheduler_t* scheduler = (tb_co_scheduler_t*)tb_co_scheduler_self();
+
+    // wait fwatcher event
+    return scheduler? tb_co_scheduler_wait_fwatcher(scheduler, object, pevent, timeout) : -1;
+}
 tb_coroutine_ref_t tb_coroutine_self()
 {
     // get coroutine

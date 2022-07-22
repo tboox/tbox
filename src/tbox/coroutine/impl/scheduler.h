@@ -176,6 +176,17 @@ tb_long_t                   tb_co_scheduler_wait(tb_co_scheduler_t* scheduler, t
  */
 tb_long_t                   tb_co_scheduler_wait_proc(tb_co_scheduler_t* scheduler, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
 
+/* wait fwatcher event
+ *
+ * @param scheduler         the scheduler
+ * @param object            the fwatcher poller object
+ * @param pevent            the fwatcher event pointer
+ * @param timeout           the timeout, infinity: -1
+ *
+ * @return                  > 0: has event, 0: timeout, -1: failed
+ */
+tb_long_t                   tb_co_scheduler_wait_fwatcher(tb_co_scheduler_t* scheduler, tb_poller_object_ref_t object, tb_fwatcher_event_t* pevent, tb_long_t timeout);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */
