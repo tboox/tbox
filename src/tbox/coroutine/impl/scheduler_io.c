@@ -93,7 +93,7 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
     {
         // reset the waited coroutines in the poller object data
         tb_size_t object_type = coroutine->rs.wait.object.type;
-        if (object_type == TB_POLLER_OBJECT_PROC)
+        if (object_type == TB_POLLER_OBJECT_PROC || object_type == TB_POLLER_OBJECT_FWATCHER)
             coroutine->rs.wait.object_waiting = 0;
         else if (object_type)
         {
@@ -118,8 +118,8 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_poller_obj
     tb_co_scheduler_io_ref_t scheduler_io = (tb_co_scheduler_io_ref_t)tb_poller_priv(poller);
     tb_assert(scheduler_io && scheduler_io->scheduler && object);
 
-    // is process object?
-    if (object->type == TB_POLLER_OBJECT_PROC)
+    // is process/fwatcher object?
+    if (object->type == TB_POLLER_OBJECT_PROC || object->type == TB_POLLER_OBJECT_FWATCHER)
     {
         // resume coroutine and return the process exit status
         tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
@@ -702,7 +702,7 @@ tb_bool_t tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_po
     tb_trace_d("coroutine(%p): cancel poller object(%p) ..", coroutine, object->ref.ptr);
 
     // cancel process object
-    if (object->type == TB_POLLER_OBJECT_PROC)
+    if (object->type == TB_POLLER_OBJECT_PROC || object->type == TB_POLLER_OBJECT_FWATCHER)
     {
         // clear process status
         coroutine->rs.wait.object_event = 0;

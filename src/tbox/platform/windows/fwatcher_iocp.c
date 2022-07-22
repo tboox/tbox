@@ -31,6 +31,11 @@
 #include "../../algorithm/algorithm.h"
 #include "interface/interface.h"
 #include "ntstatus.h"
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -266,6 +271,18 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, t
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
     tb_assert_and_check_return_val(fwatcher && fwatcher->port && fwatcher->watchitems && fwatcher->waited_events && event, -1);
+
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+    // attempt to wait it in coroutine if timeout is non-zero
+    if (timeout && tb_coroutine_self())
+    {
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_FWATCHER;
+        object.ref.fwatcher = self;
+        return tb_coroutine_waitfs(&object, event, timeout);
+    }
+#endif
 
     // get it if has events
     tb_bool_t has_events = tb_false;
