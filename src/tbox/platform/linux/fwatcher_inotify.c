@@ -316,6 +316,7 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, t
     while (i < real)
     {
         struct inotify_event* ievent = (struct inotify_event*)&fwatcher->buffer[i];
+        i += TB_FWATCHER_EVENT_SIZE + ievent->len;
 
         // get event code
         tb_size_t event_code = 0;
@@ -328,7 +329,8 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, t
 
         // get watchitem
         tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)tb_hash_map_get(fwatcher->watchitems, tb_i2p(ievent->wd));
-        tb_assert_and_check_break(watchitem && watchitem->watchdir);
+        tb_check_continue(watchitem);
+        tb_assert_and_check_break(watchitem->watchdir);
 
         // add event
         if (event_code)
@@ -339,19 +341,18 @@ tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, t
             else tb_strlcpy(evt.filepath, watchitem->watchdir, TB_PATH_MAXN);
             evt.event = event_code;
             tb_queue_put(fwatcher->waited_events, &evt);
-        }
-        i += TB_FWATCHER_EVENT_SIZE + ievent->len;
 
-        // rescan the watch directory
-        tb_file_info_t info;
-        if (event_code && watchitem->recursion &&
-            tb_file_info(watchitem->watchdir, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
-        {
-            if (event_code == TB_FWATCHER_EVENT_MODIFY ||
-                event_code == TB_FWATCHER_EVENT_CREATE)
-                tb_fwatcher_add(self, watchitem->watchdir, watchitem->recursion);
-            else if (event_code == TB_FWATCHER_EVENT_DELETE)
-                tb_fwatcher_remove(self, watchitem->watchdir);
+            // rescan the watch directory
+            tb_file_info_t info;
+            if (watchitem->recursion &&
+                tb_file_info(evt.filepath, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
+            {
+                if (event_code == TB_FWATCHER_EVENT_MODIFY ||
+                    event_code == TB_FWATCHER_EVENT_CREATE)
+                    tb_fwatcher_add(self, evt.filepath, watchitem->recursion);
+                else if (event_code == TB_FWATCHER_EVENT_DELETE)
+                    tb_fwatcher_remove(self, evt.filepath);
+            }
         }
     }
 
