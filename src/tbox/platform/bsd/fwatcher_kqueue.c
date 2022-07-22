@@ -87,7 +87,7 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)buff;
     if (watchitem && watchitem->wd >= 0)
     {
-        close((tb_int_t)(tb_long_t)watchitem->wd);
+        close(watchitem->wd);
         watchitem->wd = -1;
     }
 }
