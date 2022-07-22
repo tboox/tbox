@@ -33,6 +33,11 @@ target("tbox")
     add_headerfiles("../(tbox/utils/impl/*.h)")
     add_headerfiles("$(buildir)/$(plat)/$(arch)/$(mode)/tbox.config.h", {prefixdir = "tbox"})
 
+    -- add frameworks
+    if is_plat("macosx") then
+        add_frameworks("CoreFoundation", "CoreServices", {public = true})
+    end
+
     -- add packages
     for _, name in ipairs({"mbedtls", "polarssl", "openssl", "pcre2", "pcre", "zlib", "mysql", "sqlite3"}) do
         add_packages(name)

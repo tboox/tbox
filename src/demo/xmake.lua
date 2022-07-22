@@ -94,7 +94,3 @@ target("demo")
         add_syslinks("execinfo")
     end
 
-    -- add frameworks
-    if is_plat("macosx") then
-        add_frameworks("CoreFoundation", "CoreServices")
-    end
