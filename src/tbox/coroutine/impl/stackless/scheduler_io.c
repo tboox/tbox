@@ -102,7 +102,7 @@ static tb_void_t tb_lo_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
         tb_size_t object_type = coroutine->rs.wait.object.type;
 #ifndef TB_CONFIG_MICRO_ENABLE
         if (object_type == TB_POLLER_OBJECT_PROC)
-            coroutine->rs.wait.proc_waiting = 0;
+            coroutine->rs.wait.object_waiting = 0;
         else
 #endif
         if (object_type)
@@ -136,15 +136,15 @@ static tb_void_t tb_lo_scheduler_io_events(tb_poller_ref_t poller, tb_poller_obj
         // resume coroutine and return the process exit status
         tb_lo_coroutine_t* coroutine = (tb_lo_coroutine_t*)priv;
         tb_assert(coroutine);
-        coroutine->rs.wait.proc_status = (tb_int_t)events;
+        coroutine->rs.wait.object_event = events;
 
         // waiting process? resume this coroutine
-        if (coroutine->rs.wait.proc_waiting)
+        if (coroutine->rs.wait.object_waiting)
         {
-            coroutine->rs.wait.proc_waiting = 0;
+            coroutine->rs.wait.object_waiting = 0;
             tb_lo_scheduler_io_resume(scheduler_io->scheduler, coroutine, 1);
         }
-        else coroutine->rs.wait.proc_pending = 1;
+        else coroutine->rs.wait.object_pending = 1;
         return ;
     }
 #endif
@@ -608,9 +608,9 @@ tb_bool_t tb_lo_scheduler_io_wait_proc(tb_lo_scheduler_io_ref_t scheduler_io, tb
     tb_trace_d("coroutine(%p): wait process object(%p) with %ld ms ..", coroutine, object->ref.proc, timeout);
 
     // has pending process status?
-    if (coroutine->rs.wait.proc_pending)
+    if (coroutine->rs.wait.object_pending)
     {
-        coroutine->rs.wait.proc_pending = 0;
+        coroutine->rs.wait.object_pending = 0;
         coroutine->rs.wait.result = 1;
         return tb_false;
     }
@@ -649,12 +649,12 @@ tb_bool_t tb_lo_scheduler_io_wait_proc(tb_lo_scheduler_io_ref_t scheduler_io, tb
     }
 
     // save the timer task to coroutine
-    coroutine->rs.wait.task         = task;
-    coroutine->rs.wait.object       = *object;
-    coroutine->rs.wait.is_ltimer    = is_ltimer;
-    coroutine->rs.wait.proc_status  = 0;
-    coroutine->rs.wait.proc_pending = 0;
-    coroutine->rs.wait.proc_waiting = 1;
+    coroutine->rs.wait.task           = task;
+    coroutine->rs.wait.object         = *object;
+    coroutine->rs.wait.is_ltimer      = is_ltimer;
+    coroutine->rs.wait.object_event   = 0;
+    coroutine->rs.wait.object_pending = 0;
+    coroutine->rs.wait.object_waiting = 1;
 
     // suspend the current coroutine
     return tb_true;
@@ -677,9 +677,9 @@ tb_bool_t tb_lo_scheduler_io_cancel(tb_lo_scheduler_io_ref_t scheduler_io, tb_po
     if (object->type == TB_POLLER_OBJECT_PROC)
     {
         // clear process status
-        coroutine->rs.wait.proc_status = 0;
-        coroutine->rs.wait.proc_pending = 0;
-        coroutine->rs.wait.proc_waiting = 0;
+        coroutine->rs.wait.object_event = 0;
+        coroutine->rs.wait.object_pending = 0;
+        coroutine->rs.wait.object_waiting = 0;
 
         // remove the previous poller object first if exists
         if (!tb_poller_remove(scheduler_io->poller, object))

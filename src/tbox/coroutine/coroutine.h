@@ -30,6 +30,7 @@
 #include "semaphore.h"
 #include "scheduler.h"
 #include "../platform/poller.h"
+#include "../platform/fwatcher.h"
 #include "stackless/stackless.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -112,6 +113,16 @@ tb_long_t               tb_coroutine_waitio(tb_poller_object_ref_t object, tb_si
  * @return              > 0: process exited, 0: timeout, -1: failed
  */
 tb_long_t               tb_coroutine_waitproc(tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
+
+/*! wait fwatcher event
+ *
+ * @param object        the poller object
+ * @param pevent        the fwatcher event pointer
+ * @param timeout       the timeout, infinity: -1
+ *
+ * @return              > 0: has event, 0: timeout, -1: failed
+ */
+tb_long_t               tb_coroutine_waitfs(tb_poller_object_ref_t object, tb_fwatcher_event_t* pevent, tb_long_t timeout);
 
 /*! get the current coroutine
  *

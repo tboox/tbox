@@ -147,6 +147,17 @@ tb_long_t                   tb_co_scheduler_io_wait(tb_co_scheduler_io_ref_t sch
  */
 tb_long_t                   tb_co_scheduler_io_wait_proc(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_long_t* pstatus, tb_long_t timeout);
 
+/*! wait fwatcher event
+ *
+ * @param scheduler_io      the io scheduler
+ * @param object            the process poller object
+ * @param pevent            the fwatcher event pointer
+ * @param timeout           the timeout, infinity: -1
+ *
+ * @return                  > 0: has event, 0: timeout, -1: failed
+ */
+tb_long_t                   tb_co_scheduler_io_wait_fwatcher(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_fwatcher_event_t* pevent, tb_long_t timeout);
+
 /*! cancel io events for the given poller object
  *
  * @param scheduler_io      the io scheduler

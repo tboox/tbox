@@ -69,6 +69,16 @@
 #   endif
 #endif
 
+#ifndef TB_CONFIG_MICRO_ENABLE
+#   if defined(TB_CONFIG_OS_WINDOWS) || \
+        defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT) || \
+        defined(TB_CONFIG_OS_MACOSX) || \
+        defined(TB_CONFIG_OS_BSD)
+#       include "impl/poller_fwatcher.c"
+#       define TB_POLLER_ENABLE_FWATCHER
+#   endif
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -123,6 +133,12 @@ tb_void_t tb_poller_exit(tb_poller_ref_t self)
     poller->process_poller = tb_null;
 #endif
 
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // exit the fwatcher poller
+    if (poller->fwatcher_poller) tb_poller_fwatcher_exit(poller->fwatcher_poller);
+    poller->fwatcher_poller = tb_null;
+#endif
+
     // exit poller
     if (poller->exit)
         poller->exit(poller);
@@ -152,6 +168,11 @@ tb_void_t tb_poller_kill(tb_poller_ref_t self)
     if (poller->process_poller) tb_poller_process_kill(poller->process_poller);
 #endif
 
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // kill the fwatcher poller
+    if (poller->fwatcher_poller) tb_poller_fwatcher_kill(poller->fwatcher_poller);
+#endif
+
     // kill the poller
     if (poller->kill) poller->kill(poller);
 }
@@ -164,6 +185,11 @@ tb_void_t tb_poller_spak(tb_poller_ref_t self)
 #ifdef TB_POLLER_ENABLE_PROCESS
     // spank the process poller
     if (poller->process_poller) tb_poller_process_spak(poller->process_poller);
+#endif
+
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // spank the fwatcher poller
+    if (poller->fwatcher_poller) tb_poller_fwatcher_spak(poller->fwatcher_poller);
 #endif
 
     // spank the poller
@@ -197,6 +223,21 @@ tb_bool_t tb_poller_insert(tb_poller_ref_t self, tb_poller_object_ref_t object, 
     tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
 #endif
 
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // is the fwatcher object?
+    if (object->type == TB_POLLER_OBJECT_FWATCHER)
+    {
+        // init the fwatcher poller first
+        if (!poller->fwatcher_poller) poller->fwatcher_poller = tb_poller_fwatcher_init(poller);
+        tb_assert_and_check_return_val(poller->fwatcher_poller, tb_false);
+
+        // insert this fwatcher and the user private data
+        return tb_poller_fwatcher_insert(poller->fwatcher_poller, object->ref.fwatcher, priv);
+    }
+#else
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_FWATCHER, tb_false);
+#endif
+
     // insert the poller object
     return poller->insert(poller, object, events, priv);
 }
@@ -217,6 +258,19 @@ tb_bool_t tb_poller_remove(tb_poller_ref_t self, tb_poller_object_ref_t object)
     }
 #else
     tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
+#endif
+
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // is the fwatcher object?
+    if (object->type == TB_POLLER_OBJECT_FWATCHER)
+    {
+        // remove this fwatcher and the user private data
+        if (poller->fwatcher_poller)
+            return tb_poller_fwatcher_remove(poller->fwatcher_poller, object->ref.fwatcher);
+        return tb_true;
+    }
+#else
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_FWATCHER, tb_false);
 #endif
 
     // remove the poller object
@@ -241,6 +295,19 @@ tb_bool_t tb_poller_modify(tb_poller_ref_t self, tb_poller_object_ref_t object, 
     tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_PROC, tb_false);
 #endif
 
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // is the fwatcher object?
+    if (object->type == TB_POLLER_OBJECT_FWATCHER)
+    {
+        // modify the user private data of this fwatcher
+        if (poller->fwatcher_poller)
+            return tb_poller_fwatcher_modify(poller->fwatcher_poller, object->ref.fwatcher, priv);
+        return tb_true;
+    }
+#else
+    tb_assert_and_check_return_val(object->type != TB_POLLER_OBJECT_FWATCHER, tb_false);
+#endif
+
     // modify the poller object
     return poller->modify(poller, object, events, priv);
 }
@@ -257,19 +324,43 @@ tb_long_t tb_poller_wait(tb_poller_ref_t self, tb_poller_event_func_t func, tb_l
         // prepare to wait processes
         if (!tb_poller_process_wait_prepare(poller->process_poller))
             return -1;
+    }
+#endif
 
-        // wait the poller objects
-        tb_long_t wait = poller->wait(poller, func, timeout);
-        tb_check_return_val(wait >= 0, -1);
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // prepare to wait the fwatchers
+    if (poller->fwatcher_poller)
+    {
+        // prepare to wait fwatchers
+        if (!tb_poller_fwatcher_wait_prepare(poller->fwatcher_poller))
+            return -1;
+    }
+#endif
 
-        // poll all waited processes
+    // wait the poller objects
+    tb_long_t wait = poller->wait(poller, func, timeout);
+    tb_check_return_val(wait >= 0, -1);
+
+#ifdef TB_POLLER_ENABLE_PROCESS
+    // poll all waited processes
+    if (poller->process_poller)
+    {
         tb_long_t proc_wait = tb_poller_process_wait_poll(poller->process_poller, func);
         tb_check_return_val(proc_wait >= 0, -1);
         wait += proc_wait;
-        return wait;
     }
 #endif
-    return poller->wait(poller, func, timeout);
+
+#ifdef TB_POLLER_ENABLE_FWATCHER
+    // poll all waited fwatchers
+    if (poller->fwatcher_poller)
+    {
+        tb_long_t fwatcher_wait = tb_poller_fwatcher_wait_poll(poller->fwatcher_poller, func);
+        tb_check_return_val(fwatcher_wait >= 0, -1);
+        wait += fwatcher_wait;
+    }
+#endif
+    return wait;
 }
 tb_void_t tb_poller_attach(tb_poller_ref_t self)
 {

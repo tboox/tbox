@@ -148,13 +148,13 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                  *
                  * in fact, any unix program will only ever return a max of 255.
                  */
-                tb_poller_processes_status_t proc_status;
-                proc_status.status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
-                proc_status.pid = result;
+                tb_poller_processes_status_t object_event;
+                object_event.status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
+                object_event.pid = result;
 
                 // save the process status
                 tb_spinlock_enter(&poller->lock);
-                tb_vector_insert_tail(poller->processes_status, &proc_status);
+                tb_vector_insert_tail(poller->processes_status, &object_event);
                 has_exited = tb_true;
                 tb_spinlock_leave(&poller->lock);
             }
@@ -420,16 +420,16 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     tb_long_t wait = 0;
     tb_poller_object_t object;
     object.type = TB_POLLER_OBJECT_PROC;
-    tb_for_all_if (tb_poller_processes_status_t*, proc_status, poller->processes_status_copied, proc_status)
+    tb_for_all_if (tb_poller_processes_status_t*, object_event, poller->processes_status_copied, object_event)
     {
         // trace
-        tb_trace_d("process: pid: %d", proc_status->pid);
+        tb_trace_d("process: pid: %d", object_event->pid);
 
-        tb_poller_processes_data_t* proc_data = tb_hash_map_get(poller->processes_data, tb_i2p(proc_status->pid));
+        tb_poller_processes_data_t* proc_data = tb_hash_map_get(poller->processes_data, tb_i2p(object_event->pid));
         if (proc_data)
         {
             object.ref.proc = proc_data->process;
-            func((tb_poller_ref_t)poller->main_poller, &object, proc_status->status, proc_data->priv);
+            func((tb_poller_ref_t)poller->main_poller, &object, object_event->status, proc_data->priv);
             wait++;
         }
     }

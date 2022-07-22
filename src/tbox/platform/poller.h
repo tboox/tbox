@@ -28,6 +28,7 @@
 #include "pipe.h"
 #include "socket.h"
 #include "process.h"
+#include "fwatcher.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
@@ -81,9 +82,10 @@ typedef enum __tb_poller_event_e
 typedef enum __tb_poller_object_type_e
 {
     TB_POLLER_OBJECT_NONE         = 0
-,   TB_POLLER_OBJECT_SOCK         = 1
-,   TB_POLLER_OBJECT_PIPE         = 2
-,   TB_POLLER_OBJECT_PROC         = 3
+,   TB_POLLER_OBJECT_SOCK         = 1 //!< socket
+,   TB_POLLER_OBJECT_PIPE         = 2 //!< pipe
+,   TB_POLLER_OBJECT_PROC         = 3 //!< process
+,   TB_POLLER_OBJECT_FWATCHER     = 4 //!< fwatcher
 
 }tb_poller_object_type_e;
 
@@ -102,6 +104,7 @@ typedef struct __tb_poller_object_t
         tb_socket_ref_t     sock;
         tb_pipe_file_ref_t  pipe;
         tb_process_ref_t    proc;
+        tb_fwatcher_ref_t   fwatcher;
         tb_pointer_t        ptr;
 
     }ref;

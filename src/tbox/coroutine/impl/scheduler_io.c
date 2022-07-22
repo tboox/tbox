@@ -93,8 +93,8 @@ static tb_void_t tb_co_scheduler_io_timeout(tb_bool_t killed, tb_cpointer_t priv
     {
         // reset the waited coroutines in the poller object data
         tb_size_t object_type = coroutine->rs.wait.object.type;
-        if (object_type == TB_POLLER_OBJECT_PROC)
-            coroutine->rs.wait.proc_waiting = 0;
+        if (object_type == TB_POLLER_OBJECT_PROC || object_type == TB_POLLER_OBJECT_FWATCHER)
+            coroutine->rs.wait.object_waiting = 0;
         else if (object_type)
         {
             tb_co_scheduler_io_ref_t   scheduler_io = tb_co_scheduler_io(scheduler);
@@ -118,21 +118,21 @@ static tb_void_t tb_co_scheduler_io_events(tb_poller_ref_t poller, tb_poller_obj
     tb_co_scheduler_io_ref_t scheduler_io = (tb_co_scheduler_io_ref_t)tb_poller_priv(poller);
     tb_assert(scheduler_io && scheduler_io->scheduler && object);
 
-    // is process object?
-    if (object->type == TB_POLLER_OBJECT_PROC)
+    // is process/fwatcher object?
+    if (object->type == TB_POLLER_OBJECT_PROC || object->type == TB_POLLER_OBJECT_FWATCHER)
     {
         // resume coroutine and return the process exit status
         tb_coroutine_t* coroutine = (tb_coroutine_t*)priv;
         tb_assert(coroutine);
-        coroutine->rs.wait.proc_status = (tb_int_t)events;
+        coroutine->rs.wait.object_event = events;
 
         // waiting process? resume this coroutine
-        if (coroutine->rs.wait.proc_waiting)
+        if (coroutine->rs.wait.object_waiting)
         {
-            coroutine->rs.wait.proc_waiting = 0;
+            coroutine->rs.wait.object_waiting = 0;
             tb_co_scheduler_io_resume(scheduler_io->scheduler, coroutine, 1);
         }
-        else coroutine->rs.wait.proc_pending = 1;
+        else coroutine->rs.wait.object_pending = 1;
         return ;
     }
 
@@ -567,10 +567,10 @@ tb_long_t tb_co_scheduler_io_wait_proc(tb_co_scheduler_io_ref_t scheduler_io, tb
     tb_trace_d("coroutine(%p): wait process object(%p) with %ld ms ..", coroutine, object->ref.proc, timeout);
 
     // has pending process status?
-    if (coroutine->rs.wait.proc_pending)
+    if (coroutine->rs.wait.object_pending)
     {
-        if (pstatus) *pstatus = coroutine->rs.wait.proc_status;
-        coroutine->rs.wait.proc_pending = 0;
+        if (pstatus) *pstatus = coroutine->rs.wait.object_event;
+        coroutine->rs.wait.object_pending = 0;
         return 1;
     }
 
@@ -607,16 +607,86 @@ tb_long_t tb_co_scheduler_io_wait_proc(tb_co_scheduler_io_ref_t scheduler_io, tb
     }
 
     // save the timer task to coroutine
-    coroutine->rs.wait.task         = task;
-    coroutine->rs.wait.object       = *object;
-    coroutine->rs.wait.is_ltimer    = is_ltimer;
-    coroutine->rs.wait.proc_status  = 0;
-    coroutine->rs.wait.proc_pending = 0;
-    coroutine->rs.wait.proc_waiting = 1;
+    coroutine->rs.wait.task           = task;
+    coroutine->rs.wait.object         = *object;
+    coroutine->rs.wait.is_ltimer      = is_ltimer;
+    coroutine->rs.wait.object_event   = 0;
+    coroutine->rs.wait.object_pending = 0;
+    coroutine->rs.wait.object_waiting = 1;
 
     // suspend the current coroutine and return the waited result
     tb_long_t ok = (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);
-    if (ok > 0 && pstatus) *pstatus = coroutine->rs.wait.proc_status;
+    if (ok > 0 && pstatus) *pstatus = coroutine->rs.wait.object_event;
+    return ok;
+}
+tb_long_t tb_co_scheduler_io_wait_fwatcher(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object, tb_fwatcher_event_t* pevent, tb_long_t timeout)
+{
+    // check
+    tb_assert(scheduler_io && scheduler_io->poller && scheduler_io->scheduler);
+    tb_assert(object && object->type == TB_POLLER_OBJECT_FWATCHER && object->ref.fwatcher);
+
+    // get the current coroutine
+    tb_coroutine_t* coroutine = tb_co_scheduler_running(scheduler_io->scheduler);
+    tb_assert(coroutine);
+
+    // get the poller
+    tb_poller_ref_t poller = scheduler_io->poller;
+    tb_assert(poller);
+
+    // trace
+    tb_trace_d("coroutine(%p): wait fwatcher object(%p) with %ld ms ..", coroutine, object->ref.fwatcher, timeout);
+
+    // has pending fwatcher event?
+    if (coroutine->rs.wait.object_pending)
+    {
+        if (pevent) *pevent = *((tb_fwatcher_event_t*)coroutine->rs.wait.object_event);
+        coroutine->rs.wait.object_pending = 0;
+        return 1;
+    }
+
+    // insert poller object to poller for waiting fwatcher
+    if (!tb_poller_insert(poller, object, 0, coroutine))
+    {
+        // trace
+        tb_trace_e("failed to insert fwatcher object(%p) to poller on coroutine(%p)!", object->ref.fwatcher, coroutine);
+        return -1;
+    }
+
+    // exists timeout?
+    tb_cpointer_t   task = tb_null;
+    tb_bool_t       is_ltimer = tb_false;
+    if (timeout >= 0)
+    {
+        // high-precision interval?
+        if (timeout % 1000)
+        {
+            // init task for timer
+            task = tb_timer_task_init(scheduler_io->timer, timeout, tb_false, tb_co_scheduler_io_timeout, coroutine);
+            tb_assert_and_check_return_val(task, tb_false);
+        }
+        // low-precision interval?
+        else
+        {
+            // init task for ltimer (faster)
+            task = tb_ltimer_task_init(scheduler_io->ltimer, timeout, tb_false, tb_co_scheduler_io_timeout, coroutine);
+            tb_assert_and_check_return_val(task, tb_false);
+
+            // mark as low-precision timer
+            is_ltimer = tb_true;
+        }
+    }
+
+    // save the timer task to coroutine
+    coroutine->rs.wait.task           = task;
+    coroutine->rs.wait.object         = *object;
+    coroutine->rs.wait.is_ltimer      = is_ltimer;
+    coroutine->rs.wait.object_event   = 0;
+    coroutine->rs.wait.object_pending = 0;
+    coroutine->rs.wait.object_waiting = 1;
+
+    // suspend the current coroutine and return the waited result
+    tb_long_t ok = (tb_long_t)tb_co_scheduler_suspend(scheduler_io->scheduler, tb_null);
+    if (ok > 0 && pevent) *pevent = *((tb_fwatcher_event_t*)coroutine->rs.wait.object_event);
     return ok;
 }
 tb_bool_t tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_poller_object_ref_t object)
@@ -632,12 +702,12 @@ tb_bool_t tb_co_scheduler_io_cancel(tb_co_scheduler_io_ref_t scheduler_io, tb_po
     tb_trace_d("coroutine(%p): cancel poller object(%p) ..", coroutine, object->ref.ptr);
 
     // cancel process object
-    if (object->type == TB_POLLER_OBJECT_PROC)
+    if (object->type == TB_POLLER_OBJECT_PROC || object->type == TB_POLLER_OBJECT_FWATCHER)
     {
         // clear process status
-        coroutine->rs.wait.proc_status = 0;
-        coroutine->rs.wait.proc_pending = 0;
-        coroutine->rs.wait.proc_waiting = 0;
+        coroutine->rs.wait.object_event = 0;
+        coroutine->rs.wait.object_pending = 0;
+        coroutine->rs.wait.object_waiting = 0;
 
         // remove the previous poller object first if exists
         if (!tb_poller_remove(scheduler_io->poller, object))

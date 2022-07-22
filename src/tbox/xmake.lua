@@ -66,7 +66,7 @@ target("tbox")
     add_files("libm/isqrti.c")
     add_files("libm/isqrti64.c")
     add_files("libm/idivi8.c")
-    add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c|charset.c")
+    add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c|charset.c|poller_fwatcher.c")
 
     -- add the source files for the float type
     if has_config("float") then add_files("libm/*.c") end

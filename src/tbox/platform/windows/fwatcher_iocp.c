@@ -31,6 +31,11 @@
 #include "../../algorithm/algorithm.h"
 #include "interface/interface.h"
 #include "ntstatus.h"
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+#   include "../../coroutine/coroutine.h"
+#   include "../../coroutine/impl/impl.h"
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -48,7 +53,8 @@ typedef struct __tb_fwatcher_item_t
      * http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx)
      */
     BYTE                buffer[10 * 1024];
-    tb_char_t const*    filepath;
+    tb_char_t const*    watchdir;
+    tb_bool_t           recursion;
 
 }tb_fwatcher_item_t;
 
@@ -57,6 +63,7 @@ typedef struct __tb_fwatcher_t
 {
     HANDLE              port;
     tb_hash_map_ref_t   watchitems;
+    tb_queue_ref_t      waited_events;
 
 }tb_fwatcher_t;
 
@@ -81,22 +88,22 @@ static tb_bool_t tb_fwatcher_item_refresh(tb_fwatcher_item_t* watchitem)
 {
     // refresh directory watching
     return ReadDirectoryChangesW(watchitem->handle,
-        watchitem->buffer, sizeof(watchitem->buffer), TRUE,
+        watchitem->buffer, sizeof(watchitem->buffer), watchitem->recursion? TRUE : FALSE,
         FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE,
         tb_null, &watchitem->overlapped, tb_null);
 }
 
-static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const* filepath, tb_fwatcher_item_t* watchitem)
+static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const* watchdir, tb_fwatcher_item_t* watchitem)
 {
-    tb_assert_and_check_return_val(fwatcher && watchitem && filepath && !watchitem->handle && fwatcher->port, tb_false);
+    tb_assert_and_check_return_val(fwatcher && watchitem && watchdir && !watchitem->handle && fwatcher->port, tb_false);
 
     // get the absolute path
-    tb_wchar_t filepath_w[TB_PATH_MAXN];
-    if (!tb_path_absolute_w(filepath, filepath_w, TB_PATH_MAXN))
+    tb_wchar_t watchdir_w[TB_PATH_MAXN];
+    if (!tb_path_absolute_w(watchdir, watchdir_w, TB_PATH_MAXN))
         return tb_false;
 
     // create file
-    watchitem->handle = CreateFileW(filepath_w, GENERIC_READ,
+    watchitem->handle = CreateFileW(watchdir_w, GENERIC_READ,
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, tb_null,
 		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, tb_null);
     tb_assert_and_check_return_val(watchitem->handle, tb_false);
@@ -106,55 +113,53 @@ static tb_bool_t tb_fwatcher_item_init(tb_fwatcher_t* fwatcher, tb_char_t const*
         return tb_false;
 
     // save file path
-    watchitem->filepath = filepath;
+    watchitem->watchdir = watchdir;
 
     // refresh directory watching
     return tb_fwatcher_item_refresh(watchitem);
 }
 
-static tb_long_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item_t* watchitem, tb_fwatcher_event_t* events, tb_size_t events_maxn)
+static tb_void_t tb_fwatcher_item_spak(tb_fwatcher_t* fwatcher, tb_fwatcher_item_t* watchitem)
 {
-    tb_assert_and_check_return_val(fwatcher && watchitem && watchitem->handle && watchitem->filepath && events, -1);
+    tb_assert_and_check_return(fwatcher && watchitem && watchitem->handle && watchitem->watchdir);
 
     tb_size_t offset = 0;
-    tb_size_t events_count = 0;
+    tb_fwatcher_event_t event;
 	PFILE_NOTIFY_INFORMATION notify;
     do
     {
 		notify = (PFILE_NOTIFY_INFORMATION)&watchitem->buffer[offset];
 		offset += notify->NextEntryOffset;
 
-        // get event
-        tb_check_break(events_count < events_maxn);
-        tb_fwatcher_event_t* event = &events[events_count++];
-
         // get file path
         tb_char_t filename[TB_PATH_MAXN];
 		tb_int_t count = WideCharToMultiByte(CP_UTF8, 0, notify->FileName, notify->FileNameLength / sizeof(WCHAR),
             filename, sizeof(filename) - 1, tb_null, tb_null);
 		filename[count] = '\0';
-        tb_snprintf(event->filepath, TB_PATH_MAXN, "%s/%s", watchitem->filepath, filename);
+        tb_snprintf(event.filepath, TB_PATH_MAXN, "%s/%s", watchitem->watchdir, filename);
 
         // get event code
         if (notify->Action == FILE_ACTION_ADDED)
-            event->event = TB_FWATCHER_EVENT_CREATE;
+            event.event = TB_FWATCHER_EVENT_CREATE;
         else if (notify->Action == FILE_ACTION_MODIFIED)
-            event->event = TB_FWATCHER_EVENT_MODIFY;
+            event.event = TB_FWATCHER_EVENT_MODIFY;
         else if (notify->Action == FILE_ACTION_REMOVED)
-            event->event = TB_FWATCHER_EVENT_DELETE;
+            event.event = TB_FWATCHER_EVENT_DELETE;
         else if (notify->Action == FILE_ACTION_RENAMED_NEW_NAME)
         {
             // the parent directory is changed
-            event->event = TB_FWATCHER_EVENT_MODIFY;
-            tb_strlcpy(event->filepath, watchitem->filepath, sizeof(event->filepath));
+            event.event = TB_FWATCHER_EVENT_MODIFY;
+            tb_strlcpy(event.filepath, watchitem->watchdir, sizeof(event.filepath));
         }
+
+        // save event
+        tb_queue_put(fwatcher->waited_events, &event);
 
     } while (notify->NextEntryOffset);
 
     // continue to refresh directory watching
 	if (!watchitem->stop)
         tb_fwatcher_item_refresh(watchitem);
-    return events_count;
 }
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +182,10 @@ tb_fwatcher_ref_t tb_fwatcher_init()
         // init watch items
         fwatcher->watchitems = tb_hash_map_init(0, tb_element_str(tb_true), tb_element_mem(sizeof(tb_fwatcher_item_t), tb_fwatcher_item_free, tb_null));
         tb_assert_and_check_break(fwatcher->watchitems);
+
+        // init waited events
+        fwatcher->waited_events = tb_queue_init(0, tb_element_mem(sizeof(tb_fwatcher_event_t), tb_null, tb_null));
+        tb_assert_and_check_break(fwatcher->waited_events);
 
         ok = tb_true;
     } while (0);
@@ -201,6 +210,13 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
             fwatcher->watchitems = tb_null;
         }
 
+        // exit waited events
+        if (fwatcher->waited_events)
+        {
+            tb_queue_exit(fwatcher->waited_events);
+            fwatcher->waited_events = tb_null;
+        }
+
         // exit port
         if (fwatcher->port) CloseHandle(fwatcher->port);
         fwatcher->port = tb_null;
@@ -211,34 +227,35 @@ tb_void_t tb_fwatcher_exit(tb_fwatcher_ref_t self)
     }
 }
 
-tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir, tb_bool_t recursion)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && watchdir, tb_false);
 
     // file not found
     tb_file_info_t info;
-    if (!tb_file_info(filepath, &info))
+    if (!tb_file_info(watchdir, &info) || info.type != TB_FILE_TYPE_DIRECTORY)
         return tb_false;
 
     // this path has been added?
-    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, filepath);
+    tb_size_t itor = tb_hash_map_find(fwatcher->watchitems, watchdir);
     if (itor != tb_iterator_tail(fwatcher->watchitems))
         return tb_true;
 
     // save watch item
     tb_fwatcher_item_t watchitem;
     tb_memset(&watchitem, 0, sizeof(tb_fwatcher_item_t));
-    return tb_hash_map_insert(fwatcher->watchitems, filepath, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
+    watchitem.recursion = recursion;
+    return tb_hash_map_insert(fwatcher->watchitems, watchdir, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
 
-tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* filepath)
+tb_bool_t tb_fwatcher_remove(tb_fwatcher_ref_t self, tb_char_t const* watchdir)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && filepath, tb_false);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->watchitems && watchdir, tb_false);
 
     // remove the watchitem
-    tb_hash_map_remove(fwatcher->watchitems, filepath);
+    tb_hash_map_remove(fwatcher->watchitems, watchdir);
     return tb_true;
 }
 
@@ -250,61 +267,88 @@ tb_void_t tb_fwatcher_spak(tb_fwatcher_ref_t self)
     PostQueuedCompletionStatus(fwatcher->port, 0, (ULONG_PTR)tb_u2p(1), tb_null);
 }
 
-tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* events, tb_size_t events_maxn, tb_long_t timeout)
+tb_long_t tb_fwatcher_wait(tb_fwatcher_ref_t self, tb_fwatcher_event_t* event, tb_long_t timeout)
 {
     tb_fwatcher_t* fwatcher = (tb_fwatcher_t*)self;
-    tb_assert_and_check_return_val(fwatcher && fwatcher->port && fwatcher->watchitems && events && events_maxn, -1);
+    tb_assert_and_check_return_val(fwatcher && fwatcher->port && fwatcher->watchitems && fwatcher->waited_events && event, -1);
+
+#if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
+        && !defined(TB_CONFIG_MICRO_ENABLE)
+    // attempt to wait it in coroutine if timeout is non-zero
+    if (timeout && tb_coroutine_self())
+    {
+        tb_poller_object_t object;
+        object.type = TB_POLLER_OBJECT_FWATCHER;
+        object.ref.fwatcher = self;
+        return tb_coroutine_waitfs(&object, event, timeout);
+    }
+#endif
+
+    // get it if has events
+    tb_bool_t has_events = tb_false;
+    if (!tb_queue_null(fwatcher->waited_events))
+    {
+        tb_fwatcher_event_t* e = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->waited_events);
+        if (e)
+        {
+            *event = *e;
+            tb_queue_pop(fwatcher->waited_events);
+            has_events = tb_true;
+        }
+    }
+    tb_check_return_val(!has_events, 1);
 
     // init watch items
     tb_for_all(tb_hash_map_item_ref_t, item, fwatcher->watchitems)
     {
         // get watch item and path
-        tb_char_t const* path = (tb_char_t const*)item->name;
+        tb_char_t const* watchdir = (tb_char_t const*)item->name;
         tb_fwatcher_item_t* watchitem = (tb_fwatcher_item_t*)item->data;
-        tb_assert_and_check_return_val(watchitem && path, -1);
+        tb_assert_and_check_return_val(watchitem && watchdir, -1);
 
         // init watch item first
-        if (!watchitem->handle && !tb_fwatcher_item_init(fwatcher, path, watchitem))
+        if (!watchitem->handle && !tb_fwatcher_item_init(fwatcher, watchdir, watchitem))
         {
-            tb_trace_d("watch %s failed", path);
+            tb_trace_d("watch %s failed", watchdir);
             return -1;
         }
     }
 
-    // wait watch items
-    tb_size_t events_count = 0;
-    while (events_count < events_maxn)
+    // clear error first
+    SetLastError(ERROR_SUCCESS);
+
+    // wait event
+    DWORD           real = 0;
+    tb_pointer_t    pkey = tb_null;
+    OVERLAPPED*     overlapped = tb_null;
+    BOOL            wait_ok = GetQueuedCompletionStatus(fwatcher->port,
+        (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&overlapped, (DWORD)(timeout < 0? INFINITE : timeout));
+
+    // the last error
+    tb_size_t error = (tb_size_t)GetLastError();
+
+    // timeout?
+    if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
+        return 0;
+
+    // spank notification?
+    if (tb_p2u32(pkey) == 0x1)
+        return 0;
+
+    // handle event
+    if (real && overlapped)
+        tb_fwatcher_item_spak(fwatcher, (tb_fwatcher_item_t*)overlapped);
+
+    // get event
+    if (!tb_queue_null(fwatcher->waited_events))
     {
-        // compute the timeout
-        if (events_count) timeout = 0;
-
-        // clear error first
-        SetLastError(ERROR_SUCCESS);
-
-        // wait event
-        DWORD           real = 0;
-        tb_pointer_t    pkey = tb_null;
-        OVERLAPPED*     overlapped = tb_null;
-        BOOL            wait_ok = GetQueuedCompletionStatus(fwatcher->port,
-            (LPDWORD)&real, (PULONG_PTR)&pkey, (LPOVERLAPPED*)&overlapped, (DWORD)(timeout < 0? INFINITE : timeout));
-
-        // the last error
-        tb_size_t error = (tb_size_t)GetLastError();
-
-        // timeout?
-        if (!wait_ok && (error == WAIT_TIMEOUT || error == ERROR_OPERATION_ABORTED))
-            break;
-
-        // spank notification?
-        if (tb_p2u32(pkey) == 0x1)
-            break ;
-
-        // handle event
-        if (real && overlapped)
+        tb_fwatcher_event_t* e = (tb_fwatcher_event_t*)tb_queue_get(fwatcher->waited_events);
+        if (e)
         {
-            tb_long_t count = tb_fwatcher_item_spak(fwatcher, (tb_fwatcher_item_t*)overlapped, events + events_count, events_maxn - events_count);
-            if (count > 0) events_count += count;
+            *event = *e;
+            tb_queue_pop(fwatcher->waited_events);
+            has_events = tb_true;
         }
     }
-    return events_count;
+    return has_events? 1 : 0;
 }
