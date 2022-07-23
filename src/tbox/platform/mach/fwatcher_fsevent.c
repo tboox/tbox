@@ -297,6 +297,7 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir, tb_
 
     // save watch item
     tb_fwatcher_item_t watchitem;
+    tb_memset(&watchitem, 0, sizeof(tb_fwatcher_item_t));
     watchitem.recursion = recursion;
     return tb_hash_map_insert(fwatcher->watchitems, watchdir_real, &watchitem) != tb_iterator_tail(fwatcher->watchitems);
 }
