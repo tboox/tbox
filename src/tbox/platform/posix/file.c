@@ -610,4 +610,53 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
 
     return !access(full, flags);
 }
+tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+{
+    // check
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the full path
+    tb_char_t full[TB_PATH_MAXN];
+    path = tb_path_absolute(path, full, TB_PATH_MAXN);
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // file exists?
+    tb_bool_t ok = tb_false;
+    struct timespec ts[2] = {0};
+    if (!access(path, F_OK))
+    {
+        if (atime > 0 || mtime > 0)
+        {
+#ifdef TB_CONFIG_POSIX_HAVE_UTIMENSAT
+            if (atime > 0) ts[0].tv_sec = atime;
+            else ts[0].tv_nsec = UTIME_OMIT;
+            if (mtime > 0) ts[1].tv_sec = mtime;
+            else ts[1].tv_nsec = UTIME_OMIT;
+            ok = !utimensat(AT_FDCWD, path, ts, 0);
+#endif
+        }
+        else ok = tb_true;
+    }
+    else
+    {
+        // create a new file if not exists
+        tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT);
+        if (file)
+        {
+            if (atime > 0 || mtime > 0)
+            {
+#ifdef TB_CONFIG_POSIX_HAVE_FUTIMENS
+                if (atime > 0) ts[0].tv_sec = atime;
+                else ts[0].tv_nsec = UTIME_OMIT;
+                if (mtime > 0) ts[1].tv_sec = mtime;
+                else ts[1].tv_nsec = UTIME_OMIT;
+                ok = !futimens(tb_file2fd(file), ts);
+#endif
+            }
+            else ok = tb_true;
+            tb_file_exit(file);
+        }
+    }
+    return ok;
+}
 #endif

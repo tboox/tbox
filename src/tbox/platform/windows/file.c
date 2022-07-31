@@ -603,6 +603,7 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
             }
             ok = SetFileTime(file, tb_null, &atime_ft, &mtime_ft);
         }
+        else ok = tb_true;
         CloseHandle(file);
     }
     return ok;

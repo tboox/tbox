@@ -290,6 +290,7 @@ function check_interfaces()
         check_module_cfuncs("posix", "unistd.h",                         "pipe", "pipe2")
         check_module_cfuncs("posix", "sys/stat.h",                       "mkfifo")
         check_module_cfuncs("posix", "sys/mman.h",                       "mmap")
+        check_module_cfuncs("posix", "sys/stat.h",                       "futimens", "utimensat")
     end
 
     -- add the interfaces for windows/msvc
