@@ -313,8 +313,8 @@ tb_bool_t               tb_file_access(tb_char_t const* path, tb_size_t mode);
 /*! update the file time, it will create a new if file not found
  *
  * @param path          the file path
- * @param atime         the last access time, it will be update to the current time if it's zero
- * @param mtime         the last modify time, it will be update to the current time if it's zero
+ * @param atime         the last access time, it will not modify this time if it's zero
+ * @param mtime         the last modify time, it will not modify this time if it's zero
  *
  * @return              tb_true or tb_false
  */
