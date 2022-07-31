@@ -622,7 +622,8 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
 
     // file exists?
     tb_bool_t ok = tb_false;
-    struct timespec ts[2] = {0};
+    struct timespec ts[2];
+    tb_memset(ts, 0, sizeof(ts));
     if (!access(path, F_OK))
     {
         if (atime > 0 || mtime > 0)
