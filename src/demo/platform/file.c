@@ -205,6 +205,11 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
     tb_bool_t ok = tb_file_copy(argv[1], argv[2]);
     tb_trace_i("copy: %s => %s %s", argv[1], argv[2], ok? "ok" : "failed");
 #elif 1
+    tb_file_info_t info;
+    tb_hong_t time = tb_time();
+    if (tb_file_touch(argv[1], time, time) && tb_file_info(argv[1], &info))
+        tb_trace_i("touch: %s, atime: %lld mtime: %lld, time: %lld", argv[1], info.atime, info.mtime, time);
+#elif 0
     tb_bool_t ok = tb_file_link(argv[1], argv[2]);
     tb_trace_i("link: %s => %s %s", argv[1], argv[2], ok? "ok" : "failed");
 #else

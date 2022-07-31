@@ -411,10 +411,10 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;
 
         // the last access time
-        info->atime = tb_filetime_to_time(st.ftLastAccessTime);
+        info->atime = tb_filetime_to_time(&st.ftLastAccessTime);
 
         // the last modify time
-        info->mtime = tb_filetime_to_time(st.ftLastWriteTime);
+        info->mtime = tb_filetime_to_time(&st.ftLastWriteTime);
     }
 
     // ok
@@ -561,4 +561,50 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     tb_check_return_val(h != INVALID_HANDLE_VALUE, tb_false);
     CloseHandle(h);
     return tb_true;
+}
+tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+{
+    // check
+    tb_assert_and_check_return_val(path, tb_false);
+
+    // the full path
+    tb_wchar_t full[TB_PATH_MAXN];
+    if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
+
+    // get file info
+    tb_bool_t ok = tb_false;
+    HANDLE file = tb_null;
+    WIN32_FILE_ATTRIBUTE_DATA st = {0};
+    if (GetFileAttributesExW(full, GetFileExInfoStandard, &st))
+    {
+        if (st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            file = CreateFileW(full, GENERIC_WRITE, FILE_SHARE_READ, tb_null, OPEN_EXISTING, FILE_ATTRIBUTE_DIRECTORY | FILE_FLAG_BACKUP_SEMANTICS, tb_null);
+        else if (st.dwFileAttributes != 0xffffffff)
+            file = CreateFileW(full, GENERIC_WRITE, FILE_SHARE_READ, tb_null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, tb_null);
+    }
+    // we create an empty file if it does not exist
+    else file = CreateFileW(full, GENERIC_WRITE, FILE_SHARE_READ, tb_null, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, tb_null);
+    if (file && file != INVALID_HANDLE_VALUE)
+    {
+        if (atime > 0 || mtime > 0)
+        {
+            FILETIME atime_ft, mtime_ft;
+            if (atime > 0) tb_time_to_filetime(atime, &atime_ft);
+            else
+            {
+                atime_ft.dwLowDateTime = 0xffffffff;
+                atime_ft.dwHighDateTime = 0xffffffff;
+            }
+            if (mtime > 0) tb_time_to_filetime(mtime, &mtime_ft);
+            else
+            {
+                mtime_ft.dwLowDateTime = 0;
+                mtime_ft.dwHighDateTime = 0;
+            }
+            ok = SetFileTime(file, tb_null, &atime_ft, &mtime_ft);
+        }
+        else ok = tb_true;
+        CloseHandle(file);
+    }
+    return ok;
 }
