@@ -562,3 +562,7 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     CloseHandle(h);
     return tb_true;
 }
+tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+{
+    return tb_false;
+}
