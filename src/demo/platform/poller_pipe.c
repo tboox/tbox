@@ -75,6 +75,7 @@ static tb_int_t tb_demo_session_writ(tb_cpointer_t priv)
         if (!tb_pipe_file_bwrit(pipe, data, sizeof(data))) break;
         tb_usleep(50000);
     }
+    tb_used(&total);
     return 0;
 }
 static tb_void_t tb_demo_session_start(tb_poller_ref_t poller, tb_pipe_file_ref_t pipe)
