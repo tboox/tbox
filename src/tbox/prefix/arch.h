@@ -74,9 +74,11 @@
 #   else
 #       define TB_ARCH_STRING               "x64"
 #   endif
-#elif defined(__arm__) || defined(__arm64) || defined(__arm64__) || (defined(__aarch64__) && __aarch64__)
+#elif defined(__arm__) || defined(__arm64) || \
+    defined(__arm64__) || (defined(__aarch64__) && __aarch64__) || \
+    defined(_M_ARM64) || defined(_M_ARM)
 #   define TB_ARCH_ARM
-#   if defined(__ARM64_ARCH_8__)
+#   if defined(__ARM64_ARCH_8__) || defined(_M_ARM64)
 #       define TB_ARCH_ARM64
 #       define TB_ARCH_ARM_VERSION          (8)
 #       define TB_ARCH_ARM_v8

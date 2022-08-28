@@ -47,6 +47,7 @@
     || defined(__loongarch64) \
     || defined(_M_X64) \
     || defined(_M_AMD64) \
+    || defined(_M_ARM64) \
     || defined(_M_IA64) || defined(__ia64__) || defined(__ia64) \
     || (defined(__WORDSIZE) && (__WORDSIZE == 64)) \
     || defined(TCC_TARGET_X86_64)
