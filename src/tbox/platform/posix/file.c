@@ -198,12 +198,12 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         tb_memset(info, 0, sizeof(tb_file_info_t));
 
         // get stat
-#ifdef TB_CONFIG_POSIX_HAVE_STAT64
+#if defined(TB_CONFIG_POSIX_HAVE_LSTAT64)
         struct stat64 st = {0};
-        if (!stat64(path, &st))
+        if (!lstat64(path, &st))
 #else
         struct stat st = {0};
-        if (!stat(path, &st))
+        if (!lstat(path, &st))
 #endif
         {
             // get file type
