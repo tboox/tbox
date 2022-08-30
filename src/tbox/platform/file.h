@@ -51,7 +51,7 @@ __tb_extern_c_enter__
  */
 
 /// the file mode type
-typedef enum __tb_file_mode_t
+typedef enum __tb_file_mode_e
 {
     TB_FILE_MODE_RO         = 1     //!< read only
 ,   TB_FILE_MODE_WO         = 2     //!< write only
@@ -62,19 +62,19 @@ typedef enum __tb_file_mode_t
 ,   TB_FILE_MODE_DIRECT     = 64    //!< direct, no cache, @note data & size must be aligned by TB_FILE_DIRECT_ASIZE
 ,   TB_FILE_MODE_EXEC       = 128   //!< executable, only for tb_file_access, not supported when creating files, not supported on windows
 
-}tb_file_mode_t;
+}tb_file_mode_e;
 
 /// the file seek type
-typedef enum __tb_file_seek_flag_t
+typedef enum __tb_file_seek_flag_e
 {
     TB_FILE_SEEK_BEG        = 0
 ,   TB_FILE_SEEK_CUR        = 1
 ,   TB_FILE_SEEK_END        = 2
 
-}tb_file_seek_flag_t;
+}tb_file_seek_flag_e;
 
 /// the file type
-typedef enum __tb_file_type_t
+typedef enum __tb_file_type_e
 {
     TB_FILE_TYPE_NONE       = 0
 ,   TB_FILE_TYPE_DIRECTORY  = 1
@@ -82,13 +82,24 @@ typedef enum __tb_file_type_t
 ,   TB_FILE_TYPE_DOT        = 3
 ,   TB_FILE_TYPE_DOT2       = 4
 
-}tb_file_type_t;
+}tb_file_type_e;
+
+/// the file flag
+typedef enum __tb_file_flag_e
+{
+    TB_FILE_FLAG_NONE       = 0
+,   TB_FILE_FLAG_LINK       = 1 //!< is symlink?
+
+}tb_file_flag_e;
 
 /// the file info type
 typedef struct __tb_file_info_t
 {
     /// the file type
-    tb_size_t               type;
+    tb_size_t               type: 16;
+
+    /// the file flags
+    tb_size_t               flags: 16;
 
     /// the file size
     tb_hize_t               size;

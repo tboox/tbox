@@ -10,6 +10,8 @@
 ### Changes
 
 * Support wasm
+* Support arm64 for windows
+* Improve tb_file_info to detect symlink
 
 ## v1.6.9
 
@@ -262,6 +264,8 @@
 ### 改进
 
 * 支持 wasm
+* 支持 arm64 windows
+* 改进 tb_file_info，支持判断符号链接
 
 ## v1.6.9
 

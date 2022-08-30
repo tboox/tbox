@@ -403,9 +403,12 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         // init info
         tb_memset(info, 0, sizeof(tb_file_info_t));
 
-        // file type
+        // get file type
         if (st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) info->type = TB_FILE_TYPE_DIRECTORY;
         else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
+
+        // TODO does not support symlink now
+        info->flags = TB_FILE_FLAG_NONE;
 
         // file size
         info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;

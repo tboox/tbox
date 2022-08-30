@@ -206,9 +206,13 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         if (!stat(path, &st))
 #endif
         {
-            // file type
+            // get file type
             if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIRECTORY;
             else info->type = TB_FILE_TYPE_FILE;
+
+            // is symlink?
+            info->flags = TB_FILE_FLAG_NONE;
+            if (S_ISLNK(st.st_mode)) info->flags |= TB_FILE_FLAG_LINK;
 
             // file size
             info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
