@@ -212,7 +212,21 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
             // is symlink?
             info->flags = TB_FILE_FLAG_NONE;
-            if (S_ISLNK(st.st_mode)) info->flags |= TB_FILE_FLAG_LINK;
+            if (S_ISLNK(st.st_mode))
+            {
+                // we need get more file info about symlink, does it point to directory?
+                tb_memset(&st, 0, sizeof(st));
+#if defined(TB_CONFIG_POSIX_HAVE_STAT64)
+                if (!stat64(path, &st))
+#else
+                if (!stat(path, &st))
+#endif
+                {
+                    if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIRECTORY;
+                    else info->type = TB_FILE_TYPE_FILE;
+                }
+                info->flags |= TB_FILE_FLAG_LINK;
+            }
 
             // file size
             info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
@@ -665,3 +679,4 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
     return ok;
 }
 #endif
+
