@@ -281,7 +281,7 @@ tb_bool_t               tb_file_info(tb_char_t const* path, tb_file_info_t* info
  *
  * @param path          the file path
  * @param dest          the dest path
- * @param flags         the copy flags
+ * @param flags         the copy flags, e.g. TB_FILE_COPY_LINK
  *
  * @return              tb_true or tb_false
  */

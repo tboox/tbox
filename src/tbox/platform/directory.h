@@ -125,10 +125,11 @@ tb_void_t               tb_directory_walk(tb_char_t const* path, tb_long_t recur
  *
  * @param path          the directory path
  * @param dest          the directory dest
+ * @param flags         the copy flags, e.g. TB_FILE_COPY_LINK
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_directory_copy(tb_char_t const* path, tb_char_t const* dest);
+tb_bool_t               tb_directory_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern

@@ -12,6 +12,8 @@
 * Support wasm
 * Support arm64 for windows
 * Improve tb_file_info to detect symlink
+* Improve tb_file_copy to support symlink
+* Improve tb_directory_copy to support symlink
 
 ## v1.6.9
 
@@ -266,6 +268,8 @@
 * 支持 wasm
 * 支持 arm64 windows
 * 改进 tb_file_info，支持判断符号链接
+* 改进 tb_file_copy 支持符号链接
+* 改进 tb_directory_copy 支持符号链接
 
 ## v1.6.9
 

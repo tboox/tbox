@@ -305,7 +305,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_
             tb_directory_walk_impl(full_w, recursion, prefix, func, priv);
     }
 }
-tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
+tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags)
 {
     // the absolute path
     tb_char_t full0[TB_PATH_MAXN];
