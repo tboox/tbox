@@ -118,7 +118,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
+tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags)
 {
     tb_trace_noimpl();
     return tb_false;

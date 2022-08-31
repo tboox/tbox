@@ -423,7 +423,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
     // ok
     return tb_true;
 }
-tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
+tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags)
 {
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);

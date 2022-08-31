@@ -401,17 +401,54 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     return real;
 #endif
 }
-tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
+tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags)
 {
     // check
     tb_assert_and_check_return_val(path && dest, tb_false);
 
-#ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
-
     // the full path
-    tb_char_t full0[TB_PATH_MAXN];
-    path = tb_path_absolute(path, full0, TB_PATH_MAXN);
+    tb_char_t data[TB_PATH_MAXN];
+    path = tb_path_absolute(path, data, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
+
+    // copy link
+    tb_file_info_t info = {0};
+    if (flags & TB_FILE_COPY_LINK && tb_file_info(path, &info) && info.flags & TB_FILE_FLAG_LINK)
+    {
+        // read link first
+        tb_char_t srcpath[TB_PATH_MAXN];
+        tb_long_t size = readlink(path, srcpath, TB_PATH_MAXN);
+        tb_char_t const* linkpath = srcpath;
+        if (size == TB_PATH_MAXN)
+        {
+            tb_size_t  maxn = TB_PATH_MAXN * 2;
+            tb_char_t* buff = (tb_char_t*)tb_malloc(maxn);
+            if (buff)
+            {
+                tb_long_t size = readlink(path, buff, maxn);
+                if (size > 0 && size < maxn)
+                {
+                    buff[size] = '\0';
+                    linkpath = buff;
+                }
+            }
+        }
+        else if (size >= 0 && size < TB_PATH_MAXN)
+            srcpath[size] = '\0';
+
+        // do link
+        tb_bool_t ok = tb_file_link(linkpath, dest);
+
+        // free link path
+        if (linkpath && linkpath != srcpath)
+        {
+            tb_free((tb_pointer_t)linkpath);
+            linkpath = tb_null;
+        }
+        return ok;
+    }
+
+#ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
 
     // the dest path
     tb_char_t full1[TB_PATH_MAXN];
@@ -436,11 +473,6 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
     tb_bool_t   ok = tb_false;
     do
     {
-        // get the absolute source path
-        tb_char_t data[8192];
-        path = tb_path_absolute(path, data, sizeof(data));
-        tb_assert_and_check_break(path);
-
         // get stat.st_mode first
 #ifdef TB_CONFIG_POSIX_HAVE_STAT64
         struct stat64 st = {0};

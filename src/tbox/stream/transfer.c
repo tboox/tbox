@@ -227,7 +227,7 @@ tb_hong_t tb_transfer_url(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_
         {
             // copy it directly
             tb_file_info_t info;
-            if (tb_file_copy(iurl, ourl) && tb_file_info(ourl, &info))
+            if (tb_file_copy(iurl, ourl, TB_FILE_COPY_NONE) && tb_file_info(ourl, &info))
                 size = info.size;
 
             // end

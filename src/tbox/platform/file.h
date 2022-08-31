@@ -64,7 +64,7 @@ typedef enum __tb_file_mode_e
 
 }tb_file_mode_e;
 
-/// the file seek type
+/// the file seek flag
 typedef enum __tb_file_seek_flag_e
 {
     TB_FILE_SEEK_BEG        = 0
@@ -72,6 +72,14 @@ typedef enum __tb_file_seek_flag_e
 ,   TB_FILE_SEEK_END        = 2
 
 }tb_file_seek_flag_e;
+
+/// the file copy flag
+typedef enum __tb_file_copy_flag_e
+{
+    TB_FILE_COPY_NONE       = 0 //!< default: copy symlink as file
+,   TB_FILE_COPY_LINK       = 1 //!< reserve symlink
+
+}tb_file_copy_flag_e;
 
 /// the file type
 typedef enum __tb_file_type_e
@@ -273,10 +281,11 @@ tb_bool_t               tb_file_info(tb_char_t const* path, tb_file_info_t* info
  *
  * @param path          the file path
  * @param dest          the dest path
+ * @param flags         the copy flags
  *
  * @return              tb_true or tb_false
  */
-tb_bool_t               tb_file_copy(tb_char_t const* path, tb_char_t const* dest);
+tb_bool_t               tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags);
 
 /*! create the file
  *
