@@ -86,9 +86,11 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
     {
 #ifndef TB_CONFIG_MICRO_ENABLE
         // open it again after creating the file directory
+        tb_int_t errno_bak = errno;
         tb_char_t dir[TB_PATH_MAXN];
         if (tb_directory_create(tb_path_directory(path, dir, sizeof(dir))))
             fd = open(path, flags, modes);
+        else errno = errno_bak;
 #endif
     }
     tb_check_return_val(fd >= 0, tb_null);
@@ -188,16 +190,13 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
     path = tb_path_absolute(path, full, TB_PATH_MAXN);
     tb_assert_and_check_return_val(path, tb_false);
 
-    // exists?
-    tb_check_return_val(!access(path, F_OK), tb_false);
-
     // get info
     if (info)
     {
         // init info
         tb_memset(info, 0, sizeof(tb_file_info_t));
 
-        // get stat
+        // get stat, even if the file does not exist, it may be a dead symbolic link
 #if defined(TB_CONFIG_POSIX_HAVE_LSTAT64)
         struct stat64 st = {0};
         if (!lstat64(path, &st))
@@ -236,11 +235,14 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
             // the last modify time
             info->mtime = (tb_time_t)st.st_mtime;
+            return tb_true;
         }
     }
-
-    // ok
-    return tb_true;
+    else if (!access(path, F_OK))
+    {
+        return tb_true;
+    }
+    return tb_false;
 }
 #ifndef TB_CONFIG_MICRO_ENABLE
 tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
@@ -461,8 +463,10 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     {
         // attempt to copy it again after creating directory
         tb_char_t dir[TB_PATH_MAXN];
+        tb_int_t errno_bak = errno;
         if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
             return !copyfile(path, dest, 0, COPYFILE_ALL);
+        else errno = errno_bak;
     }
 
     // failed
@@ -495,9 +499,11 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
         if (ofd < 0 && (errno != EPERM && errno != EACCES))
         {
             // attempt to open it again after creating directory
+            tb_int_t errno_bak = errno;
             tb_char_t dir[TB_PATH_MAXN];
             if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
                 ofd = open(dest, O_RDWR | O_CREAT | O_TRUNC, st.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+            else errno = errno_bak;
         }
         tb_check_break(ofd >= 0);
 
@@ -610,9 +616,11 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
     else if (errno != EPERM && errno != EACCES)
     {
         // attempt to rename it again after creating directory
+        tb_int_t errno_bak = errno;
         tb_char_t dir[TB_PATH_MAXN];
         if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
             return !rename(path, dest);
+        else errno = errno_bak;
     }
     return tb_false;
 }
@@ -632,9 +640,11 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
     else if (errno != EPERM && errno != EACCES)
     {
         // attempt to link it again after creating directory
+        tb_int_t errno_bak = errno;
         tb_char_t dir[TB_PATH_MAXN];
         if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
             return !symlink(path, dest);
+        else errno = errno_bak;
     }
     return tb_false;
 }
@@ -711,4 +721,5 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
     return ok;
 }
 #endif
+
 
