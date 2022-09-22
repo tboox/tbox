@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.1
+
 ### New features
 
 * [#190](https://github.com/tboox/tbox/pull/190): Add fs watcher
@@ -257,6 +259,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.7.1
 
 ### 新特性
 

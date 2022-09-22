@@ -2,10 +2,10 @@
 set_project("tbox")
 
 -- set xmake minimum version
-set_xmakever("2.5.1")
+set_xmakever("2.6.1")
 
 -- set project version
-set_version("1.6.8", {build = "%Y%m%d%H%M"})
+set_version("1.7.1", {build = "%Y%m%d%H%M"})
 
 -- set warning all as error
 set_warnings("all", "error")
