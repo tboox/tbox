@@ -205,7 +205,8 @@ tb_long_t tb_charset_conv_cstr(tb_size_t ftype, tb_size_t ttype, tb_char_t const
 tb_long_t tb_charset_conv_data(tb_size_t ftype, tb_size_t ttype, tb_byte_t const* idata, tb_size_t isize, tb_byte_t* odata, tb_size_t osize)
 {
     // check
-    tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(ftype) && TB_CHARSET_TYPE_OK(ttype) && idata && isize && odata && osize, -1);
+    tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(ftype) && TB_CHARSET_TYPE_OK(ttype) && idata && odata && osize, -1);
+    tb_check_return_val(isize, 0);
 
     // init static stream
     tb_static_stream_t ist;
