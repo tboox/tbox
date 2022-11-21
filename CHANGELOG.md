@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Bugs Fixed
+
+* [#199](https://github.com/tboox/tbox/issues/199): Fix tb_strcmp
+
 ## v1.7.1
 
 ### New features
@@ -259,6 +263,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### Bugs 修复
+
+* [#199](https://github.com/tboox/tbox/issues/199): 修复 tb_strcmp
 
 ## v1.7.1
 
