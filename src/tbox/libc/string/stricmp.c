@@ -34,7 +34,8 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRCASECMP
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
-    tb_assert_and_check_return_val(s1 && s2, 0);
+    if (s1 == s2) return 0;
+    tb_assert_and_check_return_val(s1 && s2, -1);
 #ifdef TB_COMPILER_IS_MSVC
     return _stricmp(s1, s2);
 #else
@@ -44,11 +45,9 @@ static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 #else
 static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
-    // check
-    tb_assert_and_check_return_val(s1 && s2, 0);
-    tb_check_return_val(s1 != s2, 0);
+    if (s1 == s2) return 0;
+    tb_assert_and_check_return_val(s1 && s2, -1);
 
-    // done
     tb_long_t r = 0;
     while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
     return r;
@@ -60,7 +59,6 @@ static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
  */
 tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
-    // check
 #ifdef __tb_debug__
     {
         // check overflow?
@@ -68,7 +66,5 @@ tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
         tb_strlen(s2);
     }
 #endif
-
-    // done
     return tb_stricmp_impl(s1, s2);
 }

@@ -42,14 +42,15 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRNCMP)
 static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s1 && s2, 0);
+    if (s1 == s2 || !n) return 0;
+    tb_assert_and_check_return_val(s1 && s2, -1);
     return strncmp(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_IMPL_STRNCMP)
 static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-    tb_assert_and_check_return_val(s1 && s2, 0);
     if (s1 == s2 || !n) return 0;
+    tb_assert_and_check_return_val(s1 && s2, -1);
 
     tb_long_t r = 0;
     while (n-- && ((r = ((tb_long_t)(*((tb_byte_t *)s1))) - *((tb_byte_t *)s2++)) == 0) && *s1++);
@@ -62,6 +63,5 @@ static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_si
  */
 tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-    // done
     return tb_strncmp_impl(s1, s2, n);
 }
