@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Improve path for windows, support UNC and dos device path
+
 ### Bugs Fixed
 
 * [#199](https://github.com/tboox/tbox/issues/199): Fix tb_strcmp
@@ -263,6 +267,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 改进 windows 下根路径处理，支持 UNC 和 dos 设备路径格式
 
 ### Bugs 修复
 
