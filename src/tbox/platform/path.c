@@ -121,6 +121,12 @@ tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t*
         *(dst++) = src[3];
         src += 4;
     }
+    // the absolute path on the root path of the current drive, e.g. `\Program files`
+    else if (src[0] == '\\' && src[1] != '\\')
+    {
+        *(dst++) = src[0];
+        src += 1;
+    }
 #endif
     tb_char_t const* src_root = src;
     tb_char_t const* dst_root = dst;
@@ -195,6 +201,7 @@ tb_bool_t tb_path_is_absolute(tb_char_t const* path)
 #ifdef TB_CONFIG_OS_WINDOWS
     // @see https://learn.microsoft.com/zh-cn/dotnet/standard/io/file-path-formats
     return (    path[0] == '~'
+            ||  path[0] == '\\' // The absolute path on the root path of the current drive, e.g. `\Program files`
             ||  (path[0] == '\\' && path[1] == '\\' && (tb_isalpha(path[2]) || tb_isdigit(path[2]))) // UNC path, e.g. `\\Server2\Share\Test\Foo.txt`
             ||  (path[0] == '\\' && path[1] == '\\' && (path[2] == '.' || path[2] == '?') && path[3] == '\\')  // dos device path, e.g. `\\.\`, `\\?\`
 #   ifdef TB_COMPILER_LIKE_UNIX

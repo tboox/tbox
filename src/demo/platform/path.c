@@ -92,6 +92,7 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_path_test_absolute_to("c:\\tmp\\", "foo", "c:\\tmp\\foo");
     tb_demo_path_test_absolute_to("\\\\.\\tmp\\", "foo", "\\\\.\\tmp\\foo");
     tb_demo_path_test_absolute_to("\\\\wsl.localhost\\tmp\\", "foo", "\\\\wsl.localhost\\tmp\\foo");
+    tb_demo_path_test_absolute_to("\\tmp\\", "foo", "\\tmp\\foo");
 #else
     tb_demo_path_test_absolute_to("/", "", tb_null);
     tb_demo_path_test_absolute_to("/", "/", "/");
@@ -140,6 +141,7 @@ tb_int_t tb_demo_platform_path_main(tb_int_t argc, tb_char_t** argv)
     tb_demo_path_test_translate(tb_false, "\\\\?\\c:\\temp\\test-file.txt", "\\\\?\\c:\\temp\\test-file.txt");
     tb_demo_path_test_translate(tb_false, "\\\\.\\UNC\\LOCALHOST\\c$\\temp\\test-file.txt", "\\\\.\\UNC\\LOCALHOST\\c$\\temp\\test-file.txt");
     tb_demo_path_test_translate(tb_false, "\\\\127.0.0.1\\c$\\temp\\test-file.txt", "\\\\127.0.0.1\\c$\\temp\\test-file.txt");
+    tb_demo_path_test_translate(tb_false, "\\temp\\test-file.txt", "\\temp\\test-file.txt");
 #else
     tb_demo_path_test_translate(tb_false, "/", "/");
     tb_demo_path_test_translate(tb_false, "////", "/");
