@@ -94,15 +94,32 @@ tb_size_t tb_path_translate_to(tb_char_t const* path, tb_size_t size, tb_char_t*
     }
     if (!size) size = tb_strlen(path);
 
-    // copy root path, e.g. "C:/" or "/"
+    // copy root path
     tb_char_t* dst       = data;
     tb_char_t const* src = p;
 #ifdef TB_CONFIG_OS_WINDOWS
+    // e.g. c:/
     if (tb_isalpha(src[0]) && src[1] == ':')
     {
         *(dst++) = src[0];
         *(dst++) = ':';
         src += 2;
+    }
+    // UNC path, e.g. `\\wsl.localhost`
+    else if (src[0] == '\\' && src[1] == '\\' && (tb_isalpha(src[2]) || tb_isdigit(src[2])))
+    {
+        *(dst++) = src[0];
+        *(dst++) = src[1];
+        src += 2;
+    }
+    // dos device path, e.g. `\\.\`, `\\?\`
+    else if (src[0] == '\\' && src[1] == '\\' && (src[2] == '.' || src[2] == '?') && src[3] == '\\')
+    {
+        *(dst++) = src[0];
+        *(dst++) = src[1];
+        *(dst++) = src[2];
+        *(dst++) = src[3];
+        src += 4;
     }
 #endif
     tb_char_t const* src_root = src;
@@ -178,6 +195,8 @@ tb_bool_t tb_path_is_absolute(tb_char_t const* path)
     // is absolute?
 #ifdef TB_CONFIG_OS_WINDOWS
     return (    path[0] == '~'
+            ||  (path[0] == '\\' && path[1] == '\\' && (tb_isalpha(path[2]) || tb_isdigit(path[2]))) // UNC path, e.g. `\\Server2\Share\Test\Foo.txt`
+            ||  (path[0] == '\\' && path[1] == '\\' && (path[2] == '.' || path[2] == '?') && path[3] == '\\')  // dos device path, e.g. `\\.\`, `\\?\`
 #   ifdef TB_COMPILER_LIKE_UNIX
             ||  path[0] == '/'
             ||  path[0] == '\\'
