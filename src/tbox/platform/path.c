@@ -192,8 +192,8 @@ tb_bool_t tb_path_is_absolute(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // is absolute?
 #ifdef TB_CONFIG_OS_WINDOWS
+    // @see https://learn.microsoft.com/zh-cn/dotnet/standard/io/file-path-formats
     return (    path[0] == '~'
             ||  (path[0] == '\\' && path[1] == '\\' && (tb_isalpha(path[2]) || tb_isdigit(path[2]))) // UNC path, e.g. `\\Server2\Share\Test\Foo.txt`
             ||  (path[0] == '\\' && path[1] == '\\' && (path[2] == '.' || path[2] == '?') && path[3] == '\\')  // dos device path, e.g. `\\.\`, `\\?\`
