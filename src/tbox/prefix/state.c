@@ -135,6 +135,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 
     case TB_STATE_SYSERROR_NOT_PERM:            return "syserror: permission denied";
     case TB_STATE_SYSERROR_NOT_FILEDIR:         return "syserror: not file or directory";
+    case TB_STATE_SYSERROR_NOT_ACCESS:          return "syserror: not access";
     case TB_STATE_SYSERROR_UNKNOWN_ERROR:       return "syserror: unknown error";
 
     default:                                    return "unknown";

@@ -33,10 +33,11 @@ tb_size_t tb_syserror_state()
     switch (errno)
     {
     case EPERM:
-    case EACCES:
         return TB_STATE_SYSERROR_NOT_PERM;
     case ENOENT:
         return TB_STATE_SYSERROR_NOT_FILEDIR;
+    case EACCES:
+        return TB_STATE_SYSERROR_NOT_ACCESS;
     default:
         return TB_STATE_SYSERROR_UNKNOWN_ERROR;
     }

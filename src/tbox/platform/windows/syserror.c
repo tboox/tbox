@@ -36,6 +36,9 @@ tb_size_t tb_syserror_state()
         return TB_STATE_SYSERROR_NOT_PERM;
     case ERROR_FILE_NOT_FOUND:
         return TB_STATE_SYSERROR_NOT_FILEDIR;
+    case ERROR_SHARING_VIOLATION:
+    case ERROR_LOCK_VIOLATION:
+        return TB_STATE_SYSERROR_NOT_ACCESS;
     default:
         return TB_STATE_SYSERROR_UNKNOWN_ERROR;
     }
