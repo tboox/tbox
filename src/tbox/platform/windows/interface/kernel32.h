@@ -53,13 +53,23 @@ typedef struct _tb_OVERLAPPED_ENTRY_t
 }tb_OVERLAPPED_ENTRY_t, *tb_LPOVERLAPPED_ENTRY_t;
 
 // the GetQueuedCompletionStatusEx func type
-typedef BOOL (WINAPI* tb_kernel32_GetQueuedCompletionStatusEx_t)(HANDLE CompletionPort, tb_LPOVERLAPPED_ENTRY_t lpCompletionPortEntries, ULONG ulCount, PULONG ulNumEntriesRemoved, DWORD dwMilliseconds, BOOL fAlertable);
+typedef BOOL (WINAPI* tb_kernel32_GetQueuedCompletionStatusEx_t)(
+    HANDLE CompletionPort,
+    tb_LPOVERLAPPED_ENTRY_t lpCompletionPortEntries,
+    ULONG ulCount,
+    PULONG ulNumEntriesRemoved,
+    DWORD dwMilliseconds,
+    BOOL fAlertable);
 
 // the CancelIoEx func type
 typedef BOOL (WINAPI* tb_kernel32_CancelIoEx_t)(HANDLE hFile, LPOVERLAPPED lpOverlapped);
 
 // the RtlCaptureStackBackTrace func type
-typedef USHORT (WINAPI* tb_kernel32_RtlCaptureStackBackTrace_t)(ULONG FramesToSkip, ULONG FramesToCapture, PVOID *BackTrace, PULONG BackTraceHash);
+typedef USHORT (WINAPI* tb_kernel32_RtlCaptureStackBackTrace_t)(
+    ULONG FramesToSkip,
+    ULONG FramesToCapture,
+    PVOID *BackTrace,
+    PULONG BackTraceHash);
 
 // the GetFileSizeEx func type
 typedef BOOL (WINAPI* tb_kernel32_GetFileSizeEx_t)(HANDLE hFile, PLARGE_INTEGER lpFileSize);
@@ -71,10 +81,24 @@ typedef DWORD (WINAPI* tb_kernel32_GetEnvironmentVariableW_t)(LPCWSTR lpName, LP
 typedef BOOL (WINAPI* tb_kernel32_SetEnvironmentVariableW_t)(LPCWSTR lpName, LPCWSTR lpValue);
 
 // the CreateProcessW func type
-typedef BOOL (WINAPI* tb_kernel32_CreateProcessW_t)(LPCWSTR lpApplicationName, LPCWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFO lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
+typedef BOOL (WINAPI* tb_kernel32_CreateProcessW_t)(
+    LPCWSTR lpApplicationName,
+    LPCWSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,
+    LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,
+    DWORD dwCreationFlags,
+    LPVOID lpEnvironment,
+    LPCWSTR lpCurrentDirectory,
+    LPSTARTUPINFO lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation);
 
 // the WaitForMultipleObjects func type
-typedef DWORD (WINAPI* tb_kernel32_WaitForMultipleObjects_t)(DWORD  nCount, const HANDLE *lpHandles, BOOL bWaitAll, DWORD dwMilliseconds);
+typedef DWORD (WINAPI* tb_kernel32_WaitForMultipleObjects_t)(
+    DWORD  nCount,
+    const HANDLE* lpHandles,
+    BOOL bWaitAll,
+    DWORD dwMilliseconds);
 
 // the GetExitCodeProcess func type
 typedef BOOL (WINAPI* tb_kernel32_GetExitCodeProcess_t)(HANDLE hProcess, LPDWORD lpExitCode);
@@ -92,35 +116,76 @@ typedef DWORD (WINAPI* tb_kernel32_ResumeThread_t)(HANDLE hThread);
 typedef LPWCH (WINAPI* tb_kernel32_GetEnvironmentStringsW_t)(tb_void_t);
 
 // the FreeEnvironmentStringsW func type
-typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(LPWCH lpszEnvironmentBlock);
+typedef DWORD (WINAPI* tb_kernel32_FreeEnvironmentStringsW_t)(
+    LPWCH lpszEnvironmentBlock);
 
 // the SetHandleInformation func type
-typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(HANDLE hObject, DWORD dwMask, DWORD dwFlags);
+typedef BOOL (WINAPI* tb_kernel32_SetHandleInformation_t)(
+    HANDLE hObject,
+    DWORD dwMask,
+    DWORD dwFlags);
 
 // the SetFileCompletionNotificationModes func type
-typedef BOOL (WINAPI* tb_kernel32_SetFileCompletionNotificationModes_t)(HANDLE FileHandle, UCHAR Flags);
+typedef BOOL (WINAPI* tb_kernel32_SetFileCompletionNotificationModes_t)(
+    HANDLE FileHandle,
+    UCHAR Flags);
 
 // the CreateSymbolicLinkW func type
-typedef BOOLEAN (WINAPI* tb_kernel32_CreateSymbolicLinkW_t)(LPCWSTR lpSymlinkFileName, LPCWSTR lpTargetFileName, DWORD dwFlags);
+typedef BOOLEAN (WINAPI* tb_kernel32_CreateSymbolicLinkW_t)(
+    LPCWSTR lpSymlinkFileName,
+    LPCWSTR lpTargetFileName,
+    DWORD dwFlags);
 
 // the CreateJobObjectW func type
 typedef HANDLE (WINAPI* tb_kernel32_CreateJobObjectW_t)(LPSECURITY_ATTRIBUTES lpJobAttributes, LPCWSTR lpName);
 
 // the TerminateJobObject func type
-typedef BOOL (WINAPI* tb_kernel32_TerminateJobObject_t)(HANDLE hJob, UINT uExitCode);
+typedef BOOL (WINAPI* tb_kernel32_TerminateJobObject_t)(
+    HANDLE hJob,
+    UINT uExitCode);
 
 // the AssignProcessToJobObject func type
-typedef BOOL (WINAPI* tb_kernel32_AssignProcessToJobObject_t)(HANDLE hJob, HANDLE hProcess);
+typedef BOOL (WINAPI* tb_kernel32_AssignProcessToJobObject_t)(
+    HANDLE hJob,
+    HANDLE hProcess);
 
 // the SetInformationJobObject func type
-typedef BOOL (WINAPI* tb_kernel32_SetInformationJobObject_t)(HANDLE hJob, JOBOBJECTINFOCLASS JobObjectInformationClass, LPVOID lpJobObjectInformation, DWORD cbJobObjectInformationLength);
+typedef BOOL (WINAPI* tb_kernel32_SetInformationJobObject_t)(
+    HANDLE hJob,
+    JOBOBJECTINFOCLASS JobObjectInformationClass,
+    LPVOID lpJobObjectInformation,
+    DWORD cbJobObjectInformationLength);
 
 // the GetActiveProcessorCount func type
 typedef DWORD (WINAPI* tb_kernel32_GetActiveProcessorCount_t)(WORD GroupNumber);
 
+// the InitializeProcThreadAttributeList func type
+typedef BOOL (WINAPI* tb_kernel32_InitializeProcThreadAttributeList_t)(
+    LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
+    DWORD dwAttributeCount,
+    DWORD dwFlags,
+    PSIZE_T lpSize);
+
+// the UpdateProcThreadAttribute func type
+typedef BOOL (WINAPI* tb_kernel32_UpdateProcThreadAttribute_t)(
+    LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
+    DWORD dwFlags,
+    DWORD_PTR Attribute,
+    PVOID lpValue,
+    SIZE_T cbSize,
+    PVOID lpPreviousValue,
+    PSIZE_T lpReturnSize);
+
+// the DeleteProcThreadAttributeList func type
+typedef void (WINAPI* tb_kernel32_DeleteProcThreadAttributeList_t)(
+    LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList);
+
 // the GetLogicalProcessorInformationEx func type
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
-typedef BOOL (WINAPI* tb_kernel32_GetLogicalProcessorInformationEx_t)(LOGICAL_PROCESSOR_RELATIONSHIP RelationshipType, PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX Buffer, PDWORD ReturnedLength);
+typedef BOOL (WINAPI* tb_kernel32_GetLogicalProcessorInformationEx_t)(
+    LOGICAL_PROCESSOR_RELATIONSHIP RelationshipType,
+    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX Buffer,
+    PDWORD ReturnedLength);
 #endif
 
 // the kernel32 interfaces type
@@ -188,6 +253,15 @@ typedef struct __tb_kernel32_t
 
     // GetActiveProcessorCount
     tb_kernel32_GetActiveProcessorCount_t               GetActiveProcessorCount;
+
+    // InitializeProcThreadAttributeList
+    tb_kernel32_InitializeProcThreadAttributeList_t     InitializeProcThreadAttributeList;
+
+    // UpdateProcThreadAttribute
+    tb_kernel32_UpdateProcThreadAttribute_t             UpdateProcThreadAttribute;
+
+    // DeleteProcThreadAttributeList
+    tb_kernel32_DeleteProcThreadAttributeList_t         DeleteProcThreadAttributeList;
 
     // GetLogicalProcessorInformationEx
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)

@@ -61,6 +61,9 @@ static tb_bool_t tb_kernel32_instance_init(tb_kernel32_ref_t kernel32)
     TB_INTERFACE_LOAD(kernel32, AssignProcessToJobObject);
     TB_INTERFACE_LOAD(kernel32, SetInformationJobObject);
     TB_INTERFACE_LOAD(kernel32, GetActiveProcessorCount);
+    TB_INTERFACE_LOAD(kernel32, InitializeProcThreadAttributeList);
+    TB_INTERFACE_LOAD(kernel32, UpdateProcThreadAttribute);
+    TB_INTERFACE_LOAD(kernel32, DeleteProcThreadAttributeList);
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
     TB_INTERFACE_LOAD(kernel32, GetLogicalProcessorInformationEx);
 #endif
