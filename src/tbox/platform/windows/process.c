@@ -436,9 +436,24 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // init default std handles
         if (process->psi->dwFlags & STARTF_USESTDHANDLES)
         {
-            if (!process->psi->hStdInput) process->psi->hStdInput   = GetStdHandle(STD_INPUT_HANDLE);
-            if (!process->psi->hStdOutput) process->psi->hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-            if (!process->psi->hStdError) process->psi->hStdError   = GetStdHandle(STD_ERROR_HANDLE);
+            if (!process->psi->hStdInput)
+            {
+                process->psi->hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+                if (handlesToInheritCount)
+                    handlesToInherit[handlesToInheritCount++] = process->psi->hStdInput;
+            }
+            if (!process->psi->hStdOutput)
+            {
+                process->psi->hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+                if (handlesToInheritCount)
+                    handlesToInherit[handlesToInheritCount++] = process->psi->hStdOutput;
+            }
+            if (!process->psi->hStdError)
+            {
+                process->psi->hStdError = GetStdHandle(STD_ERROR_HANDLE);
+                if (handlesToInheritCount)
+                    handlesToInherit[handlesToInheritCount++] = process->psi->hStdError;
+            }
         }
 
         // init process security attributes
