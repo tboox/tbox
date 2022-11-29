@@ -437,23 +437,11 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         if (process->psi->dwFlags & STARTF_USESTDHANDLES)
         {
             if (!process->psi->hStdInput)
-            {
-                process->psi->hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-                if (handlesToInheritCount)
-                    handlesToInherit[handlesToInheritCount++] = process->psi->hStdInput;
-            }
+                process->psi->hStdInput = INVALID_HANDLE_VALUE;
             if (!process->psi->hStdOutput)
-            {
-                process->psi->hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-                if (handlesToInheritCount)
-                    handlesToInherit[handlesToInheritCount++] = process->psi->hStdOutput;
-            }
+                process->psi->hStdOutput = INVALID_HANDLE_VALUE;
             if (!process->psi->hStdError)
-            {
-                process->psi->hStdError = GetStdHandle(STD_ERROR_HANDLE);
-                if (handlesToInheritCount)
-                    handlesToInherit[handlesToInheritCount++] = process->psi->hStdError;
-            }
+                process->psi->hStdError = INVALID_HANDLE_VALUE;
         }
 
         // init process security attributes
@@ -786,3 +774,4 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
     // ok?
     return infosize;
 }
+
