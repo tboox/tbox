@@ -463,19 +463,12 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             }
         }
 
-        // we pass std handles to StartupInfo to inherit them if lpAttributeList is not supported
+        /* we just use the default std handles if lpAttributeList is not supported
+         *
+         * @see https://github.com/xmake-io/xmake/issues/3138#issuecomment-1338970250
+         */
         if (bInheritHandle)
-        {
             process->psi->dwFlags |= STARTF_USESTDHANDLES;
-            if (!process->psi->hStdInput)
-                process->psi->hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-
-            if (!process->psi->hStdOutput)
-                process->psi->hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-
-            if (!process->psi->hStdError)
-                process->psi->hStdError = GetStdHandle(STD_ERROR_HANDLE);
-        }
 
         // init process security attributes
         SECURITY_ATTRIBUTES sap     = {0};
@@ -780,6 +773,7 @@ tb_long_t tb_process_waitlist(tb_process_ref_t const* processes, tb_process_wait
     // ok?
     return infosize;
 }
+
 
 
 
