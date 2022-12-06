@@ -49,6 +49,10 @@ typedef struct __tb_process_t
     // the process info
     PROCESS_INFORMATION     pi;
 
+    // the file handles
+    HANDLE                  file_handles[3];
+    DWORD                   file_handles_count;
+
     // the stdin redirect type
     tb_uint16_t             intype;
 
@@ -110,19 +114,21 @@ tb_void_t tb_process_handle_close(tb_process_ref_t self)
         CloseHandle(process->pi.hProcess);
     process->pi.hProcess = INVALID_HANDLE_VALUE;
 
-    // exit stdin file
-    if (process->intype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->psi->hStdInput && process->psi->hStdInput != INVALID_HANDLE_VALUE)
-        tb_file_exit((tb_file_ref_t)process->psi->hStdInput);
+    // exit file handles
+    for (tb_size_t i = 0; i < process->file_handles_count; i++)
+    {
+        HANDLE handle = process->file_handles[i];
+        if (handle && handle != INVALID_HANDLE_VALUE)
+        {
+            tb_file_exit((tb_file_ref_t)handle);
+            process->file_handles[i] = INVALID_HANDLE_VALUE;
+        }
+    }
+    process->file_handles_count = 0;
+
+    // reset std handles
     process->psi->hStdInput = INVALID_HANDLE_VALUE;
-
-    // exit stdout file
-    if (process->outtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->psi->hStdOutput && process->psi->hStdOutput != INVALID_HANDLE_VALUE)
-        tb_file_exit((tb_file_ref_t)process->psi->hStdOutput);
     process->psi->hStdOutput = INVALID_HANDLE_VALUE;
-
-    // exit stderr file
-    if (process->errtype == TB_PROCESS_REDIRECT_TYPE_FILEPATH && process->psi->hStdError && process->psi->hStdError != INVALID_HANDLE_VALUE)
-        tb_file_exit((tb_file_ref_t)process->psi->hStdError);
     process->psi->hStdError = INVALID_HANDLE_VALUE;
 }
 tb_bool_t tb_process_group_init()
@@ -343,27 +349,26 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 // no mode? uses the default mode
                 if (!inmode) inmode = TB_FILE_MODE_RO;
 
-                // enable handles
-                process->psi->dwFlags |= STARTF_USESTDHANDLES;
-
                 // open file
-                process->psi->hStdInput = (HANDLE)tb_file_init(attr->in.path, inmode);
-                tb_assertf_pass_and_check_break(process->psi->hStdInput, "cannot redirect stdin to file: %s", attr->in.path);
+                HANDLE hStdInput = (HANDLE)tb_file_init(attr->in.path, inmode);
+                tb_assertf_pass_and_check_break(hStdInput, "cannot redirect stdin to file: %s", attr->in.path);
 
                 // enable inherit
-                tb_kernel32()->SetHandleInformation(process->psi->hStdInput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = process->psi->hStdInput;
+                tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
+                handlesToInherit[handlesToInheritCount++] = hStdInput;
+                process->file_handles[process->file_handles_count++] = hStdInput;
+                process->psi->hStdInput = hStdInput;
             }
             else if ((attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->in.pipe) ||
                      (attr->intype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->in.file))
             {
                 // enable handles
-                process->psi->dwFlags |= STARTF_USESTDHANDLES;
-                process->psi->hStdInput = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->in.pipe) : (HANDLE)attr->in.file;
+                HANDLE hStdInput = attr->intype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->in.pipe) : (HANDLE)attr->in.file;
 
                 // enable inherit
-                tb_kernel32()->SetHandleInformation(process->psi->hStdInput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = process->psi->hStdInput;
+                tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
+                handlesToInherit[handlesToInheritCount++] = hStdInput;
+                process->psi->hStdInput = hStdInput;
             }
 
             // redirect to stdout
@@ -376,27 +381,26 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 // no mode? uses the default mode
                 if (!outmode) outmode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
 
-                // enable handles
-                process->psi->dwFlags |= STARTF_USESTDHANDLES;
-
                 // open file
-                process->psi->hStdOutput = (HANDLE)tb_file_init(attr->out.path, outmode);
-                tb_assertf_pass_and_check_break(process->psi->hStdOutput, "cannot redirect stdout to file: %s", attr->out.path);
+                HANDLE hStdOutput = (HANDLE)tb_file_init(attr->out.path, outmode);
+                tb_assertf_pass_and_check_break(hStdOutput, "cannot redirect stdout to file: %s", attr->out.path);
 
                 // enable inherit
-                tb_kernel32()->SetHandleInformation(process->psi->hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = process->psi->hStdOutput;
+                tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
+                handlesToInherit[handlesToInheritCount++] = hStdOutput;
+                process->file_handles[process->file_handles_count++] = hStdOutput;
+                process->psi->hStdOutput = hStdOutput;
             }
             else if ((attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->out.pipe) ||
                      (attr->outtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->out.file))
             {
                 // enable handles
-                process->psi->dwFlags |= STARTF_USESTDHANDLES;
-                process->psi->hStdOutput = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->out.pipe) : (HANDLE)attr->out.file;
+                HANDLE hStdOutput = attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->out.pipe) : (HANDLE)attr->out.file;
 
                 // enable inherit
-                tb_kernel32()->SetHandleInformation(process->psi->hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = process->psi->hStdOutput;
+                tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
+                handlesToInherit[handlesToInheritCount++] = hStdOutput;
+                process->psi->hStdOutput = hStdOutput;
             }
 
             // redirect to stderr
@@ -409,58 +413,34 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 // no mode? uses the default mode
                 if (!errmode) errmode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
 
-                // enable handles
-                process->psi->dwFlags |= STARTF_USESTDHANDLES;
-
                 // open file
-                process->psi->hStdError = (HANDLE)tb_file_init(attr->err.path, errmode);
-                tb_assertf_pass_and_check_break(process->psi->hStdError, "cannot redirect stderr to file: %s", attr->err.path);
+                HANDLE hStdError = (HANDLE)tb_file_init(attr->err.path, errmode);
+                tb_assertf_pass_and_check_break(hStdError, "cannot redirect stderr to file: %s", attr->err.path);
 
                 // enable inherit
-                tb_kernel32()->SetHandleInformation(process->psi->hStdError, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = process->psi->hStdError;
+                tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
+                handlesToInherit[handlesToInheritCount++] = hStdError;
+                process->file_handles[process->file_handles_count++] = hStdError;
+                process->psi->hStdError = hStdError;
             }
             else if ((attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->err.pipe) ||
                      (attr->errtype == TB_PROCESS_REDIRECT_TYPE_FILE && attr->err.file))
             {
                 // enable handles
-                process->psi->dwFlags |= STARTF_USESTDHANDLES;
-                process->psi->hStdError = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->err.pipe) : (HANDLE)attr->err.file;
+                HANDLE hStdError = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->err.pipe) : (HANDLE)attr->err.file;
 
                 // enable inherit
-                tb_kernel32()->SetHandleInformation(process->psi->hStdError, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = process->psi->hStdError;
+                tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
+                handlesToInherit[handlesToInheritCount++] = hStdError;
+                process->psi->hStdError = hStdError;
             }
         }
-
-        // init default std handles
-        if (process->psi->dwFlags & STARTF_USESTDHANDLES)
-        {
-            if (!process->psi->hStdInput)
-                process->psi->hStdInput = INVALID_HANDLE_VALUE;
-            if (!process->psi->hStdOutput)
-                process->psi->hStdOutput = INVALID_HANDLE_VALUE;
-            if (!process->psi->hStdError)
-                process->psi->hStdError = INVALID_HANDLE_VALUE;
-        }
-
-        // init process security attributes
-        BOOL bInheritHandle = handlesToInheritCount > 0;
-        SECURITY_ATTRIBUTES sap     = {0};
-        sap.nLength                 = sizeof(SECURITY_ATTRIBUTES);
-        sap.lpSecurityDescriptor    = tb_null;
-        sap.bInheritHandle          = bInheritHandle;
-
-        // init thread security attributes
-        SECURITY_ATTRIBUTES sat     = {0};
-        sat.nLength                 = sizeof(SECURITY_ATTRIBUTES);
-        sat.lpSecurityDescriptor    = tb_null;
-        sat.bInheritHandle          = bInheritHandle;
 
         /* we just inherit the given handles
          *
          * @see https://github.com/xmake-io/xmake/issues/2902#issuecomment-1326934902
          */
+        BOOL bInheritHandle = handlesToInheritCount > 0;
         if (bInheritHandle && tb_kernel32()->InitializeProcThreadAttributeList)
         {
             SIZE_T attributeListSize = 0;
@@ -482,6 +462,25 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 }
             }
         }
+
+        /* we just use the default std handles if lpAttributeList is not supported
+         *
+         * @see https://github.com/xmake-io/xmake/issues/3138#issuecomment-1338970250
+         */
+        if (bInheritHandle)
+            process->psi->dwFlags |= STARTF_USESTDHANDLES;
+
+        // init process security attributes
+        SECURITY_ATTRIBUTES sap     = {0};
+        sap.nLength                 = sizeof(SECURITY_ATTRIBUTES);
+        sap.lpSecurityDescriptor    = tb_null;
+        sap.bInheritHandle          = bInheritHandle;
+
+        // init thread security attributes
+        SECURITY_ATTRIBUTES sat     = {0};
+        sat.nLength                 = sizeof(SECURITY_ATTRIBUTES);
+        sat.lpSecurityDescriptor    = tb_null;
+        sat.bInheritHandle          = bInheritHandle;
 
         // create process
         if (!tb_kernel32()->CreateProcessW(tb_null,
