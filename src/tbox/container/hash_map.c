@@ -201,7 +201,7 @@ static tb_bool_t tb_hash_map_item_find(tb_hash_map_t* hash_map, tb_cpointer_t na
 
     /* update item
      *
-     * @note: m is not the prev not same item if not finded and list has repeat items
+     * @note: m is not the prev not same item if not found and list has repeat items
      * but this hash_map not exists repeat
      *
      * @see tb_binary_pfind()
