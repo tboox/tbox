@@ -2882,6 +2882,9 @@ if path_is_absolute "${xmake_sh_buildir}"; then
 else
     buildir="${xmake_sh_projectdir}/${xmake_sh_buildir}"
 fi
+plat="${_target_plat}"
+arch="${_target_arch}"
+mode="${_target_mode}"
 
 #-----------------------------------------------------------------------------
 # load project targets
