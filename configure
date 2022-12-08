@@ -791,6 +791,10 @@ option() {
     _map_set "options" "${name}_name" "${name}"
     _map_set "options" "${name}_description" "${description}"
     _map_set "options" "${name}_default" "${default}"
+    # we end option if it's just one line
+    if _test_nz "${description}"; then
+        _xmake_sh_option_current=""
+    fi
     return 0
 }
 option_end() {
