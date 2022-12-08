@@ -121,7 +121,7 @@ tb_char_t               tb_string_charat(tb_string_ref_t string, tb_size_t p);
  *
  * @param string        the string
  * @param p             the start position
- * @param c             the finded charactor
+ * @param c             the found charactor
  *
  * @return              the real position, no find: -1
  */
@@ -131,7 +131,7 @@ tb_long_t               tb_string_strchr(tb_string_ref_t string, tb_size_t p, tb
  *
  * @param string        the string
  * @param p             the start position
- * @param c             the finded charactor
+ * @param c             the found charactor
  *
  * @return              the real position, no find: -1
  */
@@ -141,7 +141,7 @@ tb_long_t               tb_string_strichr(tb_string_ref_t string, tb_size_t p, t
  *
  * @param string        the string
  * @param p             the start position
- * @param c             the finded charactor
+ * @param c             the found charactor
  *
  * @return              the real position, no find: -1
  */
@@ -151,7 +151,7 @@ tb_long_t               tb_string_strrchr(tb_string_ref_t string, tb_size_t p, t
  *
  * @param string        the string
  * @param p             the start position
- * @param c             the finded charactor
+ * @param c             the found charactor
  *
  * @return              the real position, no find: -1
  */
@@ -161,7 +161,7 @@ tb_long_t               tb_string_strirchr(tb_string_ref_t string, tb_size_t p, 
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded string
+ * @param s             the found string
  *
  * @return              the real position, no find: -1
  */
@@ -171,7 +171,7 @@ tb_long_t               tb_string_strstr(tb_string_ref_t string, tb_size_t p, tb
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded string
+ * @param s             the found string
  *
  * @return              the real position, no find: -1
  */
@@ -181,7 +181,7 @@ tb_long_t               tb_string_stristr(tb_string_ref_t string, tb_size_t p, t
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded c-string
+ * @param s             the found c-string
  *
  * @return              the real position, no find: -1
  */
@@ -191,7 +191,7 @@ tb_long_t               tb_string_cstrstr(tb_string_ref_t string, tb_size_t p, t
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded c-string
+ * @param s             the found c-string
  *
  * @return              the real position, no find: -1
  */
@@ -201,7 +201,7 @@ tb_long_t               tb_string_cstristr(tb_string_ref_t string, tb_size_t p, 
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded string
+ * @param s             the found string
  *
  * @return              the real position, no find: -1
  */
@@ -211,7 +211,7 @@ tb_long_t               tb_string_strrstr(tb_string_ref_t string, tb_size_t p, t
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded string
+ * @param s             the found string
  *
  * @return              the real position, no find: -1
  */
@@ -221,7 +221,7 @@ tb_long_t               tb_string_strirstr(tb_string_ref_t string, tb_size_t p, 
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded c-string
+ * @param s             the found c-string
  *
  * @return              the real position, no find: -1
  */
@@ -231,7 +231,7 @@ tb_long_t               tb_string_cstrrstr(tb_string_ref_t string, tb_size_t p, 
  *
  * @param string        the string
  * @param p             the start position
- * @param s             the finded c-string
+ * @param s             the found c-string
  *
  * @return              the real position, no find: -1
  */

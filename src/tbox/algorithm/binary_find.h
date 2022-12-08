@@ -41,7 +41,7 @@ __tb_extern_c_enter__
  * @param iterator  the iterator
  * @param head      the iterator head
  * @param tail      the iterator tail
- * @param item      the finded item
+ * @param item      the found item
  *
  * @return          the iterator itor, return tb_iterator_tail(iterator) if not found
  */
@@ -50,7 +50,7 @@ tb_size_t           tb_binary_find(tb_iterator_ref_t iterator, tb_size_t head, t
 /*!binary find item for all
  *
  * @param iterator  the iterator
- * @param item      the finded item
+ * @param item      the found item
  *
  * @return          the iterator itor, return tb_iterator_tail(iterator) if not found
  */
