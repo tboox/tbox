@@ -1290,7 +1290,7 @@ _get_target_objectfile() {
         extension=".obj"
     fi
     local objectdir=$(_get_target_objectdir "${name}")
-    local objectfile="${objectdir}/${filename}/${extension}"
+    local objectfile="${objectdir}/${sourcefile}${extension}"
     echo "${objectfile}"
 }
 
@@ -3597,7 +3597,5 @@ _generate_build_file() {
     fi
 }
 _generate_build_file
-
-
 
 

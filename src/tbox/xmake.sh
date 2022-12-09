@@ -158,7 +158,7 @@ target "tbox"
         add_files "object/impl/reader/reader.c"
         add_files "object/impl/writer/bin.c"
         add_files "object/impl/writer/json.c"
-        add_files "object/impl/writer/reader.c"
+        add_files "object/impl/writer/writer.c"
         add_files "utils/option.c"
         add_files "container/element/obj.c"
         if has_config "xml"; then
