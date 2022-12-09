@@ -633,6 +633,12 @@ includes() {
 # some helper functions
 #
 
+# split flags
+_split_flags() {
+    local flags=$(string_replace "${1}" ":" " ")
+    echo "${flags}"
+}
+
 # get abstract flag for gcc/clang
 _get_abstract_flag_for_gcc_clang() {
     local toolkind="${1}"
@@ -647,7 +653,7 @@ _get_abstract_flag_for_gcc_clang() {
         linkdirs) flag="-L${value}";;
         links) flag="-l${value}";;
         syslinks) flag="-l${value}";;
-        frameworks) flag="-framework ${value}";;
+        frameworks) flag="-framework:${value}";;
         frameworkdirs) flag="-F${value}";;
         rpathdirs)
             if test_eq "${toolname}" "gcc" || test_eq "${toolname}" "gxx"; then
@@ -656,7 +662,7 @@ _get_abstract_flag_for_gcc_clang() {
                 flag="-Wl,-rpath='${value}'"
             elif test_eq "${toolname}" "clang" || test_eq "${toolname}" "clangxx"; then
                 value=$(string_replace "${value}" "\$ORIGIN" "@loader_path")
-                flag="-Xlinker -rpath -Xlinker ${value}"
+                flag="-Xlinker:-rpath:-Xlinker:${value}"
             fi
             ;;
         symbols)
@@ -1510,13 +1516,18 @@ _get_target_flags() {
     local flags=""
     if test "x${toolkind}" = "xsh"; then
         flags=$(_get_target_linker_flags "${name}" "${toolkind}")
+        flags=$(_dedup_reverse "${flags}")
+        flags=$(_split_flags "${flags}")
     elif test "x${toolkind}" = "xld"; then
         flags=$(_get_target_linker_flags "${name}" "${toolkind}")
+        flags=$(_dedup_reverse "${flags}")
+        flags=$(_split_flags "${flags}")
     elif test "x${toolkind}" = "xar"; then
         flags=$(_get_target_archiver_flags "${name}" "${toolkind}")
     else
         flags=$(_get_target_compiler_flags "${name}" "${toolkind}")
         flags=$(_dedup "${flags}")
+        flags=$(_split_flags "${flags}")
     fi
     echo "${flags}"
 }
@@ -2776,6 +2787,7 @@ _check_cxsnippets() {
         for itemname in ${itemnames}; do
             local flags=$(_get_option_abstract_flags "${name}" "${sourcekind}" "${toolname}" "${itemname}")
             if test_nz "${flags}"; then
+                flags=$(_split_flags "${flags}")
                 compflags="${compflags} ${flags}"
             fi
         done
@@ -2810,6 +2822,7 @@ _check_cxsnippets() {
         for itemname in ${itemnames}; do
             local flags=$(_get_option_abstract_flags "${name}" "${toolkind}" "${toolname}" "${itemname}")
             if test_nz "${flags}"; then
+                flags=$(_split_flags "${flags}")
                 linkflags="${linkflags} ${flags}"
             fi
         done
