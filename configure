@@ -1322,11 +1322,23 @@ _get_target_toolchain_flags_for_ar() {
     echo "-cr"
 }
 
-# get toolchain flags for gcc/clang in target
-_get_target_toolchain_flags_for_gcc_clang() {
+# get toolchain flags for gcc in target
+_get_target_toolchain_flags_for_gcc() {
     local name="${1}"
     local toolkind="${2}"
     local flags=""
+    local targetkind=$(_get_target_item "${name}" "kind")
+    if _test_eq "${targetkind}" "shared" && _test_eq "${toolkind}" "sh"; then
+        flags="-shared -fPIC"
+    fi
+    echo "${flags}"
+}
+
+# get toolchain flags for clang in target
+_get_target_toolchain_flags_for_clang() {
+    local name="${1}"
+    local toolkind="${2}"
+    local flags="-Qunused-arguments"
     local targetkind=$(_get_target_item "${name}" "kind")
     if _test_eq "${targetkind}" "shared" && _test_eq "${toolkind}" "sh"; then
         flags="-shared -fPIC"
@@ -1341,10 +1353,10 @@ _get_target_toolchain_flags() {
     local toolname="${3}"
     local flags=""
     case "${toolname}" in
-        gcc) flags=$(_get_target_toolchain_flags_for_gcc_clang "${name}" "${toolkind}");;
-        gxx) flags=$(_get_target_toolchain_flags_for_gcc_clang "${name}" "${toolkind}");;
-        clang) flags=$(_get_target_toolchain_flags_for_gcc_clang "${name}" "${toolkind}");;
-        clangxx) flags=$(_get_target_toolchain_flags_for_gcc_clang "${name}" "${toolkind}");;
+        gcc) flags=$(_get_target_toolchain_flags_for_gcc "${name}" "${toolkind}");;
+        gxx) flags=$(_get_target_toolchain_flags_for_gcc "${name}" "${toolkind}");;
+        clang) flags=$(_get_target_toolchain_flags_for_clang "${name}" "${toolkind}");;
+        clangxx) flags=$(_get_target_toolchain_flags_for_clang "${name}" "${toolkind}");;
         ar) flags=$(_get_target_toolchain_flags_for_ar "${name}" "${toolkind}");;
         *) raise "unknown toolname(${toolname})!" ;;
     esac
@@ -2982,6 +2994,17 @@ _generate_configfile() {
 
     # do replace
     local content=$(cat "${configfile_in}")
+
+    # replace builtin variables
+    local target_os=""
+    if is_plat "mingw"; then
+        target_os="windows"
+    else
+        target_os="${_target_plat}"
+    fi
+    target_os=$(string_toupper ${target_os})
+    _vprint_configvar_value "${content}" "OS" "${target_os}"
+    content=$(_replace_configvar_value "${content}" "OS" "${target_os}")
 
     # replace version
     local version=$(_get_target_item "${target}" "version")

@@ -25,7 +25,7 @@ target "tbox"
     fi
 
     # add options
-    add_options "info" "float" "wchar" "exception" "force_utf8" "deprecated"
+    add_options "info" "float" "wchar" "exception" "force_utf8" "micro" "deprecated"
 
     # add modules
     add_options "xml" "zip" "hash" "regex" "coroutine" "object" "charset" "database"

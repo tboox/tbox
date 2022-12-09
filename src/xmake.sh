@@ -40,6 +40,11 @@ fi
 option "demo" "Enable or disable the demo module." true
 option "small" "Enable the small compile mode and disable all modules." true
 
+option "micro"
+    set_default false
+    set_description "Compile micro core library for the embed system."
+    set_configvar "TB_CONFIG_MICRO_ENABLE" 1
+
 option "wchar"
     add_ctypes "wchar_t"
     set_configvar "TB_CONFIG_TYPE_HAVE_WCHAR" 1
