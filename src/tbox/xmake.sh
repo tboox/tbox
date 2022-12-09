@@ -11,8 +11,8 @@ target "tbox"
     add_configfiles "tbox.config.h.in"
 
     # add include directories
-    add_includedirs ".."
-    add_includedirs "${buildir}/${plat}/${arch}/${mode}"
+    add_includedirs ".." "{public}"
+    add_includedirs "${buildir}/${plat}/${arch}/${mode}" "{public}"
 
     # add the header files for installing
     add_headerfiles "../(tbox/**.h)"
@@ -21,7 +21,7 @@ target "tbox"
 
     # add frameworks
     if is_plat "macosx"; then
-        add_frameworks "CoreFoundation" "CoreServices"
+        add_frameworks "CoreFoundation" "CoreServices" "{public}"
     fi
 
     # add options
@@ -115,6 +115,77 @@ target "tbox"
     add_files "platform/impl/platform.c"
     add_files "platform/impl/pollerdata.c"
     add_files "platform/impl/dns.c"
+
+    # add the source files for the float type
+    if has_config "float"; then
+        add_files "libm/*.c"
+    fi
+
+    # add the source files for the xml module
+    if has_config "xml"; then
+        add_files "xml/**.c"
+    fi
+
+    # add the source files for the regex module
+    if has_config "regex"; then
+        add_files "regex/*.c"
+    fi
+
+    # add the source files for the hash module
+    if has_config "hash"; then
+        add_files "hash/*.c"
+        add_files "hash/arch/crc32.S"
+    fi
+
+    # add the source files for the coroutine module
+    if has_config "coroutine"; then
+        add_files "platform/context.c"
+        add_files "platform/arch/context.S"
+        add_files "coroutine/**.c"
+    fi
+
+    # add the source files for the exception module
+    if has_config "exception"; then
+        add_files "platform/exception.c"
+    fi
+
+    # add the source files for the object module
+    if has_config "object"; then
+        add_files "object/*.c"
+        add_files "object/impl/*.c"
+        add_files "object/impl/reader/bin.c"
+        add_files "object/impl/reader/json.c"
+        add_files "object/impl/reader/reader.c"
+        add_files "object/impl/writer/bin.c"
+        add_files "object/impl/writer/json.c"
+        add_files "object/impl/writer/reader.c"
+        add_files "utils/option.c"
+        add_files "container/element/obj.c"
+        if has_config "xml"; then
+            add_files "object/impl/reader/xml.c"
+            add_files "object/impl/reader/xplist.c"
+            add_files "object/impl/writer/xml.c"
+            add_files "object/impl/writer/xplist.c"
+        fi
+    fi
+
+    # add the source files for the charset module
+    if has_config "charset"; then
+        add_files "charset/**.c"
+        add_files "platform/impl/charset.c"
+        add_files "stream/impl/filter/charset.c"
+    fi
+
+    # add the source files for the zip module
+    if has_config "zip"; then
+        add_files "zip/zip.c"
+        add_files "stream/impl/filter/zip.c"
+    fi
+
+    # add the source files for the database module
+    if has_config "database"; then
+        add_files "database/*.c"
+    fi
 
     # check interfaces
     check_interfaces

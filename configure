@@ -1285,15 +1285,12 @@ _get_target_sourcefiles() {
 _get_target_objectfile() {
     local name="${1}"
     local sourcefile="${2}"
-    local filename=$(path_filename "${sourcefile}")
     local extension=".o"
     if is_plat "mingw"; then
         extension=".obj"
     fi
-    filename=$(path_extension_replace "${filename}" "${extension}")
-    local sourcedir=$(path_directory "${sourcefile}")
     local objectdir=$(_get_target_objectdir "${name}")
-    local objectfile="${objectdir}/${sourcedir}/${filename}"
+    local objectfile="${objectdir}/${filename}/${extension}"
     echo "${objectfile}"
 }
 
@@ -1338,7 +1335,21 @@ _get_target_abstract_flags() {
     local itemname="${4}"
     local values="${5}"
     if test_z "${values}"; then
+
+        # get values from target
         values=$(_get_target_values "${name}" "${itemname}")
+
+        # get values from target deps
+        local deps=$(_get_target_item "${name}" "deps")
+        for dep in ${deps}; do
+            local dep_kind=$(_get_target_item "${dep}" "kind")
+            if test_eq "${dep_kind}" "static" || test_eq "${dep_kind}" "shared"; then
+                local depvalues=$(_get_target_values "${dep}" "${itemname}_public")
+                if test_nz "${depvalues}"; then
+                    values="${values} ${depvalues}"
+                fi
+            fi
+        done
     fi
     local flags=$(_get_abstract_flags "${toolkind}" "${toolname}" "${itemname}" "${values}")
     echo "${flags}"
@@ -1787,9 +1798,21 @@ add_configfiles() {
 # add defines in target
 add_defines() {
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+        local public=false
         for define in $@; do
-            _add_target_item "${_xmake_sh_target_current}" "defines" "${define}"
+            if test_nq "${define}" "{public}"; then
+                _add_target_item "${_xmake_sh_target_current}" "defines" "${define}"
+            else
+                public=true
+            fi
         done
+        if ${public}; then
+            for define in $@; do
+                if test_nq "${define}" "{public}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "defines_public" "${define}"
+                fi
+            done
+        fi
     elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
         for define in $@; do
             _add_option_item "${_xmake_sh_option_current}" "defines" "${define}"
@@ -1800,9 +1823,21 @@ add_defines() {
 # add udefines in target
 add_udefines() {
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
-        for udefine in $@; do
-            _add_target_item "${_xmake_sh_target_current}" "udefines" "${udefine}"
+        local public=false
+        for undefine in $@; do
+            if test_nq "${undefine}" "{public}"; then
+                _add_target_item "${_xmake_sh_target_current}" "undefines" "${undefine}"
+            else
+                public=true
+            fi
         done
+        if ${public}; then
+            for undefine in $@; do
+                if test_nq "${undefine}" "{public}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "undefines_public" "${undefine}"
+                fi
+            done
+        fi
     elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
         for udefine in $@; do
             _add_option_item "${_xmake_sh_option_current}" "udefines" "${udefine}"
@@ -1812,25 +1847,55 @@ add_udefines() {
 
 # add includedirs in target
 add_includedirs() {
+    local public=false
     for dir in $@; do
-        if ! path_is_absolute "${dir}"; then
-            dir="${xmake_sh_scriptdir}/${dir}"
-        fi
-        dir=$(path_relative ${xmake_sh_projectdir} "${dir}")
-        if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
-            _add_target_item "${_xmake_sh_target_current}" "includedirs" "${dir}"
-        elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
-            _add_option_item "${_xmake_sh_option_current}" "includedirs" "${dir}"
+        if test_nq "${dir}" "{public}"; then
+            if ! path_is_absolute "${dir}"; then
+                dir="${xmake_sh_scriptdir}/${dir}"
+            fi
+            dir=$(path_relative ${xmake_sh_projectdir} "${dir}")
+            if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+                _add_target_item "${_xmake_sh_target_current}" "includedirs" "${dir}"
+            elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
+                _add_option_item "${_xmake_sh_option_current}" "includedirs" "${dir}"
+            fi
+        else
+            public=true
         fi
     done
+    if ${public}; then
+        for dir in $@; do
+            if test_nq "${dir}" "{public}"; then
+                if ! path_is_absolute "${dir}"; then
+                    dir="${xmake_sh_scriptdir}/${dir}"
+                fi
+                dir=$(path_relative ${xmake_sh_projectdir} "${dir}")
+                if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "includedirs_public" "${dir}"
+                fi
+            fi
+        done
+    fi
 }
 
 # add links in target
 add_links() {
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+        local public=false
         for link in $@; do
-            _add_target_item "${_xmake_sh_target_current}" "links" "${link}"
+            if test_nq "${link}" "{public}"; then
+                _add_target_item "${_xmake_sh_target_current}" "links" "${link}"
+            else
+                public=true
+            fi
         done
+        if ${public}; then
+            for link in $@; do
+                if test_nq "${link}" "{public}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "links_public" "${link}"
+                fi
+            done
+        fi
     elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
         for link in $@; do
             _add_option_item "${_xmake_sh_option_current}" "links" "${link}"
@@ -1841,9 +1906,21 @@ add_links() {
 # add syslinks in target
 add_syslinks() {
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+        local public=false
         for syslink in $@; do
-            _add_target_item "${_xmake_sh_target_current}" "syslinks" "${syslink}"
+            if test_nq "${syslink}" "{public}"; then
+                _add_target_item "${_xmake_sh_target_current}" "syslinks" "${syslink}"
+            else
+                public=true
+            fi
         done
+        if ${public}; then
+            for syslink in $@; do
+                if test_nq "${syslink}" "{public}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "syslinks_public" "${syslink}"
+                fi
+            done
+        fi
     elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
         for syslink in $@; do
             _add_option_item "${_xmake_sh_option_current}" "syslinks" "${syslink}"
@@ -1853,17 +1930,35 @@ add_syslinks() {
 
 # add linkdirs in target
 add_linkdirs() {
+    local public=false
     for dir in $@; do
-        if ! path_is_absolute "${dir}"; then
-            dir="${xmake_sh_scriptdir}/${dir}"
-        fi
-        dir=$(path_relative ${xmake_sh_projectdir} "${dir}")
-        if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
-            _add_target_item "${_xmake_sh_target_current}" "linkdirs" "${dir}"
-        elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
-            _add_option_item "${_xmake_sh_option_current}" "linkdirs" "${dir}"
+        if test_nq "${dir}" "{public}"; then
+            if ! path_is_absolute "${dir}"; then
+                dir="${xmake_sh_scriptdir}/${dir}"
+            fi
+            dir=$(path_relative ${xmake_sh_projectdir} "${dir}")
+            if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+                _add_target_item "${_xmake_sh_target_current}" "linkdirs" "${dir}"
+            elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
+                _add_option_item "${_xmake_sh_option_current}" "linkdirs" "${dir}"
+            fi
+        else
+            public=true
         fi
     done
+    if ${public}; then
+        for dir in $@; do
+            if test_nq "${dir}" "{public}"; then
+                if ! path_is_absolute "${dir}"; then
+                    dir="${xmake_sh_scriptdir}/${dir}"
+                fi
+                dir=$(path_relative ${xmake_sh_projectdir} "${dir}")
+                if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "linkdirs_public" "${dir}"
+                fi
+            fi
+        done
+    fi
 }
 
 # add rpathdirs in target
@@ -1883,9 +1978,21 @@ add_rpathdirs() {
 # add frameworks in target
 add_frameworks() {
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
+        local public=false
         for framework in $@; do
-            _add_target_item "${_xmake_sh_target_current}" "frameworks" "${framework}"
+            if test_nq "${framework}" "{public}"; then
+                _add_target_item "${_xmake_sh_target_current}" "frameworks" "${framework}"
+            else
+                public=true
+            fi
         done
+        if ${public}; then
+            for framework in $@; do
+                if test_nq "${framework}" "{public}"; then
+                    _add_target_item "${_xmake_sh_target_current}" "frameworks_public" "${framework}"
+                fi
+            done
+        fi
     elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
         for framework in $@; do
             _add_option_item "${_xmake_sh_option_current}" "frameworks" "${framework}"
@@ -3490,6 +3597,7 @@ _generate_build_file() {
     fi
 }
 _generate_build_file
+
 
 
 
