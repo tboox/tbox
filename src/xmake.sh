@@ -131,6 +131,39 @@ check_module_cfuncs() {
     done
 }
 
+# check c snippets in the given module
+check_module_csnippets() {
+    local optname="${1}"
+    local varname="${2}"
+    local snippets="${3}"
+    local links="${4}"
+    option "${optname}"
+        add_csnippets "${snippets}"
+        add_defines "_GNU_SOURCE=1"
+        set_warnings "error"
+        set_languages "c99"
+        set_configvar "${varname}" 1
+        if _test_nz "${links}"; then
+            add_links "${links}"
+        fi
+    option_end
+    add_options "${optname}"
+}
+
+# disable c functions in the given module
+disable_module_cfuncs() {
+    local module="${1}"
+    local cincludes="${2}"
+    shift
+    shift
+    for func in ${@}; do
+        local funcname=$(get_function_name "${func}")
+        local module_upper=$(string_toupper "${module}")
+        local funcname_upper=$(string_toupper "${funcname}")
+        set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 0
+    done
+}
+
 # check interfaces
 check_interfaces() {
 
@@ -256,12 +289,32 @@ check_interfaces() {
     check_module_cfuncs "systemv" "sys/sem.h sys/ipc.h" "semget" "semtimedop"
 
     # add the interfaces for linux
-    if is_plat "linux" "android"; then
-        check_module_cfuncs "linux" "sys/inotify.h" "inotify_init"
-    fi
+    check_module_cfuncs "linux" "sys/inotify.h" "inotify_init"
 
     # add the interfaces for valgrind
     check_module_cfuncs "valgrind" "valgrind/valgrind.h" "VALGRIND_STACK_REGISTER(0,0)"
+
+    # add the interfaces for windows/msvc
+    local mos="z _nf _acq _rel"
+    for mo in ${mos}; do
+        if _test_eq "${mo}" "z"; then
+            mo=""
+        fi
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchange${mo}"
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchange8${mo}"
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedOr8${mo}"
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchangeAdd${mo}"
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchangeAdd64${mo}"
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedCompareExchange${mo}"
+        disable_module_cfuncs "windows" "windows.h" "_InterlockedCompareExchange64${mo}"
+    done
+
+    # check __thread keyword
+    check_module_csnippets "keyword_thread" "TB_CONFIG_KEYWORD_HAVE__thread" "__thread int a = 0;" "pthread"
+    check_module_csnippets "keyword_thread_local" "TB_CONFIG_KEYWORD_HAVE_Thread_local" "_Thread_local int a = 0;" "pthread"
+
+    # check anonymous union feature
+    check_module_csnippets "feature_anonymous_union" "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION" "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }"
 }
 
 includes "tbox"
