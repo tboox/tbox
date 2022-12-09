@@ -143,7 +143,7 @@ check_module_csnippets() {
         set_warnings "error"
         set_languages "c99"
         set_configvar "${varname}" 1
-        if _test_nz "${links}"; then
+        if test_nz "${links}"; then
             add_links "${links}"
         fi
     option_end
@@ -283,7 +283,7 @@ check_interfaces() {
     check_module_cfuncs "posix" "sys/stat.h"                       "futimens" "utimensat"
 
     # add the interfaces for bsd
-    check_module_cfuncs "bsd" "sys/file.h" "fcntl.h" "flock"
+    check_module_cfuncs "bsd" "sys/file.h fcntl.h" "flock"
 
     # add the interfaces for systemv
     check_module_cfuncs "systemv" "sys/sem.h sys/ipc.h" "semget" "semtimedop"
@@ -297,7 +297,7 @@ check_interfaces() {
     # add the interfaces for windows/msvc
     local mos="z _nf _acq _rel"
     for mo in ${mos}; do
-        if _test_eq "${mo}" "z"; then
+        if test_eq "${mo}" "z"; then
             mo=""
         fi
         disable_module_cfuncs "windows" "windows.h" "_InterlockedExchange${mo}"
