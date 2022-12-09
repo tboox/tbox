@@ -33,3 +33,6 @@ target "tbox"
     # add the common source files
     add_files "*.c"
 
+    # check interfaces
+    check_interfaces
+
