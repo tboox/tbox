@@ -647,7 +647,10 @@ _get_abstract_flag_for_gcc_clang() {
     local value="${4}"
     local flag=""
     case "${itemname}" in
-        defines) flag="-D${value}";;
+        defines)
+            value=$(string_replace "${value}" '"' '\\\"')
+            flag="-D${value}"
+            ;;
         udefines) flag="-U${value}";;
         includedirs) flag="-I${value}";;
         linkdirs) flag="-L${value}";;
