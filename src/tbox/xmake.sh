@@ -32,6 +32,27 @@ target "tbox"
 
     # add the common source files
     add_files "*.c"
+    add_files "hash/bkdr.c"
+    add_files "hash/fnv32.c"
+    add_files "hash/adler32.c"
+    add_files "math/**.c"
+    add_files "libc/**.c"
+    add_files "utils/*.c"
+    add_files "prefix/**.c"
+    add_files "memory/**.c"
+    add_files "string/**.c"
+    add_files "stream/**.c"
+    add_files "network/**.c"
+    add_files "algorithm/**.c"
+    add_files "container/**.c"
+    add_files "libm/impl/libm.c"
+    add_files "libm/idivi8.c"
+    add_files "libm/ilog2i.c"
+    add_files "libm/isqrti.c"
+    add_files "libm/isqrti64.c"
+    add_files "libm/idivi8.c"
+    add_files "platform/*.c"
+    add_files "platform/impl/*.c"
 
     # check interfaces
     check_interfaces
