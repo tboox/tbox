@@ -301,6 +301,8 @@ path_toolname() {
         gcc) toolname="gcc";;
         *-g++) toolname="gxx";;
         g++) toolname="gxx";;
+        xcrun*clang++) toolname="clangxx";;
+        xcrun*clang) toolname="clang";;
         *-clang++) toolname="clangxx";;
         clang++) toolname="clangxx";;
         *-clang) toolname="clang";;
@@ -2237,37 +2239,72 @@ _set_toolchain_toolset() {
     _set_toolchain_item "${name}" "toolset_${kind}" "${programs}"
 }
 
+# add the give toolchain toolset
+_add_toolchain_toolset() {
+    local name=${1}
+    local kind=${2}
+    local program="${3}"
+    local programs=$(_get_toolchain_item "${name}" "toolset_${kind}")
+    if test_nz "${programs}"; then
+        programs="${programs}:${program}"
+    else
+        programs="${program}"
+    fi
+    _set_toolchain_item "${name}" "toolset_${kind}" "${programs}"
+}
+
 # set toolset in toolchain
 set_toolset() {
     if ! ${_loading_toolchains}; then
         return
     fi
     local kind=${1}
-    local programs="${2}"
-    _set_toolchain_toolset "${_xmake_sh_toolchain_current}" "${kind}" "${programs}"
+    shift
+    local idx=0
+    while test $# != 0; do
+        local program="${1}"
+        local key="${kind}"
+        if test_nq "${idx}" "0"; then
+            key="${key}_${idx}"
+        fi
+        _set_toolchain_toolset "${_xmake_sh_toolchain_current}" "${key}" "${program}"
+        idx=$((idx+1))
+        shift
+    done
 }
 
 # clang toolchain
 toolchain "clang"
-    set_toolset "as" "clang"
-    set_toolset "cc" "clang"
-    set_toolset "cxx" "clang clang++"
-    set_toolset "mm" "clang"
-    set_toolset "mxx" "clang clang++"
-    set_toolset "ld" "clang++ clang"
-    set_toolset "sh" "clang++ clang"
-    set_toolset "ar" "ar"
+    if is_host "macosx"; then
+        set_toolset "as" "xcrun -sdk macosx clang"
+        set_toolset "cc" "xcrun -sdk macosx clang"
+        set_toolset "cxx" "xcrun -sdk macosx clang"
+        set_toolset "mm" "xcrun -sdk macosx clang"
+        set_toolset "mxx" "xcrun -sdk macosx clang"
+        set_toolset "ld" "xcrun -sdk macosx clang++"
+        set_toolset "sh" "xcrun -sdk macosx clang++"
+        set_toolset "ar" "ar"
+    else
+        set_toolset "as" "clang"
+        set_toolset "cc" "clang"
+        set_toolset "cxx" "clang" "clang++"
+        set_toolset "mm" "clang"
+        set_toolset "mxx" "clang" "clang++"
+        set_toolset "ld" "clang++" "clang"
+        set_toolset "sh" "clang++" "clang"
+        set_toolset "ar" "ar"
+    fi
 toolchain_end
 
 # gcc toolchain
 toolchain "gcc"
     set_toolset "as" "gcc"
     set_toolset "cc" "gcc"
-    set_toolset "cxx" "gcc g++"
+    set_toolset "cxx" "gcc" "g++"
     set_toolset "mm" "gcc"
-    set_toolset "mxx" "gcc g++"
-    set_toolset "ld" "g++ gcc"
-    set_toolset "sh" "g++ gcc"
+    set_toolset "mxx" "gcc" "g++"
+    set_toolset "ld" "g++" "gcc"
+    set_toolset "sh" "g++" "gcc"
     set_toolset "ar" "ar"
 toolchain_end
 
@@ -2694,8 +2731,13 @@ _toolchain_try_toolset() {
     local toolchain=${1}
     local kind=${2}
     local description=${3}
-    local programs=$(_get_toolchain_toolset "${toolchain}" "${kind}")
-    for program in ${programs}; do
+    local indices="0 1 2 3 4 5"
+    for idx in ${indices}; do
+        local key="${kind}"
+        if test_nq "${idx}" "0"; then
+            key="${key}_${idx}"
+        fi
+        local program=$(_get_toolchain_toolset "${toolchain}" "${key}")
         if _toolchain_try_program "${toolchain}" "${kind}" "${program}"; then
             _set_toolchain_toolset "${toolchain}" "${kind}" "${program}"
             echo "checking for the ${description} (${kind}) ... ${program}"
