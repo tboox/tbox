@@ -78,7 +78,7 @@ option "force_utf8"
 module_options() {
     local modules="xml zip hash regex object charset database coroutine"
     for name in ${modules}; do
-        local name_upper=$(string_toupper "${name}")
+        string_toupper "${name}"; local name_upper="${_ret}"
         option "${name}"
             set_default true
             set_description "The ${name} module"
@@ -92,7 +92,7 @@ module_options
 package_options() {
     local packages="zlib sqlite3 mysql mbedtls openssl polarssl pcre2 pcre"
     for name in ${packages}; do
-        local name_upper=$(string_toupper "${name}")
+        string_toupper "${name}"; local name_upper="${_ret}"
         set_configvar "TB_CONFIG_PACKAGE_HAVE_${name_upper}" 0
     done
 }
@@ -104,7 +104,7 @@ package_options
 # sigsetjmp((void*)0, 0)
 #
 get_function_name() {
-    local name=$(string_split "${1}" "(" 1)
+    string_split "${1}" "(" 1; local name="${_ret}"
     echo "${name}"
 }
 
@@ -117,8 +117,8 @@ check_module_cfuncs() {
     for func in ${@}; do
         local funcname=$(get_function_name "${func}")
         local optname="${module}_${funcname}"
-        local module_upper=$(string_toupper "${module}")
-        local funcname_upper=$(string_toupper "${funcname}")
+        string_toupper "${module}"; local module_upper="${_ret}"
+        string_toupper "${funcname}"; local funcname_upper="${_ret}"
         option "${optname}"
             add_cfuncs "${func}"
             add_cincludes "${cincludes}"
@@ -158,8 +158,8 @@ disable_module_cfuncs() {
     shift
     for func in ${@}; do
         local funcname=$(get_function_name "${func}")
-        local module_upper=$(string_toupper "${module}")
-        local funcname_upper=$(string_toupper "${funcname}")
+        string_toupper "${module}"; local module_upper="${_ret}"
+        string_toupper "${funcname}"; local funcname_upper="${_ret}"
         set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 0
     done
 }
