@@ -136,6 +136,14 @@ string_dupch() {
     printf %${count}s | tr " " "${ch}"
 }
 
+# replace file content
+_io_replace_file() {
+    local infile="${1}"
+    local outfile="${2}"
+    local patterns="${3}"
+    sed "/./ {${patterns}}" "${infile}" > "${outfile}"
+}
+
 # try remove file or directory
 _os_tryrm() {
     if test -f "${1}"; then
@@ -3122,17 +3130,15 @@ _get_targets_toolkinds() {
 
 # vprint config variable in `${name}`
 _vprint_configvar_value() {
-    local content="${1}"
-    local name="${2}"
-    local value="${3}"
+    local name="${1}"
+    local value="${2}"
     vprint "  > replace ${name} -> ${value}"
 }
 
 # vprint config variable in `${define name}`
 _vprint_configvar_define() {
-    local content="${1}"
-    local name="${2}"
-    local value="${3}"
+    local name="${1}"
+    local value="${2}"
     if test_z "${value}"; then
         vprint "  > replace ${name} -> /* #undef ${name} */"
     elif test_eq "${value}" "1" || test_eq "${value}" "true"; then
@@ -3146,28 +3152,24 @@ _vprint_configvar_define() {
 
 # replace config variable in `${define name}`
 _replace_configvar_define() {
-    local content="${1}"
-    local name="${2}"
-    local value="${3}"
+    local name="${1}"
+    local value="${2}"
     if test_z "${value}"; then
-        string_replace "${content}" "\${define ${name}}" "\/*#undef ${name}*\/"; content="${_ret}"
+        _ret="s/\${define ${name}}/\/*#undef ${name}*\//g"
     elif test_eq "${value}" "1" || test_eq "${value}" "true"; then
-        string_replace "${content}" "\${define ${name}}" "#define ${name} 1"; content="${_ret}"
+        _ret="s/\${define ${name}}/#define ${name} 1/g"
     elif test_eq "${value}" "0" || test_eq "${value}" "false"; then
-        string_replace "${content}" "\${define ${name}}" "\/*#define ${name} 0*\/"; content="${_ret}"
+        _ret="s/\${define ${name}}/\/*#define ${name} 0*\//g"
     else
-        string_replace "${content}" "\${define ${name}}" "#define ${name} ${value}"; content="${_ret}"
+        _ret="s/\${define ${name}}/#define ${name} ${value}/g"
     fi
-    _ret="${content}"
 }
 
 # replace config variable in `${name}`
 _replace_configvar_value() {
-    local content="${1}"
-    local name="${2}"
-    local value="${3}"
-    string_replace "${content}" "\${${name}}" "${value}"; content="${_ret}"
-    _ret="${content}"
+    local name="${1}"
+    local value="${2}"
+    _ret="s/\${${name}}/${value}/g"
 }
 
 # generate configfile for the given target
@@ -3185,9 +3187,6 @@ _generate_configfile() {
     local configfile="${configdir}/${filename}"
     echo "generating ${configfile} .."
 
-    # do replace
-    local content=$(cat "${configfile_in}")
-
     # replace builtin variables
     local target_os=""
     if is_plat "mingw"; then
@@ -3196,84 +3195,104 @@ _generate_configfile() {
         target_os="${_target_plat}"
     fi
     string_toupper ${target_os}; target_os="${_ret}"
-    _vprint_configvar_value "${content}" "OS" "${target_os}"
-    _replace_configvar_value "${content}" "OS" "${target_os}"; content="${_ret}"
+    _vprint_configvar_value "OS" "${target_os}"
+    _replace_configvar_value "OS" "${target_os}"; patterns="${_ret};${patterns}"
 
     # replace version
+    local patterns=""
     _get_target_item "${target}" "version"; local version="${_ret}"
     _get_target_item "${target}" "version_build"; local version_build="${_ret}"
     string_split "${version}" "." 1; local version_major="${_ret}"
     string_split "${version}" "." 2; local version_minor="${_ret}"
     string_split "${version}" "." 3; local version_alter="${_ret}"
     if test_nz "${version}"; then
-        _vprint_configvar_value "${content}" "VERSION" "${version}"
-        _replace_configvar_value "${content}" "VERSION" "${version}"; content="${_ret}"
+        _vprint_configvar_value "VERSION" "${version}"
+        _replace_configvar_value "VERSION" "${version}"; patterns="${_ret};${patterns}"
     fi
     if test_nz "${version_major}"; then
-        _vprint_configvar_value "${content}" "VERSION_MAJOR" "${version_major}"
-        _replace_configvar_value "${content}" "VERSION_MAJOR" "${version_major}"; content="${_ret}"
+        _vprint_configvar_value "VERSION_MAJOR" "${version_major}"
+        _replace_configvar_value "VERSION_MAJOR" "${version_major}"; patterns="${_ret};${patterns}"
     fi
     if test_nz "${version_minor}"; then
-        _vprint_configvar_value "${content}" "VERSION_MINOR" "${version_minor}"
-        _replace_configvar_value "${content}" "VERSION_MINOR" "${version_minor}"; content="${_ret}"
+        _vprint_configvar_value "VERSION_MINOR" "${version_minor}"
+        _replace_configvar_value "VERSION_MINOR" "${version_minor}"; patterns="${_ret};${patterns}"
     fi
     if test_nz "${version_alter}"; then
-        _vprint_configvar_value "${content}" "VERSION_ALTER" "${version_alter}"
-        _replace_configvar_value "${content}" "VERSION_ALTER" "${version_alter}"; content="${_ret}"
+        _vprint_configvar_value "VERSION_ALTER" "${version_alter}"
+        _replace_configvar_value "VERSION_ALTER" "${version_alter}"; patterns="${_ret};${patterns}"
     fi
     if test_nz "${version_build}"; then
         _os_date "${version_build}"; version_build="${_ret}"
-        _vprint_configvar_value "${content}" "VERSION_BUILD" "${version_build}"
-        _replace_configvar_value "${content}" "VERSION_BUILD" "${version_build}"; content="${_ret}"
+        _vprint_configvar_value "VERSION_BUILD" "${version_build}"
+        _replace_configvar_value "VERSION_BUILD" "${version_build}"; patterns="${_ret};${patterns}"
     fi
 
     # replace git variables
+    local content=$(cat "${configfile_in}")
     if string_contains "${content}" "GIT_"; then
         _os_iorunv "git" "describe" "--tags"; local git_tag="${_ret}"
         if test_nz "${git_tag}"; then
-            _vprint_configvar_value "${content}" "GIT_TAG" "${git_tag}"
-            _replace_configvar_value "${content}" "GIT_TAG" "${git_tag}"; content="${_ret}"
+            _vprint_configvar_value "GIT_TAG" "${git_tag}"
+            _replace_configvar_value "GIT_TAG" "${git_tag}"; patterns="${_ret};${patterns}"
         fi
         _os_iorunv "git" "describe" "--tags" "--long"; local git_tag_long="${_ret}"
         if test_nz "${git_tag_long}"; then
-            _vprint_configvar_value "${content}" "GIT_TAG_LONG" "${git_tag_long}"
-            _replace_configvar_value "${content}" "GIT_TAG_LONG" "${git_tag_long}"; content="${_ret}"
+            _vprint_configvar_value "GIT_TAG_LONG" "${git_tag_long}"
+            _replace_configvar_value "GIT_TAG_LONG" "${git_tag_long}"; patterns="${_ret};${patterns}"
         fi
         _os_iorunv "git" "rev-parse" "--abbrev-ref" "HEAD"; local git_branch="${_ret}"
         if test_nz "${git_branch}"; then
-            _vprint_configvar_value "${content}" "GIT_BRANCH" "${git_branch}"
-            _replace_configvar_value "${content}" "GIT_BRANCH" "${git_branch}"; content="${_ret}"
+            _vprint_configvar_value "GIT_BRANCH" "${git_branch}"
+            _replace_configvar_value "GIT_BRANCH" "${git_branch}"; patterns="${_ret};${patterns}"
         fi
         _os_iorunv "git" "rev-parse" "--short" "HEAD"; local git_commit="${_ret}"
         if test_nz "${git_commit}"; then
-            _vprint_configvar_value "${content}" "GIT_COMMIT" "${git_commit}"
-            _replace_configvar_value "${content}" "GIT_COMMIT" "${git_commit}"; content="${_ret}"
+            _vprint_configvar_value "GIT_COMMIT" "${git_commit}"
+            _replace_configvar_value "GIT_COMMIT" "${git_commit}"; patterns="${_ret};${patterns}"
         fi
         _os_iorunv "git" "rev-parse" "HEAD"; local git_commit_long="${_ret}"
         if test_nz "${git_commit_long}"; then
-            _vprint_configvar_value "${content}" "GIT_COMMIT_LONG" "${git_commit_long}"
-            _replace_configvar_value "${content}" "GIT_COMMIT_LONG" "${git_commit_long}"; content="${_ret}"
+            _vprint_configvar_value "GIT_COMMIT_LONG" "${git_commit_long}"
+            _replace_configvar_value "GIT_COMMIT_LONG" "${git_commit_long}"; patterns="${_ret};${patterns}"
         fi
         _os_iorunv "log" "-1" "--date=format:%Y%m%d%H%M%S" "--format=%ad"; local git_commit_date="${_ret}"
         if test_nz "${git_commit_date}"; then
-            _vprint_configvar_value "${content}" "GIT_COMMIT_DATE" "${git_commit_date}"
-            _replace_configvar_value "${content}" "GIT_COMMIT_DATE" "${git_commit_date}"; content="${_ret}"
+            _vprint_configvar_value "GIT_COMMIT_DATE" "${git_commit_date}"
+            _replace_configvar_value "GIT_COMMIT_DATE" "${git_commit_date}"; patterns="${_ret};${patterns}"
         fi
     fi
 
     # replace configvars in target
+    local count=0
+    local configfile_dst="${configfile}"
+    _os_tmpfile; local tmpfile="${_ret}"
+    cp "${configfile_in}" "${tmpfile}"
     _get_target_item "${target}" "configvars"; local configvars="${_ret}"
     for name in ${configvars}; do
         _get_target_item "${target}" "configvar_${name}"; local value="${_ret}"
-        _vprint_configvar_define "${content}" "${name}" "${value}"
-        _vprint_configvar_value "${content}" "${name}" "${value}"
-        _replace_configvar_define "${content}" "${name}" "${value}"; content="${_ret}"
-        _replace_configvar_value "${content}" "${name}" "${value}"; content="${_ret}"
+        _vprint_configvar_define "${name}" "${value}"
+        _vprint_configvar_value "${name}" "${value}"
+        _replace_configvar_define "${name}" "${value}"; patterns="${_ret};${patterns}"
+        _replace_configvar_value "${name}" "${value}"; patterns="${_ret};${patterns}"
+        count=$((count + 1))
+        if test_eq "$count" "10"; then
+            _io_replace_file "${tmpfile}" "${configfile}" "${patterns}"
+            local swapfile="${tmpfile}"
+            tmpfile="${configfile}"
+            configfile="${swapfile}"
+            patterns=""
+            count=0
+        fi
     done
 
-    # done
-    echo "${content}" > "${configfile}"
-    echo "${configfile} is generated!"
+    # do replace
+    if test_nz "${patterns}"; then
+        _io_replace_file "${tmpfile}" "${configfile}" "${patterns}"
+    fi
+    if test_nq "${configfile}" "${configfile_dst}"; then
+        cp "${configfile}" "${configfile_dst}"
+    fi
+    echo "${configfile_dst} is generated!"
 }
 
 # generate configfiles
@@ -3625,9 +3644,9 @@ _generate_for_ninja() {
 #
 
 _generate_build_file() {
-    if test "x${_project_generator}" = "xgmake"; then
+    if test_eq "${_project_generator}" "gmake"; then
         _generate_for_gmake
-    elif test "x${_project_generator}" = "xninja"; then
+    elif test_eq "${_project_generator}" "ninja"; then
         _generate_for_ninja
     else
         raise "unknown generator: ${_project_generator}"
