@@ -24,12 +24,6 @@ target "tbox"
         add_frameworks "CoreFoundation" "CoreServices" "{public}"
     fi
 
-    # add options
-    add_options "info" "float" "wchar" "exception" "force_utf8" "micro" "deprecated"
-
-    # add modules
-    add_options "xml" "zip" "hash" "regex" "coroutine" "object" "charset" "database"
-
     # add the common source files
     add_files "*.c"
     add_files "hash/bkdr.c"

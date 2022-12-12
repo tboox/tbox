@@ -276,7 +276,7 @@ path_sourcekind() {
         .cc) sourcekind="cxx";;
         .ixx) sourcekind="cxx";;
         .m) sourcekind="mm";;
-        .mxx) sourcekind="mxx";;
+        .mm) sourcekind="mxx";;
         .S) sourcekind="as";;
         .s) sourcekind="as";;
         .asm) sourcekind="as";;
@@ -348,6 +348,7 @@ _dedup() {
 _dedup_reverse() {
     local result=""
     local list=$(echo "${1}" | awk '{for (i = NF; i > 0; --i) if (!seen[$i]++) printf $i " "}')
+    local item=""
     for item in ${list}; do
         result="${item} ${result}"
     done
@@ -440,6 +441,7 @@ _map_remove() {
         eval _map_${name}_value_${key}=""
         local keys=$(eval echo \$_map_${name}_keys)
         local keys_new=""
+        local k=""
         for k in ${keys}; do
             if test_nq "${k}" "${key}"; then
                 keys_new="${keys_new} ${k}"
@@ -490,8 +492,9 @@ fi
 #     ...
 # fi
 is_host() {
+    local host=""
     for host in $@; do
-        if test "x${os_host}" = "x${host}"; then
+        if test_eq "${os_host}" "${host}"; then
             return 0
         fi
     done
@@ -540,8 +543,9 @@ _install_includedir_default="include"
 #     ...
 # fi
 is_plat() {
+    local plat=""
     for plat in $@; do
-        if test "x${_target_plat}" = "x${plat}"; then
+        if test_eq "${_target_plat}" "${plat}"; then
             return 0
         fi
     done
@@ -554,8 +558,9 @@ is_plat() {
 #     ...
 # fi
 is_arch() {
+    local arch=""
     for arch in $@; do
-        if test "x${_target_arch}" = "x${arch}"; then
+        if test_eq "${_target_arch}" "${arch}"; then
             return 0
         fi
     done
@@ -568,8 +573,9 @@ is_arch() {
 #     ...
 # fi
 is_mode() {
+    local mode=""
     for mode in $@; do
-        if test "x${_target_mode}" = "x${mode}"; then
+        if test_eq "${_target_mode}" "${mode}"; then
             return 0
         fi
     done
@@ -582,8 +588,9 @@ is_mode() {
 #     ...
 # fi
 is_toolchain() {
+    local toolchain=""
     for toolchain in $@; do
-        if test "x${_target_toolchain}" = "x${toolchain}"; then
+        if test_eq "${_target_toolchain}" "${toolchain}"; then
             return 0
         fi
     done
@@ -602,6 +609,7 @@ set_project() {
 # include the given xmake.sh file or directory
 # e.g. includes "src" "tests"
 includes() {
+    local path=""
     for path in $@; do
         if test -f "${path}"; then
             xmake_sh_scriptdir=$(dirname -- "${path}")
@@ -645,7 +653,7 @@ _get_abstract_flag_for_gcc_clang() {
         linkdirs) flag="-L${value}";;
         links) flag="-l${value}";;
         syslinks) flag="-l${value}";;
-        frameworks) flag="-framework:${value}";;
+        frameworks) flag="-framework ${value}";;
         frameworkdirs) flag="-F${value}";;
         rpathdirs)
             if test_eq "${toolname}" "gcc" || test_eq "${toolname}" "gxx"; then
@@ -654,7 +662,7 @@ _get_abstract_flag_for_gcc_clang() {
                 flag="-Wl,-rpath='${value}'"
             elif test_eq "${toolname}" "clang" || test_eq "${toolname}" "clangxx"; then
                 string_replace "${value}" "\$ORIGIN" "@loader_path"; value="${_ret}"
-                flag="-Xlinker:-rpath:-Xlinker:${value}"
+                flag="-Xlinker -rpath -Xlinker ${value}"
             fi
             ;;
         symbols)
@@ -773,6 +781,7 @@ _get_abstract_flags() {
     local itemname="${3}"
     local values="${4}"
     local flags=""
+    local value=""
     for value in ${values}; do
         local flag=""
         case "${toolname}" in
@@ -905,6 +914,7 @@ _option_need_checking() {
 # get options for the help menu
 _get_options_for_menu() {
     local options=""
+    local name=""
     for name in ${_xmake_sh_options}; do
         _get_option_item "${name}" "showmenu"; local showmenu="${_ret}"
         if _is_enabled "${showmenu}"; then
@@ -919,6 +929,7 @@ _get_options_for_menu() {
 # get options for checking
 _get_options_for_checking() {
     local options=""
+    local name=""
     for name in ${_xmake_sh_options}; do
         _get_option_item "${name}" "showmenu"; local showmenu="${_ret}"
         if test_z "${showmenu}" && _option_need_checking "${name}"; then
@@ -1107,7 +1118,11 @@ _get_target_item() {
     local values="${_ret}"
     if _map_has "targets" "__root_${key}"; then
         _map_get "targets" "__root_${key}"; local root_values="${_ret}"
-        values="${root_values} ${values}"
+        if test_nz "${values}"; then
+            values="${root_values} ${values}"
+        else
+            values="${root_values}"
+        fi
     fi
     _ret="${values}"
 }
@@ -1134,7 +1149,7 @@ _add_target_item() {
         values="${values} ${value}"
         _map_set "targets" "${name}_${key}" "${values}"
     else
-        _map_get "targets" "__root_${key}"; local values="${ret}"
+        _map_get "targets" "__root_${key}"; local values="${_ret}"
         values="${values} ${value}"
         _map_set "targets" "__root_${key}" "${values}"
     fi
@@ -1285,32 +1300,12 @@ _get_target_objectfiles() {
     local name="${1}"
     _get_target_sourcefiles "${name}"; local sourcefiles="${_ret}"
     local objectfiles=""
+    local sourcefile=""
     for sourcefile in ${sourcefiles}; do
         _get_target_objectfile "${name}" "${sourcefile}"; local objectfile="${_ret}"
         objectfiles="${objectfiles} ${objectfile}"
     done
     _ret="${objectfiles}"
-}
-
-# get values from target
-_get_target_values() {
-    local name="${1}"
-    local itemname="${2}"
-
-    # get values from target
-    _get_target_item "${name}" "${itemname}"; local values="${_ret}"
-
-    # get values from options in target
-    _get_target_item "${name}" "options"; local options="${_ret}"
-    for option in ${options}; do
-        if has_config "${option}"; then
-            _get_option_item "${option}" "${itemname}"; local option_values="${_ret}"
-            if test_nz "${option_values}"; then
-                values="${values} ${option_values}"
-            fi
-        fi
-    done
-    _ret="${values}"
 }
 
 # get abstract flags in target
@@ -1323,14 +1318,15 @@ _get_target_abstract_flags() {
     if test_z "${values}"; then
 
         # get values from target
-        _get_target_values "${name}" "${itemname}"; values="${_ret}"
+        _get_target_item "${name}" "${itemname}"; values="${_ret}"
 
         # get values from target deps
         _get_target_item "${name}" "deps"; local deps="${_ret}"
+        local dep=""
         for dep in ${deps}; do
             _get_target_item "${dep}" "kind"; local dep_kind="${_ret}"
             if test_eq "${dep_kind}" "static" || test_eq "${dep_kind}" "shared"; then
-                _get_target_values "${dep}" "${itemname}_public"; local depvalues="${_ret}"
+                _get_target_item "${dep}" "${itemname}_public"; local depvalues="${_ret}"
                 if test_nz "${depvalues}"; then
                     values="${values} ${depvalues}"
                 fi
@@ -1402,6 +1398,7 @@ _get_target_compiler_flags() {
 
     # get abstract flags
     local itemnames="symbols optimizes warnings languages defines undefines includedirs frameworkdirs frameworks"
+    local itemname=""
     for itemname in ${itemnames}; do
         _get_target_abstract_flags "${name}" "${toolkind}" "${toolname}" "${itemname}"; local flags="${_ret}"
         if test_nz "${flags}"; then
@@ -1411,17 +1408,17 @@ _get_target_compiler_flags() {
 
     # get raw flags, e.g. add_cflags, add_cxxflags
     _get_flagname "${toolkind}"; local flagname="${_ret}"
-    _get_target_values "${name}" "${flagname}"; local flags="${_ret}"
+    _get_target_item "${name}" "${flagname}"; local flags="${_ret}"
     if test_nz "${flags}"; then
         result="${result} ${flags}"
     fi
     if test_eq "${flagname}" "cflags" || test_eq "${flagname}" "cxxflags"; then
-        _get_target_values "${name}" "cxflags"; flags="${_ret}"
+        _get_target_item "${name}" "cxflags"; flags="${_ret}"
         if test_nz "${flags}"; then
             result="${result} ${flags}"
         fi
     elif test_eq "${flagname}" "mflags" || test_eq "${flagname}" "mxxflags"; then
-        _get_target_values "${name}" "mxflags"; flags="${_ret}"
+        _get_target_item "${name}" "mxflags"; flags="${_ret}"
         if test_nz "${flags}"; then
             result="${result} ${flags}"
         fi
@@ -1445,6 +1442,7 @@ _get_target_linker_flags() {
 
     # get flags from target deps
     _get_target_item "${name}" "deps"; local deps="${_ret}"
+    local dep=""
     for dep in ${deps}; do
         _get_target_item "${dep}" "kind"; local dep_kind="${_ret}"
         if test_eq "${dep_kind}" "static" || test_eq "${dep_kind}" "shared"; then
@@ -1468,6 +1466,7 @@ _get_target_linker_flags() {
 
     # get abstract flags
     local itemnames="strip frameworkdirs linkdirs links rpathdirs frameworks syslinks"
+    local itemname=""
     for itemname in ${itemnames}; do
         _get_target_abstract_flags "${name}" "${toolkind}" "${toolname}" "${itemname}"; local flags="${_ret}"
         if test_nz "${flags}"; then
@@ -1477,7 +1476,7 @@ _get_target_linker_flags() {
 
     # get raw flags, e.g. add_ldflags, add_shflags
     _get_flagname "${toolkind}"; local flagname="${_ret}"
-    _get_target_values "${name}" "${flagname}"; local flags="${_ret}"
+    _get_target_item "${name}" "${flagname}"; local flags="${_ret}"
     if test_nz "${flags}"; then
         result="${result} ${flags}"
     fi
@@ -1516,18 +1515,12 @@ _get_target_flags() {
     local flags=""
     if test_eq "${toolkind}" "sh"; then
         _get_target_linker_flags "${name}" "${toolkind}"; flags="${_ret}"
-        _dedup_reverse "${flags}"; flags="${_ret}"
-        _split_flags "${flags}"; flags="${_ret}"
     elif test_eq "${toolkind}" "ld"; then
         _get_target_linker_flags "${name}" "${toolkind}"; flags="${_ret}"
-        _dedup_reverse "${flags}"; flags="${_ret}"
-        _split_flags "${flags}"; flags="${_ret}"
     elif test_eq "${toolkind}" "ar"; then
         _get_target_archiver_flags "${name}" "${toolkind}"; flags="${_ret}"
     else
         _get_target_compiler_flags "${name}" "${toolkind}"; flags="${_ret}"
-        _dedup "${flags}"; flags="${_ret}"
-        _split_flags "${flags}"; flags="${_ret}"
     fi
     _ret="${flags}"
 }
@@ -1537,7 +1530,14 @@ _add_target_filepaths() {
     local key="$1"
     shift
     # we need avoid escape `*` automatically in for-loop
+    local file=""
     string_replace "${@}" "\*" "?"; local list="${_ret}"
+    if test_eq "${key}" "files"; then
+        for file in ${list}; do
+            path_sourcekind "${file}"; local sourcekind="${_ret}"
+            _targets_toolkinds="${_targets_toolkinds} ${sourcekind}"
+        done
+    fi
     for file in ${list}; do
         string_replace "${file}" "?" "*"; file="${_ret}"
         if ! path_is_absolute "${file}"; then
@@ -1624,6 +1624,12 @@ set_kind() {
     fi
     local kind=${1}
     _set_target_item "${_xmake_sh_target_current}" "kind" "${kind}"
+    case "${kind}" in
+        binary) _targets_toolkinds="${_targets_toolkinds} ld";;
+        static) _targets_toolkinds="${_targets_toolkinds} ar";;
+        shared) _targets_toolkinds="${_targets_toolkinds} sh";;
+        *) raise "unknown target kind ${kind}";;
+    esac
 }
 
 # set version in target
@@ -1649,15 +1655,13 @@ set_default() {
 
 # set configvar in target
 set_configvar() {
+    if ! ${_loading_targets}; then
+        return
+    fi
     local name="${1}"
     local value="${2}"
-    if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
-        _set_target_item "${_xmake_sh_target_current}" "configvar_${name}" "${value}"
-        _add_target_item "${_xmake_sh_target_current}" "configvars" "${name}"
-    elif ${_loading_options} && test_nz "${_xmake_sh_option_current}"; then
-        _set_option_item "${_xmake_sh_option_current}" "configvar_${name}" "${value}"
-        _add_option_item "${_xmake_sh_option_current}" "configvars" "${name}"
-    fi
+    _set_target_item "${_xmake_sh_target_current}" "configvar_${name}" "${value}"
+    _add_target_item "${_xmake_sh_target_current}" "configvars" "${name}"
 }
 
 # set filename in target
@@ -1733,18 +1737,9 @@ add_deps() {
     if ! ${_loading_targets}; then
         return
     fi
+    local dep=""
     for dep in $@; do
         _add_target_item "${_xmake_sh_target_current}" "deps" "${dep}"
-    done
-}
-
-# add options in target
-add_options() {
-    if ! ${_loading_targets}; then
-        return
-    fi
-    for option in $@; do
-        _add_target_item "${_xmake_sh_target_current}" "options" "${option}"
     done
 }
 
@@ -1782,6 +1777,7 @@ add_configfiles() {
 
 # add defines in target
 add_defines() {
+    local define=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         local public=false
         for define in $@; do
@@ -1807,6 +1803,7 @@ add_defines() {
 
 # add udefines in target
 add_udefines() {
+    local undefine=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         local public=false
         for undefine in $@; do
@@ -1833,6 +1830,7 @@ add_udefines() {
 # add includedirs in target
 add_includedirs() {
     local public=false
+    local dir=""
     for dir in $@; do
         if test_nq "${dir}" "{public}"; then
             if ! path_is_absolute "${dir}"; then
@@ -1865,6 +1863,7 @@ add_includedirs() {
 
 # add links in target
 add_links() {
+    local link=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         local public=false
         for link in $@; do
@@ -1890,6 +1889,7 @@ add_links() {
 
 # add syslinks in target
 add_syslinks() {
+    local syslink=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         local public=false
         for syslink in $@; do
@@ -1915,6 +1915,7 @@ add_syslinks() {
 
 # add linkdirs in target
 add_linkdirs() {
+    local dir=""
     local public=false
     for dir in $@; do
         if test_nq "${dir}" "{public}"; then
@@ -1951,6 +1952,7 @@ add_rpathdirs() {
     if ! ${_loading_targets}; then
         return
     fi
+    local dir=""
     for dir in $@; do
         if ! path_is_absolute "${dir}"; then
             dir="${xmake_sh_scriptdir}/${dir}"
@@ -1962,6 +1964,7 @@ add_rpathdirs() {
 
 # add frameworks in target
 add_frameworks() {
+    local framework=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         local public=false
         for framework in $@; do
@@ -1987,6 +1990,7 @@ add_frameworks() {
 
 # add frameworkdirs in target
 add_frameworkdirs() {
+    local dir=""
     for dir in $@; do
         if ! path_is_absolute "${dir}"; then
             dir="${xmake_sh_scriptdir}/${dir}"
@@ -2050,6 +2054,7 @@ set_optimizes() {
 
 # add cflags in target
 add_cflags() {
+    local flag=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         for flag in $@; do
             _add_target_item "${_xmake_sh_target_current}" "cflags" "${flag}"
@@ -2063,6 +2068,7 @@ add_cflags() {
 
 # add cxflags in target
 add_cxflags() {
+    local flag=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         for flag in $@; do
             _add_target_item "${_xmake_sh_target_current}" "cxflags" "${flag}"
@@ -2076,6 +2082,7 @@ add_cxflags() {
 
 # add cxxflags in target
 add_cxxflags() {
+    local flag=""
     if ${_loading_targets} && test_z "${_xmake_sh_option_current}"; then
         for flag in $@; do
             _add_target_item "${_xmake_sh_target_current}" "cxxflags" "${flag}"
@@ -2092,6 +2099,7 @@ add_asflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "asflags" "${flag}"
     done
@@ -2102,6 +2110,7 @@ add_mflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "mflags" "${flag}"
     done
@@ -2112,6 +2121,7 @@ add_mxflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "mxflags" "${flag}"
     done
@@ -2122,6 +2132,7 @@ add_mxxflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "mxxflags" "${flag}"
     done
@@ -2132,6 +2143,7 @@ add_ldflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "ldflags" "${flag}"
     done
@@ -2142,6 +2154,7 @@ add_shflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "shflags" "${flag}"
     done
@@ -2152,6 +2165,7 @@ add_arflags() {
     if ! ${_loading_targets}; then
         return
     fi
+    local flag=""
     for flag in $@; do
         _add_target_item "${_xmake_sh_target_current}" "arflags" "${flag}"
     done
@@ -3090,6 +3104,15 @@ _load_targets() {
 }
 _load_targets
 
+# get toolset kinds for all targets
+# e.g. cc cxx as mm mxx ld sh ar
+_get_targets_toolkinds() {
+    if test_z "${_targets_toolkinds_dedup}"; then
+        _dedup "${_targets_toolkinds}"; _targets_toolkinds_dedup="${_ret}"
+    fi
+    _ret="${_targets_toolkinds_dedup}"
+}
+
 #-----------------------------------------------------------------------------
 # generate configfiles
 #
@@ -3112,7 +3135,7 @@ _vprint_configvar_define() {
     elif test_eq "${value}" "1" || test_eq "${value}" "true"; then
         vprint "  > replace ${name} -> #define ${name} 1"
     elif test_eq "${value}" "0" || test_eq "${value}" "false"; then
-        vprint "  > replace ${name} -> #define ${name} 0"
+        vprint "  > replace ${name} -> /*#define ${name} 0*/"
     else
         vprint "  > replace ${name} -> #define ${name} ${value}"
     fi
@@ -3245,22 +3268,6 @@ _generate_configfile() {
         _replace_configvar_value "${content}" "${name}" "${value}"; content="${_ret}"
     done
 
-    # replace configvars in target/options
-    _get_target_item "${target}" "options"; local options="${_ret}"
-    for option in ${options}; do
-        _get_option_item "${option}" "configvars"; local configvars="${_ret}"
-        for name in ${configvars}; do
-            _get_option_item "${option}" "configvar_${name}"; local value="${_ret}"
-            if ! has_config "${option}"; then
-                value=""
-            fi
-            _vprint_configvar_define "${content}" "${name}" "${value}"
-            _vprint_configvar_value "${content}" "${name}" "${value}"
-            _replace_configvar_define "${content}" "${name}" "${value}"; content="${_ret}"
-            _replace_configvar_value "${content}" "${name}" "${value}"; content="${_ret}"
-        done
-    done
-
     # done
     echo "${content}" > "${configfile}"
     echo "${configfile} is generated!"
@@ -3300,7 +3307,7 @@ _gmake_add_switches() {
 }
 
 _gmake_add_flags() {
-    local kinds="cc cxx as mm mxx ld sh ar"
+    _get_targets_toolkinds; local kinds="${_ret}"
     for target in ${_xmake_sh_targets}; do
         for kind in ${kinds}; do
             _get_target_flags "${target}" "${kind}"; local flags="${_ret}"
@@ -3313,7 +3320,7 @@ _gmake_add_flags() {
 }
 
 _gmake_add_toolchains() {
-    local kinds="cc cxx as mm mxx ld sh ar"
+    _get_targets_toolkinds; local kinds="${_ret}"
     for kind in ${kinds}; do
         _get_toolchain_toolset "${_target_toolchain}" "${kind}"; local program="${_ret}"
         string_toupper "${kind}"; local key="${_ret}"

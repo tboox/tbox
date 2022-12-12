@@ -97,9 +97,6 @@ target "demo"
         add_files "object/*.c"
     fi
 
-    # enable utf8?
-    add_options "force_utf8"
-
     # add the source files for the charset module
     if has_config "charset"; then
         add_files "other/charset.c"

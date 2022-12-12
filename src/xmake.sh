@@ -37,54 +37,77 @@ if is_plat "linux" && is_mode "debug"; then
 fi
 
 # options
-option "demo" "Enable or disable the demo module." true
-option "small" "Enable the small compile mode and disable all modules." true
-
-option "micro"
-    set_default false
-    set_description "Compile micro core library for the embed system."
-    set_configvar "TB_CONFIG_MICRO_ENABLE" 1
+option "demo"       "Enable or disable the demo module." true
+option "small"      "Enable the small compile mode and disable all modules." true
+option "micro"      "Compile micro core library for the embed system." false
+option "float"      "Enable or disable the float type" true
+option "info"       "Enable or disable to get some info, .e.g version .." true
+option "exception"  "Enable or disable the exception." false
+option "deprecated" "Enable or disable the deprecated interfaces." false
+option "force_utf8" "Forcely regard all tb_char* as utf-8." false
 
 option "wchar"
     add_ctypes "wchar_t"
-    set_configvar "TB_CONFIG_TYPE_HAVE_WCHAR" 1
+option_end
 
-option "float"
-    set_default true
-    set_description "Enable or disable the float type"
-    set_configvar "TB_CONFIG_TYPE_HAVE_FLOAT" 1
+basic_options() {
+    if has_config "micro"; then
+        set_configvar "TB_CONFIG_MICRO_ENABLE" 1
+    else
+        set_configvar "TB_CONFIG_MICRO_ENABLE" 0
+    fi
 
-option "info"
-    set_default true
-    set_description "Enable or disable to get some info, .e.g version .."
-    set_configvar "TB_CONFIG_INFO_HAVE_VERSION" 1
-    set_configvar "TB_CONFIG_INFO_TRACE_MORE" 1
+    if has_config "wchar"; then
+        set_configvar "TB_CONFIG_TYPE_HAVE_WCHAR" 1
+    else
+        set_configvar "TB_CONFIG_TYPE_HAVE_WCHAR" 0
+    fi
 
-option "exception"
-    set_default false
-    set_description "Enable or disable the exception."
-    set_configvar "TB_CONFIG_EXCEPTION_ENABLE" 1
+    if has_config "float"; then
+        set_configvar "TB_CONFIG_TYPE_HAVE_FLOAT" 1
+    else
+        set_configvar "TB_CONFIG_TYPE_HAVE_FLOAT" 0
+    fi
 
-option "deprecated"
-    set_default false
-    set_description "Enable or disable the deprecated interfaces."
-    set_configvar "TB_CONFIG_API_HAVE_DEPRECATED" 1
+    if has_config "info"; then
+        set_configvar "TB_CONFIG_INFO_HAVE_VERSION" 1
+        set_configvar "TB_CONFIG_INFO_TRACE_MORE" 1
+    else
+        set_configvar "TB_CONFIG_INFO_HAVE_VERSION" 0
+        set_configvar "TB_CONFIG_INFO_TRACE_MORE" 0
+    fi
 
-option "force_utf8"
-    set_default false
-    set_description "Forcely regard all tb_char* as utf-8."
-    set_configvar "TB_CONFIG_FORCE_UTF8" 1
+    if has_config "exception"; then
+        set_configvar "TB_CONFIG_EXCEPTION_ENABLE" 1
+    else
+        set_configvar "TB_CONFIG_EXCEPTION_ENABLE" 0
+    fi
+
+    if has_config "deprecated"; then
+        set_configvar "TB_CONFIG_API_HAVE_DEPRECATED" 1
+    else
+        set_configvar "TB_CONFIG_API_HAVE_DEPRECATED" 0
+    fi
+
+    if has_config "force_utf8"; then
+        set_configvar "TB_CONFIG_FORCE_UTF8" 1
+    else
+        set_configvar "TB_CONFIG_FORCE_UTF8" 0
+    fi
+}
+basic_options
 
 module_options() {
     local modules="xml zip hash regex object charset database coroutine"
     for name in ${modules}; do
         string_toupper "${name}"; local name_upper="${_ret}"
-        option "${name}"
-            set_default true
-            set_description "The ${name} module"
+        option "${name}" "The ${name} module" true
+        if has_config "${name}"; then
             set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 1
+        else
+            set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 0
+        fi
     done
-    option_end
 }
 module_options
 
@@ -125,9 +148,12 @@ check_module_cfuncs() {
             add_defines "_GNU_SOURCE=1"
             set_warnings "error"
             set_languages "c99"
-            set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 1
         option_end
-        add_options "${optname}"
+        if has_config "${optname}"; then
+            set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 1
+        else
+            set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 0
+        fi
     done
 }
 
@@ -142,12 +168,15 @@ check_module_csnippets() {
         add_defines "_GNU_SOURCE=1"
         set_warnings "error"
         set_languages "c99"
-        set_configvar "${varname}" 1
         if test_nz "${links}"; then
             add_links "${links}"
         fi
     option_end
-    add_options "${optname}"
+    if has_config "${optname}"; then
+        set_configvar "${varname}" 1
+    else
+        set_configvar "${varname}" 0
+    fi
 }
 
 # disable c functions in the given module
