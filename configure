@@ -809,6 +809,9 @@ option() {
     local default=${3}
     _xmake_sh_option_current="${name}"
     if ! ${_loading_options}; then
+        if test_nz "${description}"; then
+            _xmake_sh_option_current=""
+        fi
         return
     fi
     _xmake_sh_options="${_xmake_sh_options} ${name}"
