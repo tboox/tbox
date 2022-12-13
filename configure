@@ -2321,14 +2321,6 @@ toolchain_end
 # load options
 #
 
-# is loading options?
-is_loading_options() {
-    if ${_loading_options}; then
-        return 0
-    fi
-    return 1
-}
-
 # load options and toolchains
 _load_options_and_toolchains() {
     _loading_options=true
@@ -3286,6 +3278,8 @@ _generate_configfile() {
         _replace_configvar_define "${name}" "${value}"; patterns="${_ret};${patterns}"
         _replace_configvar_value "${name}" "${value}"; patterns="${_ret};${patterns}"
         count=$((count + 1))
+
+        # do replace
         if test_eq "$count" "10"; then
             _io_replace_file "${tmpfile}" "${configfile}" "${patterns}"
             local swapfile="${tmpfile}"
@@ -3296,10 +3290,19 @@ _generate_configfile() {
         fi
     done
 
-    # do replace
+    # do replace (left)
     if test_nz "${patterns}"; then
         _io_replace_file "${tmpfile}" "${configfile}" "${patterns}"
+        local swapfile="${tmpfile}"
+        tmpfile="${configfile}"
+        configfile="${swapfile}"
+        patterns=""
+        count=0
     fi
+
+    # replace fallback
+    patterns='s/${define \(.*\)}/\/*#undef \1*\//g;'
+    _io_replace_file "${tmpfile}" "${configfile}" "${patterns}"
     if test_nq "${configfile}" "${configfile_dst}"; then
         cp "${configfile}" "${configfile_dst}"
     fi

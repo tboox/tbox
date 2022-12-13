@@ -53,46 +53,31 @@ option_end
 basic_options() {
     if has_config "micro"; then
         set_configvar "TB_CONFIG_MICRO_ENABLE" 1
-    else
-        set_configvar "TB_CONFIG_MICRO_ENABLE" 0
     fi
 
     if has_config "wchar"; then
         set_configvar "TB_CONFIG_TYPE_HAVE_WCHAR" 1
-    else
-        set_configvar "TB_CONFIG_TYPE_HAVE_WCHAR" 0
     fi
 
     if has_config "float"; then
         set_configvar "TB_CONFIG_TYPE_HAVE_FLOAT" 1
-    else
-        set_configvar "TB_CONFIG_TYPE_HAVE_FLOAT" 0
     fi
 
     if has_config "info"; then
         set_configvar "TB_CONFIG_INFO_HAVE_VERSION" 1
         set_configvar "TB_CONFIG_INFO_TRACE_MORE" 1
-    else
-        set_configvar "TB_CONFIG_INFO_HAVE_VERSION" 0
-        set_configvar "TB_CONFIG_INFO_TRACE_MORE" 0
     fi
 
     if has_config "exception"; then
         set_configvar "TB_CONFIG_EXCEPTION_ENABLE" 1
-    else
-        set_configvar "TB_CONFIG_EXCEPTION_ENABLE" 0
     fi
 
     if has_config "deprecated"; then
         set_configvar "TB_CONFIG_API_HAVE_DEPRECATED" 1
-    else
-        set_configvar "TB_CONFIG_API_HAVE_DEPRECATED" 0
     fi
 
     if has_config "force_utf8"; then
         set_configvar "TB_CONFIG_FORCE_UTF8" 1
-    else
-        set_configvar "TB_CONFIG_FORCE_UTF8" 0
     fi
 }
 basic_options
@@ -104,22 +89,10 @@ module_options() {
         option "${name}" "The ${name} module" true
         if has_config "${name}"; then
             set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 1
-        else
-            set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 0
         fi
     done
 }
 module_options
-
-# disable all packages now
-package_options() {
-    local packages="zlib sqlite3 mysql mbedtls openssl polarssl pcre2 pcre"
-    for name in ${packages}; do
-        string_toupper "${name}"; local name_upper="${_ret}"
-        set_configvar "TB_CONFIG_PACKAGE_HAVE_${name_upper}" 0
-    done
-}
-package_options
 
 # get function name
 #
@@ -150,8 +123,6 @@ check_module_cfuncs() {
         option_end
         if has_config "${optname}"; then
             set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 1
-        else
-            set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 0
         fi
     done
 }
@@ -173,32 +144,11 @@ check_module_csnippets() {
     option_end
     if has_config "${optname}"; then
         set_configvar "${varname}" 1
-    else
-        set_configvar "${varname}" 0
     fi
-}
-
-# disable c functions in the given module
-disable_module_cfuncs() {
-    local module="${1}"
-    local cincludes="${2}"
-    shift
-    shift
-    for func in ${@}; do
-        get_function_name "${func}"; local funcname="${_ret}"
-        string_toupper "${module}"; local module_upper="${_ret}"
-        string_toupper "${funcname}"; local funcname_upper="${_ret}"
-        set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 0
-    done
 }
 
 # check interfaces
 check_interfaces() {
-
-    # we only define checking options when loading options for better performance.
-    if ! is_loading_options; then
-        return
-    fi
 
     # check the interfaces for libc
     check_module_cfuncs "libc" "string.h stdlib.h" \
@@ -326,21 +276,6 @@ check_interfaces() {
 
     # add the interfaces for valgrind
     check_module_cfuncs "valgrind" "valgrind/valgrind.h" "VALGRIND_STACK_REGISTER(0,0)"
-
-    # add the interfaces for windows/msvc
-    local mos="z _nf _acq _rel"
-    for mo in ${mos}; do
-        if test_eq "${mo}" "z"; then
-            mo=""
-        fi
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchange${mo}"
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchange8${mo}"
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedOr8${mo}"
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchangeAdd${mo}"
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedExchangeAdd64${mo}"
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedCompareExchange${mo}"
-        disable_module_cfuncs "windows" "windows.h" "_InterlockedCompareExchange64${mo}"
-    done
 
     # check __thread keyword
     check_module_csnippets "keyword_thread" "TB_CONFIG_KEYWORD_HAVE__thread" "__thread int a = 0;" "pthread"
