@@ -100,7 +100,21 @@ string_split() {
     local str="${1}"
     local sep="${2}"
     local idx="${3}"
-    _ret=$(echo "${str}" | cut -d "${sep}" -f ${idx})
+    local oldifs="${IFS}"
+    IFS="${sep}"
+    set -- ${str}
+    if test_nz "${idx}"; then
+        case "${idx}" in
+            1) _ret="$1";;
+            2) _ret="$2";;
+            3) _ret="$3";;
+        esac
+    else
+        _ret="$1"
+        _ret2="$2"
+        _ret3="$3"
+    fi
+    IFS="${oldifs}"
 }
 
 # does contain sub-string?
@@ -3214,9 +3228,10 @@ _generate_configfile() {
     # replace version
     _get_target_item "${target}" "version"; local version="${_ret}"
     _get_target_item "${target}" "version_build"; local version_build="${_ret}"
-    string_split "${version}" "." 1; local version_major="${_ret}"
-    string_split "${version}" "." 2; local version_minor="${_ret}"
-    string_split "${version}" "." 3; local version_alter="${_ret}"
+    string_split "${version}" "."
+    local version_major="${_ret}"
+    local version_minor="${_ret2}"
+    local version_alter="${_ret3}"
     if test_nz "${version}"; then
         _vprint_configvar_value "VERSION" "${version}"
         _replace_configvar_value "VERSION" "${version}"; patterns="${_ret};${patterns}"
@@ -3574,9 +3589,10 @@ _gmake_add_install_target() {
     if test_nz "${headerfiles}"; then
         local includedir="${installdir}/${_install_includedir_default}"
         for srcheaderfile in ${headerfiles}; do
-            string_split "${srcheaderfile}" ":" 2; local rootdir="${_ret}"
-            string_split "${srcheaderfile}" ":" 3; local prefixdir="${_ret}"
-            string_split "${srcheaderfile}" ":" 1; srcheaderfile="${_ret}"
+            string_split "${srcheaderfile}" ":"
+            local srcheaderfile="${_ret}"
+            local rootdir="${_ret2}"
+            local prefixdir="${_ret3}"
             path_filename "${srcheaderfile}"; local filename="${_ret}"
             local dstheaderdir="${includedir}"
             if test_nz "${prefixdir}"; then
@@ -3597,9 +3613,10 @@ _gmake_add_install_target() {
     _get_target_item "${target}" "installfiles"; local installfiles="${_ret}"
     if test_nz "${installfiles}"; then
         for srcinstallfile in ${installfiles}; do
-            string_split "${srcinstallfile}" ":" 2; local rootdir="${_ret}"
-            string_split "${srcinstallfile}" ":" 3; local prefixdir="${_ret}"
-            string_split "${srcinstallfile}" ":" 1; srcinstallfile="${_ret}"
+            string_split "${srcinstallfile}" ":"
+            local srcinstallfile="${_ret}"
+            local rootdir="${_ret2}"
+            local prefixdir="${_ret3}"
             path_filename "${srcinstallfile}"; local filename="${_ret}"
             local dstinstalldir="${installdir}"
             if test_nz "${prefixdir}"; then
