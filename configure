@@ -96,6 +96,7 @@ string_replace() {
     _ret=$(echo "$1" | sed "s/${2}/${3}/g")
 }
 
+# we avoid use `cut` command, because it's slow
 string_split() {
     local str="${1}"
     local sep="${2}"
@@ -239,8 +240,37 @@ path_basename() {
     _ret="${filename%.*}"
 }
 
+# we avoid use `dirname -- ${1}`, because it's too slow
 path_directory() {
-    _ret=$(dirname -- "${1}")
+    local path="${1}"
+    local oldifs="${IFS}"
+    IFS='/'
+    set -- ${path}
+    local dir=""
+    local first=true
+    local startswith_sep=false
+    while test $# != 1; do
+        local item="${1}"
+        if test_nz "${item}"; then
+            dir="${dir}/${item}"
+        elif $first; then
+            startswith_sep=true
+        fi
+        first=false
+        shift
+    done
+    if $startswith_sep; then
+        if test_z "${dir}"; then
+            dir="/"
+        fi
+    else
+        dir="${dir#/}"
+        if test_z "${dir}"; then
+            dir="."
+        fi
+    fi
+    _ret="${dir}"
+    IFS="${oldifs}"
 }
 
 # e.g. path_filename_fromdir "/tmp/file" "/tmp" -> "file"
