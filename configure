@@ -3357,7 +3357,7 @@ _gmake_add_flags() {
         for kind in ${kinds}; do
             _get_target_flags "${target}" "${kind}"; local flags="${_ret}"
             _get_flagname "${kind}"; local flagname="${_ret}"
-            string_toupper "${target}_${flagname}"; local key="${_ret}"
+            local key="${target}_${flagname}"
             echo "${key}=${flags}" >> "${xmake_sh_projectdir}/Makefile"
         done
         echo "" >> "${xmake_sh_projectdir}/Makefile"
@@ -3368,14 +3368,14 @@ _gmake_add_toolchains() {
     _get_targets_toolkinds; local kinds="${_ret}"
     for kind in ${kinds}; do
         _get_toolchain_toolset "${_target_toolchain}" "${kind}"; local program="${_ret}"
-        string_toupper "${kind}"; local key="${_ret}"
+        local key="${kind}"
         echo "${key}=${program}" >> "${xmake_sh_projectdir}/Makefile"
     done
     echo "" >> "${xmake_sh_projectdir}/Makefile"
 }
 
 _gmake_add_build_object_for_gcc_clang() {
-    string_toupper "${1}"; local kind="${_ret}"
+    local kind="${1}"
     local sourcefile="${2}"
     local objectfile="${3}"
     local flagname="${4}"
@@ -3392,7 +3392,7 @@ _gmake_add_build_object() {
     _get_toolchain_toolset "${_target_toolchain}" "${sourcekind}"; local program="${_ret}"
     path_toolname "${program}"; local toolname="${_ret}"
     _get_flagname "${sourcekind}"; local flagname="${_ret}"
-    string_toupper "${target}_${flagname}"; flagname="${_ret}"
+    flagname="${target}_${flagname}"
     echo "${objectfile}: ${sourcefile}" >> "${xmake_sh_projectdir}/Makefile"
     print "\t@echo compiling.${_target_mode} ${sourcefile}" >> "${xmake_sh_projectdir}/Makefile"
     case "${toolname}" in
@@ -3415,7 +3415,7 @@ _gmake_add_build_objects() {
 }
 
 _gmake_add_build_target_for_gcc_clang() {
-    string_toupper "${1}"; local kind="${_ret}"
+    local kind="${1}"
     local targetfile="${2}"
     local objectfiles="${3}"
     local flagname="${4}"
@@ -3425,7 +3425,7 @@ _gmake_add_build_target_for_gcc_clang() {
 }
 
 _gmake_add_build_target_for_ar() {
-    string_toupper "${1}"; local kind="${_ret}"
+    local kind="${1}"
     local targetfile="${2}"
     local objectfiles="${3}"
     local flagname="${4}"
@@ -3455,7 +3455,7 @@ _gmake_add_build_target() {
 
     # get linker flags
     _get_flagname "${toolkind}"; local flagname="${_ret}"
-    string_toupper "${target}_${flagname}"; flagname="${_ret}"
+    flagname="${target}_${flagname}"
 
     # link target
     echo "${target}: ${targetfile}" >> "${xmake_sh_projectdir}/Makefile"
