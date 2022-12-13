@@ -282,39 +282,43 @@ path_relative() {
 }
 
 path_sourcekind() {
-    path_extension "${1}"; local extension="${_ret}"
-    case "${extension}" in
-        .c) sourcekind="cc";;
-        .cpp) sourcekind="cxx";;
-        .cc) sourcekind="cxx";;
-        .ixx) sourcekind="cxx";;
-        .m) sourcekind="mm";;
-        .mm) sourcekind="mxx";;
-        .S) sourcekind="as";;
-        .s) sourcekind="as";;
-        .asm) sourcekind="as";;
+    local sourcekind=""
+    case "${1}" in
+        *.cpp) sourcekind="cxx";;
+        *.cc) sourcekind="cxx";;
+        *.c) sourcekind="cc";;
+        *.ixx) sourcekind="cxx";;
+        *.mm) sourcekind="mxx";;
+        *.m) sourcekind="mm";;
+        *.S) sourcekind="as";;
+        *.s) sourcekind="as";;
+        *.asm) sourcekind="as";;
         *) raise "unknown sourcekind for ${1}" ;;
     esac
     _ret="${sourcekind}"
 }
 
 path_toolname() {
-    path_basename "${1}"; local basename="${_ret}"
     local toolname=""
-    case "${basename}" in
+    case "${1}" in
         *-gcc) toolname="gcc";;
+        */gcc) toolname="gcc";;
         gcc) toolname="gcc";;
         *-g++) toolname="gxx";;
+        */g++) toolname="gxx";;
         g++) toolname="gxx";;
         xcrun*clang++) toolname="clangxx";;
         xcrun*clang) toolname="clang";;
         *-clang++) toolname="clangxx";;
+        */clang++) toolname="clangxx";;
         clang++) toolname="clangxx";;
         *-clang) toolname="clang";;
+        */clang) toolname="clang";;
         clang) toolname="clang";;
         *-ar) toolname="ar";;
+        */ar) toolname="ar";;
         ar) toolname="ar";;
-        *) raise "unknown tool for ${basename}";;
+        *) raise "unknown tool for ${1}";;
     esac
     _ret="${toolname}"
 }
