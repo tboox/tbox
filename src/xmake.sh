@@ -94,28 +94,18 @@ module_options() {
 }
 module_options
 
-# get function name
-#
-# sigsetjmp
-# sigsetjmp((void*)0, 0)
-#
-get_function_name() {
-    string_split "${1}" "(" 1
-}
-
 # check c functions in the given module
 check_module_cfuncs() {
     local module="${1}"
     local cincludes="${2}"
     shift
     shift
-    for func in ${@}; do
-        get_function_name "${func}"; local funcname="${_ret}"
+    for funcname in ${@}; do
         local optname="${module}_${funcname}"
         string_toupper "${module}"; local module_upper="${_ret}"
         string_toupper "${funcname}"; local funcname_upper="${_ret}"
         option "${optname}"
-            add_cfuncs "${func}"
+            add_cfuncs "${funcname}"
             add_cincludes "${cincludes}"
             add_defines "_GNU_SOURCE=1"
             set_warnings "error"
@@ -191,7 +181,7 @@ check_interfaces() {
         "mbstowcs"
     check_module_cfuncs "libc" "time.h"                           "gmtime" "mktime" "localtime"
     check_module_cfuncs "libc" "sys/time.h"                       "gettimeofday"
-    check_module_cfuncs "libc" "signal.h setjmp.h"                "signal" "setjmp" "sigsetjmp(0,0)" "kill"
+    check_module_cfuncs "libc" "signal.h setjmp.h"                "signal" "setjmp" "kill"
     check_module_cfuncs "libc" "execinfo.h"                       "backtrace"
     check_module_cfuncs "libc" "locale.h"                         "setlocale"
     check_module_cfuncs "libc" "stdio.h"                          "fputs" "fgets" "fgetc" "ungetc" "fputc" "fread" "fwrite"
@@ -274,15 +264,24 @@ check_interfaces() {
     # add the interfaces for linux
     check_module_cfuncs "linux" "sys/inotify.h" "inotify_init"
 
+    # add the interfaces for sigsetjmp
+    check_module_csnippets "libc_sigsetjmp" "TB_CONFIG_LIBC_HAVE_SIGSETJMP" \
+        "#include <signal.h>\n
+         #include <setjmp.h>\n
+         void test() {sigjmp_buf buf; sigsetjmp(buf, 0);}"
+
     # add the interfaces for valgrind
-    check_module_cfuncs "valgrind" "valgrind/valgrind.h" "VALGRIND_STACK_REGISTER(0,0)"
+    check_module_csnippets "valgrind" "TB_CONFIG_VALGRIND_HAVE_VALGRIND_STACK_REGISTER" \
+        "#include \"valgrind/valgrind.h\"\n
+         void test() {VALGRIND_STACK_REGISTER(0,0);}"
 
     # check __thread keyword
     check_module_csnippets "keyword_thread" "TB_CONFIG_KEYWORD_HAVE__thread" "__thread int a = 0;" "pthread"
     check_module_csnippets "keyword_thread_local" "TB_CONFIG_KEYWORD_HAVE_Thread_local" "_Thread_local int a = 0;" "pthread"
 
     # check anonymous union feature
-    check_module_csnippets "feature_anonymous_union" "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION" "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }"
+    check_module_csnippets "feature_anonymous_union" "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION" \
+        "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }"
 }
 
 includes "tbox"
