@@ -112,6 +112,14 @@ target "tbox"
     add_files "platform/impl/pollerdata.c"
     add_files "platform/impl/dns.c"
 
+    # add the source files for the windows
+    if is_plat "mingw"; then
+        add_files "platform/windows/windows.c"
+        add_files "platform/windows/iocp_object.c"
+        add_files "platform/windows/socket_pool.c"
+        add_files "platform/windows/interface/*.c"
+    fi
+
     # add the source files for the float type
     if has_config "float"; then
         add_files "libm/acos.c"
