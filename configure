@@ -122,10 +122,29 @@ string_split() {
 # e.g.
 # str="src/*.cpp"
 # string_contains "$str" "src"
-# string_contains "$str" "\*"
 string_contains() {
     case "${1}" in
         *${2}*) return 0;;
+        *) return 1;;
+    esac
+    return 1
+}
+
+# does contain "*"?
+string_contains_star() {
+    case "${1}" in
+        *\**) return 0;; # bash
+        *'*'*) return 0;; # csh
+        *) return 1;;
+    esac
+    return 1
+}
+
+# does contain "**"?
+string_contains_star2() {
+    case "${1}" in
+        *\*\**) return 0;; # bash
+        *'**'*) return 0;; # csh
         *) return 1;;
     esac
     return 1
@@ -1622,11 +1641,11 @@ _add_target_filepaths() {
             file="${xmake_sh_scriptdir}/${file}"
         fi
         local files=""
-        if string_contains "${file}" "\*\*"; then
+        if string_contains_star2 "${file}"; then
             path_directory "${file}"; local dir="${_ret}"
             path_filename_fromdir "${file}" "${dir}"; local name="${_ret}"
             _os_find "${dir}" "${name}"; files="${_ret}"
-        elif string_contains "${file}" "\*"; then
+        elif string_contains_star "${file}"; then
             path_directory "${file}"; local dir="${_ret}"
             path_filename_fromdir "${file}" "${dir}"; local name="${_ret}"
             _os_find "${dir}" "${name}" 1; files="${_ret}"
@@ -1667,11 +1686,11 @@ _add_target_installpaths() {
         filepattern="${xmake_sh_scriptdir}/${filepattern}"
     fi
     local files=""
-    if string_contains "${filepattern}" "\*\*"; then
+    if string_contains_star2 "${filepattern}"; then
         path_directory "${filepattern}"; local dir="${_ret}"
         path_filename_fromdir "${filepattern}" "${dir}"; local name="${_ret}"
         _os_find "${dir}" "${name}"; files="${_ret}"
-    elif string_contains "${filepattern}" "\*"; then
+    elif string_contains_star "${filepattern}"; then
         path_directory "${filepattern}"; local dir="${_ret}"
         path_filename_fromdir "${filepattern}" "${dir}"; local name="${_ret}"
         _os_find "${dir}" "${name}" 1; files="${_ret}"
