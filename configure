@@ -229,6 +229,11 @@ path_directory() {
     _ret=$(dirname -- "${1}")
 }
 
+# e.g. path_filename_fromdir "/tmp/file" "/tmp" -> "file"
+path_filename_fromdir() {
+    _ret="${1#${2}/}"
+}
+
 path_is_absolute() {
     if string_startswith "${1}" "/"; then
         return 0
@@ -1560,11 +1565,11 @@ _add_target_filepaths() {
         local files=""
         if string_contains "${file}" "\*\*"; then
             path_directory "${file}"; local dir="${_ret}"
-            path_filename "${file}"; local name="${_ret}"
+            path_filename_fromdir "${file}" "${dir}"; local name="${_ret}"
             _os_find "${dir}" "${name}"; files="${_ret}"
         elif string_contains "${file}" "\*"; then
             path_directory "${file}"; local dir="${_ret}"
-            path_filename "${file}"; local name="${_ret}"
+            path_filename_fromdir "${file}" "${dir}"; local name="${_ret}"
             _os_find "${dir}" "${name}" 1; files="${_ret}"
         else
             files="${file}"
@@ -1605,11 +1610,11 @@ _add_target_installpaths() {
     local files=""
     if string_contains "${filepattern}" "\*\*"; then
         path_directory "${filepattern}"; local dir="${_ret}"
-        path_filename "${filepattern}"; local name="${_ret}"
+        path_filename_fromdir "${filepattern}" "${dir}"; local name="${_ret}"
         _os_find "${dir}" "${name}"; files="${_ret}"
     elif string_contains "${filepattern}" "\*"; then
         path_directory "${filepattern}"; local dir="${_ret}"
-        path_filename "${filepattern}"; local name="${_ret}"
+        path_filename_fromdir "${filepattern}" "${dir}"; local name="${_ret}"
         _os_find "${dir}" "${name}" 1; files="${_ret}"
     else
         files="${filepattern}"
@@ -3191,6 +3196,7 @@ _generate_configfile() {
     echo "generating ${configfile} .."
 
     # replace builtin variables
+    local patterns=""
     local target_os=""
     if is_plat "mingw"; then
         target_os="windows"
@@ -3202,7 +3208,6 @@ _generate_configfile() {
     _replace_configvar_value "OS" "${target_os}"; patterns="${_ret};${patterns}"
 
     # replace version
-    local patterns=""
     _get_target_item "${target}" "version"; local version="${_ret}"
     _get_target_item "${target}" "version_build"; local version_build="${_ret}"
     string_split "${version}" "." 1; local version_major="${_ret}"
