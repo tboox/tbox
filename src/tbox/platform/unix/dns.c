@@ -34,8 +34,6 @@
  */
 tb_bool_t tb_dns_init_env()
 {
-    // done
-    tb_size_t count = 0;
     if (tb_file_info("/etc/resolv.conf", tb_null))
     {
         /* try get list from "/etc/resolv.conf"
@@ -65,9 +63,6 @@ tb_bool_t tb_dns_init_env()
 
                         // add server
                         tb_dns_server_add(p);
-
-                        // count++
-                        count++;
                     }
                 }
             }

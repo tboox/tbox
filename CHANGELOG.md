@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* [#201](https://github.com/tboox/tbox/pull/201): Add xmake.sh
+
 ### Changes
 
 * Improve path for windows, support UNC and dos device path
@@ -267,6 +271,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* [#201](https://github.com/tboox/tbox/pull/201): 添加 xmake.sh
 
 ### 改进
 
