@@ -391,7 +391,7 @@ path_toolname() {
         *-ar) toolname="ar";;
         */ar) toolname="ar";;
         ar) toolname="ar";;
-        *) raise "unknown tool for ${1}";;
+        *) raise "unknown tool ${1}";;
     esac
     _ret="${toolname}"
 }
