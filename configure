@@ -1056,6 +1056,13 @@ has_config() {
     return 1
 }
 
+# set config for option, we can use it to modify option status when loading targets
+set_config() {
+    local name=${1}
+    local value=${2}
+    _set_option_value "${name}" "${value}"
+}
+
 # set showmenu in option
 set_showmenu() {
     if ! ${_loading_options}; then

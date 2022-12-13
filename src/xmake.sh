@@ -87,7 +87,10 @@ module_options() {
     for name in ${modules}; do
         string_toupper "${name}"; local name_upper="${_ret}"
         option "${name}" "The ${name} module" true
-        if has_config "${name}"; then
+        if has_config "small"; then
+            set_config "${name}" false
+            set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 0
+        elif has_config "${name}"; then
             set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 1
         fi
     done
