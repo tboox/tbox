@@ -16,6 +16,12 @@ set_configvar "_REENTRANT" 1
 # add build modes
 if is_mode "debug"; then
     add_defines "__tb_debug__"
+    set_symbols "debug"
+    set_optimizes "none"
+else
+    set_strip "all"
+    set_symbols "hidden"
+    set_optimizes "smallest"
 fi
 
 # small or micro?
