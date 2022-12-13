@@ -207,17 +207,17 @@ _os_iorunv() {
 # find file in the given directory
 # e.g. _os_find . xmake.sh
 _os_find() {
-    local dir=${1}
-    local name=${2}
-    local depth=${3}
+    local dir="${1}"
+    local name="${2}"
+    local depth="${3}"
     if test_nz "${depth}"; then
         if is_host "macosx"; then
-            _ret=$(find ${dir} -depth ${depth} -name "${name}")
+            _ret=$(find "${dir}" -depth "${depth}" -name "${name}")
         else
-            _ret=$(find ${dir} -maxdepth ${depth} -mindepth ${depth} -name "${name}")
+            _ret=$(find "${dir}" -maxdepth "${depth}" -mindepth "${depth}" -name "${name}")
         fi
     else
-        _ret=$(find ${dir} -name "${name}")
+        _ret=$(find "${dir}" -name "${name}")
     fi
 }
 
@@ -306,7 +306,7 @@ path_relative() {
     while test_eq "${target#$common_part}" "${target}"; do
         # no match, means that candidate common part is not correct
         # go up one level (reduce common part)
-        common_part="$(dirname -- $common_part)"
+        path_directory "${common_part}"; common_part="${_ret}"
         # and record that we went back, with correct / handling
         if test_z $result; then
             result=".."
@@ -686,7 +686,7 @@ includes() {
     local path=""
     for path in $@; do
         if test -f "${path}"; then
-            xmake_sh_scriptdir=$(dirname -- "${path}")
+            path_directory "${path}"; xmake_sh_scriptdir="${_ret}"
             . "${path}"
         else
             local xmake_sh_scriptdir_cur=${xmake_sh_scriptdir}
@@ -2339,41 +2339,6 @@ set_toolset() {
     done
 }
 
-# clang toolchain
-toolchain "clang"
-    if is_host "macosx"; then
-        set_toolset "as" "xcrun -sdk macosx clang"
-        set_toolset "cc" "xcrun -sdk macosx clang"
-        set_toolset "cxx" "xcrun -sdk macosx clang"
-        set_toolset "mm" "xcrun -sdk macosx clang"
-        set_toolset "mxx" "xcrun -sdk macosx clang"
-        set_toolset "ld" "xcrun -sdk macosx clang++"
-        set_toolset "sh" "xcrun -sdk macosx clang++"
-        set_toolset "ar" "ar"
-    else
-        set_toolset "as" "clang"
-        set_toolset "cc" "clang"
-        set_toolset "cxx" "clang" "clang++"
-        set_toolset "mm" "clang"
-        set_toolset "mxx" "clang" "clang++"
-        set_toolset "ld" "clang++" "clang"
-        set_toolset "sh" "clang++" "clang"
-        set_toolset "ar" "ar"
-    fi
-toolchain_end
-
-# gcc toolchain
-toolchain "gcc"
-    set_toolset "as" "gcc"
-    set_toolset "cc" "gcc"
-    set_toolset "cxx" "gcc" "g++"
-    set_toolset "mm" "gcc"
-    set_toolset "mxx" "gcc" "g++"
-    set_toolset "ld" "g++" "gcc"
-    set_toolset "sh" "g++" "gcc"
-    set_toolset "ar" "ar"
-toolchain_end
-
 #-----------------------------------------------------------------------------
 # load options
 #
@@ -2566,6 +2531,30 @@ done
 #-----------------------------------------------------------------------------
 # detect platform and toolchains
 #
+
+# clang toolchain
+toolchain "clang"
+    set_toolset "as" "clang"
+    set_toolset "cc" "clang"
+    set_toolset "cxx" "clang" "clang++"
+    set_toolset "mm" "clang"
+    set_toolset "mxx" "clang" "clang++"
+    set_toolset "ld" "clang++" "clang"
+    set_toolset "sh" "clang++" "clang"
+    set_toolset "ar" "ar"
+toolchain_end
+
+# gcc toolchain
+toolchain "gcc"
+    set_toolset "as" "gcc"
+    set_toolset "cc" "gcc"
+    set_toolset "cxx" "gcc" "g++"
+    set_toolset "mm" "gcc"
+    set_toolset "mxx" "gcc" "g++"
+    set_toolset "ld" "g++" "gcc"
+    set_toolset "sh" "g++" "gcc"
+    set_toolset "ar" "ar"
+toolchain_end
 
 # check platform
 _check_platform() {
