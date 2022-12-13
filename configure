@@ -2992,7 +2992,7 @@ _check_cxsnippets() {
     local sourcefile="${tmpfile}${extension}"
     local objectfile="${tmpfile}.o"
     local binaryfile="${tmpfile}.bin"
-    eprint "${sourcecode}" > "${sourcefile}"
+    print "${sourcecode}" > "${sourcefile}"
 
     # try compiling it
     local ok=false
