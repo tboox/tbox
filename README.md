@@ -197,7 +197,7 @@ Some projects using tbox:
 * [itrace](https://github.com/tboox/itrace)
 * [more](https://github.com/tboox/tbox/wiki/tbox-projects)
 
-## Build
+## Build (xmake)
 
 Please install xmake first: [xmake](https://github.com/xmake-io/xmake)
 
@@ -225,6 +225,13 @@ $ xmake
 $ cd ./tbox
 $ xmake f -p linux --sdk=/home/sdk # --bin=/home/sdk/bin
 $ xmake
+```
+
+## Build (xmake.sh)
+
+```console
+$ ./configure
+$ make
 ```
 
 ## Example

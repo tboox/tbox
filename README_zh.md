@@ -204,7 +204,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 * [itrace](https://github.com/tboox/itrace)
 * [更多项目](https://github.com/tboox/tbox/wiki/%E4%BD%BF%E7%94%A8tbox%E7%9A%84%E5%BC%80%E6%BA%90%E5%BA%93)
 
-## 编译
+## 使用 Xmake 编译
 
 请先安装: [xmake](https://github.com/xmake-io/xmake)
 
@@ -232,6 +232,13 @@ $ xmake
 $ cd ./tbox
 $ xmake f -p linux --sdk=/home/sdk #--bin=/home/sdk/bin
 $ xmake
+```
+
+## 使用 xmake.sh 编译
+
+```console
+$ ./configure
+$ make
 ```
 
 ## 例子
