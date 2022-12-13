@@ -226,8 +226,18 @@ _os_date() {
     _ret=$(date +"${1}")
 }
 
+# we avoid use `basename`, because it's slow
 path_filename() {
-    _ret=$(basename -- "${1}")
+    local path="${1}"
+    local oldifs="${IFS}"
+    IFS='/'
+    set -- ${path}
+    local filename=""
+    for item in $@; do
+        filename="$item"
+    done
+    _ret="${filename}"
+    IFS="${oldifs}"
 }
 
 path_extension() {
@@ -1238,9 +1248,9 @@ _is_target_default() {
 # get target basename
 _get_target_basename() {
     local name="${1}"
-    local basename="${name}"
-    if _has_target_item "${name}" "basename"; then
-        _get_target_item "${name}" "basename"; basename="${_ret}"
+    _get_target_item "${name}" "basename"; local basename="${_ret}"
+    if test_z "${basename}"; then
+        basename="${name}"
     fi
     _ret="${basename}"
 }
@@ -1298,13 +1308,11 @@ _get_target_prefixname() {
 # get target filename
 _get_target_filename() {
     local name="${1}"
-    local filename=""
-    _get_target_basename "${name}"; local basename="${_ret}"
-    _get_target_extension "${name}"; local extension="${_ret}"
-    _get_target_prefixname "${name}"; local prefixname="${_ret}"
-    if _has_target_item "${name}" "filename"; then
-        _get_target_item "${name}" "filename"; filename="${_ret}"
-    else
+    _get_target_item "${name}" "filename"; local filename="${_ret}"
+    if test_z "${filename}"; then
+        _get_target_basename "${name}"; local basename="${_ret}"
+        _get_target_extension "${name}"; local extension="${_ret}"
+        _get_target_prefixname "${name}"; local prefixname="${_ret}"
         filename="${prefixname}${basename}${extension}"
     fi
     _ret="${filename}"
@@ -1313,10 +1321,8 @@ _get_target_filename() {
 # get target directory
 _get_targetdir() {
     local name="${1}"
-    local targetdir=""
-    if _has_target_item "${name}" "targetdir"; then
-        _get_target_item "${name}" "targetdir"; targetdir="${_ret}"
-    else
+    _get_target_item "${name}" "targetdir"; local targetdir="${_ret}"
+    if test_z "${targetdir}"; then
         targetdir="${xmake_sh_buildir}/${_target_plat}/${_target_arch}/${_target_mode}"
     fi
     _ret="${targetdir}"
@@ -1325,10 +1331,8 @@ _get_targetdir() {
 # get target object directory
 _get_target_objectdir() {
     local name="${1}"
-    local objectdir=""
-    if _has_target_item "${name}" "objectdir"; then
-        _get_target_item "${name}" "objectdir"; objectdir="${_ret}"
-    else
+    _get_target_item "${name}" "objectdir"; local objectdir="${_ret}"
+    if test_z "${objectdir}"; then
         objectdir="${xmake_sh_buildir}/.objs/${name}/${_target_plat}/${_target_arch}/${_target_mode}"
     fi
     _ret="${objectdir}"
