@@ -396,15 +396,18 @@ _dedup_reverse() {
 #
 _map() {
     local name=${1}
-    eval _map_${name}_count=0
-    eval _map_${name}_keys=""
+#    eval _map_${name}_count=0
+#    eval _map_${name}_keys=""
 }
 
-_map_count() {
-    local name=${1}
-    local count=$(eval echo \$_map_${name}_count)
-    _ret="${count}"
-}
+# because the shell is slow, we have to temporarily
+# disable some of the map features for performance.
+#
+#_map_count() {
+#    local name=${1}
+#    local count=$(eval echo \$_map_${name}_count)
+#    _ret="${count}"
+#}
 
 _map_get() {
     local name=${1}
@@ -430,40 +433,40 @@ _map_set() {
     local name=${1}
     local key=${2}
     local value=${3}
-    if ! _map_has ${name} ${key}; then
-        _map_count "options"; local count="${_ret}"
-        eval _map_${name}_count=$((${count} + 1))
-        local keys=$(eval echo \$_map_${name}_keys)
-        keys="${keys} ${key}"
-        eval _map_${name}_keys=\${keys}
-    fi
+#    if ! _map_has ${name} ${key}; then
+#        _map_count "options"; local count="${_ret}"
+#        eval _map_${name}_count=$((${count} + 1))
+#        local keys=$(eval echo \$_map_${name}_keys)
+#        keys="${keys} ${key}"
+#        eval _map_${name}_keys=\${keys}
+#    fi
     eval _map_${name}_value_${key}=\${value}
 }
 
-_map_remove() {
-    local name=${1}
-    local key=${2}
-    if _map_has ${name} ${key}; then
-        _map_count "options"; local count="${_ret}"
-        eval _map_${name}_count=$((${count} - 1))
-        eval _map_${name}_value_${key}=""
-        local keys=$(eval echo \$_map_${name}_keys)
-        local keys_new=""
-        local k=""
-        for k in ${keys}; do
-            if test_nq "${k}" "${key}"; then
-                keys_new="${keys_new} ${k}"
-            fi
-        done
-        eval _map_${name}_keys=\${keys_new}
-    fi
-}
+#_map_remove() {
+#    local name=${1}
+#    local key=${2}
+#    if _map_has ${name} ${key}; then
+#        _map_count "options"; local count="${_ret}"
+#        eval _map_${name}_count=$((${count} - 1))
+#        eval _map_${name}_value_${key}=""
+#        local keys=$(eval echo \$_map_${name}_keys)
+#        local keys_new=""
+#        local k=""
+#        for k in ${keys}; do
+#            if test_nq "${k}" "${key}"; then
+#                keys_new="${keys_new} ${k}"
+#            fi
+#        done
+#        eval _map_${name}_keys=\${keys_new}
+#    fi
+#}
 
-_map_keys() {
-    local name=${1}
-    local keys=$(eval echo \$_map_${name}_keys)
-    _ret="${keys}"
-}
+#_map_keys() {
+#    local name=${1}
+#    local keys=$(eval echo \$_map_${name}_keys)
+#    _ret="${keys}"
+#}
 
 #-----------------------------------------------------------------------------
 # detect default environments
@@ -2317,6 +2320,14 @@ toolchain_end
 #-----------------------------------------------------------------------------
 # load options
 #
+
+# is loading options?
+is_loading_options() {
+    if ${_loading_options}; then
+        return 0
+    fi
+    return 1
+}
 
 # load options and toolchains
 _load_options_and_toolchains() {

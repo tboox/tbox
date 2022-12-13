@@ -127,8 +127,7 @@ package_options
 # sigsetjmp((void*)0, 0)
 #
 get_function_name() {
-    string_split "${1}" "(" 1; local name="${_ret}"
-    echo "${name}"
+    string_split "${1}" "(" 1
 }
 
 # check c functions in the given module
@@ -138,7 +137,7 @@ check_module_cfuncs() {
     shift
     shift
     for func in ${@}; do
-        local funcname=$(get_function_name "${func}")
+        get_function_name "${func}"; local funcname="${_ret}"
         local optname="${module}_${funcname}"
         string_toupper "${module}"; local module_upper="${_ret}"
         string_toupper "${funcname}"; local funcname_upper="${_ret}"
@@ -186,7 +185,7 @@ disable_module_cfuncs() {
     shift
     shift
     for func in ${@}; do
-        local funcname=$(get_function_name "${func}")
+        get_function_name "${func}"; local funcname="${_ret}"
         string_toupper "${module}"; local module_upper="${_ret}"
         string_toupper "${funcname}"; local funcname_upper="${_ret}"
         set_configvar "TB_CONFIG_${module_upper}_HAVE_${funcname_upper}" 0
@@ -195,6 +194,11 @@ disable_module_cfuncs() {
 
 # check interfaces
 check_interfaces() {
+
+    # we only define checking options when loading options for better performance.
+    if ! is_loading_options; then
+        return
+    fi
 
     # check the interfaces for libc
     check_module_cfuncs "libc" "string.h stdlib.h" \
