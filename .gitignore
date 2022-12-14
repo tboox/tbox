@@ -35,3 +35,4 @@ Doxyfile
 .idea
 CMakeLists.txt
 Makefile
+makefile
