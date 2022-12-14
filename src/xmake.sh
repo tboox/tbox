@@ -88,15 +88,13 @@ basic_options() {
 }
 basic_options
 
+# we disable all modules by default, but we can use `./configure --hash=y` to enable it
 module_options() {
     local modules="xml zip hash regex object charset database coroutine"
     for name in ${modules}; do
         string_toupper "${name}"; local name_upper="${_ret}"
-        option "${name}" "The ${name} module" true
-        if has_config "small"; then
-            set_config "${name}" false
-            set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 0
-        elif has_config "${name}"; then
+        option "${name}" "The ${name} module" false
+        if has_config "${name}"; then
             set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 1
         fi
     done
