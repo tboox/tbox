@@ -2568,6 +2568,18 @@ done
 # detect platform and toolchains
 #
 
+# envs toolchain
+toolchain "envs"
+    set_toolset "as" "$CC" "$CXX" "$AS"
+    set_toolset "cc" "$CC"
+    set_toolset "cxx" "$CC" "$CXX"
+    set_toolset "mm" "$CC" "$CXX"
+    set_toolset "mxx" "$CC" "$CXX"
+    set_toolset "ld" "$CXX" "$CC" "$LD"
+    set_toolset "sh" "$CXX" "$CC" "$LD"
+    set_toolset "ar" "$AR"
+toolchain_end
+
 # clang toolchain
 toolchain "clang"
     set_toolset "as" "clang"
@@ -2853,10 +2865,12 @@ _toolchain_try_toolset() {
             key="${key}_${idx}"
         fi
         _get_toolchain_toolset "${toolchain}" "${key}"; local program="${_ret}"
-        if _toolchain_try_program "${toolchain}" "${kind}" "${program}"; then
-            _set_toolchain_toolset "${toolchain}" "${kind}" "${program}"
-            echo "checking for the ${description} (${kind}) ... ${program}"
-            return 0
+        if test_nz "${program}"; then
+            if _toolchain_try_program "${toolchain}" "${kind}" "${program}"; then
+                _set_toolchain_toolset "${toolchain}" "${kind}" "${program}"
+                echo "checking for the ${description} (${kind}) ... ${program}"
+                return 0
+            fi
         fi
     done
     return 1
@@ -2923,7 +2937,7 @@ _toolchain_detect() {
     local toolchains="${1}"
     if test "x${toolchains}" = "x"; then
         if is_plat "macosx"; then
-            toolchains="clang gcc"
+            toolchains="envs clang gcc"
         elif is_plat "mingw"; then
             if is_arch "i386"; then
                 toolchains="i686_w64_mingw32"
@@ -2931,7 +2945,7 @@ _toolchain_detect() {
                 toolchains="x86_64_w64_mingw32"
             fi
         else
-            toolchains="gcc clang"
+            toolchains="envs gcc clang"
         fi
     fi
     for toolchain in ${toolchains}; do
