@@ -2592,6 +2592,30 @@ toolchain "gcc"
     set_toolset "ar" "ar"
 toolchain_end
 
+# mingw toolchain (x86_64)
+toolchain "x86_64_w64_mingw32"
+    set_toolset "as" "x86_64-w64-mingw32-gcc"
+    set_toolset "cc" "x86_64-w64-mingw32-gcc"
+    set_toolset "cxx" "x86_64-w64-mingw32-gcc" "x86_64-w64-mingw32-g++"
+    set_toolset "mm" "x86_64-w64-mingw32-gcc"
+    set_toolset "mxx" "x86_64-w64-mingw32-gcc" "x86_64-w64-mingw32-g++"
+    set_toolset "ld" "x86_64-w64-mingw32-g++" "x86_64-w64-mingw32-gcc"
+    set_toolset "sh" "x86_64-w64-mingw32-g++" "x86_64-w64-mingw32-gcc"
+    set_toolset "ar" "x86_64-w64-mingw32-ar" "ar"
+toolchain_end
+
+# mingw toolchain (i686)
+toolchain "i686_w64_mingw32"
+    set_toolset "as" "i686-w64-mingw32-gcc"
+    set_toolset "cc" "i686-w64-mingw32-gcc"
+    set_toolset "cxx" "i686-w64-mingw32-gcc" "i686-w64-mingw32-g++"
+    set_toolset "mm" "i686-w64-mingw32-gcc"
+    set_toolset "mxx" "i686-w64-mingw32-gcc" "i686-w64-mingw32-g++"
+    set_toolset "ld" "i686-w64-mingw32-g++" "i686-w64-mingw32-gcc"
+    set_toolset "sh" "i686-w64-mingw32-g++" "i686-w64-mingw32-gcc"
+    set_toolset "ar" "i686-w64-mingw32-ar" "ar"
+toolchain_end
+
 # check platform
 _check_platform() {
     if test "x${_target_plat}" = "x"; then
@@ -2900,6 +2924,12 @@ _toolchain_detect() {
     if test "x${toolchains}" = "x"; then
         if is_plat "macosx"; then
             toolchains="clang gcc"
+        elif is_plat "mingw"; then
+            if is_arch "i386"; then
+                toolchains="i686_w64_mingw32"
+            else
+                toolchains="x86_64_w64_mingw32"
+            fi
         else
             toolchains="gcc clang"
         fi
