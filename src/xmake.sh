@@ -97,6 +97,7 @@ module_options() {
         if has_config "${name}"; then
             set_configvar "TB_CONFIG_MODULE_HAVE_${name_upper}" 1
         fi
+        option_end
     done
 }
 module_options
