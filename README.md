@@ -15,7 +15,7 @@
       <img src="https://img.shields.io/github/actions/workflow/status/tboox/tbox/macos.yml?branch=dev&style=flat-square&logo=apple" alt="github-ci" />
     </a>
     <a href="https://github.com/tboox/tbox/actions?query=workflow%3AAndroid">
-      <img src="https://img.shields.io/github/workflow/status/tboox/tbox/Android/dev.svg?style=flat-square&logo=android" alt="github-ci" />
+      <img src="https://img.shields.io/github/actions/workflow/status/tboox/tbox/android.yml?branch=dev&style=flat-square&logo=android" alt="github-ci" />
     </a>
     <a href="https://github.com/tboox/tbox/releases">
       <img src="https://img.shields.io/github/release/tboox/tbox.svg?style=flat-square" alt="Github All Releases" />
