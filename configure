@@ -1139,8 +1139,7 @@ add_cfuncs() {
     if ! ${_loading_options}; then
         return
     fi
-    local cfuncs="${1}"
-    _add_option_item "${_xmake_sh_option_current}" "cfuncs" "${cfuncs}"
+    _add_option_item "${_xmake_sh_option_current}" "cfuncs" "${@}"
 }
 
 # add cxxfuncs in option
@@ -1148,8 +1147,7 @@ add_cxxfuncs() {
     if ! ${_loading_options}; then
         return
     fi
-    local cxxfuncs="${1}"
-    _add_option_item "${_xmake_sh_option_current}" "cxxfuncs" "${cxxfuncs}"
+    _add_option_item "${_xmake_sh_option_current}" "cxxfuncs" "${@}"
 }
 
 # add cincludes in option
@@ -2351,7 +2349,7 @@ add_options() {
     for name in $@; do
         if has_config "${name}"; then
             local itemname=""
-            local itemnames="includedirs linkdirs links cflags cxflags cxxflags ldflags"
+            local itemnames="includedirs linkdirs links defines cflags cxflags cxxflags ldflags"
             for itemname in ${itemnames}; do
                 _get_option_item "${name}" "${itemname}"; local values="${_ret}"
                 if test_nz "${values}"; then
