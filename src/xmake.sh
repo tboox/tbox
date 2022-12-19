@@ -146,7 +146,11 @@ check_module_csnippets() {
 }
 
 # check interfaces
+#check_interfaces_enabled=false
 check_interfaces() {
+    if ! $check_interfaces_enabled; then
+        return
+    fi
 
     # check the interfaces for libc
     check_module_cfuncs "libc" "string.h stdlib.h" \

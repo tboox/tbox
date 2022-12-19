@@ -519,8 +519,8 @@ _map() {
 #}
 
 _map_get() {
-    local name=${1}
-    local key=${2}
+    local name="${1}"
+    local key="${2}"
     local value=$(eval echo \$_map_${name}_value_${key})
     if test_eq "${value}" "__empty__"; then
         value=""
@@ -529,8 +529,8 @@ _map_get() {
 }
 
 _map_has() {
-    local name=${1}
-    local key=${2}
+    local name="${1}"
+    local key="${2}"
     local value=$(eval echo \$_map_${name}_value_${key})
     if test_nz "${value}"; then
         return 0
@@ -539,9 +539,9 @@ _map_has() {
 }
 
 _map_set() {
-    local name=${1}
-    local key=${2}
-    local value=${3}
+    local name="${1}"
+    local key="${2}"
+    local value="${3}"
 #    if ! _map_has ${name} ${key}; then
 #        _map_count "options"; local count="${_ret}"
 #        eval _map_${name}_count=$((${count} + 1))
@@ -553,8 +553,8 @@ _map_set() {
 }
 
 #_map_remove() {
-#    local name=${1}
-#    local key=${2}
+#    local name="${1}"
+#    local key="${2}"
 #    if _map_has ${name} ${key}; then
 #        _map_count "options"; local count="${_ret}"
 #        eval _map_${name}_count=$((${count} - 1))
@@ -572,7 +572,7 @@ _map_set() {
 #}
 
 #_map_keys() {
-#    local name=${1}
+#    local name="${1}"
 #    local keys=$(eval echo \$_map_${name}_keys)
 #    _ret="${keys}"
 #}
@@ -1508,7 +1508,11 @@ _get_target_abstract_flags() {
             fi
         done
     fi
-    _get_abstract_flags "${toolkind}" "${toolname}" "${itemname}" "${values}"
+    if test_nz "${values}"; then
+        _get_abstract_flags "${toolkind}" "${toolname}" "${itemname}" "${values}"
+    else
+        _ret=""
+    fi
 }
 
 # get toolchain flags for ar in target
@@ -2800,7 +2804,7 @@ _toolchain_linkcmd() {
 
 # try make
 _toolchain_try_make() {
-    local program=${1}
+    local program="${1}"
     if _os_runv "${program}" "--version"; then
         return 0
     fi
@@ -2809,7 +2813,7 @@ _toolchain_try_make() {
 
 # try ninja
 _toolchain_try_ninja() {
-    local program=${1}
+    local program="${1}"
     if _os_runv "${program}" "--version"; then
         return 0
     fi
@@ -2824,8 +2828,8 @@ _toolchain_try_gcc() {
         return 1
     fi
 
-    local kind=${1}
-    local program=${2}
+    local kind="${1}"
+    local program="${2}"
     if _os_runv "${program}" "--version"; then
         _toolchain_try_gcc_result="ok"
         return 0
@@ -2842,8 +2846,8 @@ _toolchain_try_gxx() {
         return 1
     fi
 
-    local kind=${1}
-    local program=${2}
+    local kind="${1}"
+    local program="${2}"
     if _os_runv "${program}" "--version"; then
         _toolchain_try_gxx_result="ok"
         return 0
@@ -2860,8 +2864,8 @@ _toolchain_try_clang() {
         return 1
     fi
 
-    local kind=${1}
-    local program=${2}
+    local kind="${1}"
+    local program="${2}"
     if _os_runv "${program}" "--version"; then
         _toolchain_try_clang_result="ok"
         return 0
@@ -2878,8 +2882,8 @@ _toolchain_try_clangxx() {
         return 1
     fi
 
-    local kind=${1}
-    local program=${2}
+    local kind="${1}"
+    local program="${2}"
     if _os_runv "${program}" "--version"; then
         _toolchain_try_clangxx_result="ok"
         return 0
@@ -2888,10 +2892,10 @@ _toolchain_try_clangxx() {
     return 1
 }
 
-# TODO try ar
+# try ar
 _toolchain_try_ar() {
-    local kind=${1}
-    local program=${2}
+    local kind="${1}"
+    local program="${2}"
 
     # generate the source file
     _os_tmpfile
@@ -2917,9 +2921,9 @@ _toolchain_try_ar() {
 
 # try program
 _toolchain_try_program() {
-    local toolchain=${1}
-    local kind=${2}
-    local program=${3}
+    local toolchain="${1}"
+    local kind="${2}"
+    local program="${3}"
     local ok=false
     path_toolname "${program}"; local toolname="${_ret}"
     case "${toolname}" in
