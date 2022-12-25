@@ -612,20 +612,26 @@ if test_eq "${os_arch}" "i686"; then
     os_arch="i386"
 fi
 
-# set the default target platform and architecture
+# set the default target platform
 _target_plat_default=${os_host}
 if is_host "msys"; then
     _target_plat_default="mingw"
 elif is_host "freebsd"; then
     _target_plat_default="bsd"
 fi
+
+# set the default target architecture
 _target_arch_default=${os_arch}
 if is_host "msys" && test_nz "${MSYSTEM_CARCH}"; then
     _target_arch_default="${MSYSTEM_CARCH}"
+elif test_nz "${TERMUX_ARCH}"; then
+    _target_arch_default="${TERMUX_ARCH}"
 fi
 if test_eq "${_target_arch_default}" "i686"; then
     _target_arch_default="i386"
 fi
+
+# set the default target mode
 _target_mode_default="release"
 
 # set the default project generator and build program
@@ -3568,8 +3574,17 @@ _gmake_add_switches() {
     echo "VV=@" >> "${xmake_sh_makefile}"
     echo "endif" >> "${xmake_sh_makefile}"
     echo "" >> "${xmake_sh_makefile}"
-    echo "ifeq (\$(PREFIX),)" >> "${xmake_sh_makefile}"
-    echo "PREFIX=${_install_prefix_default}" >> "${xmake_sh_makefile}"
+    echo "INSTALLDIR:=" >> "${xmake_sh_makefile}"
+    echo "ifneq (\$(DESTDIR),)" >> "${xmake_sh_makefile}"
+    echo "INSTALLDIR:=\$(DESTDIR)" >> "${xmake_sh_makefile}"
+    echo "endif" >> "${xmake_sh_makefile}"
+    echo "" >> "${xmake_sh_makefile}"
+    echo "ifneq (\$(PREFIX),)" >> "${xmake_sh_makefile}"
+    echo "INSTALLDIR:=\$(INSTALLDIR)/\$(PREFIX)" >> "${xmake_sh_makefile}"
+    echo "endif" >> "${xmake_sh_makefile}"
+    echo "" >> "${xmake_sh_makefile}"
+    echo "ifeq (\$(INSTALLDIR),)" >> "${xmake_sh_makefile}"
+    echo "INSTALLDIR=${_install_prefix_default}" >> "${xmake_sh_makefile}"
     echo "endif" >> "${xmake_sh_makefile}"
     echo "" >> "${xmake_sh_makefile}"
 }
@@ -3795,7 +3810,7 @@ _gmake_add_install_target() {
     path_filename "${targetfile}"; local filename="${_ret}"
     _get_target_item "${target}" "installdir"; local installdir="${_ret}"
     if test_z "${installdir}"; then
-        installdir="\$(PREFIX)"
+        installdir="\$(INSTALLDIR)"
     fi
 
     # install target file
