@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set_project "tbox"
-set_version "1.7.1" "%Y%m%d%H%M"
+set_version "1.7.2" "%Y%m%d%H%M"
 
 # set warning all as error
 set_warnings "all" "error"

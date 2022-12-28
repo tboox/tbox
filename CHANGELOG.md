@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.2
+
 ### New features
 
 * [#201](https://github.com/tboox/tbox/pull/201): Add xmake.sh
@@ -271,6 +273,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.7.2
 
 ### 新特性
 
