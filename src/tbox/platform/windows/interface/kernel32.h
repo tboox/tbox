@@ -197,6 +197,9 @@ typedef struct __tb_kernel32_t
     // GetFileSizeEx
     tb_kernel32_GetFileSizeEx_t                         GetFileSizeEx;
 
+    // CancelIoEx
+    tb_kernel32_CancelIoEx_t                            CancelIoEx;
+
     // GetQueuedCompletionStatusEx
     tb_kernel32_GetQueuedCompletionStatusEx_t           GetQueuedCompletionStatusEx;
 

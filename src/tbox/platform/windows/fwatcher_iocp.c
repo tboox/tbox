@@ -78,7 +78,8 @@ static tb_void_t tb_fwatcher_item_free(tb_element_ref_t element, tb_pointer_t bu
     watchitem->stop = tb_true;
     if (watchitem->handle && watchitem->handle != INVALID_HANDLE_VALUE)
     {
-        CancelIoEx(watchitem->handle, &watchitem->overlapped);
+        if (tb_kernel32()->CancelIoEx)
+            tb_kernel32()->CancelIoEx(watchitem->handle, &watchitem->overlapped);
         CloseHandle(watchitem->handle);
         watchitem->handle = INVALID_HANDLE_VALUE;
     }
