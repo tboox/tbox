@@ -43,7 +43,7 @@ if is_plat "linux" && is_mode "debug"; then
 fi
 
 # options
-option "demo"       "Enable or disable the demo module." false
+option "demo"       "Enable or disable the demo module." true
 option "small"      "Enable the small compile mode and disable all modules." true
 option "micro"      "Compile micro core library for the embed system." false
 option "float"      "Enable or disable the float type" true
