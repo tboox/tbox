@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.3
+
 ### Changes
 
 * Improve support for xp and mingw
@@ -278,6 +280,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.7.3
 
 ### 改进
 
