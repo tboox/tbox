@@ -5,6 +5,7 @@
 ### Changes
 
 * Improve support for xp and mingw
+* Improve configure to support debian package better
 
 ## v1.7.2
 
@@ -281,6 +282,7 @@
 ### 改进
 
 * 改进对 xp 和 mingw 的支持
+* 改进 configure 构建脚本，更好的支持 debian 打包
 
 ## v1.7.2
 
