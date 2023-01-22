@@ -29,6 +29,7 @@ jobs:
         run: |
           git clone https://github.com/xmake-io/xmake.git --recurse-submodules -b dev
           cd xmake
+          ./configure
           make build
           make install PREFIX=${{ matrix.prefix }}
           xmake --version
