@@ -624,6 +624,9 @@ tb_bool_t tb_ipaddr_unix_set_cstr(tb_ipaddr_ref_t ipaddr, tb_char_t const* cstr,
     // have ip?
     temp.have_ip = 1;
 
+    // Set port to 0 = not used
+    temp.port = 0;
+
     // save ipaddr
     tb_ipaddr_copy(ipaddr, &temp);
     return tb_true;
