@@ -33,6 +33,8 @@ fi
 
 if is_plat "mingw" "msys" "cygwin"; then
     add_syslinks "ws2_32" "pthread" "m"
+elif is_plat "haiku"; then
+    add_syslinks "pthread" "m" "c"
 else
     add_syslinks "pthread" "dl" "m" "c"
 fi
