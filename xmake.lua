@@ -65,6 +65,8 @@ elseif is_plat("android") then
     add_syslinks("m", "c")
 elseif is_plat("mingw", "msys", "cygwin") then
     add_syslinks("ws2_32", "pthread", "m")
+elseif is_plat("haiku") then
+    add_syslinks("pthread", "network", "m", "c")
 else
     add_syslinks("pthread", "dl", "m", "c")
 end
