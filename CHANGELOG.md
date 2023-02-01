@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Add Haiku support
+
 ## v1.7.3
 
 ### Changes
@@ -280,6 +284,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* 添加 Haiku 支持
 
 ## v1.7.3
 
