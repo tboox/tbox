@@ -28,7 +28,9 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <errno.h>
-#ifndef TB_CONFIG_OS_ANDROID
+#if defined(TB_CONFIG_OS_HAIKU)
+#   include <unistd.h>
+#elif !defined(TB_CONFIG_OS_ANDROID)
 #   include <sys/unistd.h>
 #endif
 
