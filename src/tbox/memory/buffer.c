@@ -194,7 +194,9 @@ tb_byte_t* tb_buffer_memset(tb_buffer_ref_t buffer, tb_byte_t b)
 }
 tb_byte_t* tb_buffer_memsetp(tb_buffer_ref_t buffer, tb_size_t p, tb_byte_t b)
 {
-    return tb_buffer_memnsetp(buffer, p, b, tb_buffer_size(buffer));
+    tb_size_t size = tb_buffer_size(buffer);
+    tb_assert_and_check_return_val(p < size, tb_null);
+    return tb_buffer_memnsetp(buffer, p, b, size - p);
 }
 tb_byte_t* tb_buffer_memnset(tb_buffer_ref_t buffer, tb_byte_t b, tb_size_t n)
 {
