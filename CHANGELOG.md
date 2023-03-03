@@ -5,6 +5,11 @@
 ### New features
 
 * Add Haiku support
+* Add tb_file_fscase
+
+### Bugs fixed
+
+* Fix tb_buffer_memsetp
 
 ## v1.7.3
 
@@ -288,6 +293,11 @@
 ### 新特性
 
 * 添加 Haiku 支持
+* 添加 tb_file_fscase 接口判断文件大小写敏感
+
+### Bugs 修复
+
+* 修复 tb_buffer_memsetp
 
 ## v1.7.3
 
