@@ -154,3 +154,37 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
     return tb_false;
 }
 #endif
+tb_long_t tb_file_fscase(tb_char_t const* path)
+{
+    // check
+    tb_assert_and_check_return_val(path, -1);
+
+    // flip path case
+    tb_char_t path_flipcase[TB_PATH_MAXN];
+    tb_char_t const* p = path;
+    tb_size_t i = 0;
+    tb_char_t ch;
+    while (*p && i < (TB_PATH_MAXN - 1))
+    {
+        ch = *p++;
+        ch = tb_islower(ch)? tb_toupper(ch) : tb_tolower(ch);
+        path_flipcase[i++] = ch;
+    }
+    path_flipcase[i] = '\0';
+
+    tb_file_info_t info, info_flipcase;
+    if (tb_file_info(path, &info))
+    {
+        if (tb_file_info(path_flipcase, &info_flipcase)
+            && info.size == info_flipcase.size
+            && info.mtime == info_flipcase.mtime
+            && info.type == info_flipcase.type
+            && info.flags == info_flipcase.flags)
+        {
+            return 0;
+        }
+        return 1;
+    }
+    else return -1;
+}
+

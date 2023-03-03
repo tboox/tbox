@@ -277,6 +277,14 @@ tb_hong_t               tb_file_offset(tb_file_ref_t file);
  */
 tb_bool_t               tb_file_info(tb_char_t const* path, tb_file_info_t* info);
 
+/*! is this file path is case sensitive?
+ *
+ * @param path          the file path, @note We must pass a path to the file that exists
+ *
+ * @return              1: case sensitive, 0: case insensitive, -1: failed
+ */
+tb_long_t               tb_file_fscase(tb_char_t const* path);
+
 /*! copy the file
  *
  * @param path          the file path
