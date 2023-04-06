@@ -126,10 +126,10 @@
 #           endif
 #       elif __ARM_ARCH >= 7
 #           define TB_ARCH_ARM_v7
-#           define  TB_ARCH_STRING          "armv7"
+#           define TB_ARCH_STRING           "armv7"
 #       elif __ARM_ARCH >= 6
 #           define TB_ARCH_ARM_v6
-#           define  TB_ARCH_STRING          "armv6"
+#           define TB_ARCH_STRING           "armv6"
 #       else
 #           define TB_ARCH_ARM_v5
 #           define TB_ARCH_STRING           "armv5"
