@@ -7,6 +7,15 @@
 * Add Haiku support
 * Add tb_file_fscase
 
+### Changes
+
+* Improve wasm support
+
+### Bugs fixed
+
+* Fix setenv for msys/mingw
+* Fix compile error for mingw
+
 ### Bugs fixed
 
 * Fix tb_buffer_memsetp
@@ -294,6 +303,16 @@
 
 * 添加 Haiku 支持
 * 添加 tb_file_fscase 接口判断文件大小写敏感
+
+### 改进
+
+* 改进 wasm 支持
+
+### Bugs 修复
+
+* 修复 msys/mingw 下 setenv 设置问题
+* 修复 mingw 编译错误
+
 
 ### Bugs 修复
 
