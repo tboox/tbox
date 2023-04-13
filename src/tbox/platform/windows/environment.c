@@ -118,6 +118,7 @@ static tb_bool_t tb_environment_set_impl(tb_char_t const* name, tb_char_t const*
     tb_bool_t   ok = tb_false;
     tb_wchar_t* value_w = tb_null;
     tb_size_t   value_n = 0;
+    tb_char_t*  env = tb_null;
     do
     {
         // make name
@@ -136,12 +137,37 @@ static tb_bool_t tb_environment_set_impl(tb_char_t const* name, tb_char_t const*
             // init value
             if (tb_atow(value_w, value, value_n + 1) == -1) break;
 
+#ifdef TB_COMPILER_IS_MINGW
+            /* we need also set it to environ for msys/mingw,
+             * because SetEnvironmentVariableW maybe cannot modify environ.
+             *
+             * when we run the process under msys, it may not be able to find the program from the PATH path set by SetEnvironmentVariableW.
+             */
+            env = (tb_char_t*)tb_malloc0_cstr(name_n + value_n + 2);
+            if (env)
+            {
+                tb_snprintf(env, name_n + value_n + 2, "%s=%s", name, value);
+                putenv(env);
+            }
+#endif
+
             // set it
             if (!tb_kernel32()->SetEnvironmentVariableW(name_w, value_w)) break;
+
         }
         // remove this variable
         else
         {
+
+#ifdef TB_COMPILER_IS_MINGW
+            // unset it from msys/mingw
+            env = (tb_char_t*)tb_malloc0_cstr(name_n + 2);
+            if (env)
+            {
+                tb_snprintf(env, name_n + 2, "%s=", name);
+                putenv(env);
+            }
+#endif
             // remove it
             if (!tb_kernel32()->SetEnvironmentVariableW(name_w, tb_null)) break;
         }
@@ -155,7 +181,9 @@ static tb_bool_t tb_environment_set_impl(tb_char_t const* name, tb_char_t const*
     if (value_w) tb_free(value_w);
     value_w = tb_null;
 
-    // ok?
+    if (env) tb_free(env);
+    env = tb_null;
+
     return ok;
 }
 /* //////////////////////////////////////////////////////////////////////////////////////
