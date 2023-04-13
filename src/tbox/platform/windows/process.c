@@ -22,17 +22,17 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#if defined(__MINGW32__) || defined(__MINGW64__)
+// enable UpdateProcThreadAttribute
+#   undef _WIN32_WINNT
+#   define _WIN32_WINNT 0x0600
+#endif
 #include "prefix.h"
 #include "../path.h"
 #include "../file.h"
 #include "../process.h"
 #include "../environment.h"
 #include "../../string/string.h"
-#ifdef TB_COMPILER_IS_MINGW
-// enable UpdateProcThreadAttribute
-#   undef _WIN32_WINNT
-#   define _WIN32_WINNT 0x0600
-#endif
 #include "interface/interface.h"
 #if defined(TB_CONFIG_MODULE_HAVE_COROUTINE) \
         && !defined(TB_CONFIG_MICRO_ENABLE)
