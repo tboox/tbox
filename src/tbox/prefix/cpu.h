@@ -50,7 +50,8 @@
     || defined(_M_ARM64) \
     || defined(_M_IA64) || defined(__ia64__) || defined(__ia64) \
     || (defined(__WORDSIZE) && (__WORDSIZE == 64)) \
-    || defined(TCC_TARGET_X86_64)
+    || defined(TCC_TARGET_X86_64) \
+    || defined(__wasm64) || defined(__wasm64__)
 #   define TB_CPU_BITSIZE       (64)
 #   define TB_CPU_BITBYTE       (8)
 #   define TB_CPU_BITALIGN      (7)
