@@ -884,7 +884,7 @@ tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
 
     // parse attributes
     tb_size_t n = 0;
-    while (p < e)
+    while (p < e && n + 1 < TB_XML_READER_ATTRIBUTES_MAXN)
     {
         // parse name
         tb_string_clear(&impl->attribute_name);
@@ -902,7 +902,6 @@ tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
         // append node
         if (tb_string_cstr(&impl->attribute_name) && tb_string_cstr(&impl->attribute_data))
         {
-            // node
             tb_xml_node_ref_t prev = n > 0? (tb_xml_node_ref_t)&impl->attributes[n - 1] : tb_null;
             tb_xml_node_ref_t node = (tb_xml_node_ref_t)&impl->attributes[n];
 
@@ -913,12 +912,8 @@ tb_xml_node_ref_t tb_xml_reader_attributes(tb_xml_reader_ref_t reader)
             // append node
             if (prev) prev->next = node;
             node->next = tb_null;
-
-            // next
             n++;
         }
     }
-
-    // ok?
     return n? (tb_xml_node_ref_t)&impl->attributes[0] : tb_null;
 }
