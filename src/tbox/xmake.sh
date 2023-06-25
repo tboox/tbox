@@ -1,7 +1,7 @@
 #!/bin/sh
 
 target "tbox"
-    set_kind "static"
+    set_kind "${kind}"
 
     # add defines
     add_defines "__tb_prefix__=\"tbox\""

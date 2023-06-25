@@ -20,7 +20,9 @@ if is_mode "debug"; then
     set_optimizes "none"
 else
     set_strip "all"
-    set_symbols "hidden"
+    if ! is_kind "shared"; then
+        set_symbols "hidden"
+    fi
     set_optimizes "smallest"
 fi
 
