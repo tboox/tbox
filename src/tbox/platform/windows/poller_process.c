@@ -299,7 +299,7 @@ static tb_void_t tb_poller_process_kill(tb_poller_process_ref_t self)
 
     // stop thread and post it
     if (!tb_atomic32_fetch_and_set(&poller->is_stopped, 1))
-        ReleaseSemaphore(poller->semaphore, 1, tb_null);
+        ReleaseSemaphore(poller->semaphore, (LONG)poller->threads_count, tb_null);
 }
 static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
 {
