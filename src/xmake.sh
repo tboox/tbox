@@ -18,6 +18,9 @@ if is_mode "debug"; then
     add_defines "__tb_debug__"
     set_symbols "debug"
     set_optimizes "none"
+elif is_mode "relwithdebinfo"; then
+    set_symbols "debug"
+    set_optimizes "smallest"
 else
     set_strip "all"
     if ! is_kind "shared"; then
@@ -42,7 +45,7 @@ else
 fi
 
 # enable backtrace symbols for linux
-if is_plat "linux" && is_mode "debug"; then
+if is_plat "linux" && (is_mode "debug" || is_mode "relwithdebinfo"); then
     add_ldflags "-rdynamic"
 fi
 

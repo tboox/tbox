@@ -693,9 +693,9 @@ if test -d "/usr/local"; then
 elif test -d "/usr"; then
     _install_prefix_default="/usr"
 fi
-_install_bindir_default="\${prefix}/bin"
-_install_libdir_default="\${prefix}/lib"
-_install_includedir_default="\${prefix}/include"
+_install_bindir_default="\$(PREFIX)/bin"
+_install_libdir_default="\$(PREFIX)/lib"
+_install_includedir_default="\$(PREFIX)/include"
 
 # determining target platform
 # e.g.
@@ -1443,6 +1443,24 @@ _get_target_filename() {
     _ret="${filename}"
 }
 
+# get target soname
+_get_target_soname() {
+    local name="${1}"
+    _get_target_item "${name}" "filename"; local filename="${_ret}"
+    if test_z "${filename}"; then
+        _get_target_basename "${name}"; local basename="${_ret}"
+        _get_target_extension "${name}"; local extension="${_ret}"
+        _get_target_prefixname "${name}"; local prefixname="${_ret}"
+        filename="${prefixname}${basename}${extension}"
+    fi
+    _get_target_item "${name}" "soversion"; local soversion="${_ret}"
+    if test_nz "${soversion}"; then
+        filename="${filename}.${soversion}"
+    fi
+
+    _ret="${filename}"
+}
+
 # get target directory
 _get_targetdir() {
     local name="${1}"
@@ -1594,6 +1612,13 @@ _get_target_toolchain_flags_for_gcc() {
             flags="${flags} -fPIC"
         fi
     fi
+    # add soname, https://github.com/tboox/tbox/issues/214#issuecomment-1608882997
+    if test_eq "${targetkind}" "shared" && test_eq "${toolkind}" "sh" && is_plat "linux"; then
+        _get_target_soname "${name}"; local soname="${_ret}"
+        if test_nz "${soname}"; then
+            flags="${flags} -Wl,-soname,${soname}"
+        fi
+    fi
     _ret="${flags}"
 }
 
@@ -1612,6 +1637,11 @@ _get_target_toolchain_flags_for_clang() {
         elif test_eq "${toolkind}" "cc" || test_eq "${toolkind}" "cxx"; then
             flags="${flags} -fPIC"
         fi
+    fi
+    # add soname, https://github.com/tboox/tbox/issues/214#issuecomment-1608882997
+    if test_eq "${targetkind}" "shared" && test_eq "${toolkind}" "sh" && is_plat "linux"; then
+        _get_target_soname "${name}"; local soname="${_ret}"
+        flags="${flags} -Wl,-soname,${soname}"
     fi
     if is_plat "macosx"; then
         _os_iorunv "xcrun" "-sdk" "macosx" "--show-sdk-path"; local sdkdir="${_ret}"
@@ -1946,8 +1976,10 @@ set_version() {
     fi
     local version="${1}"
     local version_build="${2}"
+    local soversion="${3:-${version%%.*}}"
     _set_target_item "${_xmake_sh_target_current}" "version" "${version}"
     _set_target_item "${_xmake_sh_target_current}" "version_build" "${version_build}"
+    _set_target_item "${_xmake_sh_target_current}" "soversion" "${soversion}"
 }
 
 # set default in target
@@ -3832,16 +3864,6 @@ _gmake_add_switches() {
     echo "PREFIX=${_install_prefix_default}" >> "${xmake_sh_makefile}"
     echo "endif" >> "${xmake_sh_makefile}"
     echo "" >> "${xmake_sh_makefile}"
-    echo "INSTALLDIR:=\$(DESTDIR)" >> "${xmake_sh_makefile}"
-    echo "ifneq (\$(PREFIX),)" >> "${xmake_sh_makefile}"
-    echo "ifneq (\$(INSTALLDIR),)" >> "${xmake_sh_makefile}"
-    echo "PREFIX_:=\$(patsubst /%,%,\$(PREFIX))" >> "${xmake_sh_makefile}"
-    echo "INSTALLDIR:=\$(INSTALLDIR)/\$(PREFIX_)" >> "${xmake_sh_makefile}"
-    echo "else" >> "${xmake_sh_makefile}"
-    echo "INSTALLDIR:=\$(PREFIX)" >> "${xmake_sh_makefile}"
-    echo "endif" >> "${xmake_sh_makefile}"
-    echo "endif" >> "${xmake_sh_makefile}"
-    echo "" >> "${xmake_sh_makefile}"
 }
 
 _gmake_add_flags() {
@@ -3964,8 +3986,28 @@ _gmake_add_build_target() {
         fi
     done
 
+    local versioned=false
+    local filebase=""
+    local targetbase=""
+    local targetver=""
+    local targetsover=""
+    # add soname, https://github.com/tboox/tbox/issues/214#issuecomment-1608882997
+    if test_eq "${targetkind}" "shared"; then
+      _get_target_item "${target}" "version"; targetver="${_ret}"
+      if test_nz "${targetver}"; then
+        _get_target_item "${target}" "soversion"; targetsover="${_ret}"
+        path_filename "${targetfile}"; filebase="${_ret}"
+        targetbase="${targetfile}"
+        targetfile="${targetfile}.${targetver}"
+        versioned=true
+      fi
+    fi
+
     # link target
     echo "${target}: ${targetfile}" >> "${xmake_sh_makefile}"
+    if ${versioned}; then
+      echo "${targetbase}: ${targetfile}" >> "${xmake_sh_makefile}"
+    fi
     echo "${targetfile}: ${depfiles}${objectfiles}" >> "${xmake_sh_makefile}"
     print "\t@echo linking.${_target_mode} ${targetfile}" >> "${xmake_sh_makefile}"
     case "${toolname}" in
@@ -3979,6 +4021,10 @@ _gmake_add_build_target() {
         emar) _gmake_add_build_target_for_ar "${toolkind}" "${targetfile}" "${objectfiles}" "${flagname}";;
         *) raise "unknown toolname(${toolname})!" ;;
     esac
+    if ${versioned}; then
+      print "\t@ln -sf ${filebase}.${targetver} ${targetbase}.${targetsover}" >> "${xmake_sh_makefile}"
+      print "\t@ln -sf ${filebase}.${targetver} ${targetbase}" >> "${xmake_sh_makefile}"
+    fi
     echo "" >> "${xmake_sh_makefile}"
 
     # build objects
@@ -4068,31 +4114,44 @@ _gmake_add_install_target() {
     local target=${1}
     _get_target_file "${target}"; local targetfile="${_ret}"
     path_filename "${targetfile}"; local filename="${_ret}"
-    _get_target_item "${target}" "installdir"; local installdir="${_ret}"
-    if test_z "${installdir}"; then
-        installdir="\$(INSTALLDIR)"
+
+    _get_target_item "${target}" "kind"; local targetkind="${_ret}"
+
+    local versioned=false
+    local filebase=""
+    local targetsover=""
+    # add soname, https://github.com/tboox/tbox/issues/214#issuecomment-1608882997
+    if test_eq "${targetkind}" "shared"; then
+      _get_target_item "${target}" "version"; local version="${_ret}"
+      if test_nz "${version}"; then
+        _get_target_item "${target}" "soversion"; targetsover="${_ret}"
+        filebase="${filename}"
+        filename="${filename}.${version}"
+        versioned=true
+      fi
     fi
 
     # install target file
-    _get_target_item "${target}" "kind"; local targetkind="${_ret}"
     if test_eq "${targetkind}" "binary"; then
-        string_replace "${_install_bindir_default}" "\${prefix}" "${installdir}"; _install_bindir_default="${_ret}"
         print "\t@echo installing ${targetfile} to ${_install_bindir_default}" >> "${xmake_sh_makefile}"
-        print "\t@mkdir -p ${_install_bindir_default}" >> "${xmake_sh_makefile}"
-        print "\t@cp -p ${targetfile} ${_install_bindir_default}/${filename}" >> "${xmake_sh_makefile}"
+        print "\t@mkdir -p \$(DESTDIR)${_install_bindir_default}" >> "${xmake_sh_makefile}"
+        print "\t@cp -p ${targetfile} \$(DESTDIR)${_install_bindir_default}/${filename}" >> "${xmake_sh_makefile}"
     elif test_eq "${targetkind}" "static" || test_eq "${targetkind}" "shared"; then
-        string_replace "${_install_libdir_default}" "\${prefix}" "${installdir}"; _install_libdir_default="${_ret}"
         print "\t@echo installing ${targetfile} to ${_install_libdir_default}" >> "${xmake_sh_makefile}"
-        print "\t@mkdir -p ${_install_libdir_default}" >> "${xmake_sh_makefile}"
-        print "\t@cp -p ${targetfile} ${_install_libdir_default}/${filename}" >> "${xmake_sh_makefile}"
+        print "\t@mkdir -p \$(DESTDIR)${_install_libdir_default}" >> "${xmake_sh_makefile}"
+        print "\t@cp -p ${targetfile} \$(DESTDIR)${_install_libdir_default}/${filename}" >> "${xmake_sh_makefile}"
+    fi
+
+    if ${versioned}; then
+      print "\t@ln -sf ${filename} \$(DESTDIR)${_install_libdir_default}/${filebase}.${targetsover}" >> "${xmake_sh_makefile}"
+      print "\t@ln -sf ${filename} \$(DESTDIR)${_install_libdir_default}/${filebase}" >> "${xmake_sh_makefile}"
     fi
 
     # install header files
     _get_target_item "${target}" "headerfiles"; local headerfiles="${_ret}"
     if test_nz "${headerfiles}"; then
-        string_replace "${_install_includedir_default}" "\${prefix}" "${installdir}"; _install_includedir_default="${_ret}"
         local srcheaderfile=""
-        local includedir="${_install_includedir_default}"
+        local includedir="\$(DESTDIR)${_install_includedir_default}"
         for srcheaderfile in ${headerfiles}; do
             string_split "${srcheaderfile}" ":"
             local srcheaderfile="${_ret}"
@@ -4130,7 +4189,7 @@ _gmake_add_install_target() {
             if test_z "${filename}"; then
                 path_filename "${srcinstallfile}"; filename="${_ret}"
             fi
-            local dstinstalldir="${installdir}"
+            local dstinstalldir="\$(DESTDIR)"
             if test_nz "${prefixdir}"; then
                 dstinstalldir="${dstinstalldir}/${prefixdir}"
             fi
