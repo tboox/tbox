@@ -10,6 +10,7 @@
 ### Changes
 
 * Improve wasm support
+* Improve to kill processes
 
 ### Bugs fixed
 
@@ -307,6 +308,7 @@
 ### 改进
 
 * 改进 wasm 支持
+* 改进退出子进程
 
 ### Bugs 修复
 
