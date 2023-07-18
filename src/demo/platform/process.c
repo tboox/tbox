@@ -133,7 +133,7 @@ static tb_void_t tb_demo_process_test_exit(tb_char_t** argv, tb_bool_t detach)
  */
 tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
 {
-#if 1
+#if 0
     tb_demo_process_test_run(argv);
 #else
     tb_used(tb_demo_process_test_run);
@@ -151,7 +151,7 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
     tb_used(tb_demo_process_test_waitlist);
 #endif
 
-#if 0
+#if 1
     // we can run `xxx.bat` or `xxx.sh` shell command to test it
     // @see https://github.com/xmake-io/xmake/issues/719
     tb_demo_process_test_exit(argv, tb_false);

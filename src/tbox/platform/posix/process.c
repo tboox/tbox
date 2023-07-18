@@ -47,6 +47,10 @@
 #   include "../../coroutine/coroutine.h"
 #   include "../../coroutine/impl/impl.h"
 #endif
+#ifdef TB_CONFIG_OS_MACOSX
+#   include <sys/proc_info.h>
+#   include <libproc.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * macros
@@ -107,10 +111,8 @@ __tb_extern_c_leave__
  */
 static tb_int_t tb_process_file_flags(tb_size_t mode)
 {
-    // no mode? uses the default mode
     if (!mode) mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC;
 
-    // make flags
     tb_size_t flags = 0;
     if (mode & TB_FILE_MODE_RO)         flags |= O_RDONLY;
     else if (mode & TB_FILE_MODE_WO)    flags |= O_WRONLY;
@@ -118,8 +120,6 @@ static tb_int_t tb_process_file_flags(tb_size_t mode)
     if (mode & TB_FILE_MODE_CREAT)      flags |= O_CREAT;
     if (mode & TB_FILE_MODE_APPEND)     flags |= O_APPEND;
     if (mode & TB_FILE_MODE_TRUNC)      flags |= O_TRUNC;
-
-    // ok?
     return flags;
 }
 static tb_int_t tb_process_file_modes(tb_size_t mode)
@@ -134,6 +134,50 @@ static tb_int_t tb_process_file_modes(tb_size_t mode)
     // ok?
     return modes;
 }
+#ifdef TB_CONFIG_OS_MACOSX
+static tb_bool_t tb_process_kill_allchilds(pid_t pid)
+{
+    tb_int_t procs_count = proc_listpids(PROC_PPID_ONLY, pid, tb_null, 0);
+    tb_assert_and_check_return_val(procs_count >= 0, tb_false);
+
+    if (procs_count > 0)
+    {
+        pid_t* pids = tb_nalloc0_type(procs_count, pid_t);
+        tb_assert_and_check_return_val(pids, tb_false);
+
+        proc_listpids(PROC_PPID_ONLY, pid, pids, procs_count * sizeof(pid_t));
+        for (tb_int_t i = 0; i < procs_count; ++i)
+        {
+            tb_check_continue(pids[i]);
+
+#ifdef __tb_debug__
+            tb_char_t path[PROC_PIDPATHINFO_MAXSIZE] = {0};
+            proc_pidpath(pids[i], path, sizeof(path));
+            if (tb_strlen(path) > 0)
+            {
+                tb_trace_d("kill pid: %d, path: %s", pids[i], path);
+            }
+#endif
+
+            // kill subprocess
+            kill(pids[i], SIGKILL);
+        }
+
+        tb_free(pids);
+    }
+    return tb_true;
+}
+#else
+static tb_bool_t tb_process_kill_allchilds(pid_t pid)
+{
+    return tb_false;
+}
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+
 tb_int_t tb_process_pid(tb_process_ref_t self)
 {
     // check
@@ -157,6 +201,7 @@ tb_void_t tb_process_group_exit()
         // @note we do not destroy these leaked processes now.
         tb_for_all_if (tb_process_t*, process, g_processes_group, process)
         {
+            tb_process_kill_allchilds(process->pid);
             tb_process_kill((tb_process_ref_t)process);
         }
 
