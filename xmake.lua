@@ -5,7 +5,7 @@ set_project("tbox")
 set_xmakever("2.6.1")
 
 -- set project version
-set_version("1.7.3", {build = "%Y%m%d"})
+set_version("1.7.3", {build = "%Y%m%d", soname = true})
 
 -- set warning all as error
 set_warnings("all", "error")
