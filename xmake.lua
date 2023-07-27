@@ -21,6 +21,10 @@ set_configvar("_REENTRANT", 1)
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
 add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
+if has_config("coroutine") then
+    -- https://github.com/tboox/tbox/issues/218
+    add_cxflags("gcc::-Wno-error=dangling-pointer")
+end
 
 -- add build modes
 add_rules("mode.release", "mode.debug", "mode.profile", "mode.coverage")-- TODO, "mode.valgrind", "mode.asan", "mode.tsan", "mode.ubsan") -- for xmake v2.3.3
