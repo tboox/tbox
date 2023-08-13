@@ -461,7 +461,7 @@ static tb_void_t tb_demo_coroutine_listen(tb_cpointer_t priv)
     }
 
     // trace
-    tb_trace_d("[%#x]: listened %lu", tb_thread_self(), count);
+    tb_trace_i("[%#x]: listened %lu", tb_thread_self(), count);
 }
 static tb_int_t tb_demo_coroutine_worker(tb_cpointer_t priv)
 {
