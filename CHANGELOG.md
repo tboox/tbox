@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.4
+
 ### New features
 
 * Add Haiku support
@@ -11,6 +13,7 @@
 
 * Improve wasm support
 * Improve to kill processes
+* Improve xmake.sh
 
 ### Bugs fixed
 
@@ -300,6 +303,8 @@
 
 ## master (开发中)
 
+## v1.7.4
+
 ### 新特性
 
 * 添加 Haiku 支持
@@ -309,6 +314,7 @@
 
 * 改进 wasm 支持
 * 改进退出子进程
+* 改进 xmake.sh
 
 ### Bugs 修复
 
