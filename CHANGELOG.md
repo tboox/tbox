@@ -19,9 +19,6 @@
 
 * Fix setenv for msys/mingw
 * Fix compile error for mingw
-
-### Bugs fixed
-
 * Fix tb_buffer_memsetp
 
 ## v1.7.3
@@ -320,10 +317,6 @@
 
 * 修复 msys/mingw 下 setenv 设置问题
 * 修复 mingw 编译错误
-
-
-### Bugs 修复
-
 * 修复 tb_buffer_memsetp
 
 ## v1.7.3
