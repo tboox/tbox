@@ -34,6 +34,48 @@
 #include "../../../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * private implementation
+ */
+static tb_char_t const* tb_oc_json_escape_cstr(tb_char_t* data, tb_size_t maxn, tb_object_ref_t object)
+{
+    tb_char_t const* sp = tb_oc_string_cstr(object);
+    tb_char_t const* se = sp + tb_oc_string_size(object);
+    tb_char_t*       dp = data;
+    tb_char_t const* de = data + maxn;
+    tb_char_t        ch;
+    while (sp < se && dp < de)
+    {
+        ch = *sp++;
+        if (dp + 1 < de)
+        {
+            if (ch == '\n')
+            {
+                *dp++ = '\\';
+                *dp++ = 'n';
+            }
+            else if (ch == '"')
+            {
+                *dp++ = '\\';
+                *dp++ = '"';
+            }
+            else if (ch == '\\')
+            {
+                *dp++ = '\\';
+                *dp++ = '\\';
+            }
+            else
+            {
+                *dp++ = ch;
+                continue;
+            }
+        }
+        else *dp++ = ch;
+    }
+    if (dp < de) *dp = '\0';
+    return data;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_bool_t tb_oc_json_writer_func_null(tb_oc_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
@@ -44,8 +86,6 @@ static tb_bool_t tb_oc_json_writer_func_null(tb_oc_json_writer_t* writer, tb_obj
     // write
     if (tb_stream_printf(writer->stream, "null") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
-
-    // ok
     return tb_true;
 }
 static tb_bool_t tb_oc_json_writer_func_array(tb_oc_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
@@ -94,8 +134,6 @@ static tb_bool_t tb_oc_json_writer_func_array(tb_oc_json_writer_t* writer, tb_ob
         if (tb_stream_printf(writer->stream, "[]") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
-
-    // ok
     return tb_true;
 }
 static tb_bool_t tb_oc_json_writer_func_string(tb_oc_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
@@ -103,15 +141,26 @@ static tb_bool_t tb_oc_json_writer_func_string(tb_oc_json_writer_t* writer, tb_o
     // check
     tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
-    // write
-    if (tb_oc_string_size(object))
+    tb_size_t size = tb_oc_string_size(object);
+    if (size)
     {
-        if (tb_stream_printf(writer->stream, "\"%s\"", tb_oc_string_cstr(object)) < 0) return tb_false;
+        tb_size_t maxn = (size * 3 / 2) + 16;
+        if (maxn > 8192)
+        {
+            tb_char_t* data = (tb_char_t*)tb_malloc(maxn);
+            tb_char_t const* cstr = data? tb_oc_json_escape_cstr(data, maxn, object) : tb_null;
+            if (cstr && tb_stream_printf(writer->stream, "\"%s\"", cstr) < 0) return tb_false;
+            tb_free(data);
+        }
+        else
+        {
+            tb_char_t data[8192];
+            tb_char_t const* cstr = tb_oc_json_escape_cstr(data, maxn, object);
+            if (cstr && tb_stream_printf(writer->stream, "\"%s\"", cstr) < 0) return tb_false;
+        }
     }
     else if (tb_stream_printf(writer->stream, "\"\"") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
-
-    // ok
     return tb_true;
 }
 static tb_bool_t tb_oc_json_writer_func_number(tb_oc_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
@@ -167,8 +216,6 @@ static tb_bool_t tb_oc_json_writer_func_number(tb_oc_json_writer_t* writer, tb_o
     default:
         break;
     }
-
-    // ok
     return tb_true;
 }
 static tb_bool_t tb_oc_json_writer_func_boolean(tb_oc_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
@@ -179,8 +226,6 @@ static tb_bool_t tb_oc_json_writer_func_boolean(tb_oc_json_writer_t* writer, tb_
     // write
     if (tb_stream_printf(writer->stream, "%s", tb_oc_boolean_bool(object)? "true" : "false") < 0) return tb_false;
     if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
-
-    // ok
     return tb_true;
 }
 static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, tb_object_ref_t object, tb_size_t level)
@@ -240,8 +285,6 @@ static tb_bool_t tb_oc_json_writer_func_dictionary(tb_oc_json_writer_t* writer, 
         if (tb_stream_printf(writer->stream, "{}") < 0) return tb_false;
         if (!tb_oc_writer_newline(writer->stream, writer->deflate)) return tb_false;
     }
-
-    // ok
     return tb_true;
 }
 static tb_long_t tb_oc_json_writer_done(tb_stream_ref_t stream, tb_object_ref_t object, tb_bool_t deflate)
@@ -269,8 +312,6 @@ static tb_long_t tb_oc_json_writer_done(tb_stream_ref_t stream, tb_object_ref_t 
 
     // the end offset
     tb_hize_t eof = tb_stream_offset(stream);
-
-    // ok?
     return eof >= bof? (tb_long_t)(eof - bof) : -1;
 }
 
@@ -296,32 +337,23 @@ tb_oc_writer_t* tb_oc_json_writer()
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_NUMBER, tb_oc_json_writer_func_number);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_BOOLEAN, tb_oc_json_writer_func_boolean);
     tb_hash_map_insert(s_writer.hooker, (tb_pointer_t)TB_OBJECT_TYPE_DICTIONARY, tb_oc_json_writer_func_dictionary);
-
-    // ok
     return &s_writer;
 }
 tb_bool_t tb_oc_json_writer_hook(tb_size_t type, tb_oc_json_writer_func_t func)
 {
-    // check
     tb_assert_and_check_return_val(func, tb_false);
 
-    // the writer
     tb_oc_writer_t* writer = tb_oc_writer_get(TB_OBJECT_FORMAT_JSON);
     tb_assert_and_check_return_val(writer && writer->hooker, tb_false);
 
-    // hook it
     tb_hash_map_insert(writer->hooker, (tb_pointer_t)type, func);
-
-    // ok
     return tb_true;
 }
 tb_oc_json_writer_func_t tb_oc_json_writer_func(tb_size_t type)
 {
-    // the writer
     tb_oc_writer_t* writer = tb_oc_writer_get(TB_OBJECT_FORMAT_JSON);
     tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
-    // the func
     return (tb_oc_json_writer_func_t)tb_hash_map_get(writer->hooker, (tb_pointer_t)type);
 }
 
