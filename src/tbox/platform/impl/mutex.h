@@ -30,7 +30,7 @@
 #elif defined(TB_CONFIG_POSIX_HAVE_PTHREAD_MUTEX_INIT)
 #   include <pthread.h>
 #else
-#   include "spinlock.h"
+#   include "../spinlock.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

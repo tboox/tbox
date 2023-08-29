@@ -78,10 +78,10 @@ tb_long_t tb_socket_connect(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
     tb_trace_noimpl();
     return -1;
 }
-tb_size_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
+tb_bool_t tb_socket_bind(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 {
     tb_trace_noimpl();
-    return 0;
+    return tb_false;
 }
 tb_bool_t tb_socket_listen(tb_socket_ref_t sock, tb_size_t backlog)
 {
@@ -118,17 +118,17 @@ tb_long_t tb_socket_send(tb_socket_ref_t sock, tb_byte_t const* data, tb_size_t 
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_recvv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_sendv(tb_socket_ref_t sock, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendf(tb_socket_ref_t sock, tb_file_ref_t file, tb_hize_t offset, tb_hize_t size)
 {
     tb_trace_noimpl();
     return -1;

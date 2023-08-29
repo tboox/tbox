@@ -45,7 +45,7 @@ tb_pipe_file_ref_t tb_pipe_file_init(tb_char_t const* name, tb_size_t mode, tb_s
     tb_trace_noimpl();
     return tb_null;
 }
-tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t buffer_size)
+tb_bool_t tb_pipe_file_init_pair(tb_pipe_file_ref_t pair[2], tb_size_t mode[2], tb_size_t buffer_size)
 {
     tb_trace_noimpl();
     return tb_false;
@@ -66,6 +66,11 @@ tb_long_t tb_pipe_file_write(tb_pipe_file_ref_t file, tb_byte_t const* data, tb_
     return -1;
 }
 tb_long_t tb_pipe_file_wait(tb_pipe_file_ref_t file, tb_size_t events, tb_long_t timeout)
+{
+    tb_trace_noimpl();
+    return -1;
+}
+tb_long_t tb_pipe_file_connect(tb_pipe_file_ref_t file)
 {
     tb_trace_noimpl();
     return -1;

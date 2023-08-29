@@ -31,6 +31,8 @@
 #   include "windows/prefix.h"
 #elif defined(TB_CONFIG_POSIX_HAVE_SCHED_YIELD)
 #   include <sched.h>
+#else
+#   include "time.h"
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////

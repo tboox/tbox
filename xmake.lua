@@ -26,6 +26,11 @@ if has_config("coroutine") then
     add_cxflags("gcc::-Wno-error=dangling-pointer")
 end
 
+if is_plat("wasm") then
+    add_requires("emscripten")
+    set_toolchains("emcc@emscripten")
+end
+
 -- add build modes
 add_rules("mode.release", "mode.debug", "mode.profile", "mode.coverage", "mode.valgrind", "mode.asan", "mode.tsan", "mode.ubsan")
 if is_mode("debug") then
