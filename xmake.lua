@@ -19,8 +19,8 @@ set_configvar("_GNU_SOURCE", 1)
 set_configvar("_REENTRANT", 1)
 
 -- disable some compiler errors
-add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
-add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
+add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined", "-Wno-error=empty-body")
+add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined", "-Wno-error=empty-body")
 if has_config("coroutine") then
     -- https://github.com/tboox/tbox/issues/218
     add_cxflags("gcc::-Wno-error=dangling-pointer")
