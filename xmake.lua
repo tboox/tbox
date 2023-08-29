@@ -26,6 +26,7 @@ if has_config("coroutine") then
     add_cxflags("gcc::-Wno-error=dangling-pointer")
 end
 
+-- set wasm toolchain
 if is_plat("wasm") then
     add_requires("emscripten")
     set_toolchains("emcc@emscripten")
