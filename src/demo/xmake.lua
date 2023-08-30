@@ -94,3 +94,6 @@ target("demo")
         add_syslinks("execinfo")
     end
 
+    if is_plat("linux") then
+        add_syslinks("pthread", "dl", "m", "c")
+    end
