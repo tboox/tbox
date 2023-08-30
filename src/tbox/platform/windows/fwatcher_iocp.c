@@ -22,6 +22,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "prefix.h"
 #include "../fwatcher.h"
 #include "../file.h"
 #include "../time.h"
