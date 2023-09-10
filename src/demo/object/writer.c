@@ -38,7 +38,7 @@ tb_int_t tb_demo_object_writer_main(tb_int_t argc, tb_char_t** argv)
         }
 
         // key6 => "hello world"\n
-        tb_oc_dictionary_insert(dict, "key6", tb_oc_string_init_from_cstr("\"hello world\"\n"));
+        tb_oc_dictionary_insert(dict, "key6", tb_oc_string_init_from_cstr("hello\nworld\tusa\"china\\india"));
 
         // write dictionary to json file
         tb_object_writ_to_url(dict, argv[1], TB_OBJECT_FORMAT_JSON/* | TB_OBJECT_FORMAT_DEFLATE*/);

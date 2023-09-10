@@ -208,6 +208,12 @@ static tb_object_ref_t tb_oc_json_reader_func_string(tb_oc_json_reader_t* reader
                 tb_string_chrcat(&data, ch);
 #endif
             }
+            else if (ch == 'n') {
+                tb_string_chrcat(&data, '\n');
+            }
+            else if (ch == 't') {
+                tb_string_chrcat(&data, '\t');
+            }
             // append escaped character
             else tb_string_chrcat(&data, ch);
         }
