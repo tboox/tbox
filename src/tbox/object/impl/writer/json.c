@@ -53,6 +53,11 @@ static tb_char_t const* tb_oc_json_escape_cstr(tb_char_t* data, tb_size_t maxn, 
                 *dp++ = '\\';
                 *dp++ = 'n';
             }
+            else if (ch == '\t')
+            {
+                *dp++ = '\\';
+                *dp++ = 't';
+            }
             else if (ch == '"')
             {
                 *dp++ = '\\';
