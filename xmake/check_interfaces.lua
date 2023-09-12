@@ -1,3 +1,8 @@
+-- imports
+import("core.base.option")
+import("private.async.runjobs")
+
+local _check_tasks = {}
 
 -- get function name
 --
@@ -22,11 +27,32 @@ end
 -- check c functions in the given module
 function _check_module_cfuncs(target, module, includes, ...)
     for _, func in ipairs({...}) do
-        local funcname = _get_function_name(func)
-        local checkname = module .. "_" .. funcname
+        table.insert(_check_tasks, function ()
+            local funcname = _get_function_name(func)
+            local checkname = module .. "_" .. funcname
+            local ok = false
+            if target:has_cfuncs(func, {name = checkname, includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
+                target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), 1)
+                ok = true
+            end
+            local result
+            if ok then
+                result = "${color.success}${text.success}"
+            else
+                result = "${color.nothing}${text.nothing}"
+            end
+            cprint("checking for %s ... %s", checkname, result)
+        end)
+    end
+end
+
+-- check c snippet in the given module
+function _check_module_csnippet(target, module, includes, name, snippet)
+    table.insert(_check_tasks, function ()
+        local checkname = module .. "_" .. name
         local ok = false
-        if target:has_cfuncs(func, {name = checkname, includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
-            target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), 1)
+        if target:check_csnippets({[checkname] = snippet}, {includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
+            target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
             ok = true
         end
         local result
@@ -36,41 +62,26 @@ function _check_module_cfuncs(target, module, includes, ...)
             result = "${color.nothing}${text.nothing}"
         end
         cprint("checking for %s ... %s", checkname, result)
-    end
-end
-
--- check c snippet in the given module
-function _check_module_csnippet(target, module, includes, name, snippet)
-    local checkname = module .. "_" .. name
-    local ok = false
-    if target:check_csnippets({[checkname] = snippet}, {includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
-        target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
-        ok = true
-    end
-    local result
-    if ok then
-        result = "${color.success}${text.success}"
-    else
-        result = "${color.nothing}${text.nothing}"
-    end
-    cprint("checking for %s ... %s", checkname, result)
+    end)
 end
 
 -- check c keyword
 function _check_keyword_csnippet(target, name, varname, snippet, configs)
-    local checkname = name
-    local ok = false
-    if target:check_csnippets({[checkname] = snippet}, {configs = table.join({cflags = "-Wno-error=unused-variable"}, configs)}) then
-        target:set("configvar", varname, 1)
-        ok = true
-    end
-    local result
-    if ok then
-        result = "${color.success}${text.success}"
-    else
-        result = "${color.nothing}${text.nothing}"
-    end
-    cprint("checking for %s ... %s", checkname, result)
+    table.insert(_check_tasks, function ()
+        local checkname = name
+        local ok = false
+        if target:check_csnippets({[checkname] = snippet}, {configs = table.join({cflags = "-Wno-error=unused-variable"}, configs)}) then
+            target:set("configvar", varname, 1)
+            ok = true
+        end
+        local result
+        if ok then
+            result = "${color.success}${text.success}"
+        else
+            result = "${color.nothing}${text.nothing}"
+        end
+        cprint("checking for %s ... %s", checkname, result)
+    end)
 end
 
 function _check_interfaces(target)
@@ -168,7 +179,6 @@ function _check_interfaces(target)
         _check_module_cfuncs(target, "posix", {"sys/stat.h", "fcntl.h"},          "open", "stat64", "lstat64")
         _check_module_cfuncs(target, "posix", "unistd.h",                         "gethostname")
         _check_module_cfuncs(target, "posix", "ifaddrs.h",                        "getifaddrs")
-        _check_module_cfuncs(target, "posix", "semaphore.h",                      "sem_init")
         _check_module_cfuncs(target, "posix", "unistd.h",                         "getpagesize", "sysconf")
         _check_module_cfuncs(target, "posix", "sched.h",                          "sched_yield", "sched_setaffinity") -- need _GNU_SOURCE
         _check_module_cfuncs(target, "posix", "regex.h",                          "regcomp", "regexec")
@@ -178,7 +188,6 @@ function _check_interfaces(target)
         _check_module_cfuncs(target, "posix", "copyfile.h",                       "copyfile")
         _check_module_cfuncs(target, "posix", "sys/sendfile.h",                   "sendfile")
         _check_module_cfuncs(target, "posix", "sys/epoll.h",                      "epoll_create", "epoll_wait")
-        _check_module_cfuncs(target, "posix", "spawn.h",                          "posix_spawnp", "posix_spawn_file_actions_addchdir_np")
         _check_module_cfuncs(target, "posix", "unistd.h",                         "execvp", "execvpe", "fork", "vfork")
         _check_module_cfuncs(target, "posix", "sys/wait.h",                       "waitpid")
         _check_module_cfuncs(target, "posix", "unistd.h",                         "getdtablesize")
@@ -189,6 +198,9 @@ function _check_interfaces(target)
         _check_module_cfuncs(target, "posix", "sys/stat.h",                       "mkfifo")
         _check_module_cfuncs(target, "posix", "sys/mman.h",                       "mmap")
         _check_module_cfuncs(target, "posix", "sys/stat.h",                       "futimens", "utimensat")
+    elseif not target:is_plat("windows", "wasm") then
+        _check_module_cfuncs(target, "posix", "spawn.h",                          "posix_spawnp", "posix_spawn_file_actions_addchdir_np")
+        _check_module_cfuncs(target, "posix", "semaphore.h",                      "sem_init")
     end
 
     -- add the interfaces for windows/msvc
@@ -245,7 +257,7 @@ function _check_interfaces(target)
     end
 
     -- add the interfaces for systemv
-    if not target:is_plat("windows") then
+    if not target:is_plat("windows", "wasm") then
         _check_module_cfuncs(target, "systemv", {"sys/sem.h", "sys/ipc.h"}, "semget", "semtimedop")
     end
 
@@ -263,10 +275,16 @@ function _check_interfaces(target)
 
     -- check anonymous union feature
     _check_keyword_csnippet(target, "feature_anonymous_union", "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION", "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }")
+
+    -- do check
+    local jobs = option.get("jobs") or os.default_njob()
+    runjobs("check_interfaces", function (index)
+        _check_tasks[index]()
+    end, {total = #_check_tasks, comax = jobs})
 end
 
 function main(target, opt)
-    if opt.recheck then
+    if opt and opt.recheck then
         _check_interfaces(target)
     end
 end
