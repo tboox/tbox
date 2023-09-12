@@ -25,8 +25,7 @@ function _check_module_cfuncs(target, module, includes, ...)
         local funcname = _get_function_name(func)
         local checkname = module .. "_" .. funcname
         local ok = false
-        if target:has_cfuncs(func, {name = checkname,
-                includes = includes, defines = "_GNU_SOURCE=1", warnings = "errors"}) then
+        if target:has_cfuncs(func, {name = checkname, includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
             target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), 1)
             ok = true
         end
@@ -41,11 +40,28 @@ function _check_module_cfuncs(target, module, includes, ...)
 end
 
 -- check c snippet in the given module
-function _check_module_csnippet(target, module, includes, name, snippet, opt)
+function _check_module_csnippet(target, module, includes, name, snippet)
     local checkname = module .. "_" .. name
     local ok = false
-    if target:check_csnippets({[checkname] = snippet}, table.join({includes = includes, defines = "_GNU_SOURCE=1"}, opt)) then
+    if target:check_csnippets({[checkname] = snippet}, {includes = includes}) then
         target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
+        ok = true
+    end
+    local result
+    if ok then
+        result = "${color.success}${text.success}"
+    else
+        result = "${color.nothing}${text.nothing}"
+    end
+    cprint("checking for %s ... %s", checkname, result)
+end
+
+-- check c keyword
+function _check_keyword_csnippet(target, name, varname, snippet, configs)
+    local checkname = name
+    local ok = false
+    if target:check_csnippets({[checkname] = snippet}, {configs = configs}) then
+        target:set("configvar", varname, 1)
         ok = true
     end
     local result
@@ -183,43 +199,43 @@ function _check_interfaces(target)
                 #pragma intrinsic(_InterlockedExchange%s)
                 void test() {
                     _InterlockedExchange%s(0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
             _check_module_csnippet(target, "windows", "windows.h", "_InterlockedExchange8" .. mo, format([[
                 CHAR _InterlockedExchange8%s(CHAR volatile* Destination, CHAR Value);
                 #pragma intrinsic(_InterlockedExchange8%s)
                 void test() {
                     _InterlockedExchange8%s(0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
             _check_module_csnippet(target, "windows", "windows.h", "_InterlockedOr8" .. mo, format([[
                 CHAR _InterlockedOr8%s(CHAR volatile* Destination, CHAR Value);
                 #pragma intrinsic(_InterlockedOr8%s)
                 void test() {
                     _InterlockedOr8%s(0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
             _check_module_csnippet(target, "windows", "windows.h", "_InterlockedExchangeAdd" .. mo, format([[
                 LONG _InterlockedExchangeAdd%s(LONG volatile* Destination, LONG Value);
                 #pragma intrinsic(_InterlockedExchangeAdd%s)
                 void test() {
                     _InterlockedExchangeAdd%s(0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
             _check_module_csnippet(target, "windows", "windows.h", "_InterlockedExchangeAdd64" .. mo, format([[
                 __int64 _InterlockedExchangeAdd64%s(__int64 volatile* Destination, __int64 Value);
                 #pragma intrinsic(_InterlockedExchangeAdd64%s)
                 void test() {
                     _InterlockedExchangeAdd64%s(0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
             _check_module_csnippet(target, "windows", "windows.h", "_InterlockedCompareExchange" .. mo, format([[
                 LONG _InterlockedCompareExchange%s(LONG volatile* Destination, LONG Exchange, LONG Comperand);
                 #pragma intrinsic(_InterlockedCompareExchange%s)
                 void test() {
                     _InterlockedCompareExchange%s(0, 0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
             _check_module_csnippet(target, "windows", "windows.h", "_InterlockedCompareExchange64" .. mo, format([[
                 __int64 _InterlockedCompareExchange64%s(__int64 volatile* Destination, __int64 Exchange, __int64 Comperand);
                 #pragma intrinsic(_InterlockedCompareExchange64%s)
                 void test() {
                     _InterlockedCompareExchange64%s(0, 0, 0);
-                }]], mo, mo, mo), {cxflags = "-WX -W3"})
+                }]], mo, mo, mo))
         end
     end
 
@@ -242,17 +258,11 @@ function _check_interfaces(target)
     _check_module_cfuncs(target, "valgrind", "valgrind/valgrind.h",  "VALGRIND_STACK_REGISTER(0, 0)")
 
     -- check __thread keyword
-    if target:check_csnippets({keyword_thread = "__thread int a = 0;", links = "pthread"}) then
-        target:set("configvar", "TB_CONFIG_KEYWORD_HAVE__thread", 1)
-    end
-    if target:check_csnippets({keyword_thread_local = "_Thread_local int a = 0;", links = "pthread"}) then
-        target:set("configvar", "TB_CONFIG_KEYWORD_HAVE_Thread_local", 1)
-    end
+    _check_keyword_csnippet(target, "keyword_thread", "TB_CONFIG_KEYWORD_HAVE__thread", "__thread int a = 0;", {links = "pthread"})
+    _check_keyword_csnippet(target, "keyword_thread_local", "TB_CONFIG_KEYWORD_HAVE_Thread_local", "_Thread_local int a = 0;", {links = "pthread"})
 
     -- check anonymous union feature
-    if target:check_csnippets({feature_anonymous_union = "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }"}) then
-        target:set("configvar", "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION", 1)
-    end
+    _check_keyword_csnippet(target, "feature_anonymous_union", "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION", "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }")
 end
 
 function main(target, opt)
