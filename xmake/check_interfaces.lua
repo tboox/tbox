@@ -43,7 +43,7 @@ end
 function _check_module_csnippet(target, module, includes, name, snippet)
     local checkname = module .. "_" .. name
     local ok = false
-    if target:check_csnippets({[checkname] = snippet}, {includes = includes}) then
+    if target:check_csnippets({[checkname] = snippet}, {includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
         target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
         ok = true
     end
@@ -60,7 +60,7 @@ end
 function _check_keyword_csnippet(target, name, varname, snippet, configs)
     local checkname = name
     local ok = false
-    if target:check_csnippets({[checkname] = snippet}, {configs = configs}) then
+    if target:check_csnippets({[checkname] = snippet}, {configs = table.join({cflags = "-Wno-error=unused-variable"}, configs)}) then
         target:set("configvar", varname, 1)
         ok = true
     end
