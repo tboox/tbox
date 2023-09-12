@@ -31,14 +31,14 @@ end
 function _get_cflags_for_suppress_warnings(target)
     local cflags = target:data("_check_interfaces.cflags")
     if cflags == nil then
-        if target:has_tool("cc", "cl") or target:is_plat("mingw") then
+        if target:has_tool("cc", "cl") then
             cflags = "-D_CRT_SECURE_NO_WARNINGS"
         elseif target:has_tool("cc", "gcc", "gxx", "clang", "clangxx") then
             cflags = "-Wno-error=unused-variable"
         end
-        target:data_set("_check_interfaces.cflags", cflags)
+        target:data_set("_check_interfaces.cflags", cflags or false)
     end
-    return cflags
+    return cflags or nil
 end
 
 -- check c functions in the given module
