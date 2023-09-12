@@ -2,7 +2,7 @@
 import("core.base.option")
 import("async.runjobs", {try = true})
 if not runjobs then
-    import("private.async.runjobs")
+    import("private.async.runjobs") -- it has been moved to public above 2.8.3
 end
 
 local _check_tasks = {}
