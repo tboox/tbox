@@ -27,14 +27,29 @@ function _get_function_name(func)
     return name:trim()
 end
 
+-- get the c flags for suppressing warnings
+function _get_cflags_for_suppress_warnings(target)
+    local cflags = target:data("_check_interfaces.cflags")
+    if cflags == nil then
+        if target:has_tool("cc", "cl") or target:is_plat("mingw") then
+            cflags = "-D_CRT_SECURE_NO_WARNINGS"
+        elseif target:has_tool("cc", "gcc", "gxx", "clang", "clangxx") then
+            cflags = "-Wno-error=unused-variable"
+        end
+        target:data_set("_check_interfaces.cflags", cflags)
+    end
+    return cflags
+end
+
 -- check c functions in the given module
 function _check_module_cfuncs(target, module, includes, ...)
+    local cflags = _get_cflags_for_suppress_warnings(target)
     for _, func in ipairs({...}) do
         table.insert(_check_tasks, function ()
             local funcname = _get_function_name(func)
             local checkname = module .. "_" .. funcname
             local ok = false
-            if target:has_cfuncs(func, {name = checkname, includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
+            if target:has_cfuncs(func, {name = checkname, includes = includes, configs = {cflags = cflags}}) then
                 target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), 1)
                 ok = true
             end
@@ -51,10 +66,11 @@ end
 
 -- check c snippet in the given module
 function _check_module_csnippet(target, module, includes, name, snippet)
+    local cflags = _get_cflags_for_suppress_warnings(target)
     table.insert(_check_tasks, function ()
         local checkname = module .. "_" .. name
         local ok = false
-        if target:check_csnippets({[checkname] = snippet}, {includes = includes, configs = {cflags = "-Wno-error=unused-variable"}}) then
+        if target:check_csnippets({[checkname] = snippet}, {includes = includes, configs = {cflags = cflags}}) then
             target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
             ok = true
         end
@@ -70,10 +86,11 @@ end
 
 -- check c keyword
 function _check_keyword_csnippet(target, name, varname, snippet, configs)
+    local cflags = _get_cflags_for_suppress_warnings(target)
     table.insert(_check_tasks, function ()
         local checkname = name
         local ok = false
-        if target:check_csnippets({[checkname] = snippet}, {configs = table.join({cflags = "-Wno-error=unused-variable"}, configs)}) then
+        if target:check_csnippets({[checkname] = snippet}, {configs = table.join({cflags = cflags}, configs)}) then
             target:set("configvar", varname, 1)
             ok = true
         end
