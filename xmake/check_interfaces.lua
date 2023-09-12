@@ -23,29 +23,38 @@ end
 function _check_module_cfuncs(target, module, includes, ...)
     for _, func in ipairs({...}) do
         local funcname = _get_function_name(func)
-        if target:has_cfuncs(func, {name = module .. "_" .. funcname,
+        local checkname = module .. "_" .. funcname
+        local ok = false
+        if target:has_cfuncs(func, {name = checkname,
                 includes = includes, defines = "_GNU_SOURCE=1", warnings = "errors"}) then
             target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), 1)
+            ok = true
         end
-        --[[
-        configvar_check_cfuncs(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), func,
-            {name = module .. "_" .. funcname,
-             includes = includes,
-             defines = "_GNU_SOURCE=1",
-             warnings = "error",
-             languages = stdc})
-             ]]
+        local result
+        if ok then
+            result = "${color.success}${text.success}"
+        else
+            result = "${color.nothing}${text.nothing}"
+        end
+        cprint("checking for %s ... %s", checkname, result)
     end
 end
 
 -- check c snippet in the given module
 function _check_module_csnippet(target, module, includes, name, snippet, opt)
-    local snippet_name = module .. "_" .. name
-    if target:check_csnippets({[name] = snippet}, table.join({includes = includes, defines = "_GNU_SOURCE=1"}, opt)) then
+    local checkname = module .. "_" .. name
+    local ok = false
+    if target:check_csnippets({[checkname] = snippet}, table.join({includes = includes, defines = "_GNU_SOURCE=1"}, opt)) then
         target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
+        ok = true
     end
---    configvar_check_csnippets(("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()),
---        snippet, table.join({name = module .. "_" .. name, includes = includes, defines = "_GNU_SOURCE=1", languages = stdc}, opt))
+    local result
+    if ok then
+        result = "${color.success}${text.success}"
+    else
+        result = "${color.nothing}${text.nothing}"
+    end
+    cprint("checking for %s ... %s", checkname, result)
 end
 
 function _check_interfaces(target)
@@ -233,15 +242,15 @@ function _check_interfaces(target)
     _check_module_cfuncs(target, "valgrind", "valgrind/valgrind.h",  "VALGRIND_STACK_REGISTER(0, 0)")
 
     -- check __thread keyword
-    if target:check_csnippets({keyword_thread = "__thread int a = 0;", links = "pthread", languages = stdc}) then
+    if target:check_csnippets({keyword_thread = "__thread int a = 0;", links = "pthread"}) then
         target:set("configvar", "TB_CONFIG_KEYWORD_HAVE__thread", 1)
     end
-    if target:check_csnippets({keyword_thread_local = "_Thread_local int a = 0;", links = "pthread", languages = stdc}) then
+    if target:check_csnippets({keyword_thread_local = "_Thread_local int a = 0;", links = "pthread"}) then
         target:set("configvar", "TB_CONFIG_KEYWORD_HAVE_Thread_local", 1)
     end
 
     -- check anonymous union feature
-    if target:check_csnippets({feature_anonymous_union = "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }", languages = stdc}) then
+    if target:check_csnippets({feature_anonymous_union = "void test() { struct __st { union {int dummy;};} a; a.dummy = 1; }"}) then
         target:set("configvar", "TB_CONFIG_FEATURE_HAVE_ANONYMOUS_UNION", 1)
     end
 end
