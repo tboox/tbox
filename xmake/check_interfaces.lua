@@ -53,13 +53,8 @@ function _check_module_cfuncs(target, module, includes, ...)
                 target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), funcname:upper()), 1)
                 ok = true
             end
-            local result
-            if ok then
-                result = "${color.success}${text.success}"
-            else
-                result = "${color.nothing}${text.nothing}"
-            end
-            cprint("checking for %s ... %s", checkname, result)
+            cprint("checking for %s ... %s", checkname,
+                ok and "${color.success}${text.success}" or "${color.nothing}${text.nothing}")
         end)
     end
 end
@@ -74,13 +69,8 @@ function _check_module_csnippet(target, module, includes, name, snippet)
             target:set("configvar", ("TB_CONFIG_%s_HAVE_%s"):format(module:upper(), name:upper()), 1)
             ok = true
         end
-        local result
-        if ok then
-            result = "${color.success}${text.success}"
-        else
-            result = "${color.nothing}${text.nothing}"
-        end
-        cprint("checking for %s ... %s", checkname, result)
+        cprint("checking for %s ... %s", checkname,
+            ok and "${color.success}${text.success}" or "${color.nothing}${text.nothing}")
     end)
 end
 
@@ -94,13 +84,8 @@ function _check_keyword_csnippet(target, name, varname, snippet, configs)
             target:set("configvar", varname, 1)
             ok = true
         end
-        local result
-        if ok then
-            result = "${color.success}${text.success}"
-        else
-            result = "${color.nothing}${text.nothing}"
-        end
-        cprint("checking for %s ... %s", checkname, result)
+        cprint("checking for %s ... %s", checkname,
+            ok and "${color.success}${text.success}" or "${color.nothing}${text.nothing}")
     end)
 end
 
