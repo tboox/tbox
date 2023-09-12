@@ -1,6 +1,9 @@
 -- imports
 import("core.base.option")
-import("private.async.runjobs")
+import("async.runjobs", {try = true})
+if not runjobs then
+    import("private.async.runjobs")
+end
 
 local _check_tasks = {}
 
