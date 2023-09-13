@@ -2,7 +2,7 @@
 set_project("tbox")
 
 -- set xmake minimum version
-set_xmakever("2.6.1")
+set_xmakever("2.8.2")
 
 -- set project version
 set_version("1.7.4", {build = "%Y%m%d", soname = true})
@@ -17,6 +17,9 @@ set_languages(stdc)
 -- add defines to config.h
 set_configvar("_GNU_SOURCE", 1)
 set_configvar("_REENTRANT", 1)
+
+-- add module directories
+add_moduledirs("xmake")
 
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined", "-Wno-error=empty-body")

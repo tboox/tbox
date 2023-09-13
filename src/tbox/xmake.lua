@@ -168,4 +168,4 @@ target("tbox")
     end
 
     -- check interfaces
-    check_interfaces()
+    on_config("check_interfaces")
