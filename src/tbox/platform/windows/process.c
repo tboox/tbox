@@ -434,6 +434,17 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                 // enable handles
                 HANDLE hStdError = attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE? tb_pipe_file_handle(attr->err.pipe) : (HANDLE)attr->err.file;
 
+                // we need duplicate it if output to stdout/stderr pipes in same time
+                if (attr->outtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->out.pipe &&
+                    attr->errtype == TB_PROCESS_REDIRECT_TYPE_PIPE && attr->err.pipe &&
+                    attr->out.pipe == attr->err.pipe)
+                {
+                    HANDLE hStdOutput = hStdError;
+                    if (!DuplicateHandle(GetCurrentProcess(), hStdOutput, GetCurrentProcess(), &hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS))
+                        break;
+                    process->file_handles[process->file_handles_count++] = hStdError;
+                }
+
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
                 handlesToInherit[handlesToInheritCount++] = hStdError;
