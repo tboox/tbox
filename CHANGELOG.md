@@ -2,6 +2,11 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Improve to check interfaces
+* Improve process to output same pipes
+
 ## v1.7.4
 
 ### New features
@@ -299,6 +304,11 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 改进接口检测
+* 改进 windows 进程输出，支持同时输出到同一个管道
 
 ## v1.7.4
 
