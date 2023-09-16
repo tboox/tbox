@@ -289,7 +289,7 @@ function _check_interfaces(target)
 end
 
 function main(target, opt)
-    if opt and opt.recheck then
+    if not opt or (opt and opt.recheck) then
         _check_interfaces(target)
     end
 end
