@@ -198,7 +198,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
     // exit file
     if (ifile) tb_file_exit(ifile);
     if (ofile) tb_file_exit(ofile);
-#elif 0
+#elif 1
     tb_bool_t ok = tb_file_rename(argv[1], argv[2]);
     tb_trace_i("rename: %s => %s %s", argv[1], argv[2], ok? "ok" : "failed");
 #elif 1

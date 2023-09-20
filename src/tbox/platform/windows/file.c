@@ -492,16 +492,15 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
     if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
     // rename it
-    if (!MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING))
+    DWORD flags = MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
+    if (!MoveFileExW(full0, full1, flags))
     {
         // make directory
         tb_file_mkdir(full1);
 
         // rename it again
-        return MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING);
+        return MoveFileExW(full0, full1, flags);
     }
-
-    // ok
     return tb_true;
 }
 tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
