@@ -77,13 +77,13 @@ typedef struct __tb_ssl_t
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
  */
-static tb_int_t         tb_ssl_bio_method_init(BIO* bio);
-static tb_int_t         tb_ssl_bio_method_exit(BIO* bio);
-static tb_int_t         tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size);
-static tb_int_t         tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t size);
-static tb_long_t        tb_ssl_bio_method_ctrl(BIO* bio, tb_int_t cmd, tb_long_t num, tb_pointer_t ptr);
-static tb_int_t         tb_ssl_bio_method_puts(BIO* bio, tb_char_t const* data);
-static tb_int_t         tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size);
+static int  tb_ssl_bio_method_init(BIO* bio);
+static int  tb_ssl_bio_method_exit(BIO* bio);
+static int  tb_ssl_bio_method_read(BIO* bio, char* data, int size);
+static int  tb_ssl_bio_method_writ(BIO* bio, char const* data, int size);
+static long tb_ssl_bio_method_ctrl(BIO* bio, int cmd, long num, void* ptr);
+static int  tb_ssl_bio_method_puts(BIO* bio, char const* data);
+static int  tb_ssl_bio_method_gets(BIO* bio, char* data, int size);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -163,31 +163,21 @@ static tb_char_t const* tb_ssl_error(tb_long_t error)
 #endif
 static tb_long_t tb_ssl_sock_read(tb_cpointer_t priv, tb_byte_t* data, tb_size_t size)
 {
-    // check
     tb_assert_and_check_return_val(priv, -1);
-
-    // recv it
     return tb_socket_recv((tb_socket_ref_t)priv, data, size);
 }
 static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
-    // check
     tb_assert_and_check_return_val(priv, -1);
-
-    // send it
     return tb_socket_send((tb_socket_ref_t)priv, data, size);
 }
 static tb_long_t tb_ssl_sock_wait(tb_cpointer_t priv, tb_size_t events, tb_long_t timeout)
 {
-    // check
     tb_assert_and_check_return_val(priv, -1);
-
-    // wait it
     return tb_socket_wait((tb_socket_ref_t)priv, events, timeout);
 }
-static tb_int_t tb_ssl_bio_method_init(BIO* bio)
+static int tb_ssl_bio_method_init(BIO* bio)
 {
-    // check
     tb_assert_and_check_return_val(bio, 0);
 
     // trace
@@ -197,11 +187,9 @@ static tb_int_t tb_ssl_bio_method_init(BIO* bio)
     BIO_set_init(bio, 1);
     BIO_set_data(bio, tb_null);
     BIO_set_shutdown(bio, 1);
-
-    // ok
     return 1;
 }
-static tb_int_t tb_ssl_bio_method_exit(BIO* bio)
+static int tb_ssl_bio_method_exit(BIO* bio)
 {
     // check
     tb_assert_and_check_return_val(bio, 0);
@@ -213,11 +201,9 @@ static tb_int_t tb_ssl_bio_method_exit(BIO* bio)
     BIO_set_init(bio, 0);
     BIO_set_data(bio, tb_null);
     BIO_set_shutdown(bio, 0);
-
-    // ok
     return 1;
 }
-static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
+static int tb_ssl_bio_method_read(BIO* bio, char* data, int size)
 {
     // check
     tb_assert_and_check_return_val(bio && data && size >= 0, -1);
@@ -226,7 +212,7 @@ static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
     tb_ssl_t* ssl = (tb_ssl_t*)BIO_get_data(bio);
     tb_assert_and_check_return_val(ssl && ssl->read, -1);
 
-    // writ
+    // read data
     tb_long_t real = ssl->read(ssl->priv, (tb_byte_t*)data, size);
 
     // trace
@@ -253,11 +239,9 @@ static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
         BIO_clear_retry_flags(bio);
         real = -1;
     }
-
-    // ok?
-    return (tb_int_t)real;
+    return (int)real;
 }
-static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t size)
+static int tb_ssl_bio_method_writ(BIO* bio, char const* data, int size)
 {
     // check
     tb_assert_and_check_return_val(bio && data && size >= 0, -1);
@@ -266,7 +250,7 @@ static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t
     tb_ssl_t* ssl = (tb_ssl_t*)BIO_get_data(bio);
     tb_assert_and_check_return_val(ssl && ssl->writ, -1);
 
-    // writ
+    // write data
     tb_long_t real = ssl->writ(ssl->priv, (tb_byte_t const*)data, size);
 
     // trace
@@ -293,11 +277,9 @@ static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t
         BIO_clear_retry_flags(bio);
         real = -1;
     }
-
-    // ok?
-    return (tb_int_t)real;
+    return (int)real;
 }
-static tb_long_t tb_ssl_bio_method_ctrl(BIO* bio, tb_int_t cmd, tb_long_t num, tb_pointer_t ptr)
+static long tb_ssl_bio_method_ctrl(BIO* bio, int cmd, long num, void* ptr)
 {
     // check
     tb_assert_and_check_return_val(bio, -1);
@@ -306,49 +288,35 @@ static tb_long_t tb_ssl_bio_method_ctrl(BIO* bio, tb_int_t cmd, tb_long_t num, t
     tb_ssl_t* ssl = (tb_ssl_t*)BIO_get_data(bio);
     tb_assert_and_check_return_val(ssl, -1);
 
-    // done
     tb_long_t ok = 0;
     switch (cmd)
     {
     case BIO_CTRL_FLUSH:
         {
-            // trace
             tb_trace_d("bio: ctrl: flush");
-
-            // ok
             ok = 1;
         }
         break;
     default:
         {
-            // trace
             tb_trace_d("bio: ctrl: unknown: %d", cmd);
         }
         break;
     }
-    // ok?
-    return ok;
+    return (long)ok;
 }
-static tb_int_t tb_ssl_bio_method_puts(BIO* bio, tb_char_t const* data)
+static int tb_ssl_bio_method_puts(BIO* bio, char const* data)
 {
-    // check
     tb_assert_and_check_return_val(bio && data, -1);
 
-    // trace
     tb_trace_d("bio: puts: %s", data);
-
-    // writ
     return tb_ssl_bio_method_writ(bio, data, tb_strlen(data));
 }
-static tb_int_t tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size)
+static int tb_ssl_bio_method_gets(BIO* bio, char* data, int size)
 {
-    // check
     tb_assert_and_check_return_val(bio && data, -1);
 
-    // trace
     tb_trace_d("bio: gets: %d", size);
-
-    // read it
     return tb_ssl_bio_method_read(bio, data, size);
 }
 
@@ -357,7 +325,6 @@ static tb_int_t tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size)
  */
 tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
 {
-    // done
     tb_bool_t   ok = tb_false;
     tb_ssl_t*   ssl = tb_null;
     do
@@ -400,8 +367,6 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
 
         // init state
         ssl->state = TB_STATE_OK;
-
-        // ok
         ok = tb_true;
 
     } while (0);
@@ -412,8 +377,6 @@ tb_ssl_ref_t tb_ssl_init(tb_bool_t bserver)
         if (ssl) tb_ssl_exit((tb_ssl_ref_t)ssl);
         ssl = tb_null;
     }
-
-    // ok?
     return (tb_ssl_ref_t)ssl;
 }
 tb_void_t tb_ssl_exit(tb_ssl_ref_t self)
@@ -480,8 +443,6 @@ tb_bool_t tb_ssl_open(tb_ssl_ref_t self)
         ok = tb_ssl_wait(self, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, ssl->timeout);
         tb_check_break(ok > 0);
     }
-
-    // ok?
     return ok > 0? tb_true : tb_false;
 }
 tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
@@ -490,7 +451,6 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
     tb_ssl_t* ssl = (tb_ssl_t*)self;
     tb_assert_and_check_return_val(ssl && ssl->ssl, -1);
 
-    // done
     tb_long_t ok = -1;
     do
     {
@@ -522,22 +482,15 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
             // wait?
             if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
             {
-                // trace
                 tb_trace_d("open: handshake: wait: %s: ..", error == SSL_ERROR_WANT_READ? "read" : "writ");
 
-                // continue it
                 ok = 0;
-
-                // save state
                 ssl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
             }
             // failed?
             else
             {
-                // trace
                 tb_trace_d("open: handshake: failed: %s", tb_ssl_error(error));
-
-                // save state
                 ssl->state = TB_STATE_SOCK_SSL_FAILED;
             }
         }
@@ -560,8 +513,6 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
 
     // trace
     tb_trace_d("open: handshake: %s", ok > 0? "ok" : (!ok? ".." : "no"));
-
-    // ok?
     return ok;
 }
 tb_bool_t tb_ssl_close(tb_ssl_ref_t self)
@@ -578,8 +529,6 @@ tb_bool_t tb_ssl_close(tb_ssl_ref_t self)
         ok = tb_ssl_wait(self, TB_SOCKET_EVENT_RECV | TB_SOCKET_EVENT_SEND, ssl->timeout);
         tb_check_break(ok > 0);
     }
-
-    // ok?
     return ok > 0? tb_true : tb_false;
 }
 tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
@@ -588,7 +537,6 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
     tb_ssl_t* ssl = (tb_ssl_t*)self;
     tb_assert_and_check_return_val(ssl, -1);
 
-    // done
     tb_long_t ok = -1;
     do
     {
@@ -654,8 +602,6 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
 
     // trace
     tb_trace_d("close: shutdown: %s", ok > 0? "ok" : (!ok? ".." : "no"));
-
-    // ok?
     return ok;
 }
 tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
@@ -670,7 +616,6 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
     // trace
     tb_trace_d("read: %ld", real);
 
-    // done
     if (real < 0)
     {
         // the error
@@ -778,8 +723,6 @@ tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
         ssl->state = TB_STATE_CLOSED;
         return -1;
     }
-
-    // ok
     return real;
 }
 tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t events, tb_long_t timeout)
@@ -819,17 +762,13 @@ tb_long_t tb_ssl_wait(tb_ssl_ref_t self, tb_size_t events, tb_long_t timeout)
 
     // trace
     tb_trace_d("wait: %ld", ssl->lwait);
-
-    // ok?
     return ssl->lwait;
 }
 tb_size_t tb_ssl_state(tb_ssl_ref_t self)
 {
-    // the ssl
     tb_ssl_t* ssl = (tb_ssl_t*)self;
     tb_assert_and_check_return_val(ssl, TB_STATE_UNKNOWN_ERROR);
 
-    // the state
     return ssl->state;
 }
 
