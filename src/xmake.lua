@@ -1,5 +1,3 @@
-includes("check_cfuncs.lua")
-includes("check_csnippets.lua")
 
 -- option: demo
 option("demo")
