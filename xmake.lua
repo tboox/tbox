@@ -73,11 +73,11 @@ if is_plat("windows") then
     else
         set_runtimes("MT")
     end
-    add_syslinks("ws2_32")
+    add_syslinks("ws2_32", "user32")
 elseif is_plat("android") then
     add_syslinks("m", "c")
 elseif is_plat("mingw", "msys", "cygwin") then
-    add_syslinks("ws2_32", "pthread", "m")
+    add_syslinks("ws2_32", "user32", "pthread", "m")
 elseif is_plat("haiku") then
     add_syslinks("pthread", "network", "m", "c")
 else
