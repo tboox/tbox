@@ -310,7 +310,7 @@ static int tb_ssl_bio_method_puts(BIO* bio, char const* data)
     tb_assert_and_check_return_val(bio && data, -1);
 
     tb_trace_d("bio: puts: %s", data);
-    return tb_ssl_bio_method_writ(bio, data, tb_strlen(data));
+    return tb_ssl_bio_method_writ(bio, data, (tb_int_t)tb_strlen(data));
 }
 static int tb_ssl_bio_method_gets(BIO* bio, char* data, int size)
 {
@@ -477,7 +477,7 @@ tb_long_t tb_ssl_open_try(tb_ssl_ref_t self)
         else
         {
             // the error
-            tb_long_t error = SSL_get_error(ssl->ssl, r);
+            tb_long_t error = SSL_get_error(ssl->ssl, (tb_int_t)r);
 
             // wait?
             if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
@@ -563,7 +563,7 @@ tb_long_t tb_ssl_close_try(tb_ssl_ref_t self)
         else
         {
             // the error
-            tb_long_t error = SSL_get_error(ssl->ssl, r);
+            tb_long_t error = SSL_get_error(ssl->ssl, (tb_int_t)r);
 
             // wait?
             if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
@@ -611,7 +611,7 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
     tb_assert_and_check_return_val(ssl && ssl->ssl && ssl->bopened && data, -1);
 
     // read it
-    tb_long_t real = SSL_read(ssl->ssl, data, size);
+    tb_long_t real = SSL_read(ssl->ssl, data, (tb_int_t)size);
 
     // trace
     tb_trace_d("read: %ld", real);
@@ -619,7 +619,7 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
     if (real < 0)
     {
         // the error
-        tb_long_t error = SSL_get_error(ssl->ssl, real);
+        tb_long_t error = SSL_get_error(ssl->ssl, (tb_int_t)real);
 
         // want read? continue it
         if (error == SSL_ERROR_WANT_READ)
@@ -671,7 +671,7 @@ tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
     tb_assert_and_check_return_val(ssl && ssl->ssl && ssl->bopened && data, -1);
 
     // writ it
-    tb_long_t real = SSL_write(ssl->ssl, data, size);
+    tb_long_t real = SSL_write(ssl->ssl, data, (tb_int_t)size);
 
     // trace
     tb_trace_d("writ: %ld", real);
@@ -680,7 +680,7 @@ tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
     if (real < 0)
     {
         // the error
-        tb_long_t error = SSL_get_error(ssl->ssl, real);
+        tb_long_t error = SSL_get_error(ssl->ssl, (tb_int_t)real);
 
         // want read? continue it
         if (error == SSL_ERROR_WANT_READ)
