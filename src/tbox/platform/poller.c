@@ -69,7 +69,7 @@
 #   endif
 #endif
 
-#ifndef TB_CONFIG_MICRO_ENABLE
+#if !defined(TB_CONFIG_MICRO_ENABLE) && defined(TB_CONFIG_FWATCHER_ENABLE)
 #   if defined(TB_CONFIG_OS_WINDOWS) || \
         defined(TB_CONFIG_LINUX_HAVE_INOTIFY_INIT) || \
         defined(TB_CONFIG_OS_MACOSX) || \

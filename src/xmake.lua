@@ -16,6 +16,15 @@ option("micro")
     set_configvar("TB_CONFIG_MICRO_ENABLE", 1)
 option_end()
 
+-- option: fwatcher
+option("fwatcher")
+    set_default(true)
+    set_showmenu(true)
+    set_category("option")
+    set_description("Enable or disable fwatcher for poller")
+    set_configvar("TB_CONFIG_FWATCHER_ENABLE", 1)
+option_end()
+
 -- option: small
 option("small")
     set_default(true)
