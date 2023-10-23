@@ -259,7 +259,9 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         tb_bool_t detach = attr && (attr->flags & TB_PROCESS_FLAG_DETACH);
 
         // init flags
+        // see: https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags
         DWORD flags = CREATE_UNICODE_ENVIRONMENT;
+        if (attr && attr->flags & TB_PROCESS_FLAG_NO_WINDOW) flags |= CREATE_NO_WINDOW;
         if (attr && attr->flags & TB_PROCESS_FLAG_SUSPEND) flags |= CREATE_SUSPENDED;
         if (!detach) flags |= CREATE_BREAKAWAY_FROM_JOB; // create process with parent process group by default, need set JOB_OBJECT_LIMIT_BREAKAWAY_OK limit for job
 

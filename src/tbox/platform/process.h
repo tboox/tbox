@@ -43,6 +43,7 @@ typedef enum __tb_process_flag_e
     TB_PROCESS_FLAG_NONE    = 0
 ,   TB_PROCESS_FLAG_SUSPEND = 1     //!< suspend process
 ,   TB_PROCESS_FLAG_DETACH  = 2     //!< all subprocesses will be exited when the parent process is exited (ctrl+c or onexit) if this flag is not setted
+,   TB_PROCESS_FLAG_NO_WINDOW = 4   //!< avoid to launch the console, currently only for windows when spawning command line in a GUI app
 
 }tb_process_flag_e;
 
