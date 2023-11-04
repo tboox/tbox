@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.5
+
 ### Changes
 
 * Improve to check interfaces
@@ -304,6 +306,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.7.5
 
 ### 改进
 
