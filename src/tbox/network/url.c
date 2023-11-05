@@ -593,7 +593,7 @@ tb_size_t tb_url_protocol_probe(tb_char_t const* url)
     else if (!tb_strnicmp(p, "socks://", 8))    protocol = TB_URL_PROTOCOL_SOCK;
     else if (!tb_strnicmp(p, "rtsp://", 7))     protocol = TB_URL_PROTOCOL_RTSP;
     else if (!tb_strnicmp(p, "sql://", 6))      protocol = TB_URL_PROTOCOL_SQL;
-    else if (!tb_strnstr(p, 16, "://"))         protocol = TB_URL_PROTOCOL_FILE;
+    else if (tb_strnstr(p, 16, "://"))         protocol = TB_URL_PROTOCOL_FILE;
     else
     {
         tb_trace_e("unknown protocol for url: %s", url);
