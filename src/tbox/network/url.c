@@ -583,6 +583,7 @@ tb_size_t tb_url_protocol_probe(tb_char_t const* url)
     tb_assert_and_check_return_val(url, TB_URL_PROTOCOL_NONE);
 
     // init
+    tb_char_t           full[TB_PATH_MAXN];
     tb_char_t const*    p = url;
     tb_size_t           protocol = TB_URL_PROTOCOL_NONE;
     if (!tb_strnicmp(p, "http://", 7))          protocol = TB_URL_PROTOCOL_HTTP;
@@ -593,13 +594,20 @@ tb_size_t tb_url_protocol_probe(tb_char_t const* url)
     else if (!tb_strnicmp(p, "socks://", 8))    protocol = TB_URL_PROTOCOL_SOCK;
     else if (!tb_strnicmp(p, "rtsp://", 7))     protocol = TB_URL_PROTOCOL_RTSP;
     else if (!tb_strnicmp(p, "sql://", 6))      protocol = TB_URL_PROTOCOL_SQL;
-    else if (!tb_strnstr(p, 16, "://"))         protocol = TB_URL_PROTOCOL_FILE;
-    else
+    // ./file or /home/file or c:/file or c:\\file ...
+    else if ((p = tb_path_absolute(url, full, TB_PATH_MAXN)))
+    {
+        // for unix style path
+        if ((*p == '/') || (!tb_strnicmp(p, "file://", 7)))
+            protocol = TB_URL_PROTOCOL_FILE;
+        // for windows style path
+        else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
+            protocol = TB_URL_PROTOCOL_FILE;
+    }
+    if (protocol == TB_URL_PROTOCOL_NONE)
     {
         tb_trace_e("unknown protocol for url: %s", url);
     }
-
-    // ok?
     return protocol;
 }
 tb_uint16_t tb_url_port(tb_url_ref_t url)
