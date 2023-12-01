@@ -249,7 +249,7 @@ tb_bool_t tb_option_find(tb_option_ref_t option, tb_char_t const* name)
     // find it
     return tb_oc_dictionary_value(impl->list, name)? tb_true : tb_false;
 }
-tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** argv)
+tb_bool_t tb_norm_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** argv)
 {
     // check
     tb_option_impl_t* impl = (tb_option_impl_t*)option;
@@ -564,6 +564,171 @@ tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** arg
 
     // ok
     return tb_true;//tb_option_check(impl);
+}
+static void tb_print_argv(tb_size_t argc, tb_char_t* argv[])
+{
+    tb_trace_i("argc: %d", argc);
+    tb_size_t               i = 0;
+    for (i = 0; i < argc; i++)
+    {
+        tb_trace_i("argv[%d]: %s", i, argv[i]);
+    }
+}
+tb_bool_t tb_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** argv)
+{
+    tb_bool_t ok = tb_false;
+    // check
+    tb_option_impl_t* impl = (tb_option_impl_t*)option;
+    tb_assert_and_check_return_val(impl && impl->list && impl->opts, tb_false);
+
+    // Prints the command-line arguments before normalization
+    // tb_trace_i("OLD:");
+    // tb_print_argv(argc, argv);
+
+    // Normalize the parameters, i.e., transform the form '-f a.txt' into the form '-f=a.txt'
+    // Make a two-dimensional character array to hold command-line arguments
+    // The number of first dimensions will not exceed 'argc'
+    // The number of the second dimension will not exceed twice the number of the longest 'argv[i]' +1
+    // (why +1, because of the equal sign)
+    // Let's find out how long the longest argv[i] is
+    tb_size_t               i = 0;
+    tb_size_t               longest = 0;
+    for (i = 0; i < argc; i++)
+    {
+        tb_size_t argvi_len = tb_strlen(argv[i]);
+        if (argvi_len > longest)
+        {
+            longest = argvi_len;
+        }
+    }
+
+    // Allocate space
+    tb_char_t* data = tb_malloc(argc * (2*longest+1+1)); // including the trailing '\0'
+    // Allocate space for normalized argv array. Array elements are of tb_char_t*
+    tb_char_t** new_argv = tb_malloc(argc * sizeof (tb_char_t*));
+    for (i = 0; i < argc; i++)
+    {
+        new_argv[i] = data + i*(2*longest+1+1);
+    }
+    tb_size_t new_argc = 0;
+
+    // Examine each element of the original 'argv' array one by one
+    for (i = 0; i < argc; i++)
+    {
+        // the argument
+        tb_char_t* p = argv[i];
+        tb_char_t* e = p + tb_strlen(p);
+        tb_assert_and_check_return_val(p && p < e, tb_false);
+
+        // Determine the kind of argv[i].
+        // 0 - long KEY;
+        // 1 - short KEY 
+        // 2 - not KEY (It may be an independent VAL, or it may be a VAL attached to the previous KEY
+        // It depends on whether the previous KEY has VAL or not)
+        tb_size_t kind;
+        if (p + 2 < e && p[0] == '-' && p[1] == '-' && tb_isalpha(p[2]))
+            kind = 0;
+        else if (p + 1 < e && p[0] == '-' && tb_isalpha(p[1]))
+            kind = 1;
+        else
+            kind = 2;
+
+        // If it is is a KEY, you need to determine whether it is a simple KEY or a KEY with VAL
+        // based on the option definition
+        if (kind == 0 || kind == 1)
+        {
+            tb_char_t key[512] = {0};
+            tb_char_t* val;
+            tb_option_item_t const* find;
+            if (kind == 0)
+            {
+                // the long key
+                {
+                    tb_char_t* k = key;
+                    tb_char_t* e = key + 511;
+                    for (p += 2; *p && *p != '=' && k < e; p++, k++) *k = *p;
+                }
+                // the val
+                val = (*p == '=')? (p + 1) : tb_null;
+                find = tb_option_item_find(impl->opts, key, '\0');
+            }
+            else
+            {
+                // the short key
+                {
+                    tb_char_t* k = key;
+                    tb_char_t* e = key + 511;
+                    for (p += 1; *p && *p != '=' && k < e; p++, k++) *k = *p;
+                }
+                // the val
+                val = (*p == '=')? (p + 1) : tb_null;
+                find = tb_option_item_find(impl->opts, tb_null, key[0]);
+            }
+            
+            // If it is a KEY with VAL
+            if (find->mode == TB_OPTION_MODE_KEY_VAL)
+            {
+                // Then determine whether VAL is in argv[i] or argv[i+1].
+                // If it's in argv[i], copy it directly to the new_argv array
+                // If it's in argv[i+1], copy argv[i]=argv[i+1] to the new_argv array
+                if (val)
+                {
+                    tb_strcpy(new_argv[new_argc], argv[i]);
+                    new_argc++;
+                }
+                else
+                {
+                    // If argv[i+1] is also preceded by a '-',
+                    // that is, another KEY, an error will be reported
+                    if (i+1 < argc && argv[i+1][0]=='-')
+                    {
+                        tb_trace_e("%s: no option value '--%s='", impl->name, key);
+                        tb_strcpy(new_argv[new_argc], argv[i]);
+                        new_argc++;
+                    }
+                    else
+                    {
+                        tb_strcpy(new_argv[new_argc], argv[i]);
+                        tb_strcat(new_argv[new_argc], "=");
+                        tb_strcat(new_argv[new_argc], argv[i+1]);
+                        i++;
+                        new_argc++;
+                    }
+                }
+            }
+            else
+            {
+                // If it is a simple KEY, copy it to the new_argv array
+                tb_strcpy(new_argv[new_argc], argv[i]);
+                new_argc++;
+            }
+            
+        }
+        else
+        {
+            // If it's something else, copy directly to the new argv array.
+            // This one is necessarily an independent VAL,
+            // because the subsidiary VAL has already been skipped.
+            tb_strcpy(new_argv[new_argc], argv[i]);
+            new_argc++;
+        }
+
+    }
+
+    // Prints the normalized command-line arguments
+    // tb_trace_i("NEW:");
+    // tb_print_argv(new_argc, new_argv);
+
+    // This is the original tb_option_done,
+    // renamed to tb_normalized_option_done because it can only
+    // handle normalized options (i.e., options like '-f=a.txt').
+    // In the style of tbox, use norm instead of normalized
+    ok = tb_norm_option_done(option, argc, argv);
+
+    tb_free(new_argv);
+    tb_free(data);
+
+    return ok;
 }
 tb_void_t tb_option_dump(tb_option_ref_t option)
 {

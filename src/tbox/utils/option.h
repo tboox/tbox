@@ -110,7 +110,17 @@ tb_void_t               tb_option_exit(tb_option_ref_t option);
  */
 tb_bool_t               tb_option_find(tb_option_ref_t option, tb_char_t const* name);
 
-/*! done option
+/*! done normalized option (normalized option is like '-f=a.txt')
+ *
+ * @param option        the option
+ * @param argc          the arguments count
+ * @param argv          the arguments value
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_norm_option_done(tb_option_ref_t option, tb_size_t argc, tb_char_t** argv);
+
+/*! done option (also supports '-f a.txt')
  *
  * @param option        the option
  * @param argc          the arguments count
