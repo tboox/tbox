@@ -203,7 +203,8 @@ function _check_interfaces(target)
         _check_module_cfuncs(target, "posix", "sys/stat.h",                       "mkfifo")
         _check_module_cfuncs(target, "posix", "sys/mman.h",                       "mmap")
         _check_module_cfuncs(target, "posix", "sys/stat.h",                       "futimens", "utimensat")
-    elseif not target:is_plat("windows", "wasm") then
+    end
+    if not target:is_plat("windows", "wasm") then
         _check_module_cfuncs(target, "posix", "spawn.h",                          "posix_spawnp", "posix_spawn_file_actions_addchdir_np")
         _check_module_cfuncs(target, "posix", "semaphore.h",                      "sem_init")
     end
