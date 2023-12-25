@@ -44,6 +44,7 @@
     || defined(__PPC64__) \
     || defined(__ppc64__) \
     || defined(__powerpc64__) \
+    || defined(__sw_64) \
     || defined(__loongarch64) \
     || defined(_M_X64) \
     || defined(_M_AMD64) \
