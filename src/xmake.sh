@@ -279,6 +279,9 @@ check_interfaces() {
 
     # add the interfaces for linux
     check_module_cfuncs "linux" "sys/inotify.h" "inotify_init"
+    check_module_csnippets "linux_ifaddrs" "TB_CONFIG_LINUX_HAVE_IFADDRS" \
+        "#include <linux/if.h>\n
+         #include <linux/netlink.h>"
 
     # add the interfaces for sigsetjmp
     check_module_csnippets "libc_sigsetjmp" "TB_CONFIG_LIBC_HAVE_SIGSETJMP" \

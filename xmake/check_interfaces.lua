@@ -270,6 +270,7 @@ function _check_interfaces(target)
     -- add the interfaces for linux
     if target:is_plat("linux", "android") then
         _check_module_cfuncs(target, "linux", {"sys/inotify.h"}, "inotify_init")
+        _check_keyword_csnippet(target, "linux_ifaddrs", "TB_CONFIG_LINUX_HAVE_IFADDRS", "#include <linux/if.h>\n#include <linux/netlink.h>")
     end
 
     -- add the interfaces for valgrind
