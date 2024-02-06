@@ -442,10 +442,31 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     tb_file_info_t info = {0};
     if (flags & TB_FILE_COPY_LINK && tb_file_info(path, &info) && info.flags & TB_FILE_FLAG_LINK)
     {
-        if (tb_kernel32()->CopyFileExW)
-            return (tb_bool_t)tb_kernel32()->CopyFileExW(full0, full1, tb_null, tb_null, FALSE, COPY_FILE_COPY_SYMLINK);
-        // TODO we should read file content to copy it
-        // ...
+        tb_file_mkdir(full1);
+        if (tb_kernel32()->CopyFileExW && tb_kernel32()->CopyFileExW(full0, full1, tb_null, tb_null, FALSE, COPY_FILE_COPY_SYMLINK))
+            return tb_true;
+
+        // we should read file content to copy it
+        tb_bool_t ok = tb_false;
+        tb_file_ref_t ifile = tb_file_init(path, TB_FILE_MODE_RW);
+        tb_file_ref_t ofile = tb_file_init(dest, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+        if (ifile && ofile)
+        {
+            tb_hize_t writ = 0;
+            tb_hize_t size = tb_file_size(ifile);
+            while (writ < size)
+            {
+                tb_long_t real = tb_file_writf(ofile, ifile, writ, size - writ);
+                if (real > 0) writ += real;
+                else break;
+            }
+            if (writ == size) ok = tb_true;
+        }
+
+        // exit file
+        if (ifile) tb_file_exit(ifile);
+        if (ofile) tb_file_exit(ofile);
+        return ok;
     }
 
     // copy it
