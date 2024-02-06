@@ -442,8 +442,8 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     tb_file_info_t info = {0};
     if (flags & TB_FILE_COPY_LINK && tb_file_info(path, &info) && info.flags & TB_FILE_FLAG_LINK)
     {
-        if (tb_kernel32()->CopyFileW)
-            return (tb_bool_t)tb_kernel32()->CopyFileW(full0, full1, tb_null, tb_null, FALSE, COPY_FILE_COPY_SYMLINK);
+        if (tb_kernel32()->CopyFileExW)
+            return (tb_bool_t)tb_kernel32()->CopyFileExW(full0, full1, tb_null, tb_null, FALSE, COPY_FILE_COPY_SYMLINK);
         // TODO we should read file content to copy it
         // ...
     }
