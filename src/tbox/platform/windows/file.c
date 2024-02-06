@@ -407,8 +407,10 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         if (st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) info->type = TB_FILE_TYPE_DIRECTORY;
         else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
 
-        // TODO does not support symlink now
+        // is symlink?
         info->flags = TB_FILE_FLAG_NONE;
+        if (st.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+            info->flags |= TB_FILE_FLAG_LINK;
 
         // file size
         info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;
@@ -436,17 +438,22 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     tb_wchar_t full1[TB_PATH_MAXN];
     if (!tb_path_absolute_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
+    // copy link
+    tb_file_info_t info = {0};
+    if (flags & TB_FILE_COPY_LINK && tb_file_info(path, &info) && info.flags & TB_FILE_FLAG_LINK)
+    {
+        if (tb_kernel32()->CopyFileW)
+            return (tb_bool_t)tb_kernel32()->CopyFileW(full0, full1, tb_null, tb_null, FALSE, COPY_FILE_COPY_SYMLINK);
+        // TODO we should read file content to copy it
+        // ...
+    }
+
     // copy it
     if (!CopyFileW(full0, full1, FALSE))
     {
-        // make directory
         tb_file_mkdir(full1);
-
-        // copy it again
         return (tb_bool_t)CopyFileW(full0, full1, FALSE);
     }
-
-    // ok
     return tb_true;
 }
 tb_bool_t tb_file_create(tb_char_t const* path)

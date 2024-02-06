@@ -188,6 +188,15 @@ typedef BOOL (WINAPI* tb_kernel32_GetLogicalProcessorInformationEx_t)(
     PDWORD ReturnedLength);
 #endif
 
+// the CopyFileW func type
+typedef BOOL (WINAPI* tb_kernel32_CopyFileExW_t)(
+    LPCWSTR            lpExistingFileName,
+    LPCWSTR            lpNewFileName,
+    LPPROGRESS_ROUTINE lpProgressRoutine,
+    LPVOID             lpData,
+    LPBOOL             pbCancel,
+    DWORD              dwCopyFlags);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -265,6 +274,9 @@ typedef struct __tb_kernel32_t
 
     // DeleteProcThreadAttributeList
     tb_kernel32_DeleteProcThreadAttributeList_t         DeleteProcThreadAttributeList;
+
+    // CopyFileExW
+    tb_kernel32_CopyFileExW_t                           CopyFileExW;
 
     // GetLogicalProcessorInformationEx
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
