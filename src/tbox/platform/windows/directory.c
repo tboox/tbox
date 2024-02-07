@@ -336,7 +336,7 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest, tb_siz
     tb_assert_and_check_return_val(dest, tb_false);
 
     // walk copy
-    tb_value_t tuple[3];
+    tb_value_t tuple[4];
     tuple[0].cstr = dest;
     tuple[1].ul = tb_strlen(path);
     tuple[2].ul = flags;
