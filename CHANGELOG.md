@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Implement copy symlinks on windows
+
 ## v1.7.5
 
 ### Changes
@@ -306,6 +310,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 改进 copyfile 支持，在 windows 实现对 symlinks 的复制
 
 ## v1.7.5
 
