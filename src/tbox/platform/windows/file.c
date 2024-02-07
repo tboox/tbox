@@ -456,7 +456,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
             tb_hize_t size = tb_file_size(ifile);
             while (writ < size)
             {
-                tb_long_t real = tb_file_writf(ofile, ifile, writ, size - writ);
+                tb_hong_t real = tb_file_writf(ofile, ifile, writ, size - writ);
                 if (real > 0) writ += real;
                 else break;
             }
