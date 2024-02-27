@@ -521,15 +521,21 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 
     // rename it
     DWORD flags = MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
-    if (!MoveFileExW(full0, full1, flags))
-    {
-        // make directory
-        tb_file_mkdir(full1);
+    if (MoveFileExW(full0, full1, flags)) return tb_true;
 
-        // rename it again
-        return MoveFileExW(full0, full1, flags);
+    // try to create directories and rename it again
+    tb_file_mkdir(full1);
+    if (MoveFileExW(full0, full1, flags)) return tb_true;
+
+    // MoveFileExW will fail if it crosses drive, we can use copy/delete to rename file
+    if (CopyFileW(full0, full1, FALSE))
+    {
+        DWORD attrs = GetFileAttributesW(full0);
+        if (attrs & FILE_ATTRIBUTE_READONLY)
+            SetFileAttributesW(full0, attrs & ~FILE_ATTRIBUTE_READONLY);
+        return DeleteFileW(full0);
     }
-    return tb_true;
+    return tb_false;
 }
 tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 {
