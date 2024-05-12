@@ -57,6 +57,7 @@ option "deprecated" "Enable or disable the deprecated interfaces." false
 option "force_utf8" "Forcely regard all tb_char* as utf-8." false
 
 option "wchar"
+    add_cincludes "stddef.h"
     add_ctypes "wchar_t"
 option_end
 
