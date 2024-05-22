@@ -183,7 +183,7 @@ function _check_interfaces(target)
         _check_module_cfuncs(target, "posix", "dlfcn.h",                          "dlopen")
         _check_module_cfuncs(target, "posix", {"sys/stat.h", "fcntl.h"},          "open", "stat64", "lstat64")
         _check_module_cfuncs(target, "posix", "unistd.h",                         "gethostname")
-        _check_module_cfuncs(target, "posix", "ifaddrs.h",                        "getifaddrs")
+        _check_module_cfuncs(target, "posix", {"ifaddrs.h", "net/if_dl.h"},       "getifaddrs")
         _check_module_cfuncs(target, "posix", "unistd.h",                         "getpagesize", "sysconf")
         _check_module_cfuncs(target, "posix", "sched.h",                          "sched_yield", "sched_setaffinity") -- need _GNU_SOURCE
         _check_module_cfuncs(target, "posix", "regex.h",                          "regcomp", "regexec")

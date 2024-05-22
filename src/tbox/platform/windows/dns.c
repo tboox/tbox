@@ -33,10 +33,8 @@
  */
 tb_bool_t tb_dns_init_env()
 {
-    // done
-    FIXED_INFO*             info = tb_null;
-    ULONG                   size = 0;
-    tb_size_t               count = 0;
+    FIXED_INFO* info = tb_null;
+    ULONG       size = 0;
     do
     {
         // init func
@@ -66,7 +64,6 @@ tb_bool_t tb_dns_init_env()
 
         // add the first dns address
         tb_dns_server_add(info->DnsServerList.IpAddress.String);
-        count++;
 
         // walk dns address
         IP_ADDR_STRING* addr = info->DnsServerList.Next;
@@ -77,7 +74,6 @@ tb_bool_t tb_dns_init_env()
 
             // add the dns address
             tb_dns_server_add(addr->IpAddress.String);
-            count++;
         }
 
     } while (0);
