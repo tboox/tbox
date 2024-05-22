@@ -146,6 +146,8 @@
 #   if defined(__clang__)
 #       define TB_COMPILER_IS_CLANG
 #   endif
+
+    // we always need to be compatible with gcc style code if the current compiler is clang
 #   define TB_COMPILER_IS_GCC
 
     // clang
