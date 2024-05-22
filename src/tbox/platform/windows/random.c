@@ -35,8 +35,12 @@ tb_void_t tb_random_seed(tb_size_t seed)
 }
 tb_long_t tb_random_value()
 {
+#ifdef TB_COMPILER_IS_CLANG
+    return (tb_long_t)rand();
+#else
     tb_uint_t number = 0;
     if (rand_s(&number) == 0)
         return (tb_long_t)number;
     else return 0;
+#endif
 }
