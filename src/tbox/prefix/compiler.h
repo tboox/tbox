@@ -126,9 +126,9 @@
 #       error Unknown borland c++ Compiler Version
 #   endif
 
-// gnu c/c++
-#elif defined(__GNUC__)
-#   define TB_COMPILER_IS_GCC
+// gcc or clang
+#elif defined(__GNUC__) || defined(__clang__)
+
 #   if defined(__MINGW32__) || defined(__MINGW64__)
 #       define TB_COMPILER_IS_MINGW
 #   endif
@@ -142,43 +142,23 @@
         defined(TB_COMPILER_ON_MSYS) || defined(TB_COMPILER_ON_CYGWIN)
 #       define TB_COMPILER_LIKE_UNIX
 #   endif
-#   define TB_COMPILER_VERSION_BT(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) > ((major) * 100 + (minor)))
-#   define TB_COMPILER_VERSION_BE(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) >= ((major) * 100 + (minor)))
-#   define TB_COMPILER_VERSION_EQ(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) == ((major) * 100 + (minor)))
-#   define TB_COMPILER_VERSION_LT(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) < ((major) * 100 + (minor)))
-#   define TB_COMPILER_VERSION_LE(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) <= ((major) * 100 + (minor)))
-#   define TB_COMPILER_STRING                       "gnu c/c++"
-#   if  __GNUC__ == 2
-#       if __GNUC_MINOR__ < 95
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ <2.95"
-#       elif __GNUC_MINOR__ == 95
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 2.95"
-#       elif __GNUC_MINOR__ == 96
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 2.96"
-#       else
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ > 2.96 && < 3.0"
-#       endif
-#   elif __GNUC__ == 3
-#       if __GNUC_MINOR__ == 2
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 3.2"
-#       elif __GNUC_MINOR__ == 3
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 3.3"
-#       elif __GNUC_MINOR__ == 4
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ 3.4"
-#       else
-#           define TB_COMPILER_VERSION_STRING       "gnu c/c++ > 3.4 && < 4.0"
-#       endif
-#   elif __GNUC__ >= 4 && defined(__GNUC_MINOR__)
-#       define TB_COMPILER_VERSION_STRING           __tb_mstrcat4__("gnu c/c++ ", __tb_mstring_ex__(__GNUC__), ".", __tb_mstring_ex__(__GNUC_MINOR__))
-#   else
-#       error Unknown gnu c/c++ Compiler Version
+
+#   if defined(__clang__)
+#       define TB_COMPILER_IS_CLANG
+#   endif
+#   if defined(__GNUC__)
+#       define TB_COMPILER_IS_GCC
 #   endif
 
     // clang
 #   if defined(__clang__)
-#       define TB_COMPILER_IS_CLANG
 #       undef TB_COMPILER_STRING
 #       define TB_COMPILER_STRING                   "clang c/c++"
+#       define TB_COMPILER_VERSION_BT(major, minor)     ((__clang_major__ * 100 + __clang_minor__) > ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_BE(major, minor)     ((__clang_major__ * 100 + __clang_minor__) >= ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_EQ(major, minor)     ((__clang_major__ * 100 + __clang_minor__) == ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_LT(major, minor)     ((__clang_major__ * 100 + __clang_minor__) < ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_LE(major, minor)     ((__clang_major__ * 100 + __clang_minor__) <= ((major) * 100 + (minor)))
 #       if defined(__VERSION__)
 #           undef TB_COMPILER_VERSION_STRING
 #           define TB_COMPILER_VERSION_STRING       __VERSION__
@@ -204,6 +184,40 @@
          * pointer is missing a nullability type specifier (_Nonnull, _Nullable, or _Null_unspecified)
          */
 #       pragma clang diagnostic ignored             "-Wnullability-completeness"
+
+    // gcc
+#   elif defined(__GNUC__)
+#       define TB_COMPILER_VERSION_BT(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) > ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_BE(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) >= ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_EQ(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) == ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_LT(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) < ((major) * 100 + (minor)))
+#       define TB_COMPILER_VERSION_LE(major, minor)     ((__GNUC__ * 100 + __GNUC_MINOR__) <= ((major) * 100 + (minor)))
+#       define TB_COMPILER_STRING                       "gnu c/c++"
+#       if  __GNUC__ == 2
+#           if __GNUC_MINOR__ < 95
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ <2.95"
+#           elif __GNUC_MINOR__ == 95
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ 2.95"
+#           elif __GNUC_MINOR__ == 96
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ 2.96"
+#           else
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ > 2.96 && < 3.0"
+#           endif
+#       elif __GNUC__ == 3
+#           if __GNUC_MINOR__ == 2
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ 3.2"
+#           elif __GNUC_MINOR__ == 3
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ 3.3"
+#           elif __GNUC_MINOR__ == 4
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ 3.4"
+#           else
+#               define TB_COMPILER_VERSION_STRING       "gnu c/c++ > 3.4 && < 4.0"
+#           endif
+#       elif __GNUC__ >= 4 && defined(__GNUC_MINOR__)
+#           define TB_COMPILER_VERSION_STRING           __tb_mstrcat4__("gnu c/c++ ", __tb_mstring_ex__(__GNUC__), ".", __tb_mstring_ex__(__GNUC_MINOR__))
+#       else
+#           error Unknown gnu c/c++ Compiler Version
+#       endif
 #   endif
 
 // watcom c/c++
