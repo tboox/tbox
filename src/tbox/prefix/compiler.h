@@ -146,9 +146,7 @@
 #   if defined(__clang__)
 #       define TB_COMPILER_IS_CLANG
 #   endif
-#   if defined(__GNUC__)
-#       define TB_COMPILER_IS_GCC
-#   endif
+#   define TB_COMPILER_IS_GCC
 
     // clang
 #   if defined(__clang__)
