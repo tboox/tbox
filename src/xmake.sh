@@ -248,7 +248,7 @@ check_interfaces() {
     check_module_cfuncs "posix" "dlfcn.h"                          "dlopen"
     check_module_cfuncs "posix" "sys/stat.h fcntl.h"               "open" "stat64" "lstat64"
     check_module_cfuncs "posix" "unistd.h"                         "gethostname"
-    check_module_cfuncs "posix" "ifaddrs.h"                        "getifaddrs"
+    check_module_cfuncs "posix" "ifaddrs.h net/if_dl.h"            "getifaddrs"
     check_module_cfuncs "posix" "semaphore.h"                      "sem_init"
     check_module_cfuncs "posix" "unistd.h"                         "getpagesize" "sysconf"
     check_module_cfuncs "posix" "sched.h"                          "sched_yield" "sched_setaffinity" # need _GNU_SOURCE
