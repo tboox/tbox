@@ -21,6 +21,8 @@ static tb_void_t tb_demo_process_test_pipe(tb_char_t** argv)
         tb_process_attr_t attr = {0};
         attr.out.pipe = file[1];
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
+        attr.err.pipe = file[1];
+        attr.errtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
         tb_process_ref_t process = tb_process_init(argv[1], (tb_char_t const**)(argv + 1), &attr);
         if (process)
         {
