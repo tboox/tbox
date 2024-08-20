@@ -28,7 +28,7 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <errno.h>
-#if defined(TB_CONFIG_OS_HAIKU)
+#if defined(TB_CONFIG_OS_HAIKU) || defined(__COSMOPOLITAN__)
 #   include <unistd.h>
 #elif !defined(TB_CONFIG_OS_ANDROID)
 #   include <sys/unistd.h>

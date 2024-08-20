@@ -347,7 +347,11 @@ tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
 
     // read it
 #ifdef TB_CONFIG_POSIX_HAVE_PREADV
+#   ifdef __COSMOPOLITAN__
+    return preadv(tb_file2fd(file), (struct iovec*)list, size, offset);
+#   else
     return preadv(tb_file2fd(file), (struct iovec const*)list, size, offset);
+#   endif
 #else
 
     // FIXME: lock it

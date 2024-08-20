@@ -96,6 +96,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
             size = sizeof(struct sockaddr_in);
         }
         break;
+#ifndef __COSMOPOLITAN__
     case AF_INET6:
         {
             // the ipv6 ipaddr
@@ -127,6 +128,7 @@ static __tb_inline__ tb_size_t  tb_sockaddr_save(tb_ipaddr_ref_t ipaddr, struct 
             size = sizeof(struct sockaddr_in6);
         }
         break;
+#endif
     case AF_UNIX:
         {
             tb_sockaddr_un_ref_t addru = (tb_sockaddr_un_ref_t)saddr;
