@@ -187,7 +187,7 @@ target "tbox"
         add_files "hash/rs.c"
         add_files "hash/sha.c"
         add_files "hash/uuid.c"
-        if !is_toolchain "cosmocc"; then
+        if ! is_toolchain "cosmocc"; then
             add_files "hash/arch/crc32.S"
         fi
     fi
