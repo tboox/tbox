@@ -187,7 +187,9 @@ target "tbox"
         add_files "hash/rs.c"
         add_files "hash/sha.c"
         add_files "hash/uuid.c"
-        add_files "hash/arch/crc32.S"
+        if !is_toolchain "cosmocc"; then
+            add_files "hash/arch/crc32.S"
+        fi
     fi
 
     # add the source files for the coroutine module
