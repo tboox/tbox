@@ -35,6 +35,13 @@ if is_plat("wasm") then
     set_toolchains("emcc@emscripten")
 end
 
+-- set cosmocc toolchain, e.g. xmake f -p linux --cosmocc=y
+if has_config("cosmocc") then
+    add_requires("cosmocc")
+    set_toolchains("@cosmocc")
+    set_policy("build.ccache", false)
+end
+
 -- add build modes
 add_rules("mode.release", "mode.debug", "mode.profile", "mode.coverage", "mode.valgrind", "mode.asan", "mode.tsan", "mode.ubsan")
 if is_mode("debug") then

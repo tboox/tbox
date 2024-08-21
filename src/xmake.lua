@@ -1,13 +1,7 @@
+option("demo", {default = true, category = "option", description = "Enable or disable the demo module."})
+option("small", {default = true, category = "option", description = "Enable the small compile mode and disable all modules."})
+option("cosmocc", {default = false, category = "option", description = "Use cosmocc toolchain to build once and run anywhere."})
 
--- option: demo
-option("demo")
-    set_default(true)
-    set_showmenu(true)
-    set_category("option")
-    set_description("Enable or disable the demo module")
-option_end()
-
--- option: micro
 option("micro")
     set_default(false)
     set_showmenu(true)
@@ -16,21 +10,11 @@ option("micro")
     set_configvar("TB_CONFIG_MICRO_ENABLE", 1)
 option_end()
 
--- option: small
-option("small")
-    set_default(true)
-    set_showmenu(true)
-    set_category("option")
-    set_description("Enable the small compile mode and disable all modules.")
-option_end()
-
--- option: wchar
 option("wchar")
     add_ctypes("wchar_t")
     set_configvar("TB_CONFIG_TYPE_HAVE_WCHAR", 1)
 option_end()
 
--- option: float
 option("float")
     set_default(true)
     set_showmenu(true)
@@ -45,7 +29,6 @@ option("float")
     end)
 option_end()
 
--- option: info
 option("info")
     set_default(true)
     set_showmenu(true)
@@ -61,7 +44,6 @@ option("info")
     end)
 option_end()
 
--- option: exception
 option("exception")
     set_default(false)
     set_showmenu(true)
@@ -70,7 +52,6 @@ option("exception")
     set_configvar("TB_CONFIG_EXCEPTION_ENABLE", 1)
 option_end()
 
--- option: deprecated
 option("deprecated")
     set_default(false)
     set_showmenu(true)
@@ -79,7 +60,6 @@ option("deprecated")
     set_configvar("TB_CONFIG_API_HAVE_DEPRECATED", 1)
 option_end()
 
--- option: force-utf8
 option("force-utf8")
     set_default(false)
     set_showmenu(true)
