@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### New features
+
+* Support cosmocc toolchain
+
 ### Changes
 
 * Implement copy symlinks on windows
@@ -310,6 +314,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### 新特性
+
+* 增加对 cosmocc 工具链支持
 
 ### 改进
 
