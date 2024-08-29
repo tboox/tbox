@@ -68,7 +68,7 @@ TBOX是一个用c语言实现的跨平台开发库。
 * Small: 最小化编译，默认禁用所有扩展模块，启用编译器最小化优化
 * Micro: 针对嵌入式平台，仅仅编译tbox微内核，仅提供最基础的跨平台接口，生成库仅64K左右（内置轻量libc接口实现）
 
-如果你想了解更多，请参考：[在线文档](https://docs.tboox.org/#/zh-cn/getting_started), [Github](https://github.com/tboox/tbox)以及[Gitee](https://gitee.com/tboox/tbox)
+如果你想了解更多，请参考：[在线文档](https://docs.tboox.org/#/zh-cn/getting_started), [Github](https://github.com/tboox/tbox)以及[Gitee](https://gitee.com/tboox/tbox)和[GitCode](https://gitcode.com/tboox/tbox)。
 
 ## 特性
 
