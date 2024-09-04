@@ -455,27 +455,28 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     }
 
 #ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
-
-    // the dest path
-    tb_char_t full1[TB_PATH_MAXN];
-    dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
-    tb_assert_and_check_return_val(dest, tb_false);
-
-    // attempt to copy it directly
-    if (!copyfile(path, dest, 0, COPYFILE_ALL)) return tb_true;
-    else if (errno != EPERM && errno != EACCES)
+    if (!(flags & TB_FILE_COPY_WRITEABLE))
     {
-        // attempt to copy it again after creating directory
-        tb_char_t dir[TB_PATH_MAXN];
-        tb_int_t errno_bak = errno;
-        if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
-            return !copyfile(path, dest, 0, COPYFILE_ALL);
-        else errno = errno_bak;
-    }
+        // the dest path
+        tb_char_t full1[TB_PATH_MAXN];
+        dest = tb_path_absolute(dest, full1, TB_PATH_MAXN);
+        tb_assert_and_check_return_val(dest, tb_false);
 
-    // failed
-    return tb_false;
-#else
+        // attempt to copy it directly
+        if (!copyfile(path, dest, 0, COPYFILE_ALL)) return tb_true;
+        else if (errno != EPERM && errno != EACCES)
+        {
+            // attempt to copy it again after creating directory
+            tb_char_t dir[TB_PATH_MAXN];
+            tb_int_t errno_bak = errno;
+            if (tb_directory_create(tb_path_directory(dest, dir, sizeof(dir))))
+                return !copyfile(path, dest, 0, COPYFILE_ALL);
+            else errno = errno_bak;
+        }
+        return tb_false;
+    }
+#endif
+
     tb_int_t    ifd = -1;
     tb_int_t    ofd = -1;
     tb_bool_t   ok = tb_false;
@@ -489,6 +490,10 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
         struct stat st = {0};
         if (stat(path, &st)) break;
 #endif
+
+        // mark it as writeable
+        if (flags & TB_FILE_COPY_WRITEABLE)
+            st.st_mode |= S_IWUSR;
 
         // open source file
         ifd = open(path, O_RDONLY);
@@ -571,20 +576,15 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     if (ofd >= 0) close(ofd);
     ofd = -1;
 
-    // ok?
     return ok;
-#endif
 }
 tb_bool_t tb_file_create(tb_char_t const* path)
 {
-    // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // make it
     tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
     if (file) tb_file_exit(file);
 
-    // ok?
     return file? tb_true : tb_false;
 }
 tb_bool_t tb_file_remove(tb_char_t const* path)
