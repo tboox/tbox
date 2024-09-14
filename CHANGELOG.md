@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.6
+
 ### New features
 
 * Support cosmocc toolchain
@@ -314,6 +316,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.7.6
 
 ### 新特性
 
