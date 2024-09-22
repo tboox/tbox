@@ -304,8 +304,8 @@ tb_bool_t tb_fwatcher_add(tb_fwatcher_ref_t self, tb_char_t const* watchdir, tb_
         return tb_false;
 
     // is directory? we need scan it and add all subfiles
-    if (info.type == TB_FILE_TYPE_DIRECTORY)
-        tb_directory_walk(watchdir, recursion? -1 : 0, tb_true, tb_fwatcher_add_watch_filedirs, fwatcher);
+    if (info.type == TB_FILE_TYPE_DIRECTORY && recursion)
+        tb_directory_walk(watchdir, -1, tb_true, tb_fwatcher_add_watch_filedirs, fwatcher);
     return tb_fwatcher_add_watch(fwatcher, watchdir, recursion);
 }
 
