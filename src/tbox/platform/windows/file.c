@@ -39,6 +39,11 @@
 #   define SYMBOLIC_LINK_FLAG_DIRECTORY                 (0x1)
 #endif
 
+// https://github.com/xmake-io/xmake/discussions/5821
+#ifndef COPY_FILE_COPY_SYMLINK
+#   define COPY_FILE_COPY_SYMLINK 0x800
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
