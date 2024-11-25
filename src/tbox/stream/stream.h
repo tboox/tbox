@@ -407,6 +407,15 @@ tb_stream_ref_t         tb_stream_init_filter_from_charset(tb_stream_ref_t strea
  */
 tb_stream_ref_t         tb_stream_init_filter_from_chunked(tb_stream_ref_t stream, tb_bool_t dechunked);
 
+/*! init stream from buffer
+ *
+ * @param stream        the stream
+ * @param buffer        the buffer
+ *
+ * @return              the stream
+ */
+tb_stream_ref_t         tb_stream_init_from_buffer(tb_buffer_ref_t buffer);
+
 /*! wait stream
  *
  * blocking wait the single event object, so need not aiop
