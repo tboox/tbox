@@ -31,13 +31,13 @@
 // the buffer stream type
 typedef struct __tb_stream_buffer_t
 {
-    // the data 
+    // the buffer 
     tb_buffer_ref_t         buffer;
 
     // the head
     tb_size_t               head;
 
-    // the data is referenced?
+    // the buffer is referenced?
     tb_bool_t               bref;
 
 }tb_stream_buffer_t;
@@ -85,7 +85,7 @@ static tb_void_t tb_stream_buffer_exit(tb_stream_ref_t stream)
     // clear head
     stream_buffer->head = 0;
 
-    // exit data
+    // exit buffer
     if (stream_buffer->buffer && !stream_buffer->bref) tb_buffer_exit(stream_buffer->buffer);
     stream_buffer->buffer = tb_null;
 }
@@ -140,7 +140,7 @@ static tb_bool_t tb_stream_buffer_seek(tb_stream_ref_t stream, tb_hize_t offset)
     tb_assert_and_check_return_val(stream_buffer && offset <= tb_buffer_size(stream_buffer->buffer), tb_false);
 
     // seek
-    stream_buffer->head = offset;
+    stream_buffer->head = (tb_size_t)offset;
 
     // ok
     return tb_true;
@@ -233,7 +233,7 @@ tb_stream_ref_t tb_stream_init_from_buffer(tb_buffer_ref_t buffer)
         stream = tb_stream_init_buffer();
         tb_assert_and_check_break(stream);
 
-        // set data and size
+        // set buffer and size
         if (!tb_stream_ctrl(stream, TB_STREAM_CTRL_BUFF_SET_BUFFER, buffer)) break;
 
         // ok
