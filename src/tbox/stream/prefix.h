@@ -62,8 +62,9 @@ typedef enum __tb_stream_type_e
 ,   TB_STREAM_TYPE_SOCK     = 2
 ,   TB_STREAM_TYPE_HTTP     = 3
 ,   TB_STREAM_TYPE_DATA     = 4
-,   TB_STREAM_TYPE_FLTR     = 5
-,   TB_STREAM_TYPE_USER     = 6 ///!< for user defined stream type
+,   TB_STREAM_TYPE_BUFF     = 5
+,   TB_STREAM_TYPE_FLTR     = 6
+,   TB_STREAM_TYPE_USER     = 7 ///!< for user defined stream type
 
 }tb_stream_type_e;
 
@@ -150,6 +151,8 @@ typedef enum __tb_stream_ctrl_e
 ,   TB_STREAM_CTRL_FLTR_GET_FILTER          = TB_STREAM_CTRL(TB_STREAM_TYPE_FLTR, 2)
 ,   TB_STREAM_CTRL_FLTR_SET_STREAM          = TB_STREAM_CTRL(TB_STREAM_TYPE_FLTR, 3)
 ,   TB_STREAM_CTRL_FLTR_SET_FILTER          = TB_STREAM_CTRL(TB_STREAM_TYPE_FLTR, 4)
+
+,   TB_STREAM_CTRL_BUFF_SET_BUFFER          = TB_STREAM_CTRL(TB_STREAM_TYPE_BUFF, 1)
 
 }tb_stream_ctrl_e;
 
