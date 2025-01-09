@@ -190,12 +190,28 @@ typedef BOOL (WINAPI* tb_kernel32_GetLogicalProcessorInformationEx_t)(
 
 // the CopyFileW func type
 typedef BOOL (WINAPI* tb_kernel32_CopyFileExW_t)(
-    LPCWSTR            lpExistingFileName,
-    LPCWSTR            lpNewFileName,
-    LPPROGRESS_ROUTINE lpProgressRoutine,
-    LPVOID             lpData,
-    LPBOOL             pbCancel,
-    DWORD              dwCopyFlags);
+    LPCWSTR             lpExistingFileName,
+    LPCWSTR             lpNewFileName,
+    LPPROGRESS_ROUTINE  lpProgressRoutine,
+    LPVOID              lpData,
+    LPBOOL              pbCancel,
+    DWORD               dwCopyFlags);
+
+// the PeekConsoleInput func type
+typedef BOOL (WINAPI* tb_kernel32_PeekConsoleInput_t)(
+    HANDLE              hConsoleInput,
+    PINPUT_RECORD       lpBuffer,
+    DWORD               nLength,
+    LPDWORD             lpNumberOfEventsRead);
+
+// the PeekNamedPipe func type
+typedef BOOL (WINAPI* tb_kernel32_PeekNamedPipe_t)(
+    HANDLE              hNamedPipe,
+    LPVOID              lpBuffer,
+    DWORD               nBufferSize,
+    LPDWORD             lpBytesRead,
+    LPDWORD             lpTotalBytesAvail,
+    LPDWORD             lpBytesLeftThisMessage);
 
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
@@ -277,6 +293,12 @@ typedef struct __tb_kernel32_t
 
     // CopyFileExW
     tb_kernel32_CopyFileExW_t                           CopyFileExW;
+
+    // PeekConsoleInput
+    tb_kernel32_PeekConsoleInput_t                      PeekConsoleInput;
+
+    // PeekNamedPipe
+    tb_kernel32_PeekNamedPipe_t                         PeekNamedPipe;
 
     // GetLogicalProcessorInformationEx
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)

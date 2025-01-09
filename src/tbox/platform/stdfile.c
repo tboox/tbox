@@ -136,7 +136,26 @@ tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
     tb_assert_and_check_return_val(stdfile && stdfile->type == TB_STDFILE_TYPE_STDIN, tb_false);
 #endif
 
-    return WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 0) == WAIT_OBJECT_0;
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    if (tb_kernel32()->PeekConsoleInput && tb_kernel32()->PeekNamedPipe)
+    {
+        DWORD fileType = GetFileType(hStdin);
+        if (fileType == FILE_TYPE_PIPE)
+        {
+            DWORD bytesAvailable = 0;
+            BOOL ok = tb_kernel32()->PeekNamedPipe(hStdin, NULL, NULL, NULL, &bytesAvailable, tb_null);
+            return ok && bytesAvailable;
+        }
+        else
+        {
+            // we need to ignore left 0x0d charactor, so bytesAvailable must contain at least two characters
+            DWORD bytesAvailable = 0;
+            INPUT_RECORD record = {0};
+            BOOL ok = tb_kernel32()->PeekConsoleInput(hStdin, &record, sizeof(record), &bytesAvailable);
+            return ok && bytesAvailable > 1 && record.EventType == KEY_EVENT;
+        }
+    }
+    return WaitForSingleObject(hStdin, 0) == WAIT_OBJECT_0;
 }
 #elif defined(TB_CONFIG_POSIX_HAVE_SELECT)
 tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
