@@ -204,8 +204,8 @@ typedef BOOL (WINAPI* tb_kernel32_PeekConsoleInputW_t)(
     DWORD               nLength,
     LPDWORD             lpNumberOfEventsRead);
 
-// the PeekNamedPipeW func type
-typedef BOOL (WINAPI* tb_kernel32_PeekNamedPipeW_t)(
+// the PeekNamedPipe func type
+typedef BOOL (WINAPI* tb_kernel32_PeekNamedPipe_t)(
     HANDLE              hNamedPipe,
     LPVOID              lpBuffer,
     DWORD               nBufferSize,
@@ -298,7 +298,7 @@ typedef struct __tb_kernel32_t
     tb_kernel32_PeekConsoleInputW_t                     PeekConsoleInputW;
 
     // PeekNamedPipe
-    tb_kernel32_PeekNamedPipeW_t                        PeekNamedPipeW;
+    tb_kernel32_PeekNamedPipe_t                         PeekNamedPipe;
 
     // GetLogicalProcessorInformationEx
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)

@@ -137,16 +137,19 @@ tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
 #endif
 
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-    if (tb_kernel32()->PeekConsoleInputW && tb_kernel32()->PeekNamedPipeW)
+    DWORD fileType = GetFileType(hStdin);
+    if (fileType == FILE_TYPE_PIPE)
     {
-        DWORD fileType = GetFileType(hStdin);
-        if (fileType == FILE_TYPE_PIPE)
+        if (tb_kernel32()->PeekNamedPipe)
         {
             DWORD bytesAvailable = 0;
-            BOOL ok = tb_kernel32()->PeekNamedPipeW(hStdin, NULL, NULL, NULL, &bytesAvailable, tb_null);
+            BOOL ok = tb_kernel32()->PeekNamedPipe(hStdin, NULL, NULL, NULL, &bytesAvailable, tb_null);
             return ok && bytesAvailable;
         }
-        else
+    }
+    else
+    {
+        if (tb_kernel32()->PeekConsoleInputW)
         {
             // we need to ignore left 0x0d charactor, so bytesAvailable must contain at least two characters
             DWORD bytesAvailable = 0;

@@ -67,7 +67,7 @@ static tb_bool_t tb_kernel32_instance_init(tb_kernel32_ref_t kernel32)
     TB_INTERFACE_LOAD(kernel32, DeleteProcThreadAttributeList);
     TB_INTERFACE_LOAD(kernel32, CopyFileExW);
     TB_INTERFACE_LOAD(kernel32, PeekConsoleInputW);
-    TB_INTERFACE_LOAD(kernel32, PeekNamedPipeW);
+    TB_INTERFACE_LOAD(kernel32, PeekNamedPipe);
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
     TB_INTERFACE_LOAD(kernel32, GetLogicalProcessorInformationEx);
 #endif
