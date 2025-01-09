@@ -143,7 +143,7 @@ tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
         if (tb_kernel32()->PeekNamedPipe)
         {
             DWORD bytesAvailable = 0;
-            BOOL ok = tb_kernel32()->PeekNamedPipe(hStdin, NULL, NULL, NULL, &bytesAvailable, tb_null);
+            BOOL ok = tb_kernel32()->PeekNamedPipe(hStdin, tb_null, 0, tb_null, &bytesAvailable, tb_null);
             return ok && bytesAvailable;
         }
     }
