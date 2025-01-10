@@ -153,9 +153,9 @@ tb_bool_t tb_stdfile_readable(tb_stdfile_ref_t self)
         {
             // we need to ignore left 0x0d charactor, so bytesAvailable must contain at least two characters
             DWORD bytesAvailable = 0;
-            INPUT_RECORD record = {0};
-            BOOL ok = tb_kernel32()->PeekConsoleInputW(hStdin, &record, sizeof(record), &bytesAvailable);
-            return ok && bytesAvailable > 1 && record.EventType == KEY_EVENT;
+            INPUT_RECORD record[64] = {0};
+            BOOL ok = tb_kernel32()->PeekConsoleInputW(hStdin, record, 64, &bytesAvailable);
+            return ok && bytesAvailable > 1 && record[0].EventType == KEY_EVENT;
         }
     }
     return WaitForSingleObject(hStdin, 0) == WAIT_OBJECT_0;
