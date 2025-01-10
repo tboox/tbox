@@ -66,7 +66,13 @@ if has_config("small", "micro") then
         -- TODO we should fix it in context code later
         -- https://github.com/tboox/tbox/issues/175
         not has_config("coroutine") then
-        set_optimize("smallest")
+        if is_plat("windows") then
+            -- we cannot use smallest(/O1), it maybe generates incorrect code for msvc2022
+            -- @see https://github.com/tboox/tbox/issues/272
+            set_optimize("fastest")
+        else
+            set_optimize("smallest")
+        end
     end
     add_cxflags("-fno-stack-protector")
 end
@@ -76,9 +82,9 @@ if is_plat("windows") then
     add_defines("NOCRYPT", "NOGDI")
     if is_mode("debug") then
         add_cxflags("-Gs", "-RTC1")
-        set_runtimes("MTd")
+        set_runtimes("MDd")
     else
-        set_runtimes("MT")
+        set_runtimes("MD")
     end
     add_syslinks("ws2_32", "user32")
 elseif is_plat("android") then
