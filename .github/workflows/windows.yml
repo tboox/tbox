@@ -18,6 +18,8 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
+          build-cache: true
+          build-cache-key: ${{ matrix.arch }}
 
       - name: Tests
         run: |

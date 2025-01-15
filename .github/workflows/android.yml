@@ -17,6 +17,8 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
+          build-cache: true
+          build-cache-key: 'Android'
 
       - name: Prepare
         run: |
