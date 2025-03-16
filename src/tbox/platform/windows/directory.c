@@ -241,12 +241,22 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
          *
          * CSIDL_APPDATA 0x1a
          * CSIDL_LOCAL_APPDATA 0x1c
+         * CSIDL_PROFILE 0x28
          */
-        if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x1c /* CSIDL_LOCAL_APPDATA */, &pidl)) break;
+        tb_bool_t profile = tb_false;
+        if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x1c /* CSIDL_LOCAL_APPDATA */, &pidl))
+        {
+            // https://github.com/xmake-io/xmake/issues/6208#issuecomment-2726307844
+            if (S_OK != tb_shell32()->SHGetSpecialFolderLocation(tb_null, 0x28 /* CSIDL_PROFILE */, &pidl))
+                break;
+            profile = tb_true;
+        }
         tb_check_break(pidl);
 
         // get the home directory
         if (!tb_shell32()->SHGetPathFromIDListW(pidl, home)) break;
+        if (profile)
+            tb_wcsncat(home, L"\\AppData\\Local", TB_PATH_MAXN);
 
         // ok
         ok = tb_true;
