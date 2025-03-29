@@ -85,7 +85,7 @@ target("tbox")
     -- add the source files for the hash module
     if has_config("hash") then
         add_files("hash/*.c")
-        if not is_plat("windows") and not has_config("cosmocc") then
+        if not is_plat("windows") and not has_config("cosmocc") and not is_config("toolchain", "cosmocc") then
             add_files("hash/arch/crc32.S")
         end
     end
