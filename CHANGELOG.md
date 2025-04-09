@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## v1.7.7
+
 ### New features
 
 * [#269](https://github.com/tboox/tbox/pull/269): Add buffer stream
@@ -320,6 +322,8 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.7.7
 
 ### 新特性
 
