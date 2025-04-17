@@ -124,6 +124,7 @@ static tb_long_t tb_stream_file_read(tb_stream_ref_t stream, tb_byte_t* data, tb
 
     // read
     stream_file->read = tb_file_read(stream_file->file, data, size);
+    tb_trace_i("tb_file_read: %lu %ld", size, stream_file->read);
     if (stream_file->read > 0)
         stream_file->offset += stream_file->read;
 

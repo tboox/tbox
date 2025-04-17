@@ -155,7 +155,9 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 
     // read
     DWORD real_size = 0;
-    return ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    tb_long_t ret = ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    tb_trace_i("real_size: %d, ret: %ld", real_size, ret);
+    return ret;
 }
 tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
