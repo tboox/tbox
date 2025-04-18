@@ -136,7 +136,6 @@ tb_file_ref_t tb_file_init(tb_char_t const* path, tb_size_t mode)
         }
     }
 
-    // ok?
     return file != INVALID_HANDLE_VALUE? (tb_file_ref_t)file : tb_null;
 }
 tb_bool_t tb_file_exit(tb_file_ref_t file)
@@ -153,7 +152,7 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
     tb_assert_and_check_return_val(file && data, -1);
     tb_check_return_val(size, 0);
 
-    // read
+    // @see https://github.com/tboox/tbox/issues/272
     DWORD real_size = 0;
     if (ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null))
         return (tb_long_t)real_size;
@@ -165,7 +164,7 @@ tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size
     tb_assert_and_check_return_val(file && data, -1);
     tb_check_return_val(size, 0);
 
-    // write
+    // @see https://github.com/tboox/tbox/issues/272
     DWORD real_size = 0;
     if (WriteFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null))
         return (tb_long_t)real_size;
@@ -188,8 +187,6 @@ tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
-
-    // ok
     return real;
 }
 tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
@@ -209,8 +206,6 @@ tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t siz
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
-
-    // ok
     return real;
 }
 tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
@@ -247,8 +242,6 @@ tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
         // end
         break;
     }
-
-    // ok?
     return read;
 }
 tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
@@ -285,8 +278,6 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
         // end
         break;
     }
-
-    // ok?
     return writ;
 }
 tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
@@ -307,8 +298,6 @@ tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offse
         if (real > 0) writ += real;
         else break;
     }
-
-    // ok?
     return writ == read? writ : -1;
 }
 tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
@@ -328,8 +317,6 @@ tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
-
-    // ok
     return real;
 }
 tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
@@ -349,24 +336,17 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
-
-    // ok
     return real;
 }
 tb_bool_t tb_file_sync(tb_file_ref_t file)
 {
-    // check
     tb_assert_and_check_return_val(file, tb_false);
-
-    // sync it
     return FlushFileBuffers((HANDLE)file)? tb_true : tb_false;
 }
 tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
 {
-    // check
     tb_assert_and_check_return_val(file, -1);
 
-    // seek
     LARGE_INTEGER o = {{0}};
     LARGE_INTEGER p = {{0}};
     o.QuadPart = (LONGLONG)offset;
@@ -374,10 +354,7 @@ tb_hong_t tb_file_seek(tb_file_ref_t file, tb_hong_t offset, tb_size_t mode)
 }
 tb_hong_t tb_file_offset(tb_file_ref_t file)
 {
-    // check
     tb_assert_and_check_return_val(file, -1);
-
-    // the file size
     return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
 }
 tb_hize_t tb_file_size(tb_file_ref_t file)
@@ -430,8 +407,6 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         // the last modify time
         info->mtime = tb_filetime_to_time(&st.ftLastWriteTime);
     }
-
-    // ok
     return tb_true;
 }
 tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t flags)
@@ -495,7 +470,6 @@ tb_bool_t tb_file_create(tb_char_t const* path)
     tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
     if (file) tb_file_exit(file);
 
-    // ok?
     return file? tb_true : tb_false;
 }
 tb_bool_t tb_file_remove(tb_char_t const* path)
