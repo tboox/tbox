@@ -155,7 +155,9 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
 
     // read
     DWORD real_size = 0;
-    return ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    if (ReadFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null))
+        return (tb_long_t)real_size;
+    return -1;
 }
 tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
@@ -165,7 +167,9 @@ tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size
 
     // write
     DWORD real_size = 0;
-    return WriteFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null)? (tb_long_t)real_size : -1;
+    if (WriteFile((HANDLE)file, data, (DWORD)size, &real_size, tb_null))
+        return (tb_long_t)real_size;
+    return -1;
 }
 tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
 {

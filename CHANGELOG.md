@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+### Bugs fixed
+
+* [#272](https://github.com/tboox/tbox/issues/272): Fix read file stuck on windows arm64
+
 ## v1.7.7
 
 ### New features
@@ -322,6 +326,10 @@
 # 更新日志
 
 ## master (开发中)
+
+### Bugs 修复
+
+* [#272](https://github.com/tboox/tbox/issues/272): 修复读取文件卡住问题
 
 ## v1.7.7
 
