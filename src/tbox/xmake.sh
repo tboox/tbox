@@ -8,14 +8,14 @@ target "tbox"
 
     # set the auto-generated config.h
     if $check_interfaces_enabled; then
-        set_configdir "${buildir}/${plat}/${arch}/${mode}"
+        set_configdir "${builddir}/${plat}/${arch}/${mode}"
         add_configfiles "tbox.config.h.in"
-        add_headerfiles "${buildir}/${plat}/${arch}/${mode}/tbox.config.h" "tbox"
+        add_headerfiles "${builddir}/${plat}/${arch}/${mode}/tbox.config.h" "tbox"
     fi
 
     # add include directories
     add_includedirs ".." "{public}"
-    add_includedirs "${buildir}/${plat}/${arch}/${mode}" "{public}"
+    add_includedirs "${builddir}/${plat}/${arch}/${mode}" "{public}"
 
     # add the header files for installing
     add_headerfiles "../(tbox/**.h)"
