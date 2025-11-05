@@ -159,30 +159,85 @@ tb_void_t tb_process_group_exit()
     if (g_process_group)
         tb_kernel32()->TerminateJobObject(g_process_group, 0);
 }
+/*
+ * e.g.
+ * "C:\Program Files\app.exe"  -> "\"C:\\Program Files\\app.exe\""
+ * "path\to\file"              -> "path\to\file"
+ * "path with spaces"          -> "\"path with spaces\""
+ * "test\"quote"               -> "\"test\\\"quote\""
+ * "ends with backslash\"      -> "\"ends with backslash\\\\\""
+ *
+ * @see https://github.com/xmake-io/xmake/issues/6979
+ */
 static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const* cstr)
 {
-    // need wrap quote?
+    // check if we need to wrap with quotes
+    // according to Windows command line argument rules
     tb_char_t ch;
     tb_char_t const* p = cstr;
     tb_bool_t wrap_quote = tb_false;
+    tb_bool_t empty = tb_true;
+
     while ((ch = *p))
     {
-        if (ch == ' ' || ch == '(' || ch == ')') wrap_quote = tb_true;
+        empty = tb_false;
+        // wrap if contains: space, tab, double quote, or empty string
+        if (ch == ' ' || ch == '\t' || ch == '\"')
+        {
+            wrap_quote = tb_true;
+            break;
+        }
         p++;
     }
+
+    // empty string also needs quotes
+    if (empty) wrap_quote = tb_true;
 
     // wrap begin quote
     if (wrap_quote) tb_string_chrcat(result, '\"');
 
-    // escape characters
+    // escape characters according to Windows rules:
+    // 1. Backslashes are interpreted literally, unless they immediately precede a double quote
+    // 2. A double quote preceded by a backslash is interpreted as a literal double quote
+    // 3. Backslashes are interpreted literally, unless they immediately precede a double quote
+    // 4. When followed by a double quote, backslashes must be doubled
     p = cstr;
     while ((ch = *p))
     {
-        // escape '"' or '\\'
-        if (ch == '\"' || (wrap_quote && ch == '\\'))
+        tb_size_t backslash_count = 0;
+
+        // count consecutive backslashes
+        while (ch == '\\')
+        {
+            backslash_count++;
+            p++;
+            ch = *p;
+        }
+
+        if (ch == '\"')
+        {
+            // backslashes before quote need to be doubled, plus escape the quote
+            for (tb_size_t i = 0; i < backslash_count * 2; i++)
+                tb_string_chrcat(result, '\\');
             tb_string_chrcat(result, '\\');
-        tb_string_chrcat(result, ch);
-        p++;
+            tb_string_chrcat(result, '\"');
+            p++;
+        }
+        else if (ch == '\0')
+        {
+            // backslashes at the end need to be doubled if we're wrapping with quotes
+            for (tb_size_t i = 0; i < (wrap_quote ? backslash_count * 2 : backslash_count); i++)
+                tb_string_chrcat(result, '\\');
+            break;
+        }
+        else
+        {
+            // normal backslashes don't need escaping
+            for (tb_size_t i = 0; i < backslash_count; i++)
+                tb_string_chrcat(result, '\\');
+            tb_string_chrcat(result, ch);
+            p++;
+        }
     }
 
     // wrap end quote
