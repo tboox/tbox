@@ -507,14 +507,16 @@ static tb_size_t tb_oc_json_reader_probe(tb_stream_ref_t stream)
     // check
     tb_assert_and_check_return_val(stream, 0);
 
-    // need it
+    // need it, try to get up to 5 bytes (but accept less for small JSON like "{}")
     tb_byte_t*  p = tb_null;
-    if (!tb_stream_need(stream, &p, 5)) return 0;
+    tb_size_t   left = tb_stream_left(stream);
+    tb_size_t   need = tb_min(left, 5);
+    if (!need || !tb_stream_need(stream, &p, need)) return 0;
     tb_assert_and_check_return_val(p, 0);
 
     // probe it
     tb_size_t   s = 10;
-    tb_byte_t*  e = p + 5;
+    tb_byte_t*  e = p + need;
     for (; p < e && *p; p++)
     {
         if (*p == '{' || *p == '[')
