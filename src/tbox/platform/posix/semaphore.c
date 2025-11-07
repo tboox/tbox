@@ -26,6 +26,7 @@
 #include <time.h>
 #include <errno.h>
 #include <semaphore.h>
+#include "../time.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -103,26 +104,57 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     sem_t* h = (sem_t*)semaphore;
     tb_assert_and_check_return_val(h, -1);
 
-    // init time
-    struct timespec t = {0};
-    t.tv_sec = time(tb_null);
-    if (timeout > 0)
+    // non-blocking?
+    if (!timeout)
     {
-        t.tv_sec += timeout / 1000;
-        t.tv_nsec += (timeout % 1000) * 1000000;
+        while (sem_trywait(h))
+        {
+            if (errno == EINTR) continue;
+            return (errno == EAGAIN)? 0 : -1;
+        }
+        return 1;
     }
-    else if (timeout < 0) t.tv_sec += 12 * 30 * 24 * 3600; // infinity: one year
 
-    // wait semaphore
-    tb_long_t r = sem_timedwait(h, &t);
+    // infinite wait?
+    if (timeout < 0)
+    {
+        while (sem_wait(h))
+        {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        return 1;
+    }
 
-    // ok?
-    tb_check_return_val(r, 1);
+    // finite timeout, loop until deadline or success
+    tb_hong_t deadline = tb_mclock() + timeout;
+    while (tb_true)
+    {
+        tb_hong_t remain = deadline - tb_mclock();
+        if (remain <= 0) return 0;
 
-    // timeout?
-    if (errno == EINTR || errno == EAGAIN || errno == ETIMEDOUT) return 0;
+        struct timespec ts;
+        if (clock_gettime(CLOCK_REALTIME, &ts))
+            return -1;
 
-    // error
-    return -1;
+        ts.tv_sec += (time_t)(remain / 1000);
+        ts.tv_nsec += (long)((remain % 1000) * 1000000);
+        if (ts.tv_nsec >= 1000000000L)
+        {
+            ts.tv_sec += 1;
+            ts.tv_nsec -= 1000000000L;
+        }
+
+        if (!sem_timedwait(h, &ts))
+            return 1;
+
+        if (errno == EINTR)
+            continue;
+
+        if (errno == ETIMEDOUT || errno == EAGAIN)
+            return 0;
+
+        return -1;
+    }
 }
 

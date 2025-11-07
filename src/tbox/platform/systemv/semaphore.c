@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/sem.h>
 #include <sys/ipc.h>
+#include "../time.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -116,29 +117,54 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     tb_long_t h = (tb_long_t)semaphore - 1;
     tb_assert_and_check_return_val(semaphore, -1);
 
-    // init time
-    struct timeval t = {0};
-    if (timeout > 0)
-    {
-        t.tv_sec = timeout / 1000;
-        t.tv_usec = (timeout % 1000) * 1000;
-    }
-
-    // init
     struct sembuf sb;
     sb.sem_num = 0;
     sb.sem_op = -1;
     sb.sem_flg = SEM_UNDO;
 
-    // wait semaphore
-    tb_long_t r = semtimedop(h, &sb, 1, timeout >= 0? &t : tb_null);
+    // non-blocking?
+    if (!timeout)
+    {
+        struct timespec ts = {0, 0};
+        while (semtimedop(h, &sb, 1, &ts))
+        {
+            if (errno == EINTR) continue;
+            return (errno == EAGAIN)? 0 : -1;
+        }
+        return 1;
+    }
 
-    // ok?
-    tb_check_return_val(r, 1);
+    // infinite wait?
+    if (timeout < 0)
+    {
+        while (semop(h, &sb, 1))
+        {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        return 1;
+    }
 
-    // timeout or interrupted?
-    if (errno == EINTR || errno == EAGAIN) return 0;
+    // finite timeout
+    tb_hong_t deadline = tb_mclock() + timeout;
+    while (tb_true)
+    {
+        tb_hong_t remain = deadline - tb_mclock();
+        if (remain <= 0) return 0;
 
-    // error
-    return -1;
+        struct timespec ts;
+        ts.tv_sec = (time_t)(remain / 1000);
+        ts.tv_nsec = (long)((remain % 1000) * 1000000);
+
+        if (!semtimedop(h, &sb, 1, &ts))
+            return 1;
+
+        if (errno == EINTR)
+            continue;
+
+        if (errno == EAGAIN)
+            return 0;
+
+        return -1;
+    }
 }

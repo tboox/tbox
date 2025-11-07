@@ -23,6 +23,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../time.h"
 #include <time.h>
 #include <errno.h>
 #include <mach/semaphore.h>
@@ -134,31 +135,62 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     tb_semaphore_impl_t* impl = (tb_semaphore_impl_t*)semaphore;
     tb_assert_and_check_return_val(semaphore, -1);
 
-    // init timespec
-    mach_timespec_t spec = {0};
+    // the deadline (milliseconds)
+    tb_hong_t deadline = 0;
     if (timeout > 0)
+        deadline = tb_mclock() + timeout;
+
+    kern_return_t result = KERN_SUCCESS;
+
+    while (tb_true)
     {
-        spec.tv_sec += timeout / 1000;
-        spec.tv_nsec += (timeout % 1000) * 1000000;
+        if (timeout < 0)
+        {
+            // infinite wait
+            result = semaphore_wait(impl->semaphore);
+        }
+        else
+        {
+            // compute remaining time (milliseconds)
+            tb_hong_t remain = timeout;
+            if (timeout > 0)
+            {
+                remain = deadline - tb_mclock();
+                if (remain <= 0)
+                    return 0;
+            }
+
+            if (remain < 0)
+                remain = 0;
+
+            mach_timespec_t spec;
+            spec.tv_sec = (unsigned int)tb_min(remain / 1000, (tb_hong_t)TB_MAXU32);
+            spec.tv_nsec = (unsigned int)(((remain % 1000) < 0? 0 : (remain % 1000)) * 1000000);
+
+            result = semaphore_timedwait(impl->semaphore, spec);
+        }
+
+        if (result == KERN_SUCCESS)
+            break;
+
+        if (result == KERN_OPERATION_TIMED_OUT)
+            return 0;
+
+        if (result == KERN_ABORTED)
+        {
+            // The wait was interrupted (e.g. by thread cancellation). Retry until timeout expires.
+            if (!timeout)
+                return 0;
+            continue;
+        }
+
+        return -1;
     }
-    else if (timeout < 0) spec.tv_sec += 12 * 30 * 24 * 3600; // infinity: one year
-
-    // wait
-    tb_long_t ok = semaphore_timedwait(impl->semaphore, spec);
-
-    // timeout or interrupted?
-    tb_check_return_val(ok != KERN_OPERATION_TIMED_OUT && ok != KERN_ABORTED, 0);
-
-    // ok?
-    tb_check_return_val(ok == KERN_SUCCESS, -1);
 
     // check value
     tb_assert_and_check_return_val((tb_long_t)tb_atomic32_get(&impl->value) > 0, -1);
 
-    // value--
     tb_atomic32_fetch_and_sub(&impl->value, 1);
-
-    // ok
     return 1;
 }
 
