@@ -145,6 +145,9 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 
     // wait
     tb_long_t ok = semaphore_timedwait(impl->semaphore, spec);
+    tb_trace_i("semaphore_timedwait %ld, timeout: %ld, errno: %d", ok, timeout, errno);
+    tb_trace_i("KERN_OPERATION_TIMED_OUT: %d", KERN_OPERATION_TIMED_OUT);
+    tb_trace_i("KERN_ABORTED: %d", KERN_ABORTED);
 
     // timeout or interrupted?
     tb_check_return_val(ok != KERN_OPERATION_TIMED_OUT && ok != KERN_ABORTED, 0);

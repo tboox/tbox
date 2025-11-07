@@ -115,6 +115,7 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
 
     // wait semaphore
     tb_long_t r = sem_timedwait(h, &t);
+    tb_trace_i("sem_timedwait %ld, timeout: %ld, errno: %d", r, timeout, errno);
 
     // ok?
     tb_check_return_val(r, 1);
