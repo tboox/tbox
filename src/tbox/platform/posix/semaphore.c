@@ -115,15 +115,34 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
         return 1;
     }
 
-    // infinite wait?
+    // infinite wait? use very large timeout and retry on timeout/interrupt
     if (timeout < 0)
     {
-        while (sem_wait(h))
+        while (tb_true)
         {
-            if (errno == EINTR) continue;
+            struct timespec ts;
+            if (clock_gettime(CLOCK_REALTIME, &ts))
+                return -1;
+
+            ts.tv_sec += (time_t)(30 * 24 * 3600); // one month ahead
+            // ensure nsec stays normalized
+            if (ts.tv_nsec >= 1000000000L)
+            {
+                ts.tv_sec += ts.tv_nsec / 1000000000L;
+                ts.tv_nsec %= 1000000000L;
+            }
+
+            if (!sem_timedwait(h, &ts))
+                return 1;
+
+            if (errno == EINTR)
+                continue;
+
+            if (errno == ETIMEDOUT || errno == EAGAIN)
+                continue; // we treat as infinite wait
+
             return -1;
         }
-        return 1;
     }
 
     // finite timeout, loop until deadline or success
