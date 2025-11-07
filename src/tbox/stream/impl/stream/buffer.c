@@ -99,7 +99,25 @@ static tb_long_t tb_stream_buffer_writ(tb_stream_ref_t stream, tb_byte_t const* 
     tb_check_return_val(data, -1);
     tb_check_return_val(size, 0);
 
-    if (size) tb_buffer_memncpyp(stream_buffer->buffer, stream_buffer->head, data, size);
+    /* ensure the buffer is large enough to hold the data at the write position
+     * tb_buffer_memncpyp will resize to head + size, which may truncate existing data
+     * so we need to ensure the buffer size is at least max(current_size, head + size)
+     *
+     * @see https://github.com/tboox/tbox/issues/208
+     */
+    if (size)
+    {
+        tb_size_t need_size = stream_buffer->head + size;
+        tb_size_t curr_size = tb_buffer_size(stream_buffer->buffer);
+        if (need_size > curr_size)
+        {
+            // expand the buffer
+            if (!tb_buffer_resize(stream_buffer->buffer, need_size)) return -1;
+        }
+        
+        // copy data at the write position
+        tb_memcpy(tb_buffer_data(stream_buffer->buffer) + stream_buffer->head, data, size);
+    }
     stream_buffer->head += size;
     return size;
 }
