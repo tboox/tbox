@@ -120,10 +120,12 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
     {
         while (tb_true)
         {
+            tb_trace_i("sem 111");
             struct timespec ts;
             if (clock_gettime(CLOCK_REALTIME, &ts))
                 return -1;
 
+            tb_trace_i("sem 222");
             ts.tv_sec += (time_t)(30 * 24 * 3600); // one month ahead
             // ensure nsec stays normalized
             if (ts.tv_nsec >= 1000000000L)
@@ -132,15 +134,19 @@ tb_long_t tb_semaphore_wait(tb_semaphore_ref_t semaphore, tb_long_t timeout)
                 ts.tv_nsec %= 1000000000L;
             }
 
+            tb_trace_i("sem 333");
             if (!sem_timedwait(h, &ts))
                 return 1;
 
+            tb_trace_i("sem 444");
             if (errno == EINTR)
                 continue;
 
+            tb_trace_i("sem 555");
             if (errno == ETIMEDOUT || errno == EAGAIN)
                 continue; // we treat as infinite wait
 
+            tb_trace_i("sem 666");
             return -1;
         }
     }
