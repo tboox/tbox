@@ -36,3 +36,4 @@ Doxyfile
 CMakeLists.txt
 Makefile
 makefile
+build.ninja
