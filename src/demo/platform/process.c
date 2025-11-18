@@ -130,6 +130,201 @@ static tb_void_t tb_demo_process_test_exit(tb_char_t** argv, tb_bool_t detach)
     tb_getchar();
 }
 
+/* test: redirect stdout only, stderr should still output to terminal
+ * @see https://github.com/xmake-io/xmake/issues/3138
+ */
+static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test_cmd)
+{
+    tb_trace_i("test: redirect stdout only, stderr should still output to terminal");
+    tb_trace_i("you should see stderr output in terminal");
+
+    // create temp file for stdout
+    tb_char_t tmpdir[TB_PATH_MAXN];
+    tb_char_t stdout_path[TB_PATH_MAXN];
+    if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
+    {
+        tb_snprintf(stdout_path, sizeof(stdout_path), "%s%ctest_stdout.txt", tmpdir, TB_PATH_SEP);
+        // init process with stdout redirected to file
+        tb_process_attr_t attr = {0};
+        attr.out.path = stdout_path;
+        attr.outtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
+
+        // use cmd /c to output to both stdout and stderr
+        // format: cmd /c "echo stdout_message && echo stderr_message >&2"
+        tb_char_t cmd[TB_PATH_MAXN];
+        tb_snprintf(cmd, sizeof(cmd), "cmd /c \"echo This goes to stdout && echo This goes to stderr >&2\"");
+
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && echo This goes to stderr >&2", tb_null};
+        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        if (process)
+        {
+            // wait process
+            tb_long_t status = 0;
+            tb_process_wait(process, &status, -1);
+            tb_trace_i("process exited with status: %ld", status);
+
+            // read stdout from file
+            tb_file_ref_t file = tb_file_init(stdout_path, TB_FILE_MODE_RO);
+            if (file)
+            {
+                tb_byte_t data[8192];
+                tb_long_t size = tb_file_read(file, data, sizeof(data) - 1);
+                if (size > 0)
+                {
+                    data[size] = '\0';
+                    tb_trace_i("stdout from file: %s", (tb_char_t const*)data);
+                }
+                tb_file_exit(file);
+            }
+
+            // exit process
+            tb_process_exit(process);
+        }
+
+        // remove temp file
+        tb_file_remove(stdout_path);
+    }
+}
+
+/* test: redirect stdin only, stdout and stderr should still output to terminal
+ * @see https://github.com/xmake-io/xmake/issues/3138
+ */
+static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_cmd)
+{
+    tb_trace_i("test: redirect stdin only, stdout and stderr should still output to terminal");
+    tb_trace_i("you should see both stdout and stderr output in terminal");
+
+    // create temp file for stdin (with some test content)
+    tb_char_t tmpdir[TB_PATH_MAXN];
+    tb_char_t stdin_path[TB_PATH_MAXN];
+    if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
+    {
+        tb_snprintf(stdin_path, sizeof(stdin_path), "%s%ctest_stdin.txt", tmpdir, TB_PATH_SEP);
+        // write test content to stdin file
+        tb_file_ref_t file = tb_file_init(stdin_path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+        if (file)
+        {
+            tb_char_t const* content = "test input\n";
+            tb_file_writ(file, (tb_byte_t const*)content, tb_strlen(content));
+            tb_file_exit(file);
+        }
+
+        // init process with stdin redirected from file
+        tb_process_attr_t attr = {0};
+        attr.in.path = stdin_path;
+        attr.intype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
+
+        // use cmd /c to read from stdin and output to stdout/stderr
+        tb_char_t* argv[] = {"cmd", "/c", "more && echo This goes to stdout && echo This goes to stderr >&2", tb_null};
+        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        if (process)
+        {
+            // wait process
+            tb_long_t status = 0;
+            tb_process_wait(process, &status, -1);
+            tb_trace_i("process exited with status: %ld", status);
+
+            // exit process
+            tb_process_exit(process);
+        }
+
+        // remove temp file
+        tb_file_remove(stdin_path);
+    }
+}
+
+/* test: redirect stdout to pipe only, stderr should still output to terminal
+ * @see https://github.com/xmake-io/xmake/issues/3138
+ */
+static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const* test_cmd)
+{
+    tb_trace_i("test: redirect stdout to pipe only, stderr should still output to terminal");
+    tb_trace_i("you should see stderr output in terminal");
+
+    // init pipe files
+    tb_pipe_file_ref_t file[2] = {0};
+    if (tb_pipe_file_init_pair(file, tb_null, 0))
+    {
+        // init process with stdout redirected to pipe
+        tb_process_attr_t attr = {0};
+        attr.out.pipe = file[1];
+        attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
+
+        // use cmd /c to output to both stdout and stderr
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && echo This goes to stderr >&2", tb_null};
+        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        if (process)
+        {
+            // read stdout from pipe
+            tb_size_t read = 0;
+            tb_byte_t data[8192];
+            tb_size_t size = sizeof(data);
+            tb_bool_t wait = tb_false;
+            while (read < size)
+            {
+                tb_long_t real = tb_pipe_file_read(file[0], data + read, size - read);
+                if (real > 0)
+                {
+                    read += real;
+                    wait = tb_false;
+                }
+                else if (!real && !wait)
+                {
+                    // wait pipe
+                    tb_long_t ok = tb_pipe_file_wait(file[0], TB_PIPE_EVENT_READ, 1000);
+                    if (ok <= 0) break;
+                    wait = tb_true;
+                }
+                else break;
+            }
+
+            // dump stdout data from pipe
+            if (read)
+            {
+                data[read] = '\0';
+                tb_trace_i("stdout from pipe: %s", (tb_char_t const*)data);
+            }
+
+            // wait process
+            tb_long_t status = 0;
+            tb_process_wait(process, &status, -1);
+            tb_trace_i("process exited with status: %ld", status);
+
+            // exit process
+            tb_process_exit(process);
+        }
+
+        // exit pipe files
+        tb_pipe_file_exit(file[0]);
+        tb_pipe_file_exit(file[1]);
+    }
+}
+
+/* test: all redirect scenarios
+ */
+static tb_void_t tb_demo_process_test_redirect_all(tb_char_t const* test_cmd)
+{
+    tb_trace_i("test: all redirect scenarios");
+    tb_trace_i("");
+
+    // test 1: stdout only
+    tb_trace_i("=== Test 1: Redirect stdout only ===");
+    tb_demo_process_test_redirect_stdout_only(test_cmd);
+    tb_trace_i("");
+
+    // test 2: stdin only
+    tb_trace_i("=== Test 2: Redirect stdin only ===");
+    tb_demo_process_test_redirect_stdin_only(test_cmd);
+    tb_trace_i("");
+
+    // test 3: stdout pipe only
+    tb_trace_i("=== Test 3: Redirect stdout to pipe only ===");
+    tb_demo_process_test_redirect_stdout_pipe_only(test_cmd);
+    tb_trace_i("");
+
+    tb_trace_i("all redirect tests completed");
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */
@@ -153,13 +348,27 @@ tb_int_t tb_demo_platform_process_main(tb_int_t argc, tb_char_t** argv)
     tb_used(tb_demo_process_test_waitlist);
 #endif
 
-#if 1
+#if 0
     // we can run `xxx.bat` or `xxx.sh` shell command to test it
     // @see https://github.com/xmake-io/xmake/issues/719
     tb_demo_process_test_exit(argv, tb_false);
 //    tb_demo_process_test_exit(argv, tb_true);
 #else
     tb_used(tb_demo_process_test_exit);
+#endif
+
+#if 1
+    // test: Windows process redirect scenarios
+    // @see https://github.com/xmake-io/xmake/issues/3138
+    // verify that when only stdout is redirected, stderr still outputs to terminal
+    tb_char_t const* test_cmd = argv[1];
+    if (!test_cmd) test_cmd = "cmd";
+    tb_demo_process_test_redirect_all(test_cmd);
+#else
+    tb_used(tb_demo_process_test_redirect_all);
+    tb_used(tb_demo_process_test_redirect_stdout_only);
+    tb_used(tb_demo_process_test_redirect_stdin_only);
+    tb_used(tb_demo_process_test_redirect_stdout_pipe_only);
 #endif
     return 0;
 }

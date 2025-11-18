@@ -399,6 +399,12 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // redirect
         HANDLE handlesToInherit[3];
         DWORD  handlesToInheritCount = 0;
+        
+        // initialize all std handles to INVALID_HANDLE_VALUE
+        process->psi->hStdInput = INVALID_HANDLE_VALUE;
+        process->psi->hStdOutput = INVALID_HANDLE_VALUE;
+        process->psi->hStdError = INVALID_HANDLE_VALUE;
+        
         if (attr)
         {
             // redirect from stdin
@@ -536,12 +542,26 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             }
         }
 
-        /* we just use the default std handles if lpAttributeList is not supported
+        /* if STARTF_USESTDHANDLES is set, we need to ensure all three handles are set
+         * for unset handles, use GetStdHandle() to get current standard handles
+         * but don't add them to handlesToInherit to avoid case1/case2 issues
          *
          * @see https://github.com/xmake-io/xmake/issues/3138#issuecomment-1338970250
          */
         if (bInheritHandle)
+        {
             process->psi->dwFlags |= STARTF_USESTDHANDLES;
+            
+            // for unset handles, use GetStdHandle() to get current standard handles
+            // these handles are only set in StartupInfo, not in handlesToInherit list
+            // to avoid case1/case2 issues (invalid handle in CI or detect vs fails)
+            if (process->psi->hStdInput == INVALID_HANDLE_VALUE)
+                process->psi->hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+            if (process->psi->hStdOutput == INVALID_HANDLE_VALUE)
+                process->psi->hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+            if (process->psi->hStdError == INVALID_HANDLE_VALUE)
+                process->psi->hStdError = GetStdHandle(STD_ERROR_HANDLE);
+        }
 
         // init process security attributes
         SECURITY_ATTRIBUTES sap     = {0};
