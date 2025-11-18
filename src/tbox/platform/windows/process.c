@@ -555,35 +555,65 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             // for unset handles, use GetStdHandle() to get current standard handles
             // these handles are only set in StartupInfo, not in handlesToInherit list
             // to avoid case1/case2 issues (invalid handle in CI or detect vs fails)
-            // but we need to make them inheritable so child process can use them
+            // we need to duplicate and make them inheritable so child process can use them
             if (process->psi->hStdInput == INVALID_HANDLE_VALUE)
             {
                 HANDLE hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-                if (hStdInput != INVALID_HANDLE_VALUE)
+                if (hStdInput != INVALID_HANDLE_VALUE && hStdInput != tb_null)
                 {
-                    // make handle inheritable so child process can inherit it
-                    tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
-                    process->psi->hStdInput = hStdInput;
+                    HANDLE hDupInput = INVALID_HANDLE_VALUE;
+                    // duplicate handle and make it inheritable to avoid affecting parent process
+                    if (DuplicateHandle(GetCurrentProcess(), hStdInput, GetCurrentProcess(), &hDupInput, 0, TRUE, DUPLICATE_SAME_ACCESS))
+                    {
+                        process->psi->hStdInput = hDupInput;
+                        process->file_handles[process->file_handles_count++] = hDupInput;
+                    }
+                    else
+                    {
+                        // if duplication fails, try to make original inheritable (may affect parent)
+                        tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
+                        process->psi->hStdInput = hStdInput;
+                    }
                 }
             }
             if (process->psi->hStdOutput == INVALID_HANDLE_VALUE)
             {
                 HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-                if (hStdOutput != INVALID_HANDLE_VALUE)
+                if (hStdOutput != INVALID_HANDLE_VALUE && hStdOutput != tb_null)
                 {
-                    // make handle inheritable so child process can inherit it
-                    tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
-                    process->psi->hStdOutput = hStdOutput;
+                    HANDLE hDupOutput = INVALID_HANDLE_VALUE;
+                    // duplicate handle and make it inheritable to avoid affecting parent process
+                    if (DuplicateHandle(GetCurrentProcess(), hStdOutput, GetCurrentProcess(), &hDupOutput, 0, TRUE, DUPLICATE_SAME_ACCESS))
+                    {
+                        process->psi->hStdOutput = hDupOutput;
+                        process->file_handles[process->file_handles_count++] = hDupOutput;
+                    }
+                    else
+                    {
+                        // if duplication fails, try to make original inheritable (may affect parent)
+                        tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
+                        process->psi->hStdOutput = hStdOutput;
+                    }
                 }
             }
             if (process->psi->hStdError == INVALID_HANDLE_VALUE)
             {
                 HANDLE hStdError = GetStdHandle(STD_ERROR_HANDLE);
-                if (hStdError != INVALID_HANDLE_VALUE)
+                if (hStdError != INVALID_HANDLE_VALUE && hStdError != tb_null)
                 {
-                    // make handle inheritable so child process can inherit it
-                    tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
-                    process->psi->hStdError = hStdError;
+                    HANDLE hDupError = INVALID_HANDLE_VALUE;
+                    // duplicate handle and make it inheritable to avoid affecting parent process
+                    if (DuplicateHandle(GetCurrentProcess(), hStdError, GetCurrentProcess(), &hDupError, 0, TRUE, DUPLICATE_SAME_ACCESS))
+                    {
+                        process->psi->hStdError = hDupError;
+                        process->file_handles[process->file_handles_count++] = hDupError;
+                    }
+                    else
+                    {
+                        // if duplication fails, try to make original inheritable (may affect parent)
+                        tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
+                        process->psi->hStdError = hStdError;
+                    }
                 }
             }
         }
