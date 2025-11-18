@@ -154,12 +154,11 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         attr.out.path = stdout_path;
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
-        // use cmd /c to output to both stdout and stderr
-        // in Windows cmd, use separate echo commands with proper stderr redirection
-        // Note: stderr output will appear directly in console, not in trace logs
-        // Using 2>con: to explicitly write to console, which is more reliable
-        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout & echo This goes to stderr >&2", tb_null};
-        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        // use PowerShell to output to both stdout and stderr reliably
+        // PowerShell has Write-Host for stdout and Write-Error for stderr
+        // This is more reliable than cmd's >&2 syntax
+        tb_char_t* argv[] = {"powershell", "-Command", "Write-Host 'This goes to stdout'; Write-Error 'This goes to stderr' -ErrorAction Continue", tb_null};
+        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // wait process
@@ -226,11 +225,11 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
         attr.in.path = stdin_path;
         attr.intype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
-        // use cmd /c to output to stdout and stderr (stdin is redirected but we just verify stdout/stderr work)
+        // use PowerShell to output to stdout and stderr (stdin is redirected but we just verify stdout/stderr work)
         // the stdin redirection is verified by the fact that the process can read from the file
         // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout & echo This goes to stderr >&2", tb_null};
-        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        tb_char_t* argv[] = {"powershell", "-Command", "Write-Host 'This goes to stdout'; Write-Error 'This goes to stderr' -ErrorAction Continue", tb_null};
+        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // wait process
@@ -271,10 +270,10 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
         attr.out.pipe = file[1];
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
 
-        // use cmd /c to output to both stdout and stderr
+        // use PowerShell to output to both stdout and stderr
         // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout & echo This goes to stderr >&2", tb_null};
-        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        tb_char_t* argv[] = {"powershell", "-Command", "Write-Host 'This goes to stdout'; Write-Error 'This goes to stderr' -ErrorAction Continue", tb_null};
+        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // read stdout from pipe
