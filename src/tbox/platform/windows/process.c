@@ -640,15 +640,26 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             {
                 if (lpAttributeListInited && lpAttributeList)
                 {
-                    // already initialized, just update with new handle list
-                    tb_kernel32()->UpdateProcThreadAttribute(lpAttributeList, 0,
+                    // already initialized, try to update with new handle list
+                    // note: UpdateProcThreadAttribute may not support updating existing attribute list
+                    // so if update fails, we recreate the attribute list
+                    if (!tb_kernel32()->UpdateProcThreadAttribute(lpAttributeList, 0,
                             PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
                             handlesToInherit,
-                            handlesToInheritCount * sizeof(HANDLE), tb_null, tb_null);
+                            handlesToInheritCount * sizeof(HANDLE), tb_null, tb_null))
+                    {
+                        // update failed, recreate the attribute list
+                        tb_kernel32()->DeleteProcThreadAttributeList(lpAttributeList);
+                        tb_free(lpAttributeList);
+                        lpAttributeList = tb_null;
+                        lpAttributeListInited = tb_false;
+                        // fall through to initialization code below
+                    }
                 }
-                else if (!lpAttributeListInited)
+                
+                if (!lpAttributeListInited)
                 {
-                    // not initialized yet, initialize it now
+                    // not initialized yet (or recreate after failed update), initialize it now
                     SIZE_T attributeListSize = 0;
                     if (tb_kernel32()->InitializeProcThreadAttributeList(tb_null, 1, 0, &attributeListSize) ||
                         GetLastError() == ERROR_INSUFFICIENT_BUFFER)

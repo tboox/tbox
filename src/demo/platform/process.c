@@ -197,7 +197,8 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         attr2.err.path = stderr_path;
         attr2.errtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
         
-        tb_process_ref_t process2 = tb_process_init("cmd", (tb_char_t const**)argv, &attr2);
+        // use same PowerShell command for verification
+        tb_process_ref_t process2 = tb_process_init("powershell", (tb_char_t const**)argv, &attr2);
         if (process2)
         {
             tb_long_t status2 = 0;
