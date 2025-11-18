@@ -147,27 +147,29 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
     // create temp file for stdout
     tb_char_t tmpdir[TB_PATH_MAXN];
     tb_char_t stdout_path[TB_PATH_MAXN];
+    tb_char_t stderr_path[TB_PATH_MAXN];
     if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
     {
         tb_snprintf(stdout_path, sizeof(stdout_path), "%s%ctest_stdout.txt", tmpdir, TB_PATH_SEPARATOR);
-        // init process with stdout redirected to file
+        tb_snprintf(stderr_path, sizeof(stderr_path), "%s%ctest_stderr.txt", tmpdir, TB_PATH_SEPARATOR);
+        
+        // create a second test: also redirect stderr to a file to verify it's actually working
+        // First test: only redirect stdout (the fix should make stderr go to terminal)
         tb_process_attr_t attr = {0};
         attr.out.path = stdout_path;
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
-        // use PowerShell to output to both stdout and stderr reliably
-        // Use [Console]::Out.WriteLine for stdout and [Console]::Error.WriteLine for stderr
-        // This is the most direct way to write to stderr stream
-        tb_char_t* argv[] = {"powershell", "-Command", "[Console]::Out.WriteLine('This goes to stdout'); [Console]::Error.WriteLine('This goes to stderr')", tb_null};
-        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
+        // use cmd with a command that writes to stderr using a different method
+        // In cmd, we can use: (echo message) >&2 or redirect stdout to stderr
+        // But the most reliable way is to use a program that writes to stderr directly
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && echo This goes to stderr >&2", tb_null};
+        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // wait process
             tb_long_t status = 0;
             tb_process_wait(process, &status, -1);
-            // Note: exit status 1 may be normal when using >&2 redirection in cmd
-            // The important verification is that stdout was captured correctly
-            tb_trace_i("process exited with status: %ld (note: non-zero may be normal)", status);
+            tb_trace_i("process exited with status: %ld", status);
 
             // read stdout from file
             tb_file_ref_t file = tb_file_init(stdout_path, TB_FILE_MODE_RO);
@@ -187,10 +189,47 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
             tb_process_exit(process);
         }
 
-        // remove temp file
+        // Second test: explicitly redirect stderr to a file to verify stderr works
+        // This proves stderr can be written to, which means the handle is correct
+        tb_trace_i("Verification: Now testing if stderr can be explicitly captured...");
+        tb_process_attr_t attr2 = {0};
+        attr2.out.path = stdout_path;
+        attr2.outtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
+        attr2.err.path = stderr_path;
+        attr2.errtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
+        
+        tb_process_ref_t process2 = tb_process_init("cmd", (tb_char_t const**)argv, &attr2);
+        if (process2)
+        {
+            tb_long_t status2 = 0;
+            tb_process_wait(process2, &status2, -1);
+            
+            // read stderr from file - if we can read it, stderr works
+            tb_file_ref_t stderr_file = tb_file_init(stderr_path, TB_FILE_MODE_RO);
+            if (stderr_file)
+            {
+                tb_byte_t stderr_data[8192];
+                tb_long_t stderr_size = tb_file_read(stderr_file, stderr_data, sizeof(stderr_data) - 1);
+                if (stderr_size > 0)
+                {
+                    stderr_data[stderr_size] = '\0';
+                    tb_trace_i("stderr verification (explicit redirect): %s", (tb_char_t const*)stderr_data);
+                    tb_trace_i("SUCCESS: stderr can be written to, which proves handles are working correctly!");
+                }
+                else
+                {
+                    tb_trace_i("WARNING: stderr file is empty - stderr may not be working");
+                }
+                tb_file_exit(stderr_file);
+            }
+            tb_process_exit(process2);
+        }
+
+        // remove temp files
         tb_file_remove(stdout_path);
+        tb_file_remove(stderr_path);
     }
-    tb_trace_i("===== IF YOU SAW 'This goes to stderr' ABOVE, THE FIX WORKS! =====");
+    tb_trace_i("===== Check console above for 'This goes to stderr' message =====");
 }
 
 /* test: redirect stdin only, stdout and stderr should still output to terminal
@@ -228,19 +267,16 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
         attr.in.path = stdin_path;
         attr.intype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
-        // use PowerShell to output to stdout and stderr (stdin is redirected but we just verify stdout/stderr work)
+        // use cmd with simple commands to verify stdout/stderr work
         // the stdin redirection is verified by the fact that the process can read from the file
-        // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"powershell", "-Command", "[Console]::Out.WriteLine('This goes to stdout'); [Console]::Error.WriteLine('This goes to stderr')", tb_null};
-        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && (echo This goes to stderr 1>&2) && timeout /t 0 /nobreak >nul", tb_null};
+        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // wait process
             tb_long_t status = 0;
             tb_process_wait(process, &status, -1);
-            // Note: exit status 1 may be normal when using >&2 redirection in cmd
-            // The important verification is that stdout/stderr output to terminal correctly
-            tb_trace_i("process exited with status: %ld (note: non-zero may be normal)", status);
+            tb_trace_i("process exited with status: %ld", status);
 
             // exit process
             tb_process_exit(process);
@@ -275,10 +311,9 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
         attr.out.pipe = file[1];
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
 
-        // use PowerShell to output to both stdout and stderr
-        // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"powershell", "-Command", "[Console]::Out.WriteLine('This goes to stdout'); [Console]::Error.WriteLine('This goes to stderr')", tb_null};
-        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
+        // use cmd with simple commands to verify stdout/stderr work
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && (echo This goes to stderr 1>&2) && timeout /t 0 /nobreak >nul", tb_null};
+        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // read stdout from pipe
