@@ -141,7 +141,8 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
 {
     tb_trace_i("test: redirect stdout only, stderr should still output to terminal");
     tb_trace_i("verification: stdout goes to file (read below), stderr should appear in console output");
-    tb_trace_i("NOTE: Check your console/terminal for 'This goes to stderr' message (not in these logs)");
+    tb_trace_i("NOTE: Look for 'This goes to stderr' message in your console/terminal output (may appear between these log lines)");
+    tb_trace_i("===== STDOUT REDIRECTED - STDERR SHOULD APPEAR BELOW =====");
 
     // create temp file for stdout
     tb_char_t tmpdir[TB_PATH_MAXN];
@@ -189,7 +190,7 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         // remove temp file
         tb_file_remove(stdout_path);
     }
-}
+    tb_trace_i("===== IF YOU SAW 'This goes to stderr' ABOVE, THE FIX WORKS! =====");
 
 /* test: redirect stdin only, stdout and stderr should still output to terminal
  * @see https://github.com/xmake-io/xmake/issues/3138
@@ -203,7 +204,8 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
 {
     tb_trace_i("test: redirect stdin only, stdout and stderr should still output to terminal");
     tb_trace_i("verification: stdin from file, stdout and stderr should appear in console output");
-    tb_trace_i("NOTE: Check your console/terminal for 'This goes to stdout' and 'This goes to stderr' messages");
+    tb_trace_i("NOTE: Look for 'This goes to stdout' and 'This goes to stderr' messages (may appear between log lines)");
+    tb_trace_i("===== STDIN REDIRECTED - STDOUT/STDERR SHOULD APPEAR BELOW =====");
 
     // create temp file for stdin (with some test content)
     tb_char_t tmpdir[TB_PATH_MAXN];
@@ -246,7 +248,7 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
         // remove temp file
         tb_file_remove(stdin_path);
     }
-}
+    tb_trace_i("===== IF YOU SAW 'This goes to stdout/stderr' ABOVE, THE FIX WORKS! =====");
 
 /* test: redirect stdout to pipe only, stderr should still output to terminal
  * @see https://github.com/xmake-io/xmake/issues/3138
@@ -259,7 +261,8 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
 {
     tb_trace_i("test: redirect stdout to pipe only, stderr should still output to terminal");
     tb_trace_i("verification: stdout goes to pipe (read below), stderr should appear in console output");
-    tb_trace_i("NOTE: Check your console/terminal for 'This goes to stderr' message (not in these logs)");
+    tb_trace_i("NOTE: Look for 'This goes to stderr' message (may appear between log lines)");
+    tb_trace_i("===== STDOUT TO PIPE - STDERR SHOULD APPEAR BELOW =====");
 
     // init pipe files
     tb_pipe_file_ref_t file[2] = {0};
@@ -321,6 +324,7 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
         tb_pipe_file_exit(file[0]);
         tb_pipe_file_exit(file[1]);
     }
+    tb_trace_i("===== IF YOU SAW 'This goes to stderr' ABOVE, THE FIX WORKS! =====");
 }
 
 /* test: all redirect scenarios
