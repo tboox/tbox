@@ -191,6 +191,7 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         tb_file_remove(stdout_path);
     }
     tb_trace_i("===== IF YOU SAW 'This goes to stderr' ABOVE, THE FIX WORKS! =====");
+}
 
 /* test: redirect stdin only, stdout and stderr should still output to terminal
  * @see https://github.com/xmake-io/xmake/issues/3138
