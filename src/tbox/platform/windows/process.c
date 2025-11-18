@@ -397,7 +397,8 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         }
 
         // redirect
-        HANDLE handlesToInherit[3];
+        // note: we may need up to 3 redirected handles + 3 standard handles = 6 total
+        HANDLE handlesToInherit[6];
         DWORD  handlesToInheritCount = 0;
         
         // initialize all std handles to INVALID_HANDLE_VALUE
@@ -553,9 +554,9 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             process->psi->dwFlags |= STARTF_USESTDHANDLES;
             
             // for unset handles, use GetStdHandle() to get current standard handles
-            // these handles are only set in StartupInfo, not in handlesToInherit list
-            // to avoid case1/case2 issues (invalid handle in CI or detect vs fails)
             // we need to duplicate and make them inheritable so child process can use them
+            // when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST, we must also add these handles
+            // to the list, otherwise they won't be inherited even if set in StartupInfo
             if (process->psi->hStdInput == INVALID_HANDLE_VALUE)
             {
                 HANDLE hStdInput = GetStdHandle(STD_INPUT_HANDLE);
@@ -567,12 +568,17 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                     {
                         process->psi->hStdInput = hDupInput;
                         process->file_handles[process->file_handles_count++] = hDupInput;
+                        // add to handlesToInherit list so it can be inherited when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST
+                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
+                            handlesToInherit[handlesToInheritCount++] = hDupInput;
                     }
                     else
                     {
                         // if duplication fails, try to make original inheritable (may affect parent)
                         tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
                         process->psi->hStdInput = hStdInput;
+                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
+                            handlesToInherit[handlesToInheritCount++] = hStdInput;
                     }
                 }
             }
@@ -587,12 +593,17 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                     {
                         process->psi->hStdOutput = hDupOutput;
                         process->file_handles[process->file_handles_count++] = hDupOutput;
+                        // add to handlesToInherit list so it can be inherited when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST
+                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
+                            handlesToInherit[handlesToInheritCount++] = hDupOutput;
                     }
                     else
                     {
                         // if duplication fails, try to make original inheritable (may affect parent)
                         tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
                         process->psi->hStdOutput = hStdOutput;
+                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
+                            handlesToInherit[handlesToInheritCount++] = hStdOutput;
                     }
                 }
             }
@@ -607,12 +618,64 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                     {
                         process->psi->hStdError = hDupError;
                         process->file_handles[process->file_handles_count++] = hDupError;
+                        // add to handlesToInherit list so it can be inherited when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST
+                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
+                            handlesToInherit[handlesToInheritCount++] = hDupError;
                     }
                     else
                     {
                         // if duplication fails, try to make original inheritable (may affect parent)
                         tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
                         process->psi->hStdError = hStdError;
+                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
+                            handlesToInherit[handlesToInheritCount++] = hStdError;
+                    }
+                }
+            }
+            
+            // update lpAttributeList if we added standard handles to handlesToInherit
+            // if lpAttributeList was already initialized (from earlier redirected handles), just update it
+            // otherwise, initialize it now
+            if (handlesToInheritCount > 0 && tb_kernel32()->InitializeProcThreadAttributeList)
+            {
+                if (lpAttributeListInited && lpAttributeList)
+                {
+                    // already initialized, just update with new handle list
+                    tb_kernel32()->UpdateProcThreadAttribute(lpAttributeList, 0,
+                            PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                            handlesToInherit,
+                            handlesToInheritCount * sizeof(HANDLE), tb_null, tb_null);
+                }
+                else if (!lpAttributeListInited)
+                {
+                    // not initialized yet, initialize it now
+                    SIZE_T attributeListSize = 0;
+                    if (tb_kernel32()->InitializeProcThreadAttributeList(tb_null, 1, 0, &attributeListSize) ||
+                        GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                    {
+                        // if lpAttributeList was already allocated (from earlier), free it first
+                        if (lpAttributeList)
+                        {
+                            tb_free(lpAttributeList);
+                            lpAttributeList = tb_null;
+                        }
+                        
+                        if (!lpAttributeList)
+                            lpAttributeList = (LPPROC_THREAD_ATTRIBUTE_LIST)tb_malloc(attributeListSize);
+                        
+                        if (lpAttributeList && tb_kernel32()->InitializeProcThreadAttributeList(lpAttributeList, 1, 0, &attributeListSize))
+                        {
+                            lpAttributeListInited = tb_true;
+                            if (tb_kernel32()->UpdateProcThreadAttribute(lpAttributeList, 0,
+                                    PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                                    handlesToInherit,
+                                    handlesToInheritCount * sizeof(HANDLE), tb_null, tb_null))
+                            {
+                                process->si.lpAttributeList = lpAttributeList;
+                                flags |= EXTENDED_STARTUPINFO_PRESENT;
+                                bInheritHandle = tb_true;
+                            }
+                        }
                     }
                 }
             }

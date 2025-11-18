@@ -159,24 +159,10 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         attr.out.path = stdout_path;
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
-        // create a batch file that explicitly writes to stderr using cmd's con device
-        // This is more reliable than using >&2 syntax
-        tb_char_t batch_path[TB_PATH_MAXN];
-        tb_snprintf(batch_path, sizeof(batch_path), "%s%ctest_stderr.bat", tmpdir, TB_PATH_SEPARATOR);
-        tb_file_ref_t batch_file = tb_file_init(batch_path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-        if (batch_file)
-        {
-            tb_char_t const* batch_content = 
-                "@echo off\r\n"
-                "echo This goes to stdout\r\n"
-                "echo This goes to stderr >&2\r\n";
-            tb_file_writ(batch_file, (tb_byte_t const*)batch_content, tb_strlen(batch_content));
-            tb_file_exit(batch_file);
-        }
-        
-        // run the batch file
-        tb_char_t* argv[] = {"cmd", "/c", batch_path, tb_null};
-        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        // use PowerShell to output to stderr - this is the most reliable method
+        // PowerShell's [Console]::Error.WriteLine directly writes to stderr stream
+        tb_char_t* argv[] = {"powershell", "-Command", "[Console]::Out.WriteLine('This goes to stdout'); [Console]::Error.WriteLine('This goes to stderr')", tb_null};
+        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // wait process
@@ -241,7 +227,6 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         // remove temp files
         tb_file_remove(stdout_path);
         tb_file_remove(stderr_path);
-        tb_file_remove(batch_path);
     }
     tb_trace_i("===== Check console above for 'This goes to stderr' message =====");
 }
@@ -281,23 +266,10 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
         attr.in.path = stdin_path;
         attr.intype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
-        // create a batch file that explicitly writes to stderr
-        tb_char_t batch_path[TB_PATH_MAXN];
-        tb_snprintf(batch_path, sizeof(batch_path), "%s%ctest_stderr2.bat", tmpdir, TB_PATH_SEPARATOR);
-        tb_file_ref_t batch_file = tb_file_init(batch_path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-        if (batch_file)
-        {
-            tb_char_t const* batch_content = 
-                "@echo off\r\n"
-                "echo This goes to stdout\r\n"
-                "echo This goes to stderr >&2\r\n";
-            tb_file_writ(batch_file, (tb_byte_t const*)batch_content, tb_strlen(batch_content));
-            tb_file_exit(batch_file);
-        }
-        
-        // run the batch file - stdin is redirected but stdout/stderr should output to terminal
-        tb_char_t* argv[] = {"cmd", "/c", batch_path, tb_null};
-        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        // use PowerShell to output to stdout and stderr
+        // stdin is redirected but stdout/stderr should output to terminal
+        tb_char_t* argv[] = {"powershell", "-Command", "[Console]::Out.WriteLine('This goes to stdout'); [Console]::Error.WriteLine('This goes to stderr')", tb_null};
+        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // wait process
@@ -309,9 +281,8 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
             tb_process_exit(process);
         }
 
-        // remove temp files
+        // remove temp file
         tb_file_remove(stdin_path);
-        tb_file_remove(batch_path);
     }
     tb_trace_i("===== IF YOU SAW 'This goes to stdout/stderr' ABOVE, THE FIX WORKS! =====");
 }
@@ -339,27 +310,9 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
         attr.out.pipe = file[1];
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_PIPE;
 
-        // create a batch file that explicitly writes to stderr
-        tb_char_t batch_path[TB_PATH_MAXN];
-        tb_char_t tmpdir[TB_PATH_MAXN];
-        if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
-        {
-            tb_snprintf(batch_path, sizeof(batch_path), "%s%ctest_stderr3.bat", tmpdir, TB_PATH_SEPARATOR);
-            tb_file_ref_t batch_file = tb_file_init(batch_path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-            if (batch_file)
-            {
-                tb_char_t const* batch_content = 
-                    "@echo off\r\n"
-                    "echo This goes to stdout\r\n"
-                    "echo This goes to stderr >&2\r\n";
-                tb_file_writ(batch_file, (tb_byte_t const*)batch_content, tb_strlen(batch_content));
-                tb_file_exit(batch_file);
-            }
-        }
-        
-        // run the batch file
-        tb_char_t* argv[] = {"cmd", "/c", batch_path, tb_null};
-        tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
+        // use PowerShell to output to stdout and stderr
+        tb_char_t* argv[] = {"powershell", "-Command", "[Console]::Out.WriteLine('This goes to stdout'); [Console]::Error.WriteLine('This goes to stderr')", tb_null};
+        tb_process_ref_t process = tb_process_init("powershell", (tb_char_t const**)argv, &attr);
         if (process)
         {
             // read stdout from pipe
@@ -406,12 +359,6 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
         // exit pipe files
         tb_pipe_file_exit(file[0]);
         tb_pipe_file_exit(file[1]);
-        
-        // remove batch file
-        if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
-        {
-            tb_file_remove(batch_path);
-        }
     }
     tb_trace_i("===== IF YOU SAW 'This goes to stderr' ABOVE, THE FIX WORKS! =====");
 }
