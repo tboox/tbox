@@ -155,9 +155,9 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
         attr.outtype = TB_PROCESS_REDIRECT_TYPE_FILEPATH;
 
         // use cmd /c to output to both stdout and stderr
-        // in Windows cmd, we use echo with >&2 to redirect to stderr
+        // in Windows cmd, output to stderr using the correct syntax
         // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout & echo This goes to stderr >&2", tb_null};
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && (echo This goes to stderr 1>&2)", tb_null};
         tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
         if (process)
         {
@@ -226,7 +226,7 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
         // use cmd /c to output to stdout and stderr (stdin is redirected but we just verify stdout/stderr work)
         // the stdin redirection is verified by the fact that the process can read from the file
         // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout & echo This goes to stderr >&2", tb_null};
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && (echo This goes to stderr 1>&2)", tb_null};
         tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
         if (process)
         {
@@ -268,7 +268,7 @@ static tb_void_t tb_demo_process_test_redirect_stdout_pipe_only(tb_char_t const*
 
         // use cmd /c to output to both stdout and stderr
         // Note: stderr output will appear directly in console, not in trace logs
-        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout & echo This goes to stderr >&2", tb_null};
+        tb_char_t* argv[] = {"cmd", "/c", "echo This goes to stdout && (echo This goes to stderr 1>&2)", tb_null};
         tb_process_ref_t process = tb_process_init("cmd", (tb_char_t const**)argv, &attr);
         if (process)
         {
