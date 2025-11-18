@@ -143,7 +143,7 @@ static tb_void_t tb_demo_process_test_redirect_stdout_only(tb_char_t const* test
     tb_char_t stdout_path[TB_PATH_MAXN];
     if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
     {
-        tb_snprintf(stdout_path, sizeof(stdout_path), "%s%ctest_stdout.txt", tmpdir, TB_PATH_SEP);
+        tb_snprintf(stdout_path, sizeof(stdout_path), "%s%ctest_stdout.txt", tmpdir, TB_PATH_SEPARATOR);
         // init process with stdout redirected to file
         tb_process_attr_t attr = {0};
         attr.out.path = stdout_path;
@@ -199,7 +199,7 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
     tb_char_t stdin_path[TB_PATH_MAXN];
     if (tb_directory_temporary(tmpdir, sizeof(tmpdir)))
     {
-        tb_snprintf(stdin_path, sizeof(stdin_path), "%s%ctest_stdin.txt", tmpdir, TB_PATH_SEP);
+        tb_snprintf(stdin_path, sizeof(stdin_path), "%s%ctest_stdin.txt", tmpdir, TB_PATH_SEPARATOR);
         // write test content to stdin file
         tb_file_ref_t file = tb_file_init(stdin_path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
         if (file)
