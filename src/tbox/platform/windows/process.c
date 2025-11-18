@@ -555,12 +555,37 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
             // for unset handles, use GetStdHandle() to get current standard handles
             // these handles are only set in StartupInfo, not in handlesToInherit list
             // to avoid case1/case2 issues (invalid handle in CI or detect vs fails)
+            // but we need to make them inheritable so child process can use them
             if (process->psi->hStdInput == INVALID_HANDLE_VALUE)
-                process->psi->hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+            {
+                HANDLE hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+                if (hStdInput != INVALID_HANDLE_VALUE)
+                {
+                    // make handle inheritable so child process can inherit it
+                    tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
+                    process->psi->hStdInput = hStdInput;
+                }
+            }
             if (process->psi->hStdOutput == INVALID_HANDLE_VALUE)
-                process->psi->hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+            {
+                HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+                if (hStdOutput != INVALID_HANDLE_VALUE)
+                {
+                    // make handle inheritable so child process can inherit it
+                    tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
+                    process->psi->hStdOutput = hStdOutput;
+                }
+            }
             if (process->psi->hStdError == INVALID_HANDLE_VALUE)
-                process->psi->hStdError = GetStdHandle(STD_ERROR_HANDLE);
+            {
+                HANDLE hStdError = GetStdHandle(STD_ERROR_HANDLE);
+                if (hStdError != INVALID_HANDLE_VALUE)
+                {
+                    // make handle inheritable so child process can inherit it
+                    tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
+                    process->psi->hStdError = hStdError;
+                }
+            }
         }
 
         // init process security attributes
