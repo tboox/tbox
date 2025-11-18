@@ -400,12 +400,12 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         // note: we may need up to 3 redirected handles + 3 standard handles = 6 total
         HANDLE handlesToInherit[6];
         DWORD  handlesToInheritCount = 0;
-        
+
         // initialize all std handles to INVALID_HANDLE_VALUE
         process->psi->hStdInput = INVALID_HANDLE_VALUE;
         process->psi->hStdOutput = INVALID_HANDLE_VALUE;
         process->psi->hStdError = INVALID_HANDLE_VALUE;
-        
+
         if (attr)
         {
             // redirect from stdin
@@ -552,7 +552,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
         if (bInheritHandle)
         {
             process->psi->dwFlags |= STARTF_USESTDHANDLES;
-            
+
             // for unset handles, use GetStdHandle() to get current standard handles
             // we need to duplicate and make them inheritable so child process can use them
             // when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST, we must also add these handles
@@ -632,7 +632,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                     }
                 }
             }
-            
+
             // update lpAttributeList if we added standard handles to handlesToInherit
             // if lpAttributeList was already initialized (from earlier redirected handles), just update it
             // otherwise, initialize it now
@@ -656,7 +656,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                         // fall through to initialization code below
                     }
                 }
-                
+
                 if (!lpAttributeListInited)
                 {
                     // not initialized yet (or recreate after failed update), initialize it now
@@ -670,10 +670,10 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                             tb_free(lpAttributeList);
                             lpAttributeList = tb_null;
                         }
-                        
+
                         if (!lpAttributeList)
                             lpAttributeList = (LPPROC_THREAD_ATTRIBUTE_LIST)tb_malloc(attributeListSize);
-                        
+
                         if (lpAttributeList && tb_kernel32()->InitializeProcThreadAttributeList(lpAttributeList, 1, 0, &attributeListSize))
                         {
                             lpAttributeListInited = tb_true;
