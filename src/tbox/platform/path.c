@@ -34,24 +34,6 @@
 #include "../libc/libc.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// the path separator
-#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
-#   define TB_PATH_SEPARATOR            '\\'
-#else
-#   define TB_PATH_SEPARATOR            '/'
-#endif
-
-// is path separator?
-#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
-#   define tb_path_is_sep(c)      ('/' == (c) || '\\' == (c))
-#else
-#   define tb_path_is_sep(c)      ('/' == (c))
-#endif
-
-/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifndef TB_CONFIG_MICRO_ENABLE

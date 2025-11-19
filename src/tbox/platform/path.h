@@ -39,6 +39,20 @@ __tb_extern_c_enter__
 // the path maximum
 #define TB_PATH_MAXN        (4096)
 
+// the path separator
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
+#   define TB_PATH_SEPARATOR            '\\'
+#else
+#   define TB_PATH_SEPARATOR            '/'
+#endif
+
+// is path separator?
+#if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
+#   define tb_path_is_sep(c)      ('/' == (c) || '\\' == (c))
+#else
+#   define tb_path_is_sep(c)      ('/' == (c))
+#endif
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
