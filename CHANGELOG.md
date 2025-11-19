@@ -6,9 +6,16 @@
 
 * Add copy file if be different
 
+### Changes
+
+* [#291](https://github.com/tboox/tbox/pull/291): Improve semaphore
+* [#292](https://github.com/tboox/tbox/pull/292): Improve process on Windows
+
 ### Bugs fixed
 
+* [#208](https://github.com/tboox/tbox/issues/208): [#290](https://github.com/tboox/tbox/pull/290): Fix stream buffer
 * [#272](https://github.com/tboox/tbox/issues/272): Fix read file stuck on windows arm64
+* [#292](https://github.com/tboox/tbox/pull/292): Fix process and path errors on Windows
 
 ## v1.7.7
 
@@ -335,9 +342,16 @@
 
 * 添加 copy if be different 支持
 
+### 改进
+
+* [#291](https://github.com/tboox/tbox/pull/291): 改进信号量
+* [#292](https://github.com/tboox/tbox/pull/292): 改进 Windows 进程处理
+
 ### Bugs 修复
 
+* [#208](https://github.com/tboox/tbox/issues/208): [#290](https://github.com/tboox/tbox/pull/290): 修复流缓冲区问题
 * [#272](https://github.com/tboox/tbox/issues/272): 修复读取文件卡住问题
+* [#292](https://github.com/tboox/tbox/pull/292): 修复 Windows 进程和路径错误
 
 ## v1.7.7
 
