@@ -47,7 +47,7 @@ tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     cpuset_t *cpu_set = cpuset_create();
     if (!cpu_set)
         return tb_false;
-    
+
     tb_int_t i;
     for (i = 0; i < TB_CPUSET_SIZE; i++)
     {
@@ -83,7 +83,7 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     cpuset_t *cpu_set = cpuset_create();
     if (!cpu_set)
         return tb_false;
-    
+
     if (pthread_getaffinity_np(pthread, cpuset_size(cpu_set), cpu_set) != 0)
     {
         cpuset_destroy(cpu_set);

@@ -44,7 +44,7 @@ tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     cpuset_t *cpu_set = cpuset_create();
     if (!cpu_set)
         return tb_false;
-    
+
     tb_int_t i;
     for (i = 0; i < TB_CPUSET_SIZE; i++)
     {
@@ -77,7 +77,7 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     cpuset_t *cpu_set = cpuset_create();
     if (!cpu_set)
         return tb_false;
-    
+
     if (cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_PID, (pid_t)pid, cpuset_size(cpu_set), cpu_set) != 0)
     {
         cpuset_destroy(cpu_set);
