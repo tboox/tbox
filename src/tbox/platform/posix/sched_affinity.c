@@ -27,6 +27,9 @@
 #include <string.h>
 #include <sched.h>
 #include <sys/types.h>
+#ifdef __NetBSD__
+#include <sched.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -36,7 +39,23 @@ tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     // check
     tb_assert_and_check_return_val(cpuset, tb_false);
 
-    // set cpu affinity
+#ifdef __NetBSD__
+    // NetBSD uses cpuset_t API for process affinity
+    cpuset_t *cpu_set = cpuset_create();
+    if (!cpu_set)
+        return tb_false;
+    
+    tb_int_t i;
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (TB_CPUSET_ISSET(i, cpuset))
+            cpuset_set(i, cpu_set);
+    }
+    tb_bool_t ok = cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_PID, (pid_t)pid, cpuset_size(cpu_set), cpu_set) == 0;
+    cpuset_destroy(cpu_set);
+    return ok;
+#else
+    // Linux uses cpu_set_t API
     tb_int_t i;
     cpu_set_t cpu_set;
     CPU_ZERO(&cpu_set);
@@ -46,13 +65,37 @@ tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
             CPU_SET(i, &cpu_set);
     }
     return sched_setaffinity((pid_t)pid, sizeof(cpu_set_t), &cpu_set) == 0;
+#endif
 }
 tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
 {
     // check
     tb_assert_and_check_return_val(cpuset, tb_false);
 
-    // get cpu affinity
+#ifdef __NetBSD__
+    // NetBSD uses cpuset_t API for process affinity
+    cpuset_t *cpu_set = cpuset_create();
+    if (!cpu_set)
+        return tb_false;
+    
+    if (cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_PID, (pid_t)pid, cpuset_size(cpu_set), cpu_set) != 0)
+    {
+        cpuset_destroy(cpu_set);
+        return tb_false;
+    }
+
+    // save cpuset
+    tb_int_t i;
+    TB_CPUSET_ZERO(cpuset);
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (cpuset_isset(i, cpu_set))
+            TB_CPUSET_SET(i, cpuset);
+    }
+    cpuset_destroy(cpu_set);
+    return tb_true;
+#else
+    // Linux uses cpu_set_t API
     cpu_set_t cpu_set;
     CPU_ZERO(&cpu_set);
     if (sched_getaffinity((pid_t)pid, sizeof(cpu_set_t), &cpu_set) != 0)
@@ -67,4 +110,5 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
             TB_CPUSET_SET(i, cpuset);
     }
     return tb_true;
+#endif
 }

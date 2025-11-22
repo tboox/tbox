@@ -27,6 +27,9 @@
 #include "../thread.h"
 #include <pthread.h>
 #include <string.h>
+#ifdef __NetBSD__
+#include <sched.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -39,7 +42,23 @@ tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     // get thread
     pthread_t pthread = thread? *((pthread_t*)thread) : pthread_self();
 
-    // set cpu affinity
+#ifdef __NetBSD__
+    // NetBSD uses cpuset_t API
+    cpuset_t *cpu_set = cpuset_create();
+    if (!cpu_set)
+        return tb_false;
+    
+    tb_int_t i;
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (TB_CPUSET_ISSET(i, cpuset))
+            cpuset_set(i, cpu_set);
+    }
+    tb_bool_t ok = pthread_setaffinity_np(pthread, cpuset_size(cpu_set), cpu_set) == 0;
+    cpuset_destroy(cpu_set);
+    return ok;
+#else
+    // Linux uses cpu_set_t API
     tb_int_t i;
     cpu_set_t cpu_set;
     CPU_ZERO(&cpu_set);
@@ -49,6 +68,7 @@ tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
             CPU_SET(i, &cpu_set);
     }
     return pthread_setaffinity_np(pthread, sizeof(cpu_set_t), &cpu_set) == 0;
+#endif
 }
 tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
 {
@@ -58,7 +78,30 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     // get thread
     pthread_t pthread = thread? *((pthread_t*)thread) : pthread_self();
 
-    // get cpu affinity
+#ifdef __NetBSD__
+    // NetBSD uses cpuset_t API
+    cpuset_t *cpu_set = cpuset_create();
+    if (!cpu_set)
+        return tb_false;
+    
+    if (pthread_getaffinity_np(pthread, cpuset_size(cpu_set), cpu_set) != 0)
+    {
+        cpuset_destroy(cpu_set);
+        return tb_false;
+    }
+
+    // save cpuset
+    tb_int_t i;
+    TB_CPUSET_ZERO(cpuset);
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (cpuset_isset(i, cpu_set))
+            TB_CPUSET_SET(i, cpuset);
+    }
+    cpuset_destroy(cpu_set);
+    return tb_true;
+#else
+    // Linux uses cpu_set_t API
     cpu_set_t cpu_set;
     CPU_ZERO(&cpu_set);
     if (pthread_getaffinity_np(pthread, sizeof(cpu_set_t), &cpu_set) != 0)
@@ -73,4 +116,5 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
             TB_CPUSET_SET(i, cpuset);
     }
     return tb_true;
+#endif
 }

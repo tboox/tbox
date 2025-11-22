@@ -1,0 +1,35 @@
+name: OpenBSD
+
+on:
+  pull_request:
+  push:
+  release:
+    types: [published]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    concurrency:
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-OpenBSD
+        cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Tests
+        id: test
+        uses: vmactions/openbsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg_add curl git gmake bash gcc
+            ln -sf /usr/local/bin/gmake /usr/local/bin/make || true
+          run: |
+            cd $GITHUB_WORKSPACE
+            ./configure
+            gmake -j4
+            gmake run
+
