@@ -322,12 +322,24 @@ _os_find() {
     local dir="${1}"
     local name="${2}"
     local depth="${3}"
+    local find_cmd="find"
+    
+    # On Solaris, try to use gfind (GNU find) which supports -maxdepth
+    if is_host "solaris"; then
+        if command -v gfind >/dev/null 2>&1; then
+            find_cmd="gfind"
+        fi
+    fi
+    
     if test_nz "${depth}"; then
-        # Solaris doesn't support -maxdepth, use shell to filter depth
-        if is_host "solaris"; then
+        # Try -maxdepth first (works with GNU find or gfind on Solaris)
+        if ${find_cmd} "${dir}" -maxdepth 1 >/dev/null 2>&1; then
+            _ret=$(${find_cmd} "${dir}" -maxdepth "${depth}" -mindepth "${depth}" -type f -name "${name}" | LC_ALL=C sort)
+        else
+            # Fallback: use shell to filter depth (for systems without -maxdepth support)
             _ret=""
             local file=""
-            for file in $(find "${dir}" -type f -name "${name}" | LC_ALL=C sort); do
+            for file in $(${find_cmd} "${dir}" -type f -name "${name}" | LC_ALL=C sort); do
                 local relpath="${file#${dir}/}"
                 local slash_count=$(echo "${relpath}" | tr -cd '/' | wc -c | tr -d ' ')
                 if test "${slash_count}" = "$((${depth} - 1))"; then
@@ -339,11 +351,9 @@ ${file}"
                     fi
                 fi
             done
-        else
-            _ret=$(find "${dir}" -maxdepth "${depth}" -mindepth "${depth}" -type f -name "${name}" | LC_ALL=C sort)
         fi
     else
-        _ret=$(find "${dir}" -type f -name "${name}" | LC_ALL=C sort)
+        _ret=$(${find_cmd} "${dir}" -type f -name "${name}" | LC_ALL=C sort)
     fi
 }
 
