@@ -29,6 +29,9 @@ jobs:
           run: |
             cd $GITHUB_WORKSPACE
             bash ./configure
+            echo "=== tbox.config.h content ==="
+            find build -name "tbox.config.h" -type f | head -1 | xargs cat || echo "tbox.config.h not found"
+            echo "============================"
             gmake -j4
             gmake run
 
