@@ -34,6 +34,10 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <errno.h>
+#include <utime.h>
+#ifdef TB_CONFIG_POSIX_HAVE_UTIMENSAT
+#   include <sys/stat.h>
+#endif
 #ifdef TB_CONFIG_POSIX_HAVE_COPYFILE
 #   include <copyfile.h>
 #endif
@@ -690,18 +694,38 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
 
     // file exists?
     tb_bool_t ok = tb_false;
-    struct timespec ts[2];
-    tb_memset(ts, 0, sizeof(ts));
     if (!access(path, F_OK))
     {
         if (atime > 0 || mtime > 0)
         {
 #ifdef TB_CONFIG_POSIX_HAVE_UTIMENSAT
+            struct timespec ts[2];
+            tb_memset(ts, 0, sizeof(ts));
             if (atime > 0) ts[0].tv_sec = atime;
             else ts[0].tv_nsec = UTIME_OMIT;
             if (mtime > 0) ts[1].tv_sec = mtime;
             else ts[1].tv_nsec = UTIME_OMIT;
             ok = !utimensat(AT_FDCWD, path, ts, 0);
+#else
+            // Fallback to utimes for systems without utimensat (e.g. Solaris)
+            struct utimbuf ut;
+            if (atime > 0) ut.actime = atime;
+            else
+            {
+                // Get current access time if not specified
+                struct stat st;
+                if (!stat(path, &st)) ut.actime = st.st_atime;
+                else ut.actime = 0;
+            }
+            if (mtime > 0) ut.modtime = mtime;
+            else
+            {
+                // Get current modify time if not specified
+                struct stat st;
+                if (!stat(path, &st)) ut.modtime = st.st_mtime;
+                else ut.modtime = 0;
+            }
+            ok = !utime(path, &ut);
 #endif
         }
         else ok = tb_true;
@@ -715,11 +739,24 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
             if (atime > 0 || mtime > 0)
             {
 #ifdef TB_CONFIG_POSIX_HAVE_FUTIMENS
+                struct timespec ts[2];
+                tb_memset(ts, 0, sizeof(ts));
                 if (atime > 0) ts[0].tv_sec = atime;
                 else ts[0].tv_nsec = UTIME_OMIT;
                 if (mtime > 0) ts[1].tv_sec = mtime;
                 else ts[1].tv_nsec = UTIME_OMIT;
                 ok = !futimens(tb_file2fd(file), ts);
+#else
+                // Fallback to utime for systems without futimens (e.g. Solaris)
+                // Need to close file first before using utime
+                tb_file_exit(file);
+                struct utimbuf ut;
+                if (atime > 0) ut.actime = atime;
+                else ut.actime = 0;
+                if (mtime > 0) ut.modtime = mtime;
+                else ut.modtime = 0;
+                ok = !utime(path, &ut);
+                return ok;
 #endif
             }
             else ok = tb_true;
