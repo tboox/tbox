@@ -1,13 +1,7 @@
--- project
 set_project("tbox")
-
--- set xmake minimum version
-set_xmakever("2.8.2")
-
--- set project version
+set_xmakever("3.0.5")
+set_policy("build.progress_style", "multirow")
 set_version("1.7.9", {build = "%Y%m%d", soname = true})
-
--- set warning all as error
 set_warnings("all", "error")
 
 -- set language: c99
