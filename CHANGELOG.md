@@ -2,12 +2,17 @@
 
 ## master (unreleased)
 
+## v1.7.9
+
+### New features
+
+* Add support for other BSD systems (NetBSD, OpenBSD, DragonFly BSD) and Solaris
+
 ## v1.7.8
 
 ### New features
 
 * Add copy file if be different
-* Add support for other BSD systems (NetBSD, OpenBSD, DragonFly BSD) and Solaris
 
 ### Changes
 
@@ -341,12 +346,17 @@
 
 ## master (开发中)
 
+## v1.7.9
+
+### 新特性
+
+* 添加对其他 BSD 系统（NetBSD, OpenBSD, DragonFly BSD）和 Solaris 的支持
+
 ## v1.7.8
 
 ### 新特性
 
 * 添加 copy if be different 支持
-* 添加对其他 BSD 系统（NetBSD, OpenBSD, DragonFly BSD）和 Solaris 的支持
 
 ### 改进
 
