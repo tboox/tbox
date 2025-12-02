@@ -25,7 +25,15 @@ jobs:
         with:
           usesh: true
           prepare: |
-            pkgutil -y -i socat git gmake bash gcc4g++ || pkgutil -y -i socat git gmake bash gcc5g++ || pkg install -y developer/gcc || true
+            # Try OpenCSW first (for older Solaris)
+            if command -v pkgutil >/dev/null 2>&1; then
+              pkgutil -U || true
+              pkgutil -y -i socat git gmake bash gcc4g++ 2>/dev/null || pkgutil -y -i socat git gmake bash gcc5g++ 2>/dev/null || true
+            fi
+            # Try IPS (for newer Solaris)
+            if command -v pkg >/dev/null 2>&1; then
+              pkg install --accept developer/gcc developer/build/gnu-make developer/versioning/git || true
+            fi
           run: |
             cd $GITHUB_WORKSPACE
             bash ./configure
