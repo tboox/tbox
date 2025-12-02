@@ -13,6 +13,11 @@ set_languages "c99"
 set_configvar "_GNU_SOURCE" 1
 set_configvar "_REENTRANT" 1
 
+# ensure POSIX/XOPEN features are available on Solaris (for setenv, unsetenv, clock_gettime, etc.)
+if is_plat "solaris"; then
+    add_defines "_POSIX_C_SOURCE=200112L" "_XOPEN_SOURCE=600"
+fi
+
 # add build modes
 if is_mode "debug"; then
     add_defines "__tb_debug__"
