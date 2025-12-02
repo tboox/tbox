@@ -26,6 +26,16 @@
 #include "../../libc/libc.h"
 #include "../../string/string.h"
 #include "../../algorithm/algorithm.h"
+
+// ensure setenv/unsetenv are available on Solaris
+#ifdef TB_CONFIG_OS_SOLARIS
+#   ifndef _POSIX_C_SOURCE
+#       define _POSIX_C_SOURCE 200112L
+#   endif
+#   ifndef _XOPEN_SOURCE
+#       define _XOPEN_SOURCE 600
+#   endif
+#endif
 #include <stdlib.h>
 
 /* //////////////////////////////////////////////////////////////////////////////////////
