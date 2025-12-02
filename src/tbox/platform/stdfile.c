@@ -36,6 +36,7 @@
 #   include <unistd.h>
 #   include <sys/select.h>
 #   include <errno.h>
+#   include <string.h>
 #endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
