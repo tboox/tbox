@@ -117,18 +117,15 @@ static tb_long_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
     tb_long_t           last = tb_wcslen(path) - 1;
     tb_assert_and_check_return_val(last >= 0, TB_DIRECTORY_WALK_CODE_END);
 
-    // add \*.*
     tb_wchar_t          temp_w[4096] = {0};
     tb_char_t           temp_a[4096] = {0};
     tb_swprintf(temp_w, 4095, L"%s%s*.*", path, path[last] == L'\\'? L"" : L"\\");
 
-    // done
     tb_long_t           ok = TB_DIRECTORY_WALK_CODE_CONTINUE;
     WIN32_FIND_DATAW    find = {0};
     HANDLE              directory = INVALID_HANDLE_VALUE;
     if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp_w, &find)))
     {
-        // walk
         do
         {
             // check
@@ -177,11 +174,9 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
     // check
     tb_assert_and_check_return_val(path, tb_false);
 
-    // the absolute path
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
 
-    // make it
     tb_bool_t ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
     if (!ok)
     {
@@ -204,11 +199,9 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
             else p++;
         }
 
-        // make it again
         ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
     }
 
-    // ok?
     return ok;
 }
 tb_bool_t tb_directory_remove(tb_char_t const* path)
@@ -258,19 +251,14 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
         if (profile)
             tb_wcsncat(home, L"\\AppData\\Local", TB_PATH_MAXN);
 
-        // ok
         ok = tb_true;
 
     } while (0);
 
-    // exit pidl
     if (pidl) GlobalFree(pidl);
     pidl = tb_null;
 
-    // wtoa
     tb_size_t size = ok? tb_wtoa(path, home, maxn) : 0;
-
-    // ok?
     return size != -1? size : 0;
 }
 tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
@@ -278,14 +266,11 @@ tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
-    // the current directory
     tb_wchar_t current[TB_PATH_MAXN] = {0};
-    GetCurrentDirectoryW(TB_PATH_MAXN, current);
+    DWORD len = GetCurrentDirectoryW(TB_PATH_MAXN, current);
+    if (!len || len >= TB_PATH_MAXN) return 0;
 
-    // wtoa
     tb_size_t size = tb_wtoa(path, current, maxn);
-
-    // ok?
     return size != -1? size : 0;
 }
 tb_bool_t tb_directory_current_set(tb_char_t const* path)
@@ -293,6 +278,18 @@ tb_bool_t tb_directory_current_set(tb_char_t const* path)
     // the absolute path
     tb_wchar_t full[TB_PATH_MAXN];
     if (!tb_path_absolute_w(path, full, TB_PATH_MAXN)) return tb_false;
+
+    // ensure root directory ends with backslash for SetCurrentDirectoryW
+    // e.g., C: -> C:\ (SetCurrentDirectoryW requires trailing backslash for root)
+    // Note: Path normalization may remove trailing backslash, but SetCurrentDirectoryW
+    //       requires it for root directories to work correctly
+    // Check if path is root directory format (X:) without calling tb_wcslen
+    if (((full[0] >= L'A' && full[0] <= L'Z') || (full[0] >= L'a' && full[0] <= L'z')) 
+        && full[1] == L':' && full[2] == L'\0')
+    {
+        full[2] = L'\\';
+        full[3] = L'\0';
+    }
 
     // change to the directory
     return SetCurrentDirectoryW(full);
@@ -302,14 +299,11 @@ tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
     // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
-    // the temporary directory
     tb_wchar_t temporary[TB_PATH_MAXN] = {0};
-    GetTempPathW(TB_PATH_MAXN, temporary);
+    DWORD len = GetTempPathW(TB_PATH_MAXN, temporary);
+    if (!len || len >= TB_PATH_MAXN) return 0;
 
-    // wtoa
     tb_size_t size = tb_wtoa(path, temporary, maxn);
-
-    // ok?
     return size != -1? size : 0;
 }
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
