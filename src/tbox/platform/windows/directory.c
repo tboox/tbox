@@ -39,7 +39,6 @@ static tb_long_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
 
     // remove file
     if (info->type == TB_FILE_TYPE_FILE) tb_file_remove(path);
-    // remove directory
     else if (info->type == TB_FILE_TYPE_DIRECTORY)
     {
         tb_wchar_t temp[TB_PATH_MAXN];
@@ -131,12 +130,10 @@ static tb_long_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
             // check
             if (tb_wcscmp(find.cFileName, L".") && tb_wcscmp(find.cFileName, L".."))
             {
-                // the temp path
                 tb_long_t n = tb_swprintf(temp_w, 4095, L"%s%s%s", path, path[last] == L'\\'? L"" : L"\\", find.cFileName);
                 if (n >= 0 && n < 4096) temp_w[n] = L'\0';
 
-                // wtoa temp
-                n = tb_wtoa(temp_a, temp_w, 4095);
+                n = tb_wtoa_n(temp_w, (tb_size_t)n, temp_a, 4095);
                 tb_assert_and_check_break(n != -1);
 
                 // the file info
@@ -246,7 +243,6 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
         }
         tb_check_break(pidl);
 
-        // get the home directory
         if (!tb_shell32()->SHGetPathFromIDListW(pidl, home)) break;
         if (profile)
             tb_wcsncat(home, L"\\AppData\\Local", TB_PATH_MAXN);
@@ -263,15 +259,13 @@ tb_size_t tb_directory_home(tb_char_t* path, tb_size_t maxn)
 }
 tb_size_t tb_directory_current(tb_char_t* path, tb_size_t maxn)
 {
-    // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
     tb_wchar_t current[TB_PATH_MAXN] = {0};
     DWORD len = GetCurrentDirectoryW(TB_PATH_MAXN, current);
     if (!len || len >= TB_PATH_MAXN) return 0;
 
-    tb_size_t size = tb_wtoa(path, current, maxn);
-    return size != -1? size : 0;
+    return tb_wtoa_n(current, len, path, maxn);
 }
 tb_bool_t tb_directory_current_set(tb_char_t const* path)
 {
@@ -296,22 +290,19 @@ tb_bool_t tb_directory_current_set(tb_char_t const* path)
 }
 tb_size_t tb_directory_temporary(tb_char_t* path, tb_size_t maxn)
 {
-    // check
     tb_assert_and_check_return_val(path && maxn > 4, 0);
 
     tb_wchar_t temporary[TB_PATH_MAXN] = {0};
     DWORD len = GetTempPathW(TB_PATH_MAXN, temporary);
     if (!len || len >= TB_PATH_MAXN) return 0;
 
-    tb_size_t size = tb_wtoa(path, temporary, maxn);
-    return size != -1? size : 0;
+    return tb_wtoa_n(temporary, len, path, maxn);
 }
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_long_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t priv)
 {
     // check
     tb_assert_and_check_return(path && func);
 
-    // walk it directly if rootdir is relative path
     tb_file_info_t info = {0};
     if (!tb_path_is_absolute(path) && tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
     {
