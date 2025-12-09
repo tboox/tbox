@@ -57,6 +57,44 @@ static __tb_inline__ tb_void_t tb_time_to_filetime(tb_time_t tm, FILETIME* pft)
     pft->dwHighDateTime = ui.HighPart;
 }
 
+// convert wide string to multibyte string with known length (avoid wcslen)
+static __tb_inline__ tb_size_t tb_wtoa_n(tb_wchar_t const* wstr, tb_size_t wlen, tb_char_t* mstr, tb_size_t maxn)
+{
+    tb_assert_and_check_return_val(wstr && mstr && maxn > 0, 0);
+    if (!wlen)
+    {
+        mstr[0] = '\0';
+        return 0;
+    }
+
+    tb_int_t size = WideCharToMultiByte(CP_UTF8, 0, wstr, (tb_int_t)wlen, mstr, (tb_int_t)maxn - 1, tb_null, tb_null);
+    if (size > 0 && size < (tb_int_t)maxn)
+    {
+        mstr[size] = '\0';
+        return (tb_size_t)size;
+    }
+    return 0;
+}
+
+// convert multibyte string to wide string with known length (avoid strlen)
+static __tb_inline__ tb_size_t tb_atow_n(tb_char_t const* mstr, tb_size_t mlen, tb_wchar_t* wstr, tb_size_t maxn)
+{
+    tb_assert_and_check_return_val(mstr && wstr && maxn > 0, 0);
+    if (!mlen)
+    {
+        wstr[0] = L'\0';
+        return 0;
+    }
+
+    tb_int_t size = MultiByteToWideChar(CP_UTF8, 0, mstr, (tb_int_t)mlen, wstr, (tb_int_t)maxn - 1);
+    if (size > 0 && size < (tb_int_t)maxn)
+    {
+        wstr[size] = L'\0';
+        return (tb_size_t)size;
+    }
+    return 0;
+}
+
 // get absolute path for wchar
 static __tb_inline__ tb_wchar_t const* tb_path_absolute_w(tb_char_t const* path, tb_wchar_t* full, tb_size_t maxn)
 {
@@ -85,42 +123,13 @@ static __tb_inline__ tb_wchar_t const* tb_path_absolute_w(tb_char_t const* path,
             data[2] = '?';
             data[3] = '\\';
             path = data;
+            size += 4; // add "\\?\" prefix length
         }
         else return tb_null;
     }
 
-    // atow
-    return tb_atow(full, path, maxn) != (tb_size_t)-1? full : tb_null;
-}
-
-// convert wide string to multibyte string with known length (avoid wcslen)
-static __tb_inline__ tb_size_t tb_wtoa_n(tb_wchar_t const* wstr, tb_size_t wlen, tb_char_t* mstr, tb_size_t maxn)
-{
-    tb_assert_and_check_return_val(wstr && mstr && maxn > 0, 0);
-    if (!wlen) { mstr[0] = '\0'; return 0; }
-
-    int size = WideCharToMultiByte(CP_UTF8, 0, wstr, (int)wlen, mstr, (int)maxn - 1, tb_null, tb_null);
-    if (size > 0 && size < (int)maxn)
-    {
-        mstr[size] = '\0';
-        return (tb_size_t)size;
-    }
-    return 0;
-}
-
-// convert multibyte string to wide string with known length (avoid strlen)
-static __tb_inline__ tb_size_t tb_atow_n(tb_char_t const* mstr, tb_size_t mlen, tb_wchar_t* wstr, tb_size_t maxn)
-{
-    tb_assert_and_check_return_val(mstr && wstr && maxn > 0, 0);
-    if (!mlen) { wstr[0] = L'\0'; return 0; }
-
-    int size = MultiByteToWideChar(CP_UTF8, 0, mstr, (int)mlen, wstr, (int)maxn - 1);
-    if (size > 0 && size < (int)maxn)
-    {
-        wstr[size] = L'\0';
-        return (tb_size_t)size;
-    }
-    return 0;
+    // use tb_atow_n with known length to avoid tb_atow's internal strlen
+    return tb_atow_n(path, size, full, maxn)? full : tb_null;
 }
 
 #endif
