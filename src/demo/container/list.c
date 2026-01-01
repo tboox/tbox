@@ -8,344 +8,278 @@
  */
 static tb_void_t tb_list_insert_prev_test()
 {
-    // init list
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     tb_size_t itor = tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list) - 1) n = tb_list_maxn(list) - 1;
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_insert_prev(list, itor, (tb_pointer_t)0xd);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n + 1);
     tb_assert(tb_list_head(list) == (tb_pointer_t)0xd);
     tb_assert(tb_list_last(list) == (tb_pointer_t)0xd);
 
-    // clear it
     tb_list_clear(list);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_insert_next_test()
 {
-    // init list
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     tb_size_t itor = tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list) - 1) n = tb_list_maxn(list) - 1;
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_insert_next(list, itor, (tb_pointer_t)0xd);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_insert_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n + 1);
     tb_assert(tb_list_head(list) == (tb_pointer_t)0xd);
     tb_assert(tb_list_last(list) == (tb_pointer_t)0xd);
 
-    // clear it
     tb_list_clear(list);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_insert_head_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // done
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_insert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n);
     tb_assert(tb_list_head(list) == (tb_pointer_t)0xd);
     tb_assert(tb_list_last(list) == (tb_pointer_t)0xd);
 
-    // clear it
     tb_list_clear(list);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_insert_tail_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // done
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_insert_tail(list, (tb_pointer_t)0xd);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_insert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n);
     tb_assert(tb_list_head(list) == (tb_pointer_t)0xd);
     tb_assert(tb_list_last(list) == (tb_pointer_t)0xd);
 
-    // clear it
     tb_list_clear(list);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_remove_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_size_t itor = tb_iterator_head(list);
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) itor = tb_list_remove(list, itor);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_remove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(!tb_list_size(list));
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_remove_head_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_remove_head(list);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_remove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(!tb_list_size(list));
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_remove_last_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_remove_last(list);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_remove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(!tb_list_size(list));
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_replace_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_size_t itor = tb_iterator_head(list);
     tb_size_t tail = tb_iterator_tail(list);
     tb_hong_t t = tb_mclock();
     for (; itor != tail; itor = tb_iterator_next(list, itor)) tb_list_replace(list, itor, (tb_pointer_t)0xe);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_replace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n);
     tb_assert(tb_list_head(list) == (tb_pointer_t)0xe);
     tb_assert(tb_list_last(list) == (tb_pointer_t)0xe);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_replace_head_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_replace_head(list, (tb_pointer_t)0xe);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_replace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n);
     tb_assert(tb_list_head(list) == (tb_pointer_t)0xe);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_replace_last_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_hong_t t = tb_mclock();
     for (i = 0; i < n; i++) tb_list_replace_last(list, (tb_pointer_t)0xe);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_replace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // check
     tb_assert(tb_list_size(list) == n);
     tb_assert(tb_list_last(list) == (tb_pointer_t)0xe);
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_iterator_next_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_size());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_hong_t t = tb_mclock();
     tb_for_all(tb_size_t, item, list) tb_used(item);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_iterator_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_iterator_prev_test()
 {
-    // init
     tb_list_ref_t list = tb_list_init(0, tb_element_size());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t i = 0;
     __tb_volatile__ tb_size_t n = 1000000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     for (i = 0; i < n; i++) tb_list_insert_head(list, (tb_pointer_t)0xd);
 
-    // done
     tb_hong_t t = tb_mclock();
     tb_rfor_all(tb_size_t, item, list) tb_used(item);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("tb_list_iterator_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_list_size(list), tb_list_maxn(list));
 
-    // exit
     tb_list_exit(list);
 }
 static tb_void_t tb_list_int_dump(tb_list_ref_t list)
 {
-    // trace
     tb_trace_i("tb_int_t size: %d, maxn: %d", tb_list_size(list), tb_list_maxn(list));
 
-    // done
     tb_for_all(tb_char_t*, item, list)
     {
-        // trace
         tb_trace_i("tb_int_t at[%lx]: %x", item_itor, item);
     }
 }
 static tb_void_t tb_list_int_test()
 {
-    // done
     tb_list_ref_t   list = tb_null;
     tb_size_t       i;
     tb_size_t       j;
     do
     {
-        // init list
         list = tb_list_init(0, tb_element_long());
         tb_assert_and_check_break(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("insert:");
 
@@ -402,7 +336,6 @@ static tb_void_t tb_list_int_test()
         // dump
         tb_list_int_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("remove:");
 
@@ -435,7 +368,6 @@ static tb_void_t tb_list_int_test()
         // dump
         tb_list_int_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("replace:");
 
@@ -448,7 +380,6 @@ static tb_void_t tb_list_int_test()
         // dump
         tb_list_int_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("moveto:");
 
@@ -459,11 +390,9 @@ static tb_void_t tb_list_int_test()
         // dump
         tb_list_int_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("clear:");
 
-        // clear
         tb_list_clear(list);
 
         // dump
@@ -471,35 +400,28 @@ static tb_void_t tb_list_int_test()
 
     } while (0);
 
-    // exit list
     if (list) tb_list_exit(list);
 }
 
 static tb_void_t tb_list_str_dump(tb_list_ref_t list)
 {
-    // trace
     tb_trace_i("str size: %d, maxn: %d", tb_list_size(list), tb_list_maxn(list));
 
-    // done
     tb_for_all (tb_char_t*, item, list)
     {
-        // trace
         tb_trace_i("str at[%lx]: %s", item_itor, item);
     }
 }
 static tb_void_t tb_list_str_test()
 {
-    // done
     tb_list_ref_t   list = tb_null;
     tb_size_t       i;
     tb_size_t       j;
     do
     {
-        // init list
         list = tb_list_init(0, tb_element_str(tb_true));
         tb_assert_and_check_break(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("insert:");
 
@@ -556,7 +478,6 @@ static tb_void_t tb_list_str_test()
         // dump
         tb_list_str_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("remove:");
 
@@ -589,7 +510,6 @@ static tb_void_t tb_list_str_test()
         // dump
         tb_list_str_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("replace:");
 
@@ -602,7 +522,6 @@ static tb_void_t tb_list_str_test()
         // dump
         tb_list_str_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("moveto:");
 
@@ -613,11 +532,9 @@ static tb_void_t tb_list_str_test()
         // dump
         tb_list_str_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("clear:");
 
-        // clear
         tb_list_clear(list);
 
         // dump
@@ -625,7 +542,6 @@ static tb_void_t tb_list_str_test()
 
     } while (0);
 
-    // exit list
     if (list) tb_list_exit(list);
 }
 static tb_void_t tb_list_mem_free(tb_element_ref_t element, tb_pointer_t buff)
@@ -634,29 +550,23 @@ static tb_void_t tb_list_mem_free(tb_element_ref_t element, tb_pointer_t buff)
 }
 static tb_void_t tb_list_mem_dump(tb_list_ref_t list)
 {
-    // trace
     tb_trace_i("ifm size: %d, maxn: %d", tb_list_size(list), tb_list_maxn(list));
 
-    // done
     tb_for_all (tb_char_t*, item, list)
     {
-        // trace
         tb_trace_i("ifm at[%lx]: %s", item_itor, item);
     }
 }
 static tb_void_t tb_list_mem_test()
 {
-    // done
     tb_list_ref_t   list = tb_null;
     tb_size_t       i;
     tb_size_t       j;
     do
     {
-        // init list
         list = tb_list_init(0, tb_element_mem(11, tb_list_mem_free, "mem"));
         tb_assert_and_check_break(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("insert:");
 
@@ -713,7 +623,6 @@ static tb_void_t tb_list_mem_test()
         // dump
         tb_list_mem_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("remove:");
 
@@ -746,7 +655,6 @@ static tb_void_t tb_list_mem_test()
         // dump
         tb_list_mem_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("replace:");
 
@@ -759,7 +667,6 @@ static tb_void_t tb_list_mem_test()
         // dump
         tb_list_mem_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("moveto:");
 
@@ -770,11 +677,9 @@ static tb_void_t tb_list_mem_test()
         // dump
         tb_list_mem_dump(list);
 
-        // trace
         tb_trace_i("=============================================================");
         tb_trace_i("clear:");
 
-        // clear
         tb_list_clear(list);
 
         // dump
@@ -782,7 +687,6 @@ static tb_void_t tb_list_mem_test()
 
     } while (0);
 
-    // exit list
     if (list) tb_list_exit(list);
 }
 static tb_void_t tb_list_perf_test()
@@ -809,7 +713,6 @@ static tb_void_t tb_list_perf_test()
 }
 static tb_bool_t tb_list_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
 {
-    // done
     tb_hize_t*  test = (tb_hize_t*)value;
     tb_size_t   i = (tb_size_t)item;
     tb_bool_t   ok = tb_false;
@@ -825,24 +728,20 @@ static tb_bool_t tb_list_test_walk_item(tb_iterator_ref_t iterator, tb_cpointer_
 }
 static tb_void_t tb_list_walk_perf()
 {
-    // init list
     tb_list_ref_t list = tb_list_init(0, tb_element_long());
     tb_assert_and_check_return(list);
 
-    // make list
     __tb_volatile__ tb_size_t n = 100000;
+    if (n > tb_list_maxn(list)) n = tb_list_maxn(list);
     while (n--) tb_list_insert_tail(list, (tb_pointer_t)(tb_size_t)tb_random_value());
 
-    // done
     tb_hong_t t = tb_mclock();
     __tb_volatile__ tb_hize_t test[2] = {0};
     tb_remove_if(list, tb_list_test_walk_item, (tb_pointer_t)test);
     t = tb_mclock() - t;
 
-    // trace
     tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_list_size(list), t);
 
-    // exit list
     tb_list_exit(list);
 }
 
