@@ -37,3 +37,4 @@ CMakeLists.txt
 Makefile
 makefile
 build.ninja
+compile_commands.json

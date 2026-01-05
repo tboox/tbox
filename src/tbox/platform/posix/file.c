@@ -201,7 +201,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         tb_memset(info, 0, sizeof(tb_file_info_t));
 
         // get stat, even if the file does not exist, it may be a dead symbolic link
-#if defined(TB_CONFIG_POSIX_HAVE_LSTAT64)
+#if defined(TB_CONFIG_POSIX_HAVE_LSTAT64) && !defined(TB_CONFIG_OS_MACOSX)
         struct stat64 st = {0};
         if (!lstat64(path, &st))
 #else
@@ -219,7 +219,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
             {
                 // we need get more file info about symlink, does it point to directory?
                 tb_memset(&st, 0, sizeof(st));
-#if defined(TB_CONFIG_POSIX_HAVE_STAT64)
+#if defined(TB_CONFIG_POSIX_HAVE_STAT64) && !defined(TB_CONFIG_OS_MACOSX)
                 if (!stat64(path, &st))
 #else
                 if (!stat(path, &st))
@@ -491,7 +491,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
     do
     {
         // get stat.st_mode first
-#ifdef TB_CONFIG_POSIX_HAVE_STAT64
+#if defined(TB_CONFIG_POSIX_HAVE_STAT64) && !defined(TB_CONFIG_OS_MACOSX)
         struct stat64 st = {0};
         if (stat64(path, &st)) break;
 #else
