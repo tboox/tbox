@@ -29,6 +29,12 @@
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLWR
 #   include <wchar.h>
 #endif
+#if defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
+#   include <CoreFoundation/CoreFoundation.h>
+#endif
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include <windows.h>
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
@@ -37,6 +43,39 @@ tb_wchar_t* tb_wcslwr(tb_wchar_t* s)
 {
     // check
     tb_assert_and_check_return_val(s, tb_null);
+
+#ifdef TB_CONFIG_OS_WINDOWS
+    // use system api
+    CharLowerW((LPWSTR)s);
+    return s;
+#endif
+
+#if defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
+    // use framework
+    tb_bool_t ok = tb_false;
+    tb_size_t n = tb_wcslen(s);
+    CFStringEncoding encoding = (sizeof(tb_wchar_t) == 4) ? kCFStringEncodingUTF32LE : kCFStringEncodingUTF16LE;
+    CFStringRef str = CFStringCreateWithBytes(kCFAllocatorDefault, (UInt8 const*)s, n * sizeof(tb_wchar_t), encoding, false);
+    if (str)
+    {
+        CFMutableStringRef mstr = CFStringCreateMutableCopy(kCFAllocatorDefault, 0, str);
+        if (mstr)
+        {
+            CFStringLowercase(mstr, NULL);
+            CFIndex len = CFStringGetLength(mstr);
+
+            // strictly check length to avoid buffer overflow and truncation
+            if (len == (CFIndex)n)
+            {
+                CFIndex converted = CFStringGetBytes(mstr, CFRangeMake(0, len), encoding, 0, false, (UInt8*)s, n * sizeof(tb_wchar_t), NULL);
+                if (converted == len) ok = tb_true;
+            }
+            CFRelease(mstr);
+        }
+        CFRelease(str);
+    }
+    if (ok) return s;
+#endif
 
     // set local locale
     tb_setlocale();
