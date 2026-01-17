@@ -58,6 +58,7 @@ static tb_void_t tb_test_wcslwr(tb_char_t const* s)
     // trace
     tb_trace_i("wcslwr(%s) = %s", s, b);
 }
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
 static tb_void_t tb_test_strlwr_utf8(tb_char_t const* s)
 {
     tb_char_t b[4096];
@@ -72,6 +73,7 @@ static tb_void_t tb_test_strupr_utf8(tb_char_t const* s)
     tb_long_t n = tb_charset_utf8_toupper(b, tb_strlen(b));
     tb_trace_i("strupr_utf8(%s) = %s, size: %ld", s, b, n);
 }
+#endif
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * compare
@@ -275,6 +277,7 @@ tb_int_t tb_demo_libc_string_main(tb_int_t argc, tb_char_t** argv)
     tb_test_wcslwr("Test 源文件🎆 Message");
 
     tb_trace_i("");
+#ifdef TB_CONFIG_MODULE_HAVE_CHARSET
     tb_test_strlwr_utf8("HELLO");
     tb_test_strlwr_utf8("Hello");
     tb_test_strlwr_utf8("Звезда Хэнсин");
@@ -285,6 +288,7 @@ tb_int_t tb_demo_libc_string_main(tb_int_t argc, tb_char_t** argv)
     tb_test_strupr_utf8("Hello");
     tb_test_strupr_utf8("Звезда Хэнсин");
     tb_test_strupr_utf8("Test 源文件🎆 Message");
+#endif
 #endif
 
     return 0;
