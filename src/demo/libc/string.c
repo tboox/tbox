@@ -267,27 +267,35 @@ tb_int_t tb_demo_libc_string_main(tb_int_t argc, tb_char_t** argv)
     tb_trace_i("");
     tb_test_wcsupr("hello");
     tb_test_wcsupr("Hello");
-    tb_test_wcsupr("Звезда Хэнсин");
-    tb_test_wcsupr("Test 源文件🎆 Message");
+    // Russian characters
+    tb_test_wcsupr("\xD0\x97\xD0\xB2\xD0\xB5\xD0\xB7\xD0\xB4\xD0\xB0 \xD0\xA5\xD1\x8D\xD0\xBD\xD1\x81\xD0\xB8\xD0\xBD");
+    // Text with Chinese and Emoji
+    tb_test_wcsupr("Test \xE6\xBA\x90\xE6\x96\x87\xE4\xBB\xB6\xF0\x9F\x8E\x86 Message");
 
     tb_trace_i("");
     tb_test_wcslwr("HELLO");
     tb_test_wcslwr("Hello");
-    tb_test_wcslwr("Звезда Хэнсин");
-    tb_test_wcslwr("Test 源文件🎆 Message");
+    // Russian characters
+    tb_test_wcslwr("\xD0\x97\xD0\xB2\xD0\xB5\xD0\xB7\xD0\xB4\xD0\xB0 \xD0\xA5\xD1\x8D\xD0\xBD\xD1\x81\xD0\xB8\xD0\xBD");
+    // Text with Chinese and Emoji
+    tb_test_wcslwr("Test \xE6\xBA\x90\xE6\x96\x87\xE4\xBB\xB6\xF0\x9F\x8E\x86 Message");
 
     tb_trace_i("");
 #ifdef TB_CONFIG_MODULE_HAVE_CHARSET
     tb_test_strlwr_utf8("HELLO");
     tb_test_strlwr_utf8("Hello");
-    tb_test_strlwr_utf8("Звезда Хэнсин");
-    tb_test_strlwr_utf8("Test 源文件🎆 Message");
+    // Russian characters
+    tb_test_strlwr_utf8("\xD0\x97\xD0\xB2\xD0\xB5\xD0\xB7\xD0\xB4\xD0\xB0 \xD0\xA5\xD1\x8D\xD0\xBD\xD1\x81\xD0\xB8\xD0\xBD");
+    // Text with Chinese and Emoji
+    tb_test_strlwr_utf8("Test \xE6\xBA\x90\xE6\x96\x87\xE4\xBB\xB6\xF0\x9F\x8E\x86 Message");
 
     tb_trace_i("");
     tb_test_strupr_utf8("HELLO");
     tb_test_strupr_utf8("Hello");
-    tb_test_strupr_utf8("Звезда Хэнсин");
-    tb_test_strupr_utf8("Test 源文件🎆 Message");
+    // Russian characters
+    tb_test_strupr_utf8("\xD0\x97\xD0\xB2\xD0\xB5\xD0\xB7\xD0\xB4\xD0\xB0 \xD0\xA5\xD1\x8D\xD0\xBD\xD1\x81\xD0\xB8\xD0\xBD");
+    // Text with Chinese and Emoji
+    tb_test_strupr_utf8("Test \xE6\xBA\x90\xE6\x96\x87\xE4\xBB\xB6\xF0\x9F\x8E\x86 Message");
 #endif
 #endif
 
