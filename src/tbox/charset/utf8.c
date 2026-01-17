@@ -223,7 +223,6 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
 
 tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
 {
-    // check
     tb_assert_and_check_return_val(s, -1);
 
     // try ascii tolower first
@@ -244,7 +243,6 @@ tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
     tb_wchar_t* w = (wn <= 256)? wb : (tb_wchar_t*)tb_malloc(wn * sizeof(tb_wchar_t));
     if (w)
     {
-        // to lower
         if (tb_mbstowcs(w, p, wn) != -1)
         {
             tb_wcslwr(w);
@@ -252,7 +250,6 @@ tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
             if (r != -1) r += (p - s);
         }
 
-        // free it
         if (w != wb) tb_free(w);
     }
     return r;
@@ -260,7 +257,6 @@ tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
 
 tb_long_t tb_charset_utf8_toupper(tb_char_t* s, tb_size_t n)
 {
-    // check
     tb_assert_and_check_return_val(s, -1);
 
     // try ascii toupper first
@@ -281,7 +277,6 @@ tb_long_t tb_charset_utf8_toupper(tb_char_t* s, tb_size_t n)
     tb_wchar_t* w = (wn <= 256)? wb : (tb_wchar_t*)tb_malloc(wn * sizeof(tb_wchar_t));
     if (w)
     {
-        // to upper
         if (tb_mbstowcs(w, p, wn) != -1)
         {
             tb_wcsupr(w);
@@ -289,7 +284,6 @@ tb_long_t tb_charset_utf8_toupper(tb_char_t* s, tb_size_t n)
             if (r != -1) r += (p - s);
         }
 
-        // free it
         if (w != wb) tb_free(w);
     }
     return r;

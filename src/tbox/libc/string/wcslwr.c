@@ -81,7 +81,6 @@ tb_wchar_t* tb_wcslwr(tb_wchar_t* s)
     tb_setlocale();
 
 #ifdef TB_CONFIG_LIBC_HAVE_WCSLWR
-    // convert it
     wcslwr(s);
 #else
     tb_wchar_t* p = s;
@@ -95,6 +94,5 @@ tb_wchar_t* tb_wcslwr(tb_wchar_t* s)
     // set default locale
     tb_resetlocale();
 
-    // ok
     return s;
 }
