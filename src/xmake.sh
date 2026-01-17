@@ -185,7 +185,9 @@ check_interfaces() {
         "strcmp" \
         "strcasecmp" \
         "strncmp" \
-        "strncasecmp"
+        "strncasecmp" \
+        "strupr" \
+        "strlwr"
 
     check_module_cfuncs "libc" "wchar.h stdlib.h" \
         "wcscat" \
