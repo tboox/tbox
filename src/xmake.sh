@@ -203,6 +203,12 @@ check_interfaces() {
         "wcsncasecmp" \
         "wcstombs" \
         "mbstowcs"
+
+    check_module_cfuncs "libc" "wchar.h wctype.h stdlib.h" \
+        "towlower" \
+        "towupper" \
+        "wcsupr" \
+        "wcslwr"
     check_module_cfuncs "libc" "time.h"                           "gmtime" "mktime" "localtime"
     check_module_cfuncs "libc" "sys/time.h"                       "gettimeofday"
     check_module_cfuncs "libc" "signal.h setjmp.h"                "signal" "setjmp" "kill"
