@@ -10,12 +10,12 @@ static tb_void_t tb_demo_wctype_test_lower(tb_char_t const* input, tb_char_t con
 {
     // convert input to wchar
     tb_size_t n = tb_strlen(input);
-    tb_wchar_t* iw = tb_malloc0((n + 1) * sizeof(tb_wchar_t));
+    tb_wchar_t* iw = (tb_wchar_t*)tb_malloc0((n + 1) * sizeof(tb_wchar_t));
     tb_mbstowcs(iw, input, n + 1);
 
     // convert expected to wchar
     tb_size_t m = tb_strlen(expected);
-    tb_wchar_t* ew = tb_malloc0((m + 1) * sizeof(tb_wchar_t));
+    tb_wchar_t* ew = (tb_wchar_t*)tb_malloc0((m + 1) * sizeof(tb_wchar_t));
     tb_mbstowcs(ew, expected, m + 1);
 
     // do conversion
@@ -44,12 +44,12 @@ static tb_void_t tb_demo_wctype_test_upper(tb_char_t const* input, tb_char_t con
 {
     // convert input to wchar
     tb_size_t n = tb_strlen(input);
-    tb_wchar_t* iw = tb_malloc0((n + 1) * sizeof(tb_wchar_t));
+    tb_wchar_t* iw = (tb_wchar_t*)tb_malloc0((n + 1) * sizeof(tb_wchar_t));
     tb_mbstowcs(iw, input, n + 1);
 
     // convert expected to wchar
     tb_size_t m = tb_strlen(expected);
-    tb_wchar_t* ew = tb_malloc0((m + 1) * sizeof(tb_wchar_t));
+    tb_wchar_t* ew = (tb_wchar_t*)tb_malloc0((m + 1) * sizeof(tb_wchar_t));
     tb_mbstowcs(ew, expected, m + 1);
 
     // do conversion
