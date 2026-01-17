@@ -24,6 +24,9 @@
  * includes
  */
 #include "../libc.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include <windows.h>
+#endif
 #ifdef TB_CONFIG_LIBC_HAVE_TOWUPPER
 #   include <wctype.h>
 #endif
@@ -33,7 +36,9 @@
  */
 tb_wchar_t tb_towupper(tb_wchar_t c)
 {
-#ifdef TB_CONFIG_LIBC_HAVE_TOWUPPER
+#ifdef TB_CONFIG_OS_WINDOWS
+    return (tb_wchar_t)(tb_size_t)CharUpperW((LPWSTR)(tb_size_t)c);
+#elif defined(TB_CONFIG_LIBC_HAVE_TOWUPPER)
     return (tb_wchar_t)towupper((wint_t)c);
 #else
     return tb_toupper(c);

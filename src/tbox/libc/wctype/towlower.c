@@ -24,6 +24,9 @@
  * includes
  */
 #include "../libc.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include <windows.h>
+#endif
 #ifdef TB_CONFIG_LIBC_HAVE_TOWLOWER
 #   include <wctype.h>
 #endif
@@ -33,7 +36,9 @@
  */
 tb_wchar_t tb_towlower(tb_wchar_t c)
 {
-#ifdef TB_CONFIG_LIBC_HAVE_TOWLOWER
+#ifdef TB_CONFIG_OS_WINDOWS
+    return (tb_wchar_t)(tb_size_t)CharLowerW((LPWSTR)(tb_size_t)c);
+#elif defined(TB_CONFIG_LIBC_HAVE_TOWLOWER)
     return (tb_wchar_t)towlower((wint_t)c);
 #else
     return tb_tolower(c);
