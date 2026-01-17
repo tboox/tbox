@@ -99,6 +99,12 @@ tb_long_t           tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size
 tb_long_t           tb_stricmp(tb_char_t const* s1, tb_char_t const* s2);
 tb_long_t           tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n);
 
+// strupr
+tb_char_t*          tb_strupr(tb_char_t* s);
+
+// strlwr
+tb_char_t*          tb_strlwr(tb_char_t* s);
+
 // strchr
 tb_char_t*          tb_strchr(tb_char_t const* s, tb_char_t c);
 tb_char_t*          tb_strichr(tb_char_t const* s, tb_char_t c);
@@ -150,6 +156,12 @@ tb_long_t           tb_wcsncmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_si
 
 tb_long_t           tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2);
 tb_long_t           tb_wcsnicmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t n);
+
+// wcsupr
+tb_wchar_t*         tb_wcsupr(tb_wchar_t* s);
+
+// wcslwr
+tb_wchar_t*         tb_wcslwr(tb_wchar_t* s);
 
 // wcschr
 tb_wchar_t*         tb_wcschr(tb_wchar_t const* s, tb_wchar_t c);

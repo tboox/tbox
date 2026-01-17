@@ -112,7 +112,9 @@ function _check_interfaces(target)
         "strcmp",
         "strcasecmp",
         "strncmp",
-        "strncasecmp")
+        "strncasecmp",
+        "strupr",
+        "strlwr")
     _check_module_cfuncs(target, "libc", {"wchar.h", "wctype.h", "stdlib.h"},
         "wcscat",
         "wcsncat",
@@ -130,7 +132,9 @@ function _check_interfaces(target)
         "wcstombs",
         "mbstowcs",
         "towlower",
-        "towupper")
+        "towupper",
+        "wcsupr",
+        "wcslwr")
     _check_module_cfuncs(target, "libc", "time.h",                           "gmtime", "mktime", "localtime")
     _check_module_cfuncs(target, "libc", "sys/time.h",                       "gettimeofday")
     _check_module_cfuncs(target, "libc", {"signal.h", "setjmp.h"},           "signal", "setjmp", "sigsetjmp{sigjmp_buf buf; sigsetjmp(buf, 0);}", "kill")
