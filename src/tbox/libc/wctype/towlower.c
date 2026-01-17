@@ -15,22 +15,27 @@
  * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        misc.h
+ * @file        towlower.c
  * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_MISC_H
-#define TB_LIBC_MISC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "ctype.h"
-#include "wctype.h"
-#include "stdarg.h"
-#include "limits.h"
-#include "./time/time.h"
-
-
+#include "../libc.h"
+#ifdef TB_CONFIG_LIBC_HAVE_TOWLOWER
+#   include <wctype.h>
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_wchar_t tb_towlower(tb_wchar_t c)
+{
+#ifdef TB_CONFIG_LIBC_HAVE_TOWLOWER
+    return (tb_wchar_t)towlower((wint_t)c);
+#else
+    return tb_tolower(c);
+#endif
+}
