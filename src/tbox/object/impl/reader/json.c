@@ -295,7 +295,7 @@ static tb_object_ref_t tb_oc_json_reader_func_number(tb_oc_json_reader_t* reader
 
         // init number
 #ifdef TB_CONFIG_TYPE_HAVE_FLOAT
-        if (bf) number = tb_oc_number_init_from_float(tb_stod(tb_static_string_cstr(&data)));
+        if (bf) number = tb_oc_number_init_from_double(tb_stod(tb_static_string_cstr(&data)));
 #else
         if (bf) tb_trace_noimpl();
 #endif
