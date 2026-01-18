@@ -15,22 +15,32 @@
  * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        misc.h
+ * @file        towupper.c
  * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_MISC_H
-#define TB_LIBC_MISC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "ctype.h"
-#include "wctype.h"
-#include "stdarg.h"
-#include "limits.h"
-#include "./time/time.h"
-
-
+#include "../libc.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+#   include <windows.h>
 #endif
+#ifdef TB_CONFIG_LIBC_HAVE_TOWUPPER
+#   include <wctype.h>
+#endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_wchar_t tb_towupper(tb_wchar_t c)
+{
+#ifdef TB_CONFIG_OS_WINDOWS
+    return (tb_wchar_t)(tb_size_t)CharUpperW((LPWSTR)(tb_size_t)c);
+#elif defined(TB_CONFIG_LIBC_HAVE_TOWUPPER)
+    return (tb_wchar_t)towupper((wint_t)c);
+#else
+    return tb_toupper(c);
+#endif
+}

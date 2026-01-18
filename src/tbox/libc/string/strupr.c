@@ -15,22 +15,41 @@
  * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        misc.h
+ * @file        strupr.c
  * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_MISC_H
-#define TB_LIBC_MISC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "ctype.h"
-#include "wctype.h"
-#include "stdarg.h"
-#include "limits.h"
-#include "./time/time.h"
-
-
+#include "string.h"
+#include "../misc/ctype.h"
+#ifdef TB_CONFIG_LIBC_HAVE_STRUPR
+#   include <string.h>
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_char_t* tb_strupr(tb_char_t* s)
+{
+    // check
+    tb_assert_and_check_return_val(s, tb_null);
+
+#ifdef TB_CONFIG_LIBC_HAVE_STRUPR
+    // convert it
+    strupr(s);
+
+    // ok
+    return s;
+#else
+    tb_char_t* p = s;
+    while (*p)
+    {
+        *p = tb_toupper(*p);
+        p++;
+    }
+    return s;
+#endif
+}

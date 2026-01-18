@@ -15,22 +15,41 @@
  * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        misc.h
+ * @file        strlwr.c
  * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_MISC_H
-#define TB_LIBC_MISC_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "ctype.h"
-#include "wctype.h"
-#include "stdarg.h"
-#include "limits.h"
-#include "./time/time.h"
-
-
+#include "string.h"
+#include "../misc/ctype.h"
+#ifdef TB_CONFIG_LIBC_HAVE_STRLWR
+#   include <string.h>
 #endif
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_char_t* tb_strlwr(tb_char_t* s)
+{
+    // check
+    tb_assert_and_check_return_val(s, tb_null);
+
+#ifdef TB_CONFIG_LIBC_HAVE_STRLWR
+    // convert it
+    strlwr(s);
+
+    // ok
+    return s;
+#else
+    tb_char_t* p = s;
+    while (*p)
+    {
+        *p = tb_tolower(*p);
+        p++;
+    }
+    return s;
+#endif
+}

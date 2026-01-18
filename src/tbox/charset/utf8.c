@@ -24,6 +24,8 @@
  * includes
  */
 #include "prefix.h"
+#include "utf8.h"
+#include "../libc/libc.h"
 #include "../stream/stream.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -217,5 +219,73 @@ tb_long_t tb_charset_utf8_set(tb_static_stream_ref_t sstream, tb_bool_t be, tb_u
 
     // ok?
     return p > q? 1 : 0;
+}
+
+tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
+{
+    tb_assert_and_check_return_val(s, -1);
+
+    // try ascii tolower first
+    tb_char_t* p = s;
+    tb_char_t* e = s + n;
+    while (p < e && *p)
+    {
+        if ((*p) & 0x80) break; 
+        *p = tb_tolower(*p);
+        p++;
+    }
+    if (p == e || !*p) return p - s;
+
+    // convert the suffix to wchar_t
+    tb_long_t   r = -1;
+    tb_size_t   wn = e - p + 1;
+    tb_wchar_t  wb[256];
+    tb_wchar_t* w = (wn <= 256)? wb : (tb_wchar_t*)tb_malloc(wn * sizeof(tb_wchar_t));
+    if (w)
+    {
+        if (tb_mbstowcs(w, p, wn) != -1)
+        {
+            tb_wcslwr(w);
+            r = tb_wcstombs(p, w, wn);
+            if (r != -1) r += (p - s);
+        }
+
+        if (w != wb) tb_free(w);
+    }
+    return r;
+}
+
+tb_long_t tb_charset_utf8_toupper(tb_char_t* s, tb_size_t n)
+{
+    tb_assert_and_check_return_val(s, -1);
+
+    // try ascii toupper first
+    tb_char_t* p = s;
+    tb_char_t* e = s + n;
+    while (p < e && *p)
+    {
+        if ((*p) & 0x80) break;
+        *p = tb_toupper(*p);
+        p++;
+    }
+    if (p == e || !*p) return p - s;
+
+    // convert the suffix to wchar_t
+    tb_long_t   r = -1;
+    tb_size_t   wn = e - p + 1;
+    tb_wchar_t  wb[256];
+    tb_wchar_t* w = (wn <= 256)? wb : (tb_wchar_t*)tb_malloc(wn * sizeof(tb_wchar_t));
+    if (w)
+    {
+        if (tb_mbstowcs(w, p, wn) != -1)
+        {
+            tb_wcsupr(w);
+            r = tb_wcstombs(p, w, wn);
+            if (r != -1) r += (p - s);
+        }
+
+        if (w != wb) tb_free(w);
+    }
+    return r;
 }
 

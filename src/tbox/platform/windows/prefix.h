@@ -67,7 +67,7 @@ static __tb_inline__ tb_size_t tb_wtoa_n(tb_wchar_t const* wstr, tb_size_t wlen,
         return 0;
     }
 
-    tb_int_t size = WideCharToMultiByte(CP_UTF8, 0, wstr, (tb_int_t)wlen, mstr, (tb_int_t)maxn - 1, tb_null, tb_null);
+    tb_int_t size = WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)wstr, (tb_int_t)wlen, mstr, (tb_int_t)maxn - 1, tb_null, tb_null);
     if (size > 0 && size < (tb_int_t)maxn)
     {
         mstr[size] = '\0';
@@ -86,7 +86,7 @@ static __tb_inline__ tb_size_t tb_atow_n(tb_char_t const* mstr, tb_size_t mlen, 
         return 0;
     }
 
-    tb_int_t size = MultiByteToWideChar(CP_UTF8, 0, mstr, (tb_int_t)mlen, wstr, (tb_int_t)maxn - 1);
+    tb_int_t size = MultiByteToWideChar(CP_UTF8, 0, mstr, (tb_int_t)mlen, (LPWSTR)wstr, (tb_int_t)maxn - 1);
     if (size > 0 && size < (tb_int_t)maxn)
     {
         wstr[size] = L'\0';

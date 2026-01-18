@@ -15,22 +15,46 @@
  * Copyright (C) 2009-present, TBOOX Open Source Group.
  *
  * @author      ruki
- * @file        misc.h
+ * @file        wctype.h
  * @ingroup     libc
  *
  */
-#ifndef TB_LIBC_MISC_H
-#define TB_LIBC_MISC_H
+#ifndef TB_LIBC_WCTYPE_H
+#define TB_LIBC_WCTYPE_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "ctype.h"
-#include "wctype.h"
-#include "stdarg.h"
-#include "limits.h"
-#include "./time/time.h"
 
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_enter__
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! to lower
+ *
+ * @param c     the wide character
+ *
+ * @return      the lower wide character
+ */
+tb_wchar_t      tb_towlower(tb_wchar_t c);
+
+/*! to upper
+ *
+ * @param c     the wide character
+ *
+ * @return      the upper wide character
+ */
+tb_wchar_t      tb_towupper(tb_wchar_t c);
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * extern
+ */
+__tb_extern_c_leave__
 
 #endif
