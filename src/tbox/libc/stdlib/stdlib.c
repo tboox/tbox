@@ -210,13 +210,15 @@ tb_uint64_t tb_stou64(tb_char_t const* s)
     if (*p == '-' || *p == '+') p++;
 
     // is hex?
-    if (*p++ == '0')
+    if (*p++ == '0' && *p != '.')
     {
         if (*p == 'x' || *p == 'X')
             return tb_s16tou64(s);
         else if (*p == 'b' || *p == 'B')
             return tb_s2tou64(s);
-        else return tb_s8tou64(s);
+        else if (*p == 'o' || *p == 'O' || tb_isdigit(*p)) 
+            return tb_s8tou64(s);
+        else return tb_s10tou64(s);
     }
     else return tb_s10tou64(s);
 }
@@ -664,13 +666,15 @@ tb_double_t tb_stod(tb_char_t const* s)
     if (*p == '-' || *p == '+') p++;
 
     // is hex?
-    if (*p++ == '0')
+    if (*p++ == '0' && *p != '.')
     {
         if (*p == 'x' || *p == 'X')
             return tb_s16tod(s);
         else if (*p == 'b' || *p == 'B')
             return tb_s2tod(s);
-        else return tb_s8tod(s);
+        else if (*p == 'o' || *p == 'O' || tb_isdigit(*p)) 
+            return tb_s8tod(s);
+        else return tb_s10tod(s);
     }
     else return tb_s10tod(s);
 }
