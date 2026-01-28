@@ -448,8 +448,6 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
 
         // do link
         tb_bool_t ok = tb_file_link(linkpath, dest);
-
-        // free link path
         if (linkpath && linkpath != srcpath)
         {
             tb_free((tb_pointer_t)linkpath);
@@ -530,38 +528,45 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
         // init write size
         tb_hize_t writ = 0;
 
-        // attempt to copy file using `sendfile`
 #ifdef TB_CONFIG_POSIX_HAVE_SENDFILE
-        while (writ < size)
+        // attempt to copy file using `sendfile`, we cannot read /proc/xxx file.
+        if (size)
         {
-            off_t seek = writ;
-            tb_hong_t real = sendfile(ofd, ifd, &seek, (size_t)(size - writ));
-            if (real > 0) writ += real;
-            else break;
-        }
+            while (writ < size)
+            {
+                off_t seek = writ;
+                tb_hong_t real = sendfile(ofd, ifd, &seek, (size_t)(size - writ));
+                if (real > 0) writ += real;
+                else break;
+            }
 
-        /* attempt to copy file directly if sendfile failed
-         *
-         * sendfile() supports regular file only after "since Linux 2.6.33".
-         */
-        if (writ != size)
-        {
-            lseek(ifd, 0, SEEK_SET);
-            lseek(ofd, 0, SEEK_SET);
-        }
-        else
-        {
-            ok = tb_true;
-            break;
+            /* attempt to copy file directly if sendfile failed
+             *
+             * sendfile() supports regular file only after "since Linux 2.6.33".
+             */
+            if (writ != size)
+            {
+                lseek(ifd, 0, SEEK_SET);
+                lseek(ofd, 0, SEEK_SET);
+            }
+            else
+            {
+                ok = tb_true;
+                break;
+            }
         }
 #endif
 
-        // copy file using `read` and `write`
+        /* copy file using `read` and `write`
+         *
+         * size == 0: it may be dynamic file, e.g. /proc/cpuinfo, ...
+         */
         writ = 0;
-        while (writ < size)
+        while (size == 0 || writ < size)
         {
             // read some data
-            tb_int_t real = read(ifd, data, (size_t)tb_min(size - writ, sizeof(data)));
+            tb_size_t need = size? size - writ : sizeof(data);
+            tb_int_t real = read(ifd, data, (size_t)tb_min(need, sizeof(data)));
             if (real > 0)
             {
                 real = write(ofd, data, real);
@@ -572,7 +577,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
         }
 
         // ok?
-        ok = (writ == size);
+        ok = size? (writ == size) : tb_true;
 
     } while (0);
 
