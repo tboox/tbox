@@ -42,7 +42,7 @@ static tb_long_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
     else if (info->type == TB_FILE_TYPE_DIRECTORY)
     {
         tb_wchar_t temp[TB_PATH_MAXN];
-        if (tb_atow(temp, path, TB_PATH_MAXN) != -1)
+        if (tb_path_absolute_w(path, temp, TB_PATH_MAXN))
             RemoveDirectoryW(temp);
     }
     return TB_DIRECTORY_WALK_CODE_CONTINUE;
@@ -118,7 +118,26 @@ static tb_long_t tb_directory_walk_impl(tb_wchar_t const* path, tb_long_t recurs
 
     tb_wchar_t          temp_w[4096] = {0};
     tb_char_t           temp_a[4096] = {0};
-    tb_swprintf(temp_w, 4095, L"%s%s*.*", path, path[last] == L'\\'? L"" : L"\\");
+    tb_long_t           temp_len = tb_swprintf(temp_w, 4095, L"%s%s*.*", path, path[last] == L'\\'? L"" : L"\\");
+
+    // check length
+    /* we need deal with files with a name longer than 259 characters
+     * @see https://stackoverflow.com/questions/5188527/how-to-deal-with-files-with-a-name-longer-than-259-characters
+     */
+    if (temp_len >= MAX_PATH && tb_wcsnicmp(temp_w, L"\\\\?\\", 4) != 0)
+    {
+        // get absolute path
+        tb_wchar_t full[TB_PATH_MAXN];
+        DWORD len = GetFullPathNameW(path, TB_PATH_MAXN, full, tb_null);
+        if (len > 0 && len < TB_PATH_MAXN)
+        {
+             tb_size_t size = tb_wcslen(full);
+             if (size + 8 < TB_PATH_MAXN)
+             {
+                 tb_swprintf(temp_w, 4095, L"\\\\?\\%s%s*.*", full, full[size - 1] == L'\\'? L"" : L"\\");
+             }
+        }
+    }
 
     tb_long_t           ok = TB_DIRECTORY_WALK_CODE_CONTINUE;
     WIN32_FIND_DATAW    find = {0};
