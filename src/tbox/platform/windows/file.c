@@ -26,6 +26,7 @@
 #include "../file.h"
 #include "../path.h"
 #include "../print.h"
+#include "../directory.h"
 #include "interface/interface.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
@@ -514,8 +515,28 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
     tb_file_mkdir(full1);
     if (MoveFileExW(full0, full1, flags)) return tb_true;
 
-    // MoveFileExW will fail if it crosses drive, we can use copy/delete to rename file
-    if (CopyFileW(full0, full1, FALSE))
+    /* MoveFileExW may still fail for directories even with short root path,
+     * e.g. any child entry exceeds MAX_PATH without \\?\ prefix; do copy/remove fallback.
+     */
+    tb_file_info_t info = {0};
+    if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY)
+    {
+        tb_file_info_t dinfo = {0};
+        if (tb_file_info(dest, &dinfo))
+        {
+            if (dinfo.type == TB_FILE_TYPE_FILE)
+                tb_file_remove(dest);
+            else if (dinfo.type == TB_FILE_TYPE_DIRECTORY)
+                tb_directory_remove(dest);
+        }
+
+        if (tb_directory_copy(path, dest, TB_FILE_COPY_LINK))
+            return tb_directory_remove(path);
+        return tb_false;
+    }
+
+    // fallback to copy/remove only for file
+    if (info.type == TB_FILE_TYPE_FILE && CopyFileW(full0, full1, FALSE))
     {
         DWORD attrs = GetFileAttributesW(full0);
         if (attrs & FILE_ATTRIBUTE_READONLY)
