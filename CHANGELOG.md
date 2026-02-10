@@ -2,6 +2,34 @@
 
 ## master (unreleased)
 
+## v1.8.0
+
+### New features
+
+* Add wctype.h support for wide character functions
+* Add wcsupr and wcslwr functions
+
+### Changes
+
+* [#305](https://github.com/tboox/tbox/pull/305): Improve rename file to support longpath
+* [#305](https://github.com/tboox/tbox/pull/305): Improve walk directory to support longpath  
+* Improve to copy file to support /proc/xxx files
+* [#300](https://github.com/tboox/tbox/pull/300): Improve tolower/toupper with utf8 support
+* [#300](https://github.com/tboox/tbox/pull/300): Use system api for toupper and tolower
+* Improve comments and demos
+* Improve path handling
+* Improve windows directory operations
+* Improve xmake configs for solaris
+* [#297](https://github.com/tboox/tbox/pull/297): Improve environment handling for solaris
+
+### Bugs fixed
+
+* [#301](https://github.com/tboox/tbox/pull/301): Fix parsing error for decimals starting with 0
+* Fix tb_stou64
+* Fix xmake.sh script
+* Fix change directory on windows
+* Fix stdfile on solaris
+
 ## v1.7.9
 
 ### New features
@@ -345,6 +373,34 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.8.0
+
+### 新特性
+
+* 添加 wctype.h 支持，用于宽字符函数
+* 添加 wcsupr 和 wcslwr 函数
+
+### 改进
+
+* [#305](https://github.com/tboox/tbox/pull/305): 改进文件重命名，支持长路径
+* [#305](https://github.com/tboox/tbox/pull/305): 改进目录遍历，支持长路径
+* 改进文件复制，支持 /proc/xxx 文件
+* [#300](https://github.com/tboox/tbox/pull/300): 改进 tolower/toupper，支持 utf8
+* [#300](https://github.com/tboox/tbox/pull/300): 使用系统 api 进行 toupper 和 tolower
+* 改进注释和示例
+* 改进路径处理
+* 改进 Windows 目录操作
+* 改进 Solaris 的 xmake 配置
+* [#297](https://github.com/tboox/tbox/pull/297): 改进 Solaris 的环境处理
+
+### Bugs 修复
+
+* [#301](https://github.com/tboox/tbox/pull/301): 修复以 0 开头的十进制数解析错误
+* 修复 tb_stou64
+* 修复 xmake.sh 脚本
+* 修复 Windows 上的目录切换问题
+* 修复 Solaris 上的 stdfile 问题
 
 ## v1.7.9
 
