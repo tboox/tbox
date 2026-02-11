@@ -685,7 +685,19 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     }
     if (mode & TB_FILE_MODE_EXEC) flags |= X_OK;
 
-    return !access(full, flags);
+    // do access
+    tb_bool_t ok = !access(full, flags);
+
+    // access(X_OK) may report executable on some BSDs even after chmod -x
+#if defined(TB_CONFIG_OS_BSD)
+    if (ok && (mode & TB_FILE_MODE_EXEC))
+    {
+        struct stat st = {0};
+        if (stat(full, &st)) return tb_false;
+        if (!(st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))) return tb_false;
+    }
+#endif
+    return ok;
 }
 tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
 {
@@ -771,5 +783,4 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
     return ok;
 }
 #endif
-
 
