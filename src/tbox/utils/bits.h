@@ -687,6 +687,34 @@ static __tb_inline__ tb_hize_t tb_bits_swap_u64_inline(tb_hize_t x)
     return r.u64;
 }
 
+static __tb_inline__ tb_uint32_t tb_bits_wchar_to_u32_le(tb_wchar_t c)
+{
+    if (sizeof(tb_wchar_t) == 4)
+        return tb_bits_le_to_ne_u32((tb_uint32_t)c);
+    else return (tb_uint32_t)tb_bits_le_to_ne_u16((tb_uint16_t)c);
+}
+
+static __tb_inline__ tb_uint32_t tb_bits_wchar_to_u32_be(tb_wchar_t c)
+{
+    if (sizeof(tb_wchar_t) == 4)
+        return tb_bits_be_to_ne_u32((tb_uint32_t)c);
+    else return (tb_uint32_t)tb_bits_be_to_ne_u16((tb_uint16_t)c);
+}
+
+static __tb_inline__ tb_wchar_t tb_bits_u32_le_to_wchar(tb_uint32_t ch)
+{
+    if (sizeof(tb_wchar_t) == 4)
+        return (tb_wchar_t)tb_bits_ne_to_le_u32(ch);
+    else return (tb_wchar_t)tb_bits_ne_to_le_u16((tb_uint16_t)ch);
+}
+
+static __tb_inline__ tb_wchar_t tb_bits_u32_be_to_wchar(tb_uint32_t ch)
+{
+    if (sizeof(tb_wchar_t) == 4)
+        return (tb_wchar_t)tb_bits_ne_to_be_u32(ch);
+    else return (tb_wchar_t)tb_bits_ne_to_be_u16((tb_uint16_t)ch);
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * cl0
  */
@@ -1031,4 +1059,3 @@ static __tb_inline__ tb_void_t tb_bits_set_double_lle_inline(tb_byte_t* p, tb_do
 __tb_extern_c_leave__
 
 #endif
-
