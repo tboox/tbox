@@ -38,7 +38,7 @@
 #   include "windows/sched_affinity.c"
 #elif defined(TB_CONFIG_OS_MACOSX)
 #   include "mach/sched_affinity.c"
-#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_SETAFFINITY)
+#elif defined(TB_CONFIG_POSIX_HAVE_SCHED_SETAFFINITY) && !defined(TB_CONFIG_OS_HAIKU)
 #   include "posix/sched_affinity.c"
 #else
 tb_bool_t tb_sched_setaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
@@ -52,4 +52,3 @@ tb_bool_t tb_sched_getaffinity(tb_size_t pid, tb_cpuset_ref_t cpuset)
     return tb_false;
 }
 #endif
-

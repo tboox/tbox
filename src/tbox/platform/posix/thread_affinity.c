@@ -57,6 +57,16 @@ tb_bool_t tb_thread_setaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
     tb_bool_t ok = pthread_setaffinity_np(pthread, cpuset_size(cpu_set), cpu_set) == 0;
     cpuset_destroy(cpu_set);
     return ok;
+#elif defined(TB_CONFIG_OS_HAIKU)
+    tb_int_t i;
+    cpuset_t cpu_set;
+    CPUSET_ZERO(&cpu_set);
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (TB_CPUSET_ISSET(i, cpuset))
+            CPUSET_SET(i, &cpu_set);
+    }
+    return pthread_setaffinity_np(pthread, sizeof(cpuset_t), &cpu_set) == 0;
 #else
     // Linux uses cpu_set_t API
     tb_int_t i;
@@ -99,6 +109,21 @@ tb_bool_t tb_thread_getaffinity(tb_thread_ref_t thread, tb_cpuset_ref_t cpuset)
             TB_CPUSET_SET(i, cpuset);
     }
     cpuset_destroy(cpu_set);
+    return tb_true;
+#elif defined(TB_CONFIG_OS_HAIKU)
+    cpuset_t cpu_set;
+    CPUSET_ZERO(&cpu_set);
+    if (pthread_getaffinity_np(pthread, sizeof(cpuset_t), &cpu_set) != 0)
+        return tb_false;
+
+    // save cpuset
+    tb_int_t i;
+    TB_CPUSET_ZERO(cpuset);
+    for (i = 0; i < TB_CPUSET_SIZE; i++)
+    {
+        if (CPUSET_ISSET(i, &cpu_set))
+            TB_CPUSET_SET(i, cpuset);
+    }
     return tb_true;
 #else
     // Linux uses cpu_set_t API
