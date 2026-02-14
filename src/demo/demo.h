@@ -155,6 +155,7 @@ TB_DEMO_MAIN_DECL(network_impl_date);
 // platform
 TB_DEMO_MAIN_DECL(platform_file);
 TB_DEMO_MAIN_DECL(platform_lock);
+TB_DEMO_MAIN_DECL(platform_file_signature);
 TB_DEMO_MAIN_DECL(platform_path);
 TB_DEMO_MAIN_DECL(platform_sched);
 TB_DEMO_MAIN_DECL(platform_event);

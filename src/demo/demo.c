@@ -158,6 +158,7 @@ static tb_demo_t g_demo[] =
 
     // platform
 ,   TB_DEMO_MAIN_ITEM(platform_file)
+,   TB_DEMO_MAIN_ITEM(platform_file_signature)
 ,   TB_DEMO_MAIN_ITEM(platform_path)
 ,   TB_DEMO_MAIN_ITEM(platform_utils)
 ,   TB_DEMO_MAIN_ITEM(platform_sched)
