@@ -243,8 +243,22 @@ tb_long_t tb_file_fscase(tb_char_t const* path)
         {
             return 0;
         }
+
         return 1;
     }
     else return -1;
 }
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * file_signature implementation
+ */
+#if defined(TB_CONFIG_OS_WINDOWS)
+#   include "windows/file_signature.c"
+#else
+tb_bool_t tb_file_get_signature_info(tb_char_t const* path, tb_file_signature_info_t* info)
+{
+    return tb_false;
+}
+#endif
+
 
