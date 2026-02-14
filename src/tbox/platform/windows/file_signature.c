@@ -139,7 +139,7 @@ tb_bool_t tb_file_get_signature_info(tb_char_t const* filepath, tb_file_signatur
                         certInfo.SerialNumber = pSignerInfo->SerialNumber;
 
                         pCertContext = CertFindCertificateInStore(hStore,
-                                                                  ENCODING,
+                                                                  (X509_ASN_ENCODING | PKCS_7_ASN_ENCODING),
                                                                   0,
                                                                   CERT_FIND_SUBJECT_CERT,
                                                                   (PVOID)&certInfo,
