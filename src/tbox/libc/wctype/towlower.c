@@ -50,8 +50,7 @@ static __tb_inline__ tb_bool_t tb_unicode_tolower_try(tb_uint32_t ch, tb_uint32_
     // Basic Latin (ASCII)
     if (ch <= 0x7f)
     {
-        if ((tb_uint32_t)(ch - 0x41) <= (0x5a - 0x41)) *out = ch + 0x20;
-        else *out = ch;
+        *out = tb_tolower(ch);
         return tb_true;
     }
 

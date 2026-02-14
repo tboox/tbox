@@ -230,7 +230,7 @@ tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
     tb_char_t* e = s + n;
     while (p < e && *p)
     {
-        if ((*p) & 0x80) break; 
+        if ((*p) & 0x80) break;
         *p = tb_tolower(*p);
         p++;
     }
