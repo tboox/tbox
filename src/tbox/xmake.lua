@@ -72,6 +72,7 @@ target("tbox")
     add_files("libm/isqrti64.c")
     add_files("libm/idivi8.c")
     add_files("platform/*.c|context.c|exception.c", "platform/impl/*.c|charset.c|poller_fwatcher.c")
+    add_files("platform/file_signature.c")
 
     -- add the source files for the float type
     if has_config("float") then add_files("libm/*.c") end
@@ -155,6 +156,7 @@ target("tbox")
         add_files("platform/windows/iocp_object.c")
         add_files("platform/windows/socket_pool.c")
         add_files("platform/windows/interface/*.c")
+        add_syslinks("wintrust", "crypt32")
     end
 
     -- add the source files for the ios

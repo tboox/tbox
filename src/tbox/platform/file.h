@@ -122,6 +122,21 @@ typedef struct __tb_file_info_t
 
 }tb_file_info_t;
 
+/// the file signature info type
+typedef struct __tb_file_signature_info_t
+{
+    /// is the file digitally signed?
+    tb_bool_t           is_signed;
+
+    /// is the signature valid and trusted by the OS?
+    tb_bool_t           is_trusted;
+
+    /// the name of the signer (e.g., "Microsoft Corporation")
+    /// tbox uses UTF-8 by default for tb_char_t
+    tb_char_t           signer_name[256];
+
+}tb_file_signature_info_t;
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -349,6 +364,15 @@ tb_bool_t               tb_file_access(tb_char_t const* path, tb_size_t mode);
  * @return              tb_true or tb_false
  */
 tb_bool_t               tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime);
+
+/*! get file signature information (Windows Only)
+ *
+ * @param path          the file path
+ * @param info          the signature info output
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_file_get_signature_info(tb_char_t const* path, tb_file_signature_info_t* info);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
