@@ -45,7 +45,8 @@ tb_wchar_t* tb_wcscat(tb_wchar_t* s1, tb_wchar_t const* s2)
 
     // done
     __tb_register__ tb_wchar_t* s = s1;
-    while (*s) s++; --s;
+    while (*s) s++;
+    --s;
     while (!(*s++ = *s2++));
     return s1;
 }
