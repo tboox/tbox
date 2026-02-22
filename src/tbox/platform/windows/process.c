@@ -244,17 +244,33 @@ static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const*
     if (wrap_quote) tb_string_chrcat(result, '\"');
 }
 
+static tb_bool_t tb_process_is_win7_or_lower()
+{
+    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+    DWORDLONG const mask = VerSetConditionMask(
+        VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+        VER_MINORVERSION, VER_GREATER_EQUAL);
+    osvi.dwMajorVersion = 6;
+    osvi.dwMinorVersion = 2;
+    return (VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION, mask) == FALSE &&
+            GetLastError() == ERROR_OLD_WIN_VERSION);
+}
+
 static tb_bool_t tb_process_is_inheritable_handle(HANDLE handle)
 {
     if (!handle || handle == INVALID_HANDLE_VALUE)
         return tb_false;
 
-    // File handles (FILE_TYPE_DISK) and pipe handles (FILE_TYPE_PIPE) are known
-    // to be inheritable. Console handles (FILE_TYPE_CHAR) are not inheritable via
-    // PROC_THREAD_ATTRIBUTE_HANDLE_LIST. See
-    // @ref https://codereview.chromium.org/1473793002
-    DWORD handle_type = GetFileType(handle);
-    return handle_type == FILE_TYPE_DISK || handle_type == FILE_TYPE_PIPE;
+    if (tb_process_is_win7_or_lower()) {
+        // File handles (FILE_TYPE_DISK) and pipe handles (FILE_TYPE_PIPE) are known
+        // to be inheritable. Console handles (FILE_TYPE_CHAR) are not inheritable via
+        // PROC_THREAD_ATTRIBUTE_HANDLE_LIST. See
+        // @ref https://codereview.chromium.org/1473793002
+        DWORD handle_type = GetFileType(handle);
+        return handle_type == FILE_TYPE_DISK || handle_type == FILE_TYPE_PIPE;
+    }
+    // On Win 8+, console handles are safe to inherit via PROC_THREAD_ATTRIBUTE_HANDLE_LIST
+    return tb_true; 
 }
 
 static tb_void_t tb_process_add_inheritable_handle(HANDLE* handles, DWORD* count, DWORD max_count, HANDLE handle)
