@@ -244,20 +244,29 @@ static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const*
     if (wrap_quote) tb_string_chrcat(result, '\"');
 }
 
-static tb_bool_t tb_process_is_win7_or_lower()
+static tb_bool_t tb_process_is_win7_or_lower(tb_noarg_t)
 {
+    // Cache the result: -1 means uninitialized, 0 means false, 1 means true
+    static tb_long_t s_is_win7_or_lower = -1;
+    if (s_is_win7_or_lower != -1)
+        return s_is_win7_or_lower == 1;
     tb_kernel32_ref_t kernel32 = tb_kernel32();
     if (!kernel32 || !kernel32->VerifyVersionInfoW || !kernel32->VerSetConditionMask)
+    {
+        s_is_win7_or_lower = 0;
         return tb_false;
-
-    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+    }
+    OSVERSIONINFOEXW osvi = {0};
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
     DWORDLONG const mask = kernel32->VerSetConditionMask(
         kernel32->VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL),
         VER_MINORVERSION, VER_GREATER_EQUAL);
     osvi.dwMajorVersion = 6;
     osvi.dwMinorVersion = 2;
-    return (kernel32->VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION, mask) == FALSE &&
-            GetLastError() == ERROR_OLD_WIN_VERSION);
+    tb_bool_t is_win7 = (kernel32->VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION, mask) == FALSE &&
+                         GetLastError() == ERROR_OLD_WIN_VERSION);         
+    s_is_win7_or_lower = is_win7 ? 1 : 0;
+    return is_win7;
 }
 
 static tb_bool_t tb_process_is_inheritable_handle(HANDLE handle)
