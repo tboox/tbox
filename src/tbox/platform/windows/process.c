@@ -246,13 +246,17 @@ static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const*
 
 static tb_bool_t tb_process_is_win7_or_lower()
 {
+    tb_kernel32_ref_t kernel32 = tb_kernel32();
+    if (!kernel32 || !kernel32->VerifyVersionInfoW || !kernel32->VerSetConditionMask)
+        return tb_false;
+
     OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
-    DWORDLONG const mask = VerSetConditionMask(
-        VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+    DWORDLONG const mask = kernel32->VerSetConditionMask(
+        kernel32->VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL),
         VER_MINORVERSION, VER_GREATER_EQUAL);
     osvi.dwMajorVersion = 6;
     osvi.dwMinorVersion = 2;
-    return (VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION, mask) == FALSE &&
+    return (kernel32->VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION, mask) == FALSE &&
             GetLastError() == ERROR_OLD_WIN_VERSION);
 }
 
