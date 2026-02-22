@@ -244,6 +244,35 @@ static tb_void_t tb_process_args_append(tb_string_ref_t result, tb_char_t const*
     if (wrap_quote) tb_string_chrcat(result, '\"');
 }
 
+static tb_bool_t tb_process_is_inheritable_handle(HANDLE handle)
+{
+    if (!handle || handle == INVALID_HANDLE_VALUE)
+        return tb_false;
+
+    // File handles (FILE_TYPE_DISK) and pipe handles (FILE_TYPE_PIPE) are known
+    // to be inheritable. Console handles (FILE_TYPE_CHAR) are not inheritable via
+    // PROC_THREAD_ATTRIBUTE_HANDLE_LIST. See
+    // @ref https://codereview.chromium.org/1473793002
+    DWORD handle_type = GetFileType(handle);
+    return handle_type == FILE_TYPE_DISK || handle_type == FILE_TYPE_PIPE;
+}
+
+static tb_void_t tb_process_add_inheritable_handle(HANDLE* handles, DWORD* count, DWORD max_count, HANDLE handle)
+{
+    if (tb_process_is_inheritable_handle(handle))
+    {
+        // There doesn't seem to be any documentation of this, but if there's a handle
+        // duplicated in this list, CreateProcess() fails with ERROR_INVALID_PARAMETER.
+        for (DWORD i = 0; i < *count; i++)
+        {
+            if (handles[i] == handle)
+                return;
+        }
+        if (*count < max_count)
+            handles[(*count)++] = handle;
+    }
+}
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -424,7 +453,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = hStdInput;
+                tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdInput);
                 process->file_handles[process->file_handles_count++] = hStdInput;
                 process->psi->hStdInput = hStdInput;
             }
@@ -436,7 +465,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = hStdInput;
+                tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdInput);
                 process->psi->hStdInput = hStdInput;
             }
 
@@ -456,7 +485,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = hStdOutput;
+                tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdOutput);
                 process->file_handles[process->file_handles_count++] = hStdOutput;
                 process->psi->hStdOutput = hStdOutput;
             }
@@ -468,7 +497,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = hStdOutput;
+                tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdOutput);
                 process->psi->hStdOutput = hStdOutput;
             }
 
@@ -488,7 +517,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = hStdError;
+                tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdError);
                 process->file_handles[process->file_handles_count++] = hStdError;
                 process->psi->hStdError = hStdError;
             }
@@ -511,7 +540,7 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
 
                 // enable inherit
                 tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
-                handlesToInherit[handlesToInheritCount++] = hStdError;
+                tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdError);
                 process->psi->hStdError = hStdError;
             }
         }
@@ -569,16 +598,14 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                         process->psi->hStdInput = hDupInput;
                         process->file_handles[process->file_handles_count++] = hDupInput;
                         // add to handlesToInherit list so it can be inherited when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST
-                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
-                            handlesToInherit[handlesToInheritCount++] = hDupInput;
+                        tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hDupInput);
                     }
                     else
                     {
                         // if duplication fails, try to make original inheritable (may affect parent)
                         tb_kernel32()->SetHandleInformation(hStdInput, HANDLE_FLAG_INHERIT, TRUE);
                         process->psi->hStdInput = hStdInput;
-                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
-                            handlesToInherit[handlesToInheritCount++] = hStdInput;
+                        tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdInput);
                     }
                 }
             }
@@ -594,16 +621,14 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                         process->psi->hStdOutput = hDupOutput;
                         process->file_handles[process->file_handles_count++] = hDupOutput;
                         // add to handlesToInherit list so it can be inherited when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST
-                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
-                            handlesToInherit[handlesToInheritCount++] = hDupOutput;
+                        tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hDupOutput);
                     }
                     else
                     {
                         // if duplication fails, try to make original inheritable (may affect parent)
                         tb_kernel32()->SetHandleInformation(hStdOutput, HANDLE_FLAG_INHERIT, TRUE);
                         process->psi->hStdOutput = hStdOutput;
-                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
-                            handlesToInherit[handlesToInheritCount++] = hStdOutput;
+                        tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdOutput);
                     }
                 }
             }
@@ -619,16 +644,14 @@ tb_process_ref_t tb_process_init_cmd(tb_char_t const* cmd, tb_process_attr_ref_t
                         process->psi->hStdError = hDupError;
                         process->file_handles[process->file_handles_count++] = hDupError;
                         // add to handlesToInherit list so it can be inherited when using PROC_THREAD_ATTRIBUTE_HANDLE_LIST
-                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
-                            handlesToInherit[handlesToInheritCount++] = hDupError;
+                        tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hDupError);
                     }
                     else
                     {
                         // if duplication fails, try to make original inheritable (may affect parent)
                         tb_kernel32()->SetHandleInformation(hStdError, HANDLE_FLAG_INHERIT, TRUE);
                         process->psi->hStdError = hStdError;
-                        if (handlesToInheritCount < sizeof(handlesToInherit) / sizeof(handlesToInherit[0]))
-                            handlesToInherit[handlesToInheritCount++] = hStdError;
+                        tb_process_add_inheritable_handle(handlesToInherit, &handlesToInheritCount, tb_arrayn(handlesToInherit), hStdError);
                     }
                 }
             }
