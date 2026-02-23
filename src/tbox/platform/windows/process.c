@@ -269,11 +269,13 @@ static tb_bool_t tb_process_is_win7_or_lower(tb_noarg_t)
     return is_win7;
 }
 
+/* @see https://github.com/xmake-io/xmake/issues/7330
+ * https://github.com/chromium/crashpad/commit/9b92d2fb7101bae2af9bb5447227df296b37b56a
+ */
 static tb_bool_t tb_process_is_inheritable_handle(HANDLE handle)
 {
-    if (!handle || handle == INVALID_HANDLE_VALUE)
-        return tb_false;
-
+    tb_check_return_val(handle && handle != INVALID_HANDLE_VALUE, tb_false);
+    
     if (tb_process_is_win7_or_lower()) {
         // File handles (FILE_TYPE_DISK) and pipe handles (FILE_TYPE_PIPE) are known
         // to be inheritable. Console handles (FILE_TYPE_CHAR) are not inheritable via
@@ -282,6 +284,7 @@ static tb_bool_t tb_process_is_inheritable_handle(HANDLE handle)
         DWORD handle_type = GetFileType(handle);
         return handle_type == FILE_TYPE_DISK || handle_type == FILE_TYPE_PIPE;
     }
+    
     // On Win 8+, console handles are safe to inherit via PROC_THREAD_ATTRIBUTE_HANDLE_LIST
     return tb_true; 
 }
