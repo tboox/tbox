@@ -213,6 +213,18 @@ typedef BOOL (WINAPI* tb_kernel32_PeekNamedPipe_t)(
     LPDWORD             lpTotalBytesAvail,
     LPDWORD             lpBytesLeftThisMessage);
 
+// the VerifyVersionInfoW func type
+typedef BOOL (WINAPI* tb_kernel32_VerifyVersionInfoW_t)(
+    LPOSVERSIONINFOEXW lpVersionInformation,
+    DWORD              dwTypeMask,
+    DWORDLONG          dwlConditionMask);
+
+// the VerSetConditionMask func type
+typedef ULONGLONG (WINAPI* tb_kernel32_VerSetConditionMask_t)(
+    ULONGLONG ConditionMask,
+    DWORD     TypeMask,
+    BYTE      Condition);
+
 // the kernel32 interfaces type
 typedef struct __tb_kernel32_t
 {
@@ -299,6 +311,12 @@ typedef struct __tb_kernel32_t
 
     // PeekNamedPipe
     tb_kernel32_PeekNamedPipe_t                         PeekNamedPipe;
+
+    // VerifyVersionInfoW
+    tb_kernel32_VerifyVersionInfoW_t                    VerifyVersionInfoW;
+
+    // VerSetConditionMask
+    tb_kernel32_VerSetConditionMask_t                   VerSetConditionMask;
 
     // GetLogicalProcessorInformationEx
 #if defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BT(16, 0)
