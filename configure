@@ -1748,6 +1748,31 @@ _get_target_toolchain_flags_for_gcc() {
     _ret="${flags}"
 }
 
+# get macOS sysroot and target flags for clang
+# usage: _get_macosx_sysroot_flags [quoted]
+# if quoted is "quoted", the sysroot path will be wrapped in escaped quotes (for eval)
+_get_macosx_sysroot_flags() {
+    local flags=""
+    if is_plat "macosx"; then
+        _os_iorunv "xcrun" "-sdk" "macosx" "--show-sdk-path"; local sdkdir="${_ret}"
+        if test_nz "${sdkdir}"; then
+            if test_eq "${1}" "quoted"; then
+                flags="${flags} -isysroot \"${sdkdir}\""
+            else
+                flags="${flags} -isysroot ${sdkdir}"
+            fi
+            path_basename "${sdkdir}"; local basename="${_ret}"
+            if test_nz "${basename}" && string_startswith "${basename}" "MacOSX"; then
+                string_replace "${basename}" "MacOSX" ""; local target_minver="${_ret}"
+                if test_nz "${target_minver}"; then
+                    flags="${flags} -target ${_target_arch}-apple-macos${target_minver}"
+                fi
+            fi
+        fi
+    fi
+    _ret="${flags}"
+}
+
 # get toolchain flags for clang in target
 _get_target_toolchain_flags_for_clang() {
     local name="${1}"
@@ -1776,21 +1801,7 @@ _get_target_toolchain_flags_for_clang() {
         fi
     fi
     # set target and sysroot
-    if is_plat "macosx"; then
-        _os_iorunv "xcrun" "-sdk" "macosx" "--show-sdk-path"; local sdkdir="${_ret}"
-        if test_nz "${sdkdir}"; then
-            flags="${flags} -isysroot \"${sdkdir}\""
-
-            # get target minver and set target flags
-            path_basename "${sdkdir}"; local basename="${_ret}"
-            if test_nz "${basename}" && string_startswith "${basename}" "MacOSX"; then
-                string_replace "${basename}" "MacOSX" ""; local target_minver="${_ret}"
-                if test_nz "${target_minver}"; then
-                    flags="${flags} -target ${arch}-apple-macos${target_minver}"
-                fi
-            fi
-        fi
-    fi
+    _get_macosx_sysroot_flags "quoted"; flags="${flags}${_ret}"
     _ret="${flags}"
 }
 
@@ -1822,21 +1833,7 @@ _get_target_toolchain_flags_for_tcc() {
         fi
     fi
     # set target and sysroot
-    if is_plat "macosx"; then
-        _os_iorunv "xcrun" "-sdk" "macosx" "--show-sdk-path"; local sdkdir="${_ret}"
-        if test_nz "${sdkdir}"; then
-            flags="${flags} -isysroot \"${sdkdir}\""
-
-            # get target minver and set target flags
-            path_basename "${sdkdir}"; local basename="${_ret}"
-            if test_nz "${basename}" && string_startswith "${basename}" "MacOSX"; then
-                string_replace "${basename}" "MacOSX" ""; local target_minver="${_ret}"
-                if test_nz "${target_minver}"; then
-                    flags="${flags} -target ${arch}-apple-macos${target_minver}"
-                fi
-            fi
-        fi
-    fi
+    _get_macosx_sysroot_flags "quoted"; flags="${flags}${_ret}"
     _ret="${flags}"
 }
 
@@ -3754,19 +3751,7 @@ _check_cxsnippets() {
             compflags="${compflags} ${CPPFLAGS}"
         fi
         # add -isysroot and -target on macOS to ensure system SDK headers are used for option checking
-        if is_plat "macosx"; then
-            _os_iorunv "xcrun" "-sdk" "macosx" "--show-sdk-path"; local _sdkdir="${_ret}"
-            if test_nz "${_sdkdir}"; then
-                compflags="-isysroot ${_sdkdir} ${compflags}"
-                path_basename "${_sdkdir}"; local _basename="${_ret}"
-                if test_nz "${_basename}" && string_startswith "${_basename}" "MacOSX"; then
-                    string_replace "${_basename}" "MacOSX" ""; local _target_minver="${_ret}"
-                    if test_nz "${_target_minver}"; then
-                        compflags="-target ${_target_arch}-apple-macos${_target_minver} ${compflags}"
-                    fi
-                fi
-            fi
-        fi
+        _get_macosx_sysroot_flags; compflags="${_ret} ${compflags}"
         _toolchain_compcmd "${sourcekind}" "${objectfile}" "${sourcefile}" "${compflags}"; local compcmd="${_ret}"
         if ${xmake_sh_diagnosis}; then
             print "> ${compcmd}"
