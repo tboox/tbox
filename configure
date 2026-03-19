@@ -3753,6 +3753,20 @@ _check_cxsnippets() {
         if test_nz "${CPPFLAGS}"; then
             compflags="${compflags} ${CPPFLAGS}"
         fi
+        # add -isysroot and -target on macOS to ensure system SDK headers are used for option checking
+        if is_plat "macosx"; then
+            _os_iorunv "xcrun" "-sdk" "macosx" "--show-sdk-path"; local _sdkdir="${_ret}"
+            if test_nz "${_sdkdir}"; then
+                compflags="-isysroot ${_sdkdir} ${compflags}"
+                path_basename "${_sdkdir}"; local _basename="${_ret}"
+                if test_nz "${_basename}" && string_startswith "${_basename}" "MacOSX"; then
+                    string_replace "${_basename}" "MacOSX" ""; local _target_minver="${_ret}"
+                    if test_nz "${_target_minver}"; then
+                        compflags="-target ${_target_arch}-apple-macos${_target_minver} ${compflags}"
+                    fi
+                fi
+            fi
+        fi
         _toolchain_compcmd "${sourcekind}" "${objectfile}" "${sourcefile}" "${compflags}"; local compcmd="${_ret}"
         if ${xmake_sh_diagnosis}; then
             print "> ${compcmd}"
