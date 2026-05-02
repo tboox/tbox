@@ -34,5 +34,5 @@
 
 tb_int_t tb_putchar(tb_int_t ch)
 {
-    return tb_stdfile_putc(tb_stdfile_input(), (tb_char_t)ch)? ch : TB_EOF;
+    return tb_stdfile_putc(tb_stdfile_output(), (tb_char_t)ch)? ch : TB_EOF;
 }
