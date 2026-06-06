@@ -30,7 +30,7 @@ if has_config("coroutine") then
 end
 
 -- set wasm toolchain
-if is_plat("wasm") then
+if is_plat("wasm") and not has_config("toolchain") then
     add_requires("emscripten")
     set_toolchains("emcc@emscripten")
 end
