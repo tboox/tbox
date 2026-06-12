@@ -88,8 +88,14 @@ static tb_long_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
         break;
     case TB_FILE_TYPE_DIRECTORY:
         {
-            // reserve symlink?
-            if ((flags & TB_FILE_COPY_LINK) && (info->flags & TB_FILE_FLAG_LINK))
+            /* reserve symlink and skip recursion
+             *
+             * we cannot recurse into a symlinked directory, because it may point
+             * to its parent directory and cause infinite recursion (stack overflow).
+             *
+             * @see https://github.com/xmake-io/xmake/issues/7577
+             */
+            if (info->flags & TB_FILE_FLAG_LINK)
             {
                 // just copy link and skip recursion
                 ok = tb_file_copy(path, dpath, TB_FILE_COPY_LINK);
@@ -145,8 +151,15 @@ static tb_long_t tb_directory_walk_impl(tb_char_t const* path, tb_long_t recursi
                 if (prefix) ok = func(temp, &info, priv);
                 tb_check_break(ok);
 
-                // walk to the next directory
-                if (info.type == TB_FILE_TYPE_DIRECTORY && recursion && ok != TB_DIRECTORY_WALK_CODE_SKIP_RECURSION)
+                /* walk to the next directory
+                 *
+                 * we do not recurse into a symlinked directory, because it may point
+                 * to its parent directory and cause infinite recursion (stack overflow).
+                 *
+                 * @see https://github.com/xmake-io/xmake/issues/7577
+                 */
+                if (info.type == TB_FILE_TYPE_DIRECTORY && !(info.flags & TB_FILE_FLAG_LINK)
+                    && recursion && ok != TB_DIRECTORY_WALK_CODE_SKIP_RECURSION)
                     ok = tb_directory_walk_impl(temp, recursion > 0? recursion - 1 : recursion, prefix, func, priv);
                 tb_check_break(ok);
 
