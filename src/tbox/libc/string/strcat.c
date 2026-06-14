@@ -44,7 +44,7 @@ tb_char_t* tb_strcat(tb_char_t* s1, tb_char_t const* s2)
 
     __tb_register__ tb_char_t* s = s1;
     while (*s++); --s;
-    while (!(*s++ = *s2++));
+    while ((*s++ = *s2++));
     return s1;
 }
 #endif
