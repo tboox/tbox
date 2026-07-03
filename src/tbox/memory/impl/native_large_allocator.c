@@ -359,7 +359,7 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
                 data = (tb_byte_t*)tb_virtual_memory_malloc(need);
                 if (data)
                 {
-                    tb_memcpy_(data, data_head, base_head->size);
+                    tb_memcpy_(data, data_head, sizeof(tb_native_large_data_head_t) + tb_min(base_head->size, size));
                     tb_native_memory_free(data_head);
                 }
             }
@@ -373,7 +373,7 @@ static tb_pointer_t tb_native_large_allocator_ralloc(tb_allocator_ref_t self, tb
                 data = (tb_byte_t*)tb_native_memory_malloc(need);
                 if (data)
                 {
-                    tb_memcpy_(data, data_head, base_head->size);
+                    tb_memcpy_(data, data_head, sizeof(tb_native_large_data_head_t) + tb_min(base_head->size, size));
                     tb_virtual_memory_free(data_head);
                 }
             }
