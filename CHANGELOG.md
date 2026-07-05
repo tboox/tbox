@@ -2,6 +2,27 @@
 
 ## master (unreleased)
 
+## v1.8.1
+
+### Changes
+
+* [#310](https://github.com/tboox/tbox/pull/310): Improve process handle inheritance on Windows 7 and lower (detect OS version via VerifyVersionInfoW and cache the result)
+* [#307](https://github.com/tboox/tbox/pull/307): Fix executable permissions for markdown files and .gitignore
+* [#306](https://github.com/tboox/tbox/pull/306): Add Haiku CI
+* Improve towlower/towupper
+* Improve configure script and option checking
+
+### Bugs fixed
+
+* [#7577](https://github.com/xmake-io/xmake/issues/7577): Fix walk directory to avoid infinite recursion (stack overflow) on directories containing recursive symlinks
+* [#315](https://github.com/tboox/tbox/pull/315): Fix memcpy size calculation in native_large_allocator to avoid heap overflow and data loss on realloc
+* [#315](https://github.com/tboox/tbox/pull/315): Fix -Wuninitialized-const-pointer warning in the heap demo with Xcode 26.5 clang
+* [#314](https://github.com/tboox/tbox/pull/314): Fix tb_strcat
+* [#312](https://github.com/tboox/tbox/pull/312): Fix tb_putchar writing to stdin instead of stdout
+* [#309](https://github.com/tboox/tbox/pull/309): Fix misleading indentation
+* Fix access() on BSD
+* Fix compile error
+
 ## v1.8.0
 
 ### New features
@@ -373,6 +394,27 @@
 # 更新日志
 
 ## master (开发中)
+
+## v1.8.1
+
+### 改进
+
+* [#310](https://github.com/tboox/tbox/pull/310): 改进 Windows 7 及更低版本上的进程句柄继承（通过 VerifyVersionInfoW 检测系统版本并缓存结果）
+* [#307](https://github.com/tboox/tbox/pull/307): 修复 markdown 文件和 .gitignore 的可执行权限
+* [#306](https://github.com/tboox/tbox/pull/306): 添加 Haiku CI
+* 改进 towlower/towupper
+* 改进 configure 脚本和选项检测
+
+### Bugs 修复
+
+* [#7577](https://github.com/xmake-io/xmake/issues/7577): 修复目录遍历在包含递归符号链接时的无限递归（栈溢出）问题
+* [#315](https://github.com/tboox/tbox/pull/315): 修复 native_large_allocator 中 memcpy 大小计算错误，避免 realloc 时堆溢出和数据丢失
+* [#315](https://github.com/tboox/tbox/pull/315): 修复 heap 示例在 Xcode 26.5 clang 下的 -Wuninitialized-const-pointer 警告
+* [#314](https://github.com/tboox/tbox/pull/314): 修复 tb_strcat
+* [#312](https://github.com/tboox/tbox/pull/312): 修复 tb_putchar 写入 stdin 而非 stdout 的问题
+* [#309](https://github.com/tboox/tbox/pull/309): 修复误导性的缩进
+* 修复 BSD 上的 access() 问题
+* 修复编译错误
 
 ## v1.8.0
 
