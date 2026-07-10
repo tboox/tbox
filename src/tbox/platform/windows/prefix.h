@@ -109,23 +109,51 @@ static __tb_inline__ tb_wchar_t const* tb_path_absolute_w(tb_char_t const* path,
     tb_size_t size = tb_strlen(path);
     if (size >= MAX_PATH)
     {
-        tb_char_t* e = data + size - 1;
-        if (e + 5 < data + sizeof(data))
+        /* choose the long-path prefix and the number of leading chars to drop
+         *
+         * - already "\\?\" prefixed      => keep as-is
+         * - UNC path "\\server\share\.." => "\\?\UNC\server\share\.."
+         * - drive/other absolute path    => "\\?\.."
+         *
+         * @see https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
+         */
+        tb_char_t const* prefix = tb_null;
+        tb_size_t        plen   = 0;
+        tb_size_t        skip   = 0;
+        if (data[0] == '\\' && data[1] == '\\' && data[2] == '?' && data[3] == '\\')
+            ; // already a long-path form, do nothing
+        else if (data[0] == '\\' && data[1] == '\\')
         {
-            e[5] = '\0';
-            while (e >= data)
-            {
-                e[4] = *e;
-                e--;
-            }
-            data[0] = '\\';
-            data[1] = '\\';
-            data[2] = '?';
-            data[3] = '\\';
-            path = data;
-            size += 4; // add "\\?\" prefix length
+            // UNC path: replace the leading "\\" with "\\?\UNC\"
+            prefix = "\\\\?\\UNC\\";
+            plen   = 8;
+            skip   = 2;
         }
-        else return tb_null;
+        else
+        {
+            prefix = "\\\\?\\";
+            plen   = 4;
+        }
+
+        if (prefix)
+        {
+            tb_size_t new_size = plen + size - skip;
+            if (new_size < sizeof(data))
+            {
+                /* shift the kept content (with the null terminator) right, then prepend the prefix
+                 *
+                 * copy from high to low to avoid overlap corruption, e.g. for a drive path:
+                 *   "C:\..\0"  =>  "\\?\C:\..\0"
+                 */
+                tb_char_t*       d = data + new_size;
+                tb_char_t const* s = data + size;
+                while (s >= data + skip) *d-- = *s--;
+                tb_memcpy(data, prefix, plen);
+                path = data;
+                size = new_size;
+            }
+            else return tb_null;
+        }
     }
 
     // use tb_atow_n with known length to avoid tb_atow's internal strlen
