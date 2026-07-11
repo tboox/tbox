@@ -43,7 +43,14 @@ static tb_long_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
     {
         tb_wchar_t temp[TB_PATH_MAXN];
         if (tb_path_absolute_w(path, temp, TB_PATH_MAXN))
+        {
+            // remove readonly first
+            DWORD attrs = GetFileAttributesW(temp);
+            if (attrs & FILE_ATTRIBUTE_READONLY)
+                SetFileAttributesW(temp, attrs & ~FILE_ATTRIBUTE_READONLY);
+
             RemoveDirectoryW(temp);
+        }
     }
     return TB_DIRECTORY_WALK_CODE_CONTINUE;
 }
@@ -244,6 +251,11 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 
     // walk remove
     tb_directory_walk_impl(full, -1, tb_false, tb_directory_walk_remove, tb_null);
+
+    // remove readonly first
+    DWORD attrs = GetFileAttributesW(full);
+    if (attrs & FILE_ATTRIBUTE_READONLY)
+        SetFileAttributesW(full, attrs & ~FILE_ATTRIBUTE_READONLY);
 
     // remove it
     return RemoveDirectoryW(full)? tb_true : tb_false;
