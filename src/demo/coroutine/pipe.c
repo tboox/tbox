@@ -12,7 +12,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
-static tb_void_t tb_demo_coroutine_writ(tb_cpointer_t priv)
+static tb_void_t tb_demo_coroutine_write(tb_cpointer_t priv)
 {
     tb_byte_t data[BUFSIZE];
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t) priv;
@@ -48,7 +48,7 @@ tb_int_t tb_demo_coroutine_pipe_main(tb_int_t argc, tb_char_t** argv)
         if (tb_pipe_file_init_pair(pair, tb_null, 4096))
         {
             // start coroutines
-            tb_coroutine_start(scheduler, tb_demo_coroutine_writ, pair[1], 0);
+            tb_coroutine_start(scheduler, tb_demo_coroutine_write, pair[1], 0);
             tb_coroutine_start(scheduler, tb_demo_coroutine_read, pair[0], 0);
 
             // do loop

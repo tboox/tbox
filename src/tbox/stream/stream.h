@@ -195,7 +195,7 @@ __tb_extern_c_enter__
         // ok
         return tb_true;
     }
-    static tb_bool_t tb_stream_xxxx_impl_clos(tb_stream_ref_t stream)
+    static tb_bool_t tb_stream_xxxx_impl_close(tb_stream_ref_t stream)
     {
         // check
         tb_stream_xxxx_impl_t* impl = (tb_stream_xxxx_impl_t*)stream;
@@ -213,12 +213,12 @@ __tb_extern_c_enter__
                                             ,   sizeof(tb_stream_xxxx_impl_t)
                                             ,   0
                                             ,   tb_stream_xxxx_impl_open
-                                            ,   tb_stream_xxxx_impl_clos
+                                            ,   tb_stream_xxxx_impl_close
                                             ,   tb_stream_xxxx_impl_exit
                                             ,   tb_stream_xxxx_impl_ctrl
                                             ,   tb_stream_xxxx_impl_wait
                                             ,   tb_stream_xxxx_impl_read
-                                            ,   tb_stream_xxxx_impl_writ
+                                            ,   tb_stream_xxxx_impl_write
                                             ,   tb_stream_xxxx_impl_seek
                                             ,   tb_stream_xxxx_impl_sync
                                             ,   tb_stream_xxxx_impl_kill);
@@ -566,6 +566,10 @@ tb_bool_t               tb_stream_open(tb_stream_ref_t stream);
  *
  * @return              tb_true or tb_false
  */
+tb_bool_t               tb_stream_close(tb_stream_ref_t stream);
+
+/*! DEPRECATED: please use tb_stream_close instead */
+__tb_deprecated__
 tb_bool_t               tb_stream_clos(tb_stream_ref_t stream);
 
 /*! read data, non-blocking
@@ -613,6 +617,10 @@ tb_long_t               tb_stream_read(tb_stream_ref_t stream, tb_byte_t* data, 
  *
  * @return              the real size or -1
  */
+tb_long_t               tb_stream_write(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
+
+/*! DEPRECATED: please use tb_stream_write instead */
+__tb_deprecated__
 tb_long_t               tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size);
 
 /*! block read

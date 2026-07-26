@@ -80,7 +80,7 @@ typedef struct __tb_ssl_t
 static int  tb_ssl_bio_method_init(BIO* bio);
 static int  tb_ssl_bio_method_exit(BIO* bio);
 static int  tb_ssl_bio_method_read(BIO* bio, char* data, int size);
-static int  tb_ssl_bio_method_writ(BIO* bio, char const* data, int size);
+static int  tb_ssl_bio_method_write(BIO* bio, char const* data, int size);
 static long tb_ssl_bio_method_ctrl(BIO* bio, int cmd, long num, void* ptr);
 static int  tb_ssl_bio_method_puts(BIO* bio, char const* data);
 static int  tb_ssl_bio_method_gets(BIO* bio, char* data, int size);
@@ -103,7 +103,7 @@ static tb_handle_t tb_ssl_library_init(tb_cpointer_t* ppriv)
     tb_assert_and_check_return_val(g_ssl_bio_method, tb_null);
 
     // init methods
-    BIO_meth_set_write(g_ssl_bio_method, tb_ssl_bio_method_writ);
+    BIO_meth_set_write(g_ssl_bio_method, tb_ssl_bio_method_write);
     BIO_meth_set_read(g_ssl_bio_method, tb_ssl_bio_method_read);
     BIO_meth_set_puts(g_ssl_bio_method, tb_ssl_bio_method_puts);
     BIO_meth_set_gets(g_ssl_bio_method, tb_ssl_bio_method_gets);
@@ -166,7 +166,7 @@ static tb_long_t tb_ssl_sock_read(tb_cpointer_t priv, tb_byte_t* data, tb_size_t
     tb_assert_and_check_return_val(priv, -1);
     return tb_socket_recv((tb_socket_ref_t)priv, data, size);
 }
-static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_ssl_sock_write(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
     tb_assert_and_check_return_val(priv, -1);
     return tb_socket_send((tb_socket_ref_t)priv, data, size);
@@ -241,7 +241,7 @@ static int tb_ssl_bio_method_read(BIO* bio, char* data, int size)
     }
     return (int)real;
 }
-static int tb_ssl_bio_method_writ(BIO* bio, char const* data, int size)
+static int tb_ssl_bio_method_write(BIO* bio, char const* data, int size)
 {
     // check
     tb_assert_and_check_return_val(bio && data && size >= 0, -1);
@@ -310,7 +310,7 @@ static int tb_ssl_bio_method_puts(BIO* bio, char const* data)
     tb_assert_and_check_return_val(bio && data, -1);
 
     tb_trace_d("bio: puts: %s", data);
-    return tb_ssl_bio_method_writ(bio, data, (tb_int_t)tb_strlen(data));
+    return tb_ssl_bio_method_write(bio, data, (tb_int_t)tb_strlen(data));
 }
 static int tb_ssl_bio_method_gets(BIO* bio, char* data, int size)
 {
@@ -406,7 +406,7 @@ tb_void_t tb_ssl_set_bio_sock(tb_ssl_ref_t self, tb_socket_ref_t sock)
     tb_assert_and_check_return(ssl);
 
     // set bio: sock
-    tb_ssl_set_bio_func(self, tb_ssl_sock_read, tb_ssl_sock_writ, tb_ssl_sock_wait, sock);
+    tb_ssl_set_bio_func(self, tb_ssl_sock_read, tb_ssl_sock_write, tb_ssl_sock_wait, sock);
 }
 tb_void_t tb_ssl_set_bio_func(tb_ssl_ref_t self, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv)
 {
@@ -664,7 +664,9 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
     }
     return real;
 }
-tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
+// DEPRECATED: use tb_ssl_write instead
+tb_long_t tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size) { return tb_ssl_write(ssl, data, size); }
+tb_long_t tb_ssl_write(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // the ssl
     tb_ssl_t* ssl = (tb_ssl_t*)self;

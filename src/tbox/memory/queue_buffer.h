@@ -178,6 +178,10 @@ tb_long_t           tb_queue_buffer_read(tb_queue_buffer_ref_t buffer, tb_byte_t
  *
  * @return          the real size
  */
+tb_long_t           tb_queue_buffer_write(tb_queue_buffer_ref_t buffer, tb_byte_t const* data, tb_size_t size);
+
+/*! DEPRECATED: please use tb_queue_buffer_write instead */
+__tb_deprecated__
 tb_long_t           tb_queue_buffer_writ(tb_queue_buffer_ref_t buffer, tb_byte_t const* data, tb_size_t size);
 
 /*! init pull buffer for reading

@@ -182,7 +182,7 @@ tb_void_t tb_stream_exit(tb_stream_ref_t self)
     tb_assert_and_check_return(stream);
 
     // close it
-    tb_stream_clos(self);
+    tb_stream_close(self);
 
     // exit it
     if (stream->exit) stream->exit(self);
@@ -630,7 +630,9 @@ tb_bool_t tb_stream_open(tb_stream_ref_t self)
     // ok?
     return ok;
 }
-tb_bool_t tb_stream_clos(tb_stream_ref_t self)
+// DEPRECATED: use tb_stream_close instead
+tb_bool_t tb_stream_clos(tb_stream_ref_t stream) { return tb_stream_close(stream); }
+tb_bool_t tb_stream_close(tb_stream_ref_t self)
 {
     // check
     tb_stream_t* stream = tb_stream_cast(self);
@@ -878,7 +880,9 @@ tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
 //  tb_trace_d("read: %d", read);
     return read;
 }
-tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
+// DEPRECATED: use tb_stream_write instead
+tb_long_t tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size) { return tb_stream_write(stream, data, size); }
+tb_long_t tb_stream_write(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stream_t* stream = tb_stream_cast(self);
@@ -903,7 +907,7 @@ tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t 
             tb_assert_and_check_return_val(stream->bwrited, -1);
 
             // writ data to cache first
-            writ = tb_queue_buffer_writ(&stream->cache, data, size);
+            writ = tb_queue_buffer_write(&stream->cache, data, size);
             tb_check_return_val(writ >= 0, -1);
 
             // ok?
@@ -928,7 +932,7 @@ tb_long_t tb_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t 
                 tb_queue_buffer_pull_exit(&stream->cache, real);
 
                 // writ cache
-                real = tb_queue_buffer_writ(&stream->cache, data + writ, tb_min(real, size - writ));
+                real = tb_queue_buffer_write(&stream->cache, data + writ, tb_min(real, size - writ));
                 tb_check_return_val(real >= 0, -1);
 
                 // save writ
@@ -1003,7 +1007,7 @@ tb_bool_t tb_stream_bwrit(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t
     while (writ < size && (TB_STATE_OPENED == tb_atomic32_get(&stream->istate)))
     {
         // writ data
-        tb_long_t real = tb_stream_writ(self, data + writ, tb_min(size - writ, TB_STREAM_BLOCK_MAXN));
+        tb_long_t real = tb_stream_write(self, data + writ, tb_min(size - writ, TB_STREAM_BLOCK_MAXN));
         if (real > 0) writ += real;
         else if (!real)
         {

@@ -122,7 +122,7 @@ tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size
     // read data from stdin
     return fread(data, size, 1, stdfile->fp) == 1;
 }
-tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_stdfile_write(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
@@ -194,7 +194,7 @@ tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_char_t ch)
 #else
 tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_char_t ch)
 {
-    return tb_stdfile_writ(self, (tb_byte_t const*)&ch, 1);
+    return tb_stdfile_write(self, (tb_byte_t const*)&ch, 1);
 }
 #endif
 #ifdef TB_CONFIG_LIBC_HAVE_FGETS
@@ -252,7 +252,7 @@ tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t self, tb_char_t const* str)
 
     // write string to stdout/stderr
     tb_size_t len = tb_strlen(str);
-    return len? tb_stdfile_writ(self, (tb_byte_t const*)str, tb_strlen(str)) : tb_true;
+    return len? tb_stdfile_write(self, (tb_byte_t const*)str, tb_strlen(str)) : tb_true;
 }
 #endif
 

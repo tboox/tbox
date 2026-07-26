@@ -688,7 +688,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
         }
 
         // close stream
-        if (http->stream && !tb_stream_clos(http->stream)) break;
+        if (http->stream && !tb_stream_close(http->stream)) break;
 
         // switch to sstream
         http->stream = http->sstream;
@@ -883,7 +883,7 @@ tb_bool_t tb_http_open(tb_http_ref_t self)
     if (!ok)
     {
         // close stream
-        if (http->stream) tb_stream_clos(http->stream);
+        if (http->stream) tb_stream_close(http->stream);
 
         // switch to sstream
         http->stream = http->sstream;
@@ -905,7 +905,7 @@ tb_bool_t tb_http_close(tb_http_ref_t self)
     tb_check_return_val(http->bopened, tb_true);
 
     // close stream
-    if (http->stream && !tb_stream_clos(http->stream)) return tb_false;
+    if (http->stream && !tb_stream_close(http->stream)) return tb_false;
 
     // switch to sstream
     http->stream = http->sstream;
@@ -933,7 +933,7 @@ tb_bool_t tb_http_seek(tb_http_ref_t self, tb_hize_t offset)
     do
     {
         // close stream
-        if (http->stream && !tb_stream_clos(http->stream)) break;
+        if (http->stream && !tb_stream_close(http->stream)) break;
 
         // switch to sstream
         http->stream = http->sstream;

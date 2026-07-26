@@ -117,6 +117,10 @@ tb_object_ref_t     tb_object_read_from_data(tb_byte_t const* data, tb_size_t si
  *
  * @return          the writed size, failed: -1
  */
+tb_long_t           tb_object_write(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
+
+/*! DEPRECATED: please use tb_object_write instead */
+__tb_deprecated__
 tb_long_t           tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format);
 
 /*! writ object to url

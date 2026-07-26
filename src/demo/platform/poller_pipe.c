@@ -62,7 +62,7 @@ static tb_long_t tb_demo_session_read(tb_demo_client_ref_t client)
     tb_trace_d("[%p]: read %llu", client->pipe, client->size);
     return 0;
 }
-static tb_int_t tb_demo_session_writ(tb_cpointer_t priv)
+static tb_int_t tb_demo_session_write(tb_cpointer_t priv)
 {
     tb_pipe_file_ref_t pipe = (tb_pipe_file_ref_t)priv;
     tb_byte_t data[8192 * 16];
@@ -105,7 +105,7 @@ static tb_void_t tb_demo_poller_open(tb_poller_ref_t poller)
     if (tb_pipe_file_init_pair(pair, tb_null, 4096))
     {
         tb_demo_session_start(poller, pair[0]);
-        tb_thread_init(tb_null, tb_demo_session_writ, pair[1], 0);
+        tb_thread_init(tb_null, tb_demo_session_write, pair[1], 0);
     }
 }
 static tb_void_t tb_demo_poller_event(tb_poller_ref_t poller, tb_poller_object_ref_t object, tb_long_t events, tb_cpointer_t priv)

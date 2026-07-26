@@ -68,7 +68,7 @@ static tb_bool_t tb_filter_zip_open(tb_filter_t* filter)
     // ok
     return tb_true;
 }
-static tb_void_t tb_filter_zip_clos(tb_filter_t* filter)
+static tb_void_t tb_filter_zip_close(tb_filter_t* filter)
 {
     // check
     tb_filter_zip_t* zfilter = tb_filter_zip_cast(filter);
@@ -169,7 +169,7 @@ tb_filter_ref_t tb_filter_init_from_zip(tb_size_t algo, tb_size_t action)
         // init filter
         if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_ZIP)) break;
         filter->base.open   = tb_filter_zip_open;
-        filter->base.clos   = tb_filter_zip_clos;
+        filter->base.clos   = tb_filter_zip_close;
         filter->base.spak   = tb_filter_zip_spak;
         filter->base.exit   = tb_filter_zip_exit;
         filter->base.ctrl   = tb_filter_zip_ctrl;

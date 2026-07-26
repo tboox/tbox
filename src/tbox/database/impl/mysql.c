@@ -216,7 +216,7 @@ static tb_bool_t tb_database_mysql_stream_impl_open(tb_stream_ref_t stream)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_database_mysql_stream_impl_clos(tb_stream_ref_t stream)
+static tb_bool_t tb_database_mysql_stream_impl_close(tb_stream_ref_t stream)
 {
     // check
     tb_database_mysql_stream_impl_t* impl = (tb_database_mysql_stream_impl_t*)stream;
@@ -310,7 +310,7 @@ static tb_stream_ref_t tb_database_mysql_stream_impl_init(MYSQL_STMT* statement,
                                             ,   sizeof(tb_database_mysql_stream_impl_t)
                                             ,   0
                                             ,   tb_database_mysql_stream_impl_open
-                                            ,   tb_database_mysql_stream_impl_clos
+                                            ,   tb_database_mysql_stream_impl_close
                                             ,   tb_null
                                             ,   tb_database_mysql_stream_impl_ctrl
                                             ,   tb_database_mysql_stream_impl_wait
@@ -832,7 +832,7 @@ static tb_bool_t tb_database_mysql_open(tb_database_sql_impl_t* database)
     // ok?
     return ok;
 }
-static tb_void_t tb_database_mysql_clos(tb_database_sql_impl_t* database)
+static tb_void_t tb_database_mysql_close(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_mysql_t* mysql = tb_database_mysql_cast(database);
@@ -856,7 +856,7 @@ static tb_void_t tb_database_mysql_exit(tb_database_sql_impl_t* database)
     tb_assert_and_check_return(mysql);
 
     // close it first
-    tb_database_mysql_clos(database);
+    tb_database_mysql_close(database);
 
     // exit bind data
     tb_buffer_exit(&mysql->bind_data);
@@ -1631,7 +1631,7 @@ tb_database_sql_ref_t tb_database_mysql_init(tb_url_ref_t url)
         // init database
         mysql->base.type            = TB_DATABASE_SQL_TYPE_MYSQL;
         mysql->base.open            = tb_database_mysql_open;
-        mysql->base.clos            = tb_database_mysql_clos;
+        mysql->base.clos            = tb_database_mysql_close;
         mysql->base.exit            = tb_database_mysql_exit;
         mysql->base.done            = tb_database_mysql_done;
         mysql->base.begin           = tb_database_mysql_begin;

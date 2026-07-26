@@ -92,7 +92,7 @@ static tb_bool_t tb_stdfile_stream_open(tb_stream_ref_t self)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_stdfile_stream_clos(tb_stream_ref_t self)
+static tb_bool_t tb_stdfile_stream_close(tb_stream_ref_t self)
 {
     return tb_true;
 }
@@ -125,7 +125,7 @@ static tb_long_t tb_stdfile_stream_read(tb_stream_ref_t self, tb_byte_t* data, t
     }
     return read;
 }
-static tb_long_t tb_stdfile_stream_writ(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_stdfile_stream_write(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stdfile_stream_t* stream = (tb_stdfile_stream_t*)self;
@@ -181,12 +181,12 @@ static tb_stream_ref_t tb_stdfile_stream_init(tb_size_t type, HANDLE fp, tb_bool
                                                                         ,   sizeof(tb_stdfile_stream_t)
                                                                         ,   TB_STDFILE_STREAM_CACHE_MAXN
                                                                         ,   tb_stdfile_stream_open
-                                                                        ,   tb_stdfile_stream_clos
+                                                                        ,   tb_stdfile_stream_close
                                                                         ,   tb_null
                                                                         ,   tb_stdfile_stream_ctrl
                                                                         ,   tb_stdfile_stream_wait
                                                                         ,   tb_stdfile_stream_read
-                                                                        ,   tb_stdfile_stream_writ
+                                                                        ,   tb_stdfile_stream_write
                                                                         ,   tb_null
                                                                         ,   tb_stdfile_stream_sync
                                                                         ,   tb_null);
@@ -401,7 +401,7 @@ tb_bool_t tb_stdfile_read(tb_stdfile_ref_t self, tb_byte_t* data, tb_size_t size
     }
     return ok;
 }
-tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_stdfile_write(tb_stdfile_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stdfile_t* stdfile = (tb_stdfile_t*)self;
@@ -495,7 +495,7 @@ tb_bool_t tb_stdfile_getc(tb_stdfile_ref_t self, tb_char_t* pch)
 }
 tb_bool_t tb_stdfile_putc(tb_stdfile_ref_t self, tb_char_t ch)
 {
-    return tb_stdfile_writ(self, (tb_byte_t const*)&ch, 1);
+    return tb_stdfile_write(self, (tb_byte_t const*)&ch, 1);
 }
 tb_bool_t tb_stdfile_gets(tb_stdfile_ref_t self, tb_char_t* str, tb_size_t num)
 {
@@ -527,6 +527,6 @@ tb_bool_t tb_stdfile_puts(tb_stdfile_ref_t self, tb_char_t const* str)
 
     // write string to stdout/stderr
     tb_size_t len = tb_strlen(str);
-    return len? tb_stdfile_writ(self, (tb_byte_t const*)str, tb_strlen(str)) : tb_true;
+    return len? tb_stdfile_write(self, (tb_byte_t const*)str, tb_strlen(str)) : tb_true;
 }
 

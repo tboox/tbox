@@ -85,6 +85,10 @@ tb_bool_t               tb_xml_reader_open(tb_xml_reader_ref_t reader, tb_stream
  *
  * @param reader        the xml reader
  */
+tb_void_t               tb_xml_reader_close(tb_xml_reader_ref_t reader);
+
+/*! DEPRECATED: please use tb_xml_reader_close instead */
+__tb_deprecated__
 tb_void_t               tb_xml_reader_clos(tb_xml_reader_ref_t reader);
 
 /*! the next iterator for the xml reader

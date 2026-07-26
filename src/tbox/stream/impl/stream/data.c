@@ -68,7 +68,7 @@ static tb_bool_t tb_stream_data_open(tb_stream_ref_t stream)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_stream_data_clos(tb_stream_ref_t stream)
+static tb_bool_t tb_stream_data_close(tb_stream_ref_t stream)
 {
     // check
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
@@ -119,7 +119,7 @@ static tb_long_t tb_stream_data_read(tb_stream_ref_t stream, tb_byte_t* data, tb
     // ok?
     return (tb_long_t)(size);
 }
-static tb_long_t tb_stream_data_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_stream_data_write(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stream_data_t* stream_data = tb_stream_data_cast(stream);
@@ -262,12 +262,12 @@ tb_stream_ref_t tb_stream_init_data()
                         ,   sizeof(tb_stream_data_t)
                         ,   0
                         ,   tb_stream_data_open
-                        ,   tb_stream_data_clos
+                        ,   tb_stream_data_close
                         ,   tb_stream_data_exit
                         ,   tb_stream_data_ctrl
                         ,   tb_stream_data_wait
                         ,   tb_stream_data_read
-                        ,   tb_stream_data_writ
+                        ,   tb_stream_data_write
                         ,   tb_stream_data_seek
                         ,   tb_null
                         ,   tb_null);

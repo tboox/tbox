@@ -202,6 +202,10 @@ tb_long_t           tb_ssl_read(tb_ssl_ref_t ssl, tb_byte_t* data, tb_size_t siz
  *
  * @return          the real size, no data: 0 and see state for waiting, failed: -1
  */
+tb_long_t           tb_ssl_write(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size);
+
+/*! DEPRECATED: please use tb_ssl_write instead */
+__tb_deprecated__
 tb_long_t           tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size);
 
 /*! wait ssl data

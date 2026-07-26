@@ -258,7 +258,7 @@ static tb_void_t tb_demo_process_test_redirect_stdin_only(tb_char_t const* test_
         if (file)
         {
             tb_char_t const* content = "test input\n";
-            tb_file_writ(file, (tb_byte_t const*)content, tb_strlen(content));
+            tb_file_write(file, (tb_byte_t const*)content, tb_strlen(content));
             tb_file_exit(file);
         }
 

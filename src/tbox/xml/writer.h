@@ -71,6 +71,10 @@ tb_bool_t               tb_xml_writer_open(tb_xml_writer_ref_t writer, tb_bool_t
  *
  * @param writer        the xml writer
  */
+tb_void_t               tb_xml_writer_close(tb_xml_writer_ref_t writer);
+
+/*! DEPRECATED: please use tb_xml_writer_close instead */
+__tb_deprecated__
 tb_void_t               tb_xml_writer_clos(tb_xml_writer_ref_t writer);
 
 /*! save the xml document or node
