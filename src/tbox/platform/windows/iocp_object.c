@@ -927,7 +927,7 @@ tb_long_t tb_iocp_object_usend(tb_iocp_object_ref_t iocp_object, tb_ipaddr_ref_t
     // load address
     tb_size_t n = 0;
 	struct sockaddr_storage d;
-    if (!(n = tb_sockaddr_load(&d, &iocp_object->u.usend.addr))) return tb_false;
+    if (!(n = tb_sockaddr_load(&d, &iocp_object->u.usend.addr))) return -1;
 
     /* attempt to send data directly
      *

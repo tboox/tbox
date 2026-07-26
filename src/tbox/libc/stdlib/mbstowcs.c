@@ -83,8 +83,8 @@ inline static tb_size_t tb_mbstowcs_charset(tb_wchar_t* s1, tb_char_t const* s2,
                              (tb_byte_t*)s1, n * sizeof(tb_wchar_t));
     if (r > 0) r /= sizeof(tb_wchar_t);
 
-    // strip
-    if (r >= 0) s1[r] = L'\0';
+    // strip (only terminate when the result fits, to avoid writing s1[n] on exact fill)
+    if (r >= 0 && r < (tb_long_t)n) s1[r] = L'\0';
 
     // ok?
     return r >= 0 ? r : -1;

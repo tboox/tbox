@@ -440,7 +440,7 @@ tb_socket_ref_t tb_socket_accept(tb_socket_ref_t sock, tb_ipaddr_ref_t addr)
 
     // done
     struct sockaddr_storage d;
-    socklen_t               n = sizeof(struct sockaddr_in);
+    socklen_t               n = sizeof(d);
     tb_long_t               fd = accept(tb_sock2fd(sock), (struct sockaddr *)&d, &n);
 
     // no client?
