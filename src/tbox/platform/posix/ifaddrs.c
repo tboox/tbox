@@ -151,6 +151,7 @@ tb_iterator_ref_t tb_ifaddrs_itor(tb_ifaddrs_ref_t ifaddrs, tb_bool_t reload)
                         tb_list_insert_tail(interfaces, interface);
                     }
                 }
+                break;
             case AF_LINK:
                 {
                     // the address data

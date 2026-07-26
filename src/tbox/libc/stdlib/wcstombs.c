@@ -89,11 +89,11 @@ inline static tb_size_t tb_wcstombs_charset(tb_char_t* s1, tb_wchar_t const* s2,
         r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, (tb_byte_t const*)s2, l * sizeof(tb_wchar_t), (tb_byte_t*)s1, n);
     }
 
-    // strip
-    if (r >= 0) s1[r] = '\0';
+    // strip (only terminate when the result fits, to avoid writing s1[n] on exact fill)
+    if (r >= 0 && r < (tb_long_t)n) s1[r] = '\0';
 
-    // ok?
-    return r > 0? r : -1;
+    // ok? (r == 0 is valid for empty input)
+    return r >= 0? r : -1;
 }
 #endif
 

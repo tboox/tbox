@@ -272,7 +272,7 @@ tb_char_t const* tb_path_absolute_to(tb_char_t const* root, tb_char_t const* pat
     tb_char_t const*    p = path;
     tb_char_t const*    t = p;
     tb_char_t*          q = absolute + size;
-    tb_char_t const*    e = absolute + maxn - 1;
+    tb_char_t const*    e = data + maxn - 1;
     while (1)
     {
         if (tb_path_is_sep(*p) || !*p)

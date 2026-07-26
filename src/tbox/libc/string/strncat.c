@@ -50,7 +50,8 @@ tb_char_t* tb_strncat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
     // append it
     tb_char_t* s = s1;
     while (*s++); --s;
-    while (n-- && !(*s++ = *s2++));
+    while (n-- && (*s = *s2++)) s++;
+    *s = '\0';
     return s1;
 }
 #endif

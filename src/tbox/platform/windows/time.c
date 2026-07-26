@@ -35,7 +35,8 @@
 
 tb_void_t tb_usleep(tb_size_t us)
 {
-    Sleep(1);
+    // windows has no microsecond sleep, round up to milliseconds (at least 1ms for a nonzero request)
+    Sleep((DWORD)(us? (us + 999) / 1000 : 0));
 }
 tb_void_t tb_msleep(tb_size_t ms)
 {
@@ -71,7 +72,10 @@ tb_hong_t tb_uclock()
     if (!QueryPerformanceCounter(&t)) return 0;
     tb_assert_and_check_return_val(t.QuadPart, 0);
 
-    return (t.QuadPart * 1000000) / f.QuadPart;
+    /* split into whole seconds + remainder to avoid overflow of (counter * 1000000)
+     * for long uptimes (with a 10MHz QPC frequency, counter * 1000000 overflows int64 in ~10 days)
+     */
+    return (t.QuadPart / f.QuadPart) * 1000000 + ((t.QuadPart % f.QuadPart) * 1000000) / f.QuadPart;
 }
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {

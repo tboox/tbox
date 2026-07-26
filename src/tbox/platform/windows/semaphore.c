@@ -120,8 +120,10 @@ tb_bool_t tb_semaphore_post(tb_semaphore_ref_t semaphore, tb_size_t post)
     // check
     tb_assert_and_check_return_val(prev + post <= TB_SEMAPHORE_VALUE_MAXN, tb_false);
 
-    // save value
-    tb_atomic32_set(&impl->value, (tb_int32_t)(prev + post));
+    /* note: do not set the shadow value to an absolute (prev + post) here.
+     * it is already maintained by the fetch_and_add above; overwriting it with an
+     * absolute value would clobber concurrent waiters' decrements and drift the count.
+     */
 
     // ok
     return tb_true;
