@@ -2,6 +2,19 @@
 
 ## master (unreleased)
 
+### Bugs fixed
+
+* Fix buffer overflow and infinite loop in tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to with small buffers and long paths
+* Fix tb_path_absolute_w to use the correct long-path prefix for UNC (\\?\UNC\) and already-prefixed paths on Windows
+* Fix tb_strncat/tb_wcscat/tb_wcsncat truncation and missing null-termination (same bug class as tb_strcat)
+* Fix buffer overflow in tb_mbstowcs/tb_wcstombs when the output buffer is exactly filled
+* Fix tb_socket_accept truncating the peer address for IPv6
+* Fix missing break in ifaddrs causing IPv6 interface addresses to be misparsed on macOS/BSD
+* Fix tb_uclock integer overflow after long uptime on Windows
+* Fix tb_usleep ignoring the requested duration on Windows
+* Fix tb_socket_usend looping forever when the address fails to load on Windows (iocp)
+* Fix Windows semaphore value drift under concurrent post/wait
+
 ## v1.8.1
 
 ### Changes
@@ -394,6 +407,19 @@
 # 更新日志
 
 ## master (开发中)
+
+### Bugs 修复
+
+* 修复 tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to 在小缓冲和长路径下的缓冲区越界与死循环
+* 修复 tb_path_absolute_w 对 UNC（\\?\UNC\）和已带前缀路径的长路径前缀处理（Windows）
+* 修复 tb_strncat/tb_wcscat/tb_wcsncat 的截断与缺少终止符问题（与 tb_strcat 同类 bug）
+* 修复 tb_mbstowcs/tb_wcstombs 在输出缓冲恰好填满时的越界写
+* 修复 tb_socket_accept 对 IPv6 对端地址的截断
+* 修复 ifaddrs 缺少 break 导致 macOS/BSD 上 IPv6 接口地址被错误解析
+* 修复 Windows 上 tb_uclock 长时间运行后的整数溢出
+* 修复 Windows 上 tb_usleep 忽略请求时长的问题
+* 修复 Windows(iocp) 上 tb_socket_usend 在地址加载失败时的死循环
+* 修复 Windows 信号量在并发 post/wait 下的计数漂移
 
 ## v1.8.1
 
