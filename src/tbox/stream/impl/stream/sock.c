@@ -390,7 +390,7 @@ static tb_bool_t tb_stream_sock_open_ref(tb_stream_ref_t stream)
     // ok?
     return ok;
 }
-static tb_bool_t tb_stream_sock_clos(tb_stream_ref_t stream)
+static tb_bool_t tb_stream_sock_close(tb_stream_ref_t stream)
 {
     // check
     tb_stream_sock_t* stream_sock = tb_stream_sock_cast(stream);
@@ -539,7 +539,7 @@ static tb_long_t tb_stream_sock_read(tb_stream_ref_t stream, tb_byte_t* data, tb
     // ok?
     return real;
 }
-static tb_long_t tb_stream_sock_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_stream_sock_write(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stream_sock_t* stream_sock = tb_stream_sock_cast(stream);
@@ -570,7 +570,7 @@ static tb_long_t tb_stream_sock_writ(tb_stream_ref_t stream, tb_byte_t const* da
                 tb_assert_and_check_return_val(stream_sock->hssl, -1);
 
                 // writ data
-                real = tb_ssl_writ(stream_sock->hssl, data, size);
+                real = tb_ssl_write(stream_sock->hssl, data, size);
 
                 // trace
                 tb_trace_d("sock(%p): writ: %ld <? %lu", stream_sock->sock, real, size);
@@ -730,12 +730,12 @@ tb_stream_ref_t tb_stream_init_sock()
                                             ,   sizeof(tb_stream_sock_t)
                                             ,   TB_STREAM_SOCK_CACHE_MAXN
                                             ,   tb_stream_sock_open
-                                            ,   tb_stream_sock_clos
+                                            ,   tb_stream_sock_close
                                             ,   tb_stream_sock_exit
                                             ,   tb_stream_sock_ctrl
                                             ,   tb_stream_sock_wait
                                             ,   tb_stream_sock_read
-                                            ,   tb_stream_sock_writ
+                                            ,   tb_stream_sock_write
                                             ,   tb_null
                                             ,   tb_null
                                             ,   tb_stream_sock_kill);
@@ -810,12 +810,12 @@ tb_stream_ref_t tb_stream_init_from_sock_ref(tb_socket_ref_t sock, tb_size_t typ
                                 ,   sizeof(tb_stream_sock_t)
                                 ,   TB_STREAM_SOCK_CACHE_MAXN
                                 ,   tb_stream_sock_open_ref
-                                ,   tb_stream_sock_clos
+                                ,   tb_stream_sock_close
                                 ,   tb_stream_sock_exit
                                 ,   tb_stream_sock_ctrl
                                 ,   tb_stream_sock_wait
                                 ,   tb_stream_sock_read
-                                ,   tb_stream_sock_writ
+                                ,   tb_stream_sock_write
                                 ,   tb_null
                                 ,   tb_null
                                 ,   tb_stream_sock_kill);

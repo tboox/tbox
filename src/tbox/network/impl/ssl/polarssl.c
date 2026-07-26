@@ -107,7 +107,7 @@ static tb_long_t tb_ssl_sock_read(tb_cpointer_t priv, tb_byte_t* data, tb_size_t
     // recv it
     return tb_socket_recv((tb_socket_ref_t)priv, data, size);
 }
-static tb_long_t tb_ssl_sock_writ(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_ssl_sock_write(tb_cpointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(priv, -1);
@@ -147,7 +147,7 @@ static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, size_t size
     // ok?
     return (tb_int_t)real;
 }
-static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, size_t size)
+static tb_int_t tb_ssl_func_write(tb_pointer_t priv, tb_byte_t const* data, size_t size)
 {
     // check
     tb_ssl_t* ssl = (tb_ssl_t*)priv;
@@ -282,7 +282,7 @@ tb_void_t tb_ssl_set_bio_sock(tb_ssl_ref_t self, tb_socket_ref_t sock)
     tb_assert_and_check_return(ssl);
 
     // set bio: sock
-    tb_ssl_set_bio_func(self, tb_ssl_sock_read, tb_ssl_sock_writ, tb_ssl_sock_wait, sock);
+    tb_ssl_set_bio_func(self, tb_ssl_sock_read, tb_ssl_sock_write, tb_ssl_sock_wait, sock);
 }
 tb_void_t tb_ssl_set_bio_func(tb_ssl_ref_t self, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_cpointer_t priv)
 {
@@ -297,7 +297,7 @@ tb_void_t tb_ssl_set_bio_func(tb_ssl_ref_t self, tb_ssl_func_read_t read, tb_ssl
     ssl->priv = priv;
 
     // set bio: func
-    ssl_set_bio(&ssl->ssl, tb_ssl_func_read, ssl, tb_ssl_func_writ, ssl);
+    ssl_set_bio(&ssl->ssl, tb_ssl_func_read, ssl, tb_ssl_func_write, ssl);
 }
 tb_void_t tb_ssl_set_timeout(tb_ssl_ref_t self, tb_long_t timeout)
 {
@@ -566,7 +566,9 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
     // ok
     return real;
 }
-tb_long_t tb_ssl_writ(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
+// DEPRECATED: use tb_ssl_write instead
+tb_long_t tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size) { return tb_ssl_write(ssl, data, size); }
+tb_long_t tb_ssl_write(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_ssl_t* ssl = (tb_ssl_t*)self;

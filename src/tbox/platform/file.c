@@ -93,6 +93,15 @@ tb_bool_t tb_file_is_same(tb_char_t const* srcpath, tb_char_t const* dstpath)
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
+// DEPRECATED: use tb_file_write instead
+tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size) { return tb_file_write(file, data, size); }
+
+// DEPRECATED: use tb_file_writev instead
+tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size) { return tb_file_writev(file, list, size); }
+
+// DEPRECATED: use tb_file_writef instead
+tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size) { return tb_file_writef(file, ifile, offset, size); }
+
 #if defined(TB_CONFIG_OS_WINDOWS) && !defined(TB_COMPILER_LIKE_UNIX)
 #   include "windows/file.c"
 #elif defined(TB_CONFIG_POSIX_HAVE_OPEN)
@@ -113,7 +122,7 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_write(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
@@ -133,12 +142,12 @@ tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     tb_trace_noimpl();
     return -1;
 }
-tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_writev(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     tb_trace_noimpl();
     return -1;
 }
-tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writef(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     tb_trace_noimpl();
     return -1;

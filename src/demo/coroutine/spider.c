@@ -300,12 +300,12 @@ static tb_bool_t tb_demo_spider_parser_open(tb_demo_spider_parser_ref_t parser, 
     } while (0);
 
     // failed?
-    if (!ok) tb_stream_clos(parser->stream);
+    if (!ok) tb_stream_close(parser->stream);
 
     // ok?
     return ok;
 }
-static tb_void_t tb_demo_spider_parser_clos(tb_demo_spider_parser_ref_t parser)
+static tb_void_t tb_demo_spider_parser_close(tb_demo_spider_parser_ref_t parser)
 {
     // check
     tb_assert_and_check_return(parser);
@@ -315,7 +315,7 @@ static tb_void_t tb_demo_spider_parser_clos(tb_demo_spider_parser_ref_t parser)
     parser->offset = 0;
 
     // close stream
-    if (parser->stream) tb_stream_clos(parser->stream);
+    if (parser->stream) tb_stream_close(parser->stream);
 }
 static tb_char_t const* tb_demo_spider_parser_read(tb_demo_spider_parser_ref_t parser)
 {
@@ -551,12 +551,12 @@ static tb_void_t tb_demo_spider_page_grab(tb_cpointer_t priv)
                 }
 
                 // close parser
-                tb_demo_spider_parser_clos(parser);
+                tb_demo_spider_parser_close(parser);
             }
         }
 
         // close stream
-        tb_stream_clos(stream);
+        tb_stream_close(stream);
 
         // exit url
         tb_free(iurl);

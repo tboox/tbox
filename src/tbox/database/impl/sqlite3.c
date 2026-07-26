@@ -393,7 +393,7 @@ static tb_bool_t tb_database_sqlite3_open(tb_database_sql_impl_t* database)
     // ok?
     return ok;
 }
-static tb_void_t tb_database_sqlite3_clos(tb_database_sql_impl_t* database)
+static tb_void_t tb_database_sqlite3_close(tb_database_sql_impl_t* database)
 {
     // check
     tb_database_sqlite3_t* sqlite = tb_database_sqlite3_cast(database);
@@ -414,7 +414,7 @@ static tb_void_t tb_database_sqlite3_exit(tb_database_sql_impl_t* database)
     tb_assert_and_check_return(sqlite);
 
     // close it first
-    tb_database_sqlite3_clos(database);
+    tb_database_sqlite3_close(database);
 
     // exit url
     tb_url_exit(&database->url);
@@ -864,7 +864,7 @@ tb_database_sql_ref_t tb_database_sqlite3_init(tb_url_ref_t url)
         // init database
         sqlite->base.type           = TB_DATABASE_SQL_TYPE_SQLITE3;
         sqlite->base.open           = tb_database_sqlite3_open;
-        sqlite->base.clos           = tb_database_sqlite3_clos;
+        sqlite->base.clos           = tb_database_sqlite3_close;
         sqlite->base.exit           = tb_database_sqlite3_exit;
         sqlite->base.done           = tb_database_sqlite3_done;
         sqlite->base.begin          = tb_database_sqlite3_begin;

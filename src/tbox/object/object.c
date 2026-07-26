@@ -341,7 +341,9 @@ tb_object_ref_t tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
     // ok?
     return object;
 }
-tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
+// DEPRECATED: use tb_object_write instead
+tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format) { return tb_object_write(object, stream, format); }
+tb_long_t tb_object_write(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
 {
     // check
     tb_assert_and_check_return_val(object && stream, -1);
@@ -369,7 +371,7 @@ tb_long_t tb_object_writ_to_url(tb_object_ref_t object, tb_char_t const* url, tb
             tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
         // open and writ stream
-        if (tb_stream_open(stream)) writ = tb_object_writ(object, stream, format);
+        if (tb_stream_open(stream)) writ = tb_object_write(object, stream, format);
 
         // exit stream
         tb_stream_exit(stream);
@@ -389,7 +391,7 @@ tb_long_t tb_object_writ_to_data(tb_object_ref_t object, tb_byte_t* data, tb_siz
     if (stream)
     {
         // open and writ stream
-        if (tb_stream_open(stream)) writ = tb_object_writ(object, stream, format);
+        if (tb_stream_open(stream)) writ = tb_object_write(object, stream, format);
 
         // exit stream
         tb_stream_exit(stream);

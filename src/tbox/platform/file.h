@@ -161,6 +161,10 @@ tb_long_t               tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_siz
  *
  * @return              the real size or -1
  */
+tb_long_t               tb_file_write(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size);
+
+/*! DEPRECATED: please use tb_file_write instead */
+__tb_deprecated__
 tb_long_t               tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /*! pread the file data
@@ -203,6 +207,10 @@ tb_long_t               tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list
  *
  * @return              the real size or -1
  */
+tb_long_t               tb_file_writev(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size);
+
+/*! DEPRECATED: please use tb_file_writev instead */
+__tb_deprecated__
 tb_long_t               tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size);
 
 /*! writf the file data
@@ -214,6 +222,10 @@ tb_long_t               tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list
  *
  * @return              the real size or -1
  */
+tb_hong_t               tb_file_writef(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size);
+
+/*! DEPRECATED: please use tb_file_writef instead */
+__tb_deprecated__
 tb_hong_t               tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size);
 
 /*! preadv the file data

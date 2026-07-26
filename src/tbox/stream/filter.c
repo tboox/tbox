@@ -50,7 +50,9 @@ tb_bool_t tb_filter_open(tb_filter_ref_t self)
     // ok?
     return filter->bopened;
 }
-tb_void_t tb_filter_clos(tb_filter_ref_t self)
+// DEPRECATED: use tb_filter_close instead
+tb_void_t tb_filter_clos(tb_filter_ref_t filter) { tb_filter_close(filter); }
+tb_void_t tb_filter_close(tb_filter_ref_t self)
 {
     // check
     tb_filter_t* filter = (tb_filter_t*)self;

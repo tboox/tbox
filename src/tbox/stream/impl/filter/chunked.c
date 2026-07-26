@@ -202,7 +202,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_static_stream_re
     // ok
     return (op - ob);
 }
-static tb_void_t tb_filter_chunked_clos(tb_filter_t* filter)
+static tb_void_t tb_filter_chunked_close(tb_filter_t* filter)
 {
     // check
     tb_filter_chunked_t* cfilter = tb_filter_chunked_cast(filter);
@@ -251,7 +251,7 @@ tb_filter_ref_t tb_filter_init_from_chunked(tb_bool_t dechunked)
         // init filter
         if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CHUNKED)) break;
         filter->base.spak = tb_filter_chunked_spak;
-        filter->base.clos = tb_filter_chunked_clos;
+        filter->base.clos = tb_filter_chunked_close;
         filter->base.exit = tb_filter_chunked_exit;
 
         // init line

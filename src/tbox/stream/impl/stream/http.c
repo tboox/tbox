@@ -66,7 +66,7 @@ static tb_bool_t tb_stream_http_open(tb_stream_ref_t stream)
     // ok?
     return ok;
 }
-static tb_bool_t tb_stream_http_clos(tb_stream_ref_t stream)
+static tb_bool_t tb_stream_http_close(tb_stream_ref_t stream)
 {
     // check
     tb_stream_http_t* stream_http = tb_stream_http_cast(stream);
@@ -581,7 +581,7 @@ tb_stream_ref_t tb_stream_init_http()
                                 ,   sizeof(tb_stream_http_t)
                                 ,   0
                                 ,   tb_stream_http_open
-                                ,   tb_stream_http_clos
+                                ,   tb_stream_http_close
                                 ,   tb_stream_http_exit
                                 ,   tb_stream_http_ctrl
                                 ,   tb_stream_http_wait

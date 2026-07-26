@@ -159,7 +159,7 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
         return (tb_long_t)real_size;
     return -1;
 }
-tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_write(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -203,7 +203,7 @@ tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t siz
     if (current != offset && tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
     // writ it
-    tb_long_t real = tb_file_writ(file, data, size);
+    tb_long_t real = tb_file_write(file, data, size);
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
@@ -245,7 +245,7 @@ tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     }
     return read;
 }
-tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_writev(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -261,7 +261,7 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
         tb_check_break(data && need);
 
         // writ it
-        tb_long_t real = tb_file_writ(file, data, need);
+        tb_long_t real = tb_file_write(file, data, need);
 
         // full? next it
         if (real == need)
@@ -281,7 +281,7 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     }
     return writ;
 }
-tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writef(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -295,7 +295,7 @@ tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offse
     tb_long_t writ = 0;
     while (writ < read)
     {
-        tb_long_t real = tb_file_writ(file, data + writ, read - writ);
+        tb_long_t real = tb_file_write(file, data + writ, read - writ);
         if (real > 0) writ += real;
         else break;
     }
@@ -333,7 +333,7 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     if (current != offset && tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
     // writ it
-    tb_long_t real = tb_file_writv(file, list, size);
+    tb_long_t real = tb_file_writev(file, list, size);
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
@@ -441,7 +441,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest, tb_size_t f
             tb_hize_t size = tb_file_size(ifile);
             while (writ < size)
             {
-                tb_hong_t real = tb_file_writf(ofile, ifile, writ, size - writ);
+                tb_hong_t real = tb_file_writef(ofile, ifile, writ, size - writ);
                 if (real > 0) writ += real;
                 else break;
             }

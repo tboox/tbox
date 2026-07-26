@@ -6,10 +6,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_test_writ()
+static tb_void_t tb_test_write()
 {
     tb_trace_i("=================== test stdfile writ ===================");
-    tb_stdfile_writ(tb_stdfile_output(), (tb_byte_t const*)"hello world!\n", tb_strlen("hello world!\n"));
+    tb_stdfile_write(tb_stdfile_output(), (tb_byte_t const*)"hello world!\n", tb_strlen("hello world!\n"));
 }
 static tb_void_t tb_test_read()
 {
@@ -80,7 +80,7 @@ static tb_void_t tb_test_peek()
  */
 tb_int_t tb_demo_platform_stdfile_main(tb_int_t argc, tb_char_t** argv)
 {
-    tb_test_writ();
+    tb_test_write();
     tb_test_putc();
     tb_test_puts();
     tb_test_read();

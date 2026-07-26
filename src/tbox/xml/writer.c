@@ -111,7 +111,7 @@ tb_void_t tb_xml_writer_exit(tb_xml_writer_ref_t writer)
     tb_assert_and_check_return(impl);
 
     // clos it first
-    tb_xml_writer_clos(writer);
+    tb_xml_writer_close(writer);
 
     // exit attributes
     if (impl->attributes) tb_hash_map_exit(impl->attributes);
@@ -162,19 +162,21 @@ tb_bool_t tb_xml_writer_open(tb_xml_writer_ref_t writer, tb_bool_t bformat, tb_s
     } while (0);
 
     // failed? close it
-    if (!ok) tb_xml_writer_clos(writer);
+    if (!ok) tb_xml_writer_close(writer);
 
     // ok?
     return ok;
 }
-tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer)
+// DEPRECATED: use tb_xml_writer_close instead
+tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer) { tb_xml_writer_close(writer); }
+tb_void_t tb_xml_writer_close(tb_xml_writer_ref_t writer)
 {
     // check
     tb_xml_writer_impl_t* impl = (tb_xml_writer_impl_t*)writer;
     tb_assert_and_check_return(impl);
 
     // clos stream
-    if (impl->stream) tb_stream_clos(impl->stream);
+    if (impl->stream) tb_stream_close(impl->stream);
 
     // exit stream
     if (impl->stream && impl->bowner) tb_stream_exit(impl->stream);

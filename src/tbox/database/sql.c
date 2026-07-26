@@ -180,7 +180,9 @@ tb_bool_t tb_database_sql_open(tb_database_sql_ref_t database)
     // ok?
     return impl->bopened;
 }
-tb_void_t tb_database_sql_clos(tb_database_sql_ref_t database)
+// DEPRECATED: use tb_database_sql_close instead
+tb_void_t tb_database_sql_clos(tb_database_sql_ref_t database) { tb_database_sql_close(database); }
+tb_void_t tb_database_sql_close(tb_database_sql_ref_t database)
 {
     // check
     tb_database_sql_impl_t* impl = (tb_database_sql_impl_t*)database;

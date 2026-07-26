@@ -96,7 +96,7 @@ tb_size_t                           tb_database_sql_type(tb_database_sql_ref_t d
             // ...
 
             // close it
-            tb_database_sql_clos(database);
+            tb_database_sql_close(database);
         }
         tb_database_sql_exit(database);
     }
@@ -112,6 +112,10 @@ tb_bool_t                           tb_database_sql_open(tb_database_sql_ref_t d
  *
  * @param database                  the database handle
  */
+tb_void_t                           tb_database_sql_close(tb_database_sql_ref_t database);
+
+/*! DEPRECATED: please use tb_database_sql_close instead */
+__tb_deprecated__
 tb_void_t                           tb_database_sql_clos(tb_database_sql_ref_t database);
 
 /*! begin transaction

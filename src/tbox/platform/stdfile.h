@@ -119,6 +119,10 @@ tb_bool_t               tb_stdfile_read(tb_stdfile_ref_t file, tb_byte_t* data, 
  *
  * @return              tb_true or tb_false
  */
+tb_bool_t               tb_stdfile_write(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size);
+
+/*! DEPRECATED: please use tb_stdfile_write instead */
+__tb_deprecated__
 tb_bool_t               tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size);
 
 /*! has readable data for stdfile

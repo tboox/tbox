@@ -30,7 +30,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
             // writ file
             while (writ < size)
             {
-                tb_long_t real = tb_file_writ(file, buff, tb_min(maxn, size - writ));
+                tb_long_t real = tb_file_write(file, buff, tb_min(maxn, size - writ));
 //              tb_trace_i("real: %ld, size: %lu", real, tb_min(maxn, size - writ));
                 if (real > 0) writ += real;
                 else if (!real) ;
@@ -89,7 +89,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
             tb_memcpy(data + maxn + maxn + maxn, list[3].data, list[3].size);
 
             // writ
-            tb_long_t real = tb_file_writ(file, data, tb_min((size - writ), (maxn << 2)));
+            tb_long_t real = tb_file_write(file, data, tb_min((size - writ), (maxn << 2)));
             if (real > 0) writ += real;
             else if (!real) ;
             else break;
@@ -153,7 +153,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
             }
 
             // writ
-            tb_long_t real = tb_file_writv(file, list, 4);
+            tb_long_t real = tb_file_writev(file, list, 4);
             if (real > 0) writ += real;
             else if (!real) ;
             else break;
@@ -189,7 +189,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
         tb_hize_t size = tb_file_size(ifile);
         while (writ < size)
         {
-            tb_long_t real = tb_file_writf(ofile, ifile, writ, size - writ);
+            tb_long_t real = tb_file_writef(ofile, ifile, writ, size - writ);
             if (real > 0) writ += real;
             else break;
         }

@@ -178,7 +178,7 @@ tb_void_t tb_xml_reader_exit(tb_xml_reader_ref_t reader)
     tb_assert_and_check_return(impl);
 
     // clos it first
-    tb_xml_reader_clos(reader);
+    tb_xml_reader_close(reader);
 
     // exit the filter stream
     if (impl->fstream) tb_stream_exit(impl->fstream);
@@ -274,19 +274,21 @@ tb_bool_t tb_xml_reader_open(tb_xml_reader_ref_t reader, tb_stream_ref_t stream,
     } while (0);
 
     // failed? close it
-    if (!ok) tb_xml_reader_clos(reader);
+    if (!ok) tb_xml_reader_close(reader);
 
     // ok?
     return ok;
 }
-tb_void_t tb_xml_reader_clos(tb_xml_reader_ref_t reader)
+// DEPRECATED: use tb_xml_reader_close instead
+tb_void_t tb_xml_reader_clos(tb_xml_reader_ref_t reader) { tb_xml_reader_close(reader); }
+tb_void_t tb_xml_reader_close(tb_xml_reader_ref_t reader)
 {
     // check
     tb_xml_reader_impl_t* impl = (tb_xml_reader_impl_t*)reader;
     tb_assert_and_check_return(impl);
 
     // clos the reader stream
-    if (impl->rstream) tb_stream_clos(impl->rstream);
+    if (impl->rstream) tb_stream_close(impl->rstream);
     impl->rstream = tb_null;
 
     // exit the input stream

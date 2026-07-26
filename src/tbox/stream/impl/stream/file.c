@@ -96,7 +96,7 @@ static tb_bool_t tb_stream_file_open(tb_stream_ref_t stream)
     // ok
     return tb_true;
 }
-static tb_bool_t tb_stream_file_clos(tb_stream_ref_t stream)
+static tb_bool_t tb_stream_file_close(tb_stream_ref_t stream)
 {
     // check
     tb_stream_file_t* stream_file = tb_stream_file_cast(stream);
@@ -130,7 +130,7 @@ static tb_long_t tb_stream_file_read(tb_stream_ref_t stream, tb_byte_t* data, tb
     // ok?
     return stream_file->read;
 }
-static tb_long_t tb_stream_file_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_stream_file_write(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_stream_file_t* stream_file = tb_stream_file_cast(stream);
@@ -143,7 +143,7 @@ static tb_long_t tb_stream_file_writ(tb_stream_ref_t stream, tb_byte_t const* da
     tb_assert_and_check_return_val(!stream_file->bstream, -1);
 
     // writ
-    tb_long_t writ = tb_file_writ(stream_file->file, data, size);
+    tb_long_t writ = tb_file_write(stream_file->file, data, size);
     if (writ > 0)
         stream_file->offset += writ;
     return writ;
@@ -283,12 +283,12 @@ tb_stream_ref_t tb_stream_init_file()
                                             ,   sizeof(tb_stream_file_t)
                                             ,   TB_STREAM_FILE_CACHE_MAXN
                                             ,   tb_stream_file_open
-                                            ,   tb_stream_file_clos
+                                            ,   tb_stream_file_close
                                             ,   tb_null
                                             ,   tb_stream_file_ctrl
                                             ,   tb_stream_file_wait
                                             ,   tb_stream_file_read
-                                            ,   tb_stream_file_writ
+                                            ,   tb_stream_file_write
                                             ,   tb_stream_file_seek
                                             ,   tb_stream_file_sync
                                             ,   tb_null);

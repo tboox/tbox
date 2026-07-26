@@ -134,7 +134,7 @@ tb_long_t tb_file_read(tb_file_ref_t file, tb_byte_t* data, tb_size_t size)
     // read it
     return read(tb_file2fd(file), data, size);
 }
-tb_long_t tb_file_writ(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_write(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -286,7 +286,7 @@ tb_long_t tb_file_readv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     // read it
     return readv(tb_file2fd(file), (struct iovec const*)list, size);
 }
-tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_file_writev(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);
@@ -299,7 +299,7 @@ tb_long_t tb_file_writv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t si
     // writ it
     return writev(tb_file2fd(file), (struct iovec const*)list, size);
 }
-tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_file_writef(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offset, tb_hize_t size)
 {
     // check
     tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -330,7 +330,7 @@ tb_hong_t tb_file_writf(tb_file_ref_t file, tb_file_ref_t ifile, tb_hize_t offse
     tb_size_t writ = 0;
     while (writ < read)
     {
-        tb_long_t real = tb_file_writ(file, data + writ, read - writ);
+        tb_long_t real = tb_file_write(file, data + writ, read - writ);
         if (real > 0) writ += real;
         else break;
     }
@@ -402,7 +402,7 @@ tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     if (current != offset && tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
     // writ it
-    tb_long_t real = tb_file_writv(file, list, size);
+    tb_long_t real = tb_file_writev(file, list, size);
 
     // restore offset
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
