@@ -243,11 +243,15 @@ tb_long_t tb_charset_utf8_tolower(tb_char_t* s, tb_size_t n)
     tb_wchar_t* w = (wn <= 256)? wb : (tb_wchar_t*)tb_malloc(wn * sizeof(tb_wchar_t));
     if (w)
     {
-        if (tb_mbstowcs(w, p, wn) != -1)
+        /* the suffix is non-empty and non-ascii, so a valid conversion must produce
+         * at least one wchar and one byte back. an invalid utf8 byte may convert to
+         * nothing (returns 0, not -1), in which case we keep the original bytes.
+         */
+        if (tb_mbstowcs(w, p, wn) > 0)
         {
             tb_wcslwr(w);
-            r = tb_wcstombs(p, w, wn);
-            if (r != -1) r += (p - s);
+            tb_long_t mb = tb_wcstombs(p, w, wn);
+            if (mb > 0) r = mb + (p - s);
         }
 
         if (w != wb) tb_free(w);
@@ -277,11 +281,15 @@ tb_long_t tb_charset_utf8_toupper(tb_char_t* s, tb_size_t n)
     tb_wchar_t* w = (wn <= 256)? wb : (tb_wchar_t*)tb_malloc(wn * sizeof(tb_wchar_t));
     if (w)
     {
-        if (tb_mbstowcs(w, p, wn) != -1)
+        /* the suffix is non-empty and non-ascii, so a valid conversion must produce
+         * at least one wchar and one byte back. an invalid utf8 byte may convert to
+         * nothing (returns 0, not -1), in which case we keep the original bytes.
+         */
+        if (tb_mbstowcs(w, p, wn) > 0)
         {
             tb_wcsupr(w);
-            r = tb_wcstombs(p, w, wn);
-            if (r != -1) r += (p - s);
+            tb_long_t mb = tb_wcstombs(p, w, wn);
+            if (mb > 0) r = mb + (p - s);
         }
 
         if (w != wb) tb_free(w);
