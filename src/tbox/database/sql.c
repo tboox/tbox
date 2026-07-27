@@ -181,7 +181,10 @@ tb_bool_t tb_database_sql_open(tb_database_sql_ref_t database)
     return impl->bopened;
 }
 // DEPRECATED: use tb_database_sql_close instead
-tb_void_t tb_database_sql_clos(tb_database_sql_ref_t database) { tb_database_sql_close(database); }
+tb_void_t tb_database_sql_clos(tb_database_sql_ref_t database)
+{
+    tb_database_sql_close(database);
+}
 tb_void_t tb_database_sql_close(tb_database_sql_ref_t database)
 {
     // check

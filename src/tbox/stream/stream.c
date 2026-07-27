@@ -631,7 +631,10 @@ tb_bool_t tb_stream_open(tb_stream_ref_t self)
     return ok;
 }
 // DEPRECATED: use tb_stream_close instead
-tb_bool_t tb_stream_clos(tb_stream_ref_t stream) { return tb_stream_close(stream); }
+tb_bool_t tb_stream_clos(tb_stream_ref_t stream)
+{
+    return tb_stream_close(stream);
+}
 tb_bool_t tb_stream_close(tb_stream_ref_t self)
 {
     // check
@@ -881,7 +884,10 @@ tb_long_t tb_stream_read(tb_stream_ref_t self, tb_byte_t* data, tb_size_t size)
     return read;
 }
 // DEPRECATED: use tb_stream_write instead
-tb_long_t tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size) { return tb_stream_write(stream, data, size); }
+tb_long_t tb_stream_writ(tb_stream_ref_t stream, tb_byte_t const* data, tb_size_t size)
+{
+    return tb_stream_write(stream, data, size);
+}
 tb_long_t tb_stream_write(tb_stream_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check

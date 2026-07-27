@@ -593,7 +593,10 @@ tb_long_t tb_ssl_read(tb_ssl_ref_t self, tb_byte_t* data, tb_size_t size)
     return real;
 }
 // DEPRECATED: use tb_ssl_write instead
-tb_long_t tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size) { return tb_ssl_write(ssl, data, size); }
+tb_long_t tb_ssl_writ(tb_ssl_ref_t ssl, tb_byte_t const* data, tb_size_t size)
+{
+    return tb_ssl_write(ssl, data, size);
+}
 tb_long_t tb_ssl_write(tb_ssl_ref_t self, tb_byte_t const* data, tb_size_t size)
 {
     // check

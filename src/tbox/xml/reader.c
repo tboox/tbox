@@ -280,7 +280,10 @@ tb_bool_t tb_xml_reader_open(tb_xml_reader_ref_t reader, tb_stream_ref_t stream,
     return ok;
 }
 // DEPRECATED: use tb_xml_reader_close instead
-tb_void_t tb_xml_reader_clos(tb_xml_reader_ref_t reader) { tb_xml_reader_close(reader); }
+tb_void_t tb_xml_reader_clos(tb_xml_reader_ref_t reader)
+{
+    tb_xml_reader_close(reader);
+}
 tb_void_t tb_xml_reader_close(tb_xml_reader_ref_t reader)
 {
     // check

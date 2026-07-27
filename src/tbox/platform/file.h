@@ -187,6 +187,10 @@ tb_long_t               tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_si
  *
  * @return              the real size or -1
  */
+tb_long_t               tb_file_pwrite(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
+
+/*! DEPRECATED: please use tb_file_pwrite instead */
+__tb_deprecated__
 tb_long_t               tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
 
 /*! readv the file data
@@ -248,6 +252,10 @@ tb_long_t               tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* lis
  *
  * @return              the real size or -1
  */
+tb_long_t               tb_file_pwritev(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
+
+/*! DEPRECATED: please use tb_file_pwritev instead */
+__tb_deprecated__
 tb_long_t               tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
 
 /*! seek the file offset

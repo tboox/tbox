@@ -168,7 +168,10 @@ tb_bool_t tb_xml_writer_open(tb_xml_writer_ref_t writer, tb_bool_t bformat, tb_s
     return ok;
 }
 // DEPRECATED: use tb_xml_writer_close instead
-tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer) { tb_xml_writer_close(writer); }
+tb_void_t tb_xml_writer_clos(tb_xml_writer_ref_t writer)
+{
+    tb_xml_writer_close(writer);
+}
 tb_void_t tb_xml_writer_close(tb_xml_writer_ref_t writer)
 {
     // check

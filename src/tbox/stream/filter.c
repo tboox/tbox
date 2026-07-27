@@ -51,7 +51,10 @@ tb_bool_t tb_filter_open(tb_filter_ref_t self)
     return filter->bopened;
 }
 // DEPRECATED: use tb_filter_close instead
-tb_void_t tb_filter_clos(tb_filter_ref_t filter) { tb_filter_close(filter); }
+tb_void_t tb_filter_clos(tb_filter_ref_t filter)
+{
+    tb_filter_close(filter);
+}
 tb_void_t tb_filter_close(tb_filter_ref_t self)
 {
     // check

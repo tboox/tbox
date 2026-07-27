@@ -342,7 +342,10 @@ tb_object_ref_t tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
     return object;
 }
 // DEPRECATED: use tb_object_write instead
-tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format) { return tb_object_write(object, stream, format); }
+tb_long_t tb_object_writ(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
+{
+    return tb_object_write(object, stream, format);
+}
 tb_long_t tb_object_write(tb_object_ref_t object, tb_stream_ref_t stream, tb_size_t format)
 {
     // check

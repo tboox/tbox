@@ -190,7 +190,7 @@ tb_long_t tb_file_pread(tb_file_ref_t file, tb_byte_t* data, tb_size_t size, tb_
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
     return real;
 }
-tb_long_t tb_file_pwrit(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwrite(tb_file_ref_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && data, -1);
@@ -320,7 +320,7 @@ tb_long_t tb_file_preadv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t s
     if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
     return real;
 }
-tb_long_t tb_file_pwritv(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+tb_long_t tb_file_pwritev(tb_file_ref_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {
     // check
     tb_assert_and_check_return_val(file && list && size, -1);

@@ -203,7 +203,10 @@ tb_long_t tb_queue_buffer_read(tb_queue_buffer_ref_t buffer, tb_byte_t* data, tb
     return read;
 }
 // DEPRECATED: use tb_queue_buffer_write instead
-tb_long_t tb_queue_buffer_writ(tb_queue_buffer_ref_t buffer, tb_byte_t const* data, tb_size_t size) { return tb_queue_buffer_write(buffer, data, size); }
+tb_long_t tb_queue_buffer_writ(tb_queue_buffer_ref_t buffer, tb_byte_t const* data, tb_size_t size)
+{
+    return tb_queue_buffer_write(buffer, data, size);
+}
 tb_long_t tb_queue_buffer_write(tb_queue_buffer_ref_t buffer, tb_byte_t const* data, tb_size_t size)
 {
     // check

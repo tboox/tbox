@@ -69,7 +69,10 @@ tb_stdfile_ref_t tb_stdfile_error()
 }
 
 // DEPRECATED: use tb_stdfile_write instead
-tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size) { return tb_stdfile_write(file, data, size); }
+tb_bool_t tb_stdfile_writ(tb_stdfile_ref_t file, tb_byte_t const* data, tb_size_t size)
+{
+    return tb_stdfile_write(file, data, size);
+}
 
 #if defined(TB_CONFIG_OS_WINDOWS) && defined(TB_CONFIG_MODULE_HAVE_CHARSET)
 #   include "windows/stdfile.c"
