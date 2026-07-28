@@ -2,8 +2,16 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Deprecate abbreviated names and add full-name APIs (old names kept as deprecated aliases): tb_stream_write/tb_stream_close, tb_file_write/writev/writef/pwrite/pwritev, tb_object_write, tb_queue_buffer_write, tb_ssl_write, tb_stdfile_write, tb_database_sql_close, tb_filter_close, tb_xml_reader_close, tb_xml_writer_close
+* Improve tb_stream_bwrit_line to write the whole string in a single call instead of byte-by-byte
+* Grow the stream cache geometrically to avoid repeated reallocations on increasing request sizes
+
 ### Bugs fixed
 
+* Fix buffer overflow in tb_url_encode/tb_url_decode (and variants) writing past the output buffer, reachable from a malicious HTTP redirect
+* Fix off-by-one buffer overflow in tb_stream_bread_line when a line fills the caller buffer exactly
 * Fix buffer overflow and infinite loop in tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to with small buffers and long paths
 * Fix tb_path_absolute_w to use the correct long-path prefix for UNC (\\?\UNC\) and already-prefixed paths on Windows
 * Fix tb_strncat/tb_wcscat/tb_wcsncat truncation and missing null-termination (same bug class as tb_strcat)
@@ -408,8 +416,16 @@
 
 ## master (开发中)
 
+### 改进
+
+* 废弃缩写命名并新增全拼 API（旧名保留为 deprecated 别名）：tb_stream_write/tb_stream_close、tb_file_write/writev/writef/pwrite/pwritev、tb_object_write、tb_queue_buffer_write、tb_ssl_write、tb_stdfile_write、tb_database_sql_close、tb_filter_close、tb_xml_reader_close、tb_xml_writer_close
+* 改进 tb_stream_bwrit_line 一次性写入整个字符串，不再逐字节写
+* stream cache 改为几何增长，避免请求尺寸递增时反复 realloc
+
 ### Bugs 修复
 
+* 修复 tb_url_encode/tb_url_decode（及各变体）写越界，恶意 HTTP 重定向可触发
+* 修复 tb_stream_bread_line 在一行恰好填满 caller 缓冲时的 off-by-one 越界写
 * 修复 tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to 在小缓冲和长路径下的缓冲区越界与死循环
 * 修复 tb_path_absolute_w 对 UNC（\\?\UNC\）和已带前缀路径的长路径前缀处理（Windows）
 * 修复 tb_strncat/tb_wcscat/tb_wcsncat 的截断与缺少终止符问题（与 tb_strcat 同类 bug）
