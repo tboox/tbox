@@ -684,7 +684,7 @@ tb_bool_t tb_stream_need(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
     tb_assert_and_check_return_val(!stream->bwrited, tb_false);
 
     // not enough? grow the cache first
-    if (tb_queue_buffer_maxn(&stream->cache) < size) tb_queue_buffer_resize(&stream->cache, size);
+    if (tb_queue_buffer_maxn(&stream->cache) < size) tb_queue_buffer_resize(&stream->cache, tb_max(size, tb_queue_buffer_maxn(&stream->cache) << 1));
 
     // check
     tb_assert_and_check_return_val(tb_queue_buffer_maxn(&stream->cache) && size <= tb_queue_buffer_maxn(&stream->cache), tb_false);
@@ -771,7 +771,7 @@ tb_long_t tb_stream_peek(tb_stream_ref_t self, tb_byte_t** data, tb_size_t size)
     tb_assert_and_check_return_val(!stream->bwrited, -1);
 
     // not enough? grow the cache first
-    if (tb_queue_buffer_maxn(&stream->cache) < size) tb_queue_buffer_resize(&stream->cache, size);
+    if (tb_queue_buffer_maxn(&stream->cache) < size) tb_queue_buffer_resize(&stream->cache, tb_max(size, tb_queue_buffer_maxn(&stream->cache) << 1));
 
     // check
     tb_assert_and_check_return_val(tb_queue_buffer_maxn(&stream->cache) && size <= tb_queue_buffer_maxn(&stream->cache), -1);
@@ -1253,6 +1253,8 @@ tb_long_t tb_stream_bread_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
     {
         if (linesize && data[linesize - 1] == '\n') linesize--;
         if (linesize && data[linesize - 1] == '\r') linesize--;
+        // reserve space for the null terminator to avoid writing data[size] when the line fills the buffer
+        if (linesize >= size) linesize = size - 1;
         data[linesize] = '\0';
         return linesize;
     }
@@ -1268,14 +1270,10 @@ tb_long_t tb_stream_bwrit_line(tb_stream_ref_t self, tb_char_t* data, tb_size_t 
     }
     else
     {
-        tb_char_t* p = data;
-        while (*p)
-        {
-            if (!tb_stream_bwrit(self, (tb_byte_t*)p, 1)) return -1;
-            p++;
-        }
-
-        writ = p - data;
+        // write the whole null-terminated string in one call instead of byte-by-byte
+        tb_size_t n = tb_strlen(data);
+        if (n && !tb_stream_bwrit(self, (tb_byte_t*)data, n)) return -1;
+        writ = n;
     }
 
     // writ "\r\n" or "\n"
