@@ -39,7 +39,7 @@ tb_size_t tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
     static tb_char_t    ht[] = "0123456789ABCDEF";
 
     // done
-    while (ip < ie && op < oe)
+    while (ip < ie && op + 1 < oe)
     {
         // character
         tb_byte_t c = *ip++;
@@ -52,6 +52,8 @@ tb_size_t tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
                 ||  (c > 'Z' && c < 'a' && c != '_')
                 ||  (c > 'z'))
         {
+            if (op + 3 >= oe) break;
+
             op[0] = '%';
             op[1] = ht[c >> 4];
             op[2] = ht[c & 15];
@@ -76,7 +78,7 @@ tb_size_t tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_siz
 
     // done
     tb_char_t ch[3] = {0};
-    while (ip < ie && op < oe)
+    while (ip < ie && op + 1 < oe)
     {
         // space?
         if (*ip == '+') *op = ' ';
@@ -111,7 +113,7 @@ tb_size_t tb_url_encode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
     static tb_char_t    ht[] = "0123456789ABCDEF";
 
     // done
-    while (ip < ie && op < oe)
+    while (ip < ie && op + 1 < oe)
     {
         // character
         tb_byte_t c = *ip++;
@@ -122,6 +124,8 @@ tb_size_t tb_url_encode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
             ||  (c > 'Z' && c < 'a' && c != '_')
             ||  (c > 'z' && c != '~'))
         {
+            if (op + 3 >= oe) break;
+
             op[0] = '%';
             op[1] = ht[c >> 4];
             op[2] = ht[c & 15];
@@ -146,7 +150,7 @@ tb_size_t tb_url_decode2(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_si
 
     // done
     tb_char_t ch[3] = {0};
-    while (ip < ie && op < oe)
+    while (ip < ie && op + 1 < oe)
     {
         // %xx?
         if (*ip == '%' && ip + 2 < ie && tb_isdigit16(ip[1]) && tb_isdigit16(ip[2]))
@@ -179,7 +183,7 @@ tb_size_t tb_url_encode_args(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, t
     static tb_char_t    ht[] = "0123456789ABCDEF";
 
     // done
-    while (ip < ie && op < oe)
+    while (ip < ie && op + 1 < oe)
     {
         // character
         tb_byte_t c = *ip++;
@@ -190,6 +194,8 @@ tb_size_t tb_url_encode_args(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, t
             ||  (c > 'Z' && c < 'a' && c != '_')
             ||  (c > 'z' && c != '~'))
         {
+            if (op + 3 >= oe) break;
+
             op[0] = '%';
             op[1] = ht[c >> 4];
             op[2] = ht[c & 15];
