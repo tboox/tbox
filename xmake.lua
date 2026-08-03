@@ -1,7 +1,7 @@
 set_project("tbox")
 set_xmakever("3.0.5")
 set_policy("build.progress_style", "multirow")
-set_version("1.8.1", {build = "%Y%m%d", soname = true})
+set_version("1.8.2", {build = "%Y%m%d", soname = true})
 set_warnings("all", "error")
 
 -- set language: c99

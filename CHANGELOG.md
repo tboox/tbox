@@ -2,26 +2,28 @@
 
 ## master (unreleased)
 
+## v1.8.2
+
 ### Changes
 
-* Deprecate abbreviated names and add full-name APIs (old names kept as deprecated aliases): tb_stream_write/tb_stream_close, tb_file_write/writev/writef/pwrite/pwritev, tb_object_write, tb_queue_buffer_write, tb_ssl_write, tb_stdfile_write, tb_database_sql_close, tb_filter_close, tb_xml_reader_close, tb_xml_writer_close
-* Improve tb_stream_bwrit_line to write the whole string in a single call instead of byte-by-byte
-* Grow the stream cache geometrically to avoid repeated reallocations on increasing request sizes
+* [#318](https://github.com/tboox/tbox/pull/318): Deprecate abbreviated apis and add full-name versions (tb_stream_write/tb_stream_close, tb_file_write/writev/writef/pwrite/pwritev, tb_object_write, tb_queue_buffer_write, tb_ssl_write, tb_stdfile_write, tb_database_sql_close, tb_filter_close, tb_xml_reader_close, tb_xml_writer_close), keep old names as deprecated aliases
+* [#319](https://github.com/tboox/tbox/pull/319): Improve tb_stream_bwrit_line and grow the stream cache geometrically
+* Improve removing read-only directories on windows
 
 ### Bugs fixed
 
-* Fix buffer overflow in tb_url_encode/tb_url_decode (and variants) writing past the output buffer, reachable from a malicious HTTP redirect
-* Fix off-by-one buffer overflow in tb_stream_bread_line when a line fills the caller buffer exactly
-* Fix buffer overflow and infinite loop in tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to with small buffers and long paths
-* Fix tb_path_absolute_w to use the correct long-path prefix for UNC (\\?\UNC\) and already-prefixed paths on Windows
-* Fix tb_strncat/tb_wcscat/tb_wcsncat truncation and missing null-termination (same bug class as tb_strcat)
-* Fix buffer overflow in tb_mbstowcs/tb_wcstombs when the output buffer is exactly filled
-* Fix tb_socket_accept truncating the peer address for IPv6
-* Fix missing break in ifaddrs causing IPv6 interface addresses to be misparsed on macOS/BSD
-* Fix tb_uclock integer overflow after long uptime on Windows
-* Fix tb_usleep ignoring the requested duration on Windows
-* Fix tb_socket_usend looping forever when the address fails to load on Windows (iocp)
-* Fix Windows semaphore value drift under concurrent post/wait
+* [#319](https://github.com/tboox/tbox/pull/319): Fix buffer overflow in tb_url_encode/tb_url_decode
+* [#319](https://github.com/tboox/tbox/pull/319): Fix buffer overflow in tb_stream_bread_line
+* [#316](https://github.com/tboox/tbox/pull/316): Fix buffer overflow and infinite loop in tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to
+* [#316](https://github.com/tboox/tbox/pull/316): Fix long path prefix for UNC on windows
+* [#317](https://github.com/tboox/tbox/pull/317): Fix tb_strncat/tb_wcscat/tb_wcsncat
+* [#317](https://github.com/tboox/tbox/pull/317): Fix buffer overflow in tb_mbstowcs/tb_wcstombs
+* [#317](https://github.com/tboox/tbox/pull/317): Fix tb_socket_accept for IPv6 address
+* [#317](https://github.com/tboox/tbox/pull/317): Fix ifaddrs for IPv6 address on macOS/BSD
+* [#317](https://github.com/tboox/tbox/pull/317): Fix tb_uclock overflow and tb_usleep on windows
+* [#317](https://github.com/tboox/tbox/pull/317): Fix tb_socket_usend on windows
+* [#317](https://github.com/tboox/tbox/pull/317): Fix semaphore value on windows
+* Fix utf8 character decoding
 
 ## v1.8.1
 
@@ -416,26 +418,28 @@
 
 ## master (开发中)
 
+## v1.8.2
+
 ### 改进
 
-* 废弃缩写命名并新增全拼 API（旧名保留为 deprecated 别名）：tb_stream_write/tb_stream_close、tb_file_write/writev/writef/pwrite/pwritev、tb_object_write、tb_queue_buffer_write、tb_ssl_write、tb_stdfile_write、tb_database_sql_close、tb_filter_close、tb_xml_reader_close、tb_xml_writer_close
-* 改进 tb_stream_bwrit_line 一次性写入整个字符串，不再逐字节写
-* stream cache 改为几何增长，避免请求尺寸递增时反复 realloc
+* [#318](https://github.com/tboox/tbox/pull/318): 废弃缩写 api 并新增全拼版本（tb_stream_write/tb_stream_close、tb_file_write/writev/writef/pwrite/pwritev、tb_object_write、tb_queue_buffer_write、tb_ssl_write、tb_stdfile_write、tb_database_sql_close、tb_filter_close、tb_xml_reader_close、tb_xml_writer_close），旧名保留为 deprecated 别名
+* [#319](https://github.com/tboox/tbox/pull/319): 改进 tb_stream_bwrit_line 并让 stream cache 几何增长
+* 改进 Windows 上只读目录的删除
 
 ### Bugs 修复
 
-* 修复 tb_url_encode/tb_url_decode（及各变体）写越界，恶意 HTTP 重定向可触发
-* 修复 tb_stream_bread_line 在一行恰好填满 caller 缓冲时的 off-by-one 越界写
-* 修复 tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to 在小缓冲和长路径下的缓冲区越界与死循环
-* 修复 tb_path_absolute_w 对 UNC（\\?\UNC\）和已带前缀路径的长路径前缀处理（Windows）
-* 修复 tb_strncat/tb_wcscat/tb_wcsncat 的截断与缺少终止符问题（与 tb_strcat 同类 bug）
-* 修复 tb_mbstowcs/tb_wcstombs 在输出缓冲恰好填满时的越界写
-* 修复 tb_socket_accept 对 IPv6 对端地址的截断
-* 修复 ifaddrs 缺少 break 导致 macOS/BSD 上 IPv6 接口地址被错误解析
-* 修复 Windows 上 tb_uclock 长时间运行后的整数溢出
-* 修复 Windows 上 tb_usleep 忽略请求时长的问题
-* 修复 Windows(iocp) 上 tb_socket_usend 在地址加载失败时的死循环
-* 修复 Windows 信号量在并发 post/wait 下的计数漂移
+* [#319](https://github.com/tboox/tbox/pull/319): 修复 tb_url_encode/tb_url_decode 的缓冲区越界
+* [#319](https://github.com/tboox/tbox/pull/319): 修复 tb_stream_bread_line 的缓冲区越界
+* [#316](https://github.com/tboox/tbox/pull/316): 修复 tb_path_translate_to/tb_path_relative_to/tb_path_absolute_to 的越界与死循环
+* [#316](https://github.com/tboox/tbox/pull/316): 修复 Windows 上 UNC 的长路径前缀
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 tb_strncat/tb_wcscat/tb_wcsncat
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 tb_mbstowcs/tb_wcstombs 的缓冲区越界
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 tb_socket_accept 的 IPv6 地址
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 macOS/BSD 上 ifaddrs 的 IPv6 地址
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 Windows 上 tb_uclock 溢出和 tb_usleep
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 Windows 上 tb_socket_usend
+* [#317](https://github.com/tboox/tbox/pull/317): 修复 Windows 上信号量计数
+* 修复 utf8 字符解码
 
 ## v1.8.1
 
