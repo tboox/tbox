@@ -101,7 +101,7 @@ static tb_long_t tb_ifaddrs_netlink_socket_send(tb_long_t sock, tb_long_t reques
     struct sockaddr_nl addr;
     memset(&addr, 0, sizeof(addr));
     addr.nl_family = AF_NETLINK;
-    return sendto(sock, &packet.m_hdr, packet.m_hdr.nlmsg_len, 0, (struct sockaddr *)&addr, sizeof(addr));
+    return sendto(sock, &packet, packet.m_hdr.nlmsg_len, 0, (struct sockaddr *)&addr, sizeof(addr));
 }
 static tb_long_t tb_ifaddrs_netlink_socket_recv(tb_long_t sock, tb_pointer_t data, tb_size_t size)
 {
