@@ -111,7 +111,13 @@ function tb_context_make, export=1
      *
      * 64 = align8(52 + TB_CONTEXT_SJLJ_BYTES)
      */
+
+#ifdef TB_CONFIG_OS_IOS
     sub r0, r0, #64
+#else
+    // make sp 8-byte aligned
+    sub r0, r0, #68
+#endif
 
     // context.pc = func
     str r2, [r0, #40 + TB_CONTEXT_SJLJ_BYTES]
