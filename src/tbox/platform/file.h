@@ -117,8 +117,14 @@ typedef struct __tb_file_info_t
     /// the last access time
     tb_time_t               atime;
 
+    /// the nanoseconds of the last access time, if supported
+    tb_uint32_t             atime_nsec;
+
     /// the last modify time
     tb_time_t               mtime;
+
+    /// the nanoseconds of the last modify time, if supported
+    tb_uint32_t             mtime_nsec;
 
 }tb_file_info_t;
 

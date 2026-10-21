@@ -404,9 +404,11 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
         // the last access time
         info->atime = tb_filetime_to_time(&st.ftLastAccessTime);
+        info->atime_nsec = tb_filetime_to_nsec(&st.ftLastAccessTime);
 
         // the last modify time
         info->mtime = tb_filetime_to_time(&st.ftLastWriteTime);
+        info->mtime_nsec = tb_filetime_to_nsec(&st.ftLastWriteTime);
     }
     return tb_true;
 }

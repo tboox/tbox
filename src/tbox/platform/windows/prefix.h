@@ -48,6 +48,15 @@ static __tb_inline__ tb_time_t tb_filetime_to_time(FILETIME const* pft)
     return (tb_time_t)((LONGLONG)(ui.QuadPart - 116444736000000000ull) / 10000000ul);
 }
 
+// FILETIME => the nanoseconds within its second
+static __tb_inline__ tb_uint32_t tb_filetime_to_nsec(FILETIME const* pft)
+{
+    ULARGE_INTEGER  ui = {{0}};
+    ui.LowPart      = pft->dwLowDateTime;
+    ui.HighPart     = pft->dwHighDateTime;
+    return (tb_uint32_t)((ui.QuadPart % 10000000ul) * 100);
+}
+
 // tb_time_t => FILETIME
 static __tb_inline__ tb_void_t tb_time_to_filetime(tb_time_t tm, FILETIME* pft)
 {
