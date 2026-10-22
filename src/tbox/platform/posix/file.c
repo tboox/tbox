@@ -239,6 +239,15 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
             // the last modify time
             info->mtime = (tb_time_t)st.st_mtime;
+
+            // the nanoseconds of the last access and modify time
+#if defined(TB_CONFIG_OS_MACOSX) || defined(TB_CONFIG_OS_IOS)
+            info->atime_nsec = (tb_uint32_t)st.st_atimespec.tv_nsec;
+            info->mtime_nsec = (tb_uint32_t)st.st_mtimespec.tv_nsec;
+#else
+            info->atime_nsec = (tb_uint32_t)st.st_atim.tv_nsec;
+            info->mtime_nsec = (tb_uint32_t)st.st_mtim.tv_nsec;
+#endif
             return tb_true;
         }
     }
