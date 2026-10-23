@@ -25,6 +25,7 @@
 #include "prefix.h"
 #include "../process.h"
 #include "../thread.h"
+#include "../time.h"
 #include "../atomic.h"
 #include "../semaphore.h"
 #include "../spinlock.h"
@@ -36,6 +37,16 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+
+/* //////////////////////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the maximum number of retained unregistered exits
+#define TB_POLLER_PROCESS_STATUS_MAXN    (1024)
+
+// the retention timeout for unregistered exits, in milliseconds
+#define TB_POLLER_PROCESS_STATUS_TIMEOUT (60000)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -61,6 +72,9 @@ typedef struct __tb_poller_processes_status_t
     // the process status
     tb_int_t                status;
 
+    // the time when waitpid collected this status
+    tb_hong_t               time;
+
 }tb_poller_processes_status_t;
 
 // the poller process type
@@ -76,10 +90,16 @@ typedef struct __tb_poller_process_t
     tb_hash_map_ref_t       processes_data;
 
     // the processes status
-    tb_vector_ref_t         processes_status;
+    tb_list_ref_t           processes_status;
 
     // the copied processes status
     tb_vector_ref_t         processes_status_copied;
+
+    // unregistered exits retained by the last poll (main thread only)
+    tb_bool_t               processes_status_pending;
+
+    // a new registration requires a poll of retained exits (main thread only)
+    tb_bool_t               processes_status_spak;
 
     // the semaphore
     tb_semaphore_ref_t      semaphore;
@@ -91,6 +111,20 @@ typedef struct __tb_poller_process_t
     tb_spinlock_t           lock;
 
 }tb_poller_process_t;
+
+// the context for collecting ready statuses and pruning unregistered exits
+typedef struct __tb_poller_process_status_collect_t
+{
+    // the process poller
+    tb_poller_process_t*    poller;
+
+    // the current time
+    tb_hong_t               now;
+
+    // the number of retained unregistered exits
+    tb_size_t               retained;
+
+}tb_poller_process_status_collect_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * declaration
@@ -109,6 +143,34 @@ static tb_poller_process_t* g_process_poller = tb_null;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * private implementation
  */
+static tb_bool_t tb_poller_process_status_remove(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+{
+    tb_poller_processes_status_t const* status = (tb_poller_processes_status_t const*)item;
+    return tb_i2p(status->pid) == value;
+}
+static tb_bool_t tb_poller_process_status_collect(tb_iterator_ref_t iterator, tb_cpointer_t item, tb_cpointer_t value)
+{
+    tb_poller_processes_status_t const* status = (tb_poller_processes_status_t const*)item;
+    tb_poller_process_status_collect_t* context = (tb_poller_process_status_collect_t*)value;
+    tb_poller_process_t* poller = context->poller;
+
+    // collect registered exits for dispatch outside the lock
+    tb_poller_processes_data_t* procdata = tb_hash_map_get(poller->processes_data, tb_i2p(status->pid));
+    if (procdata)
+    {
+        tb_vector_insert_tail(poller->processes_status_copied, status);
+        return tb_true;
+    }
+
+    // discard expired or excess unregistered exits
+    if (!context->now)
+        context->now = tb_mclock();
+    if (context->now - status->time >= TB_POLLER_PROCESS_STATUS_TIMEOUT ||
+        context->retained >= TB_POLLER_PROCESS_STATUS_MAXN)
+        return tb_true;
+    context->retained++;
+    return tb_false;
+}
 static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
 {
     // check
@@ -151,10 +213,11 @@ static tb_int_t tb_poller_process_loop(tb_cpointer_t priv)
                 tb_poller_processes_status_t object_event;
                 object_event.status = WIFEXITED(status)? WEXITSTATUS(status) : -1;
                 object_event.pid = result;
+                object_event.time = tb_mclock();
 
                 // save the process status
                 tb_spinlock_enter(&poller->lock);
-                tb_vector_insert_tail(poller->processes_status, &object_event);
+                tb_list_insert_tail(poller->processes_status, &object_event);
                 has_exited = tb_true;
                 tb_spinlock_leave(&poller->lock);
             }
@@ -231,7 +294,7 @@ static tb_void_t tb_poller_process_exit(tb_poller_process_ref_t self)
     poller->processes_data = tb_null;
 
     // exit the processes status
-    if (poller->processes_status) tb_vector_exit(poller->processes_status);
+    if (poller->processes_status) tb_list_exit(poller->processes_status);
     poller->processes_status = tb_null;
 
     if (poller->processes_status_copied) tb_vector_exit(poller->processes_status_copied);
@@ -280,7 +343,7 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
         tb_spinlock_init(&poller->lock);
 
         // init the processes status
-        poller->processes_status = tb_vector_init(0, tb_element_mem(sizeof(tb_poller_processes_status_t), tb_null, tb_null));
+        poller->processes_status = tb_list_init(0, tb_element_mem(sizeof(tb_poller_processes_status_t), tb_null, tb_null));
         tb_assert_and_check_break(poller->processes_status);
 
         // init the copied processes status
@@ -338,6 +401,10 @@ static tb_bool_t tb_poller_process_insert(tb_poller_process_ref_t self, tb_proce
     procdata.process = process;
     procdata.priv    = priv;
     tb_hash_map_insert(poller->processes_data, tb_i2p(pid), &procdata);
+
+    // request one poll of retained exits after registration, without scanning the queue
+    if (poller->processes_status_pending)
+        poller->processes_status_spak = tb_true;
     return tb_true;
 }
 static tb_bool_t tb_poller_process_modify(tb_poller_process_ref_t self, tb_process_ref_t process, tb_cpointer_t priv)
@@ -378,6 +445,23 @@ static tb_bool_t tb_poller_process_remove(tb_poller_process_ref_t self, tb_proce
 
     // remove this process and the user private data
     tb_hash_map_remove(poller->processes_data, tb_i2p(pid));
+
+    // discard queued statuses for this process
+    tb_spinlock_enter(&poller->lock);
+    tb_remove_if(poller->processes_status, tb_poller_process_status_remove, tb_i2p(pid));
+    if (!tb_list_size(poller->processes_status))
+    {
+        poller->processes_status_pending = tb_false;
+        poller->processes_status_spak    = tb_false;
+    }
+    tb_spinlock_leave(&poller->lock);
+
+    // a callback may cancel another event in the current batch; keep iterators valid
+    tb_for_all_if (tb_poller_processes_status_t*, status, poller->processes_status_copied, status)
+    {
+        if (status->pid == pid)
+            status->pid = -1;
+    }
     return tb_true;
 }
 static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
@@ -393,6 +477,14 @@ static tb_bool_t tb_poller_process_wait_prepare(tb_poller_process_ref_t self)
     if (tb_hash_map_size(poller->processes_data) && !tb_semaphore_post(poller->semaphore, 1))
         return tb_false;
 
+    // consume the one-shot wakeup requested by registration with retained exits
+    if (poller->processes_status_spak)
+    {
+        poller->processes_status_spak = tb_false;
+        if (poller->main_poller && poller->main_poller->spak)
+            poller->main_poller->spak(poller->main_poller);
+    }
+
     // is stopped?
     return !tb_atomic32_get(&poller->is_stopped);
 }
@@ -403,15 +495,21 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     tb_assert_and_check_return_val(poller && poller->processes_data && func, -1);
     tb_assert_and_check_return_val(poller->processes_status && poller->processes_status_copied, -1);
 
-    // get all processes status
+    /* only copy ready statuses; retain unregistered exits in place
+     *
+     * children may exit before their first wait registers them in the poller.
+     * @see https://github.com/xmake-io/xmake/issues/7865
+     */
     tb_vector_clear(poller->processes_status_copied);
+    tb_poller_process_status_collect_t context;
+    context.poller   = poller;
+    context.now      = 0;
+    context.retained = 0;
     tb_spinlock_enter(&poller->lock);
-    if (tb_vector_size(poller->processes_status))
-    {
-        tb_vector_copy(poller->processes_status_copied, poller->processes_status);
-        tb_vector_clear(poller->processes_status);
-    }
+    tb_remove_if(poller->processes_status, tb_poller_process_status_collect, &context);
     tb_spinlock_leave(&poller->lock);
+    poller->processes_status_pending = context.retained != 0;
+    poller->processes_status_spak    = tb_false;
 
     // trace
     tb_trace_d("process: poll %lu", tb_vector_size(poller->processes_status_copied));
@@ -422,6 +520,9 @@ static tb_long_t tb_poller_process_wait_poll(tb_poller_process_ref_t self, tb_po
     object.type = TB_POLLER_OBJECT_PROC;
     tb_for_all_if (tb_poller_processes_status_t*, object_event, poller->processes_status_copied, object_event)
     {
+        // skip statuses cancelled by a previous callback
+        tb_check_continue(object_event->pid != -1);
+
         // trace
         tb_trace_d("process: pid: %d", object_event->pid);
 
