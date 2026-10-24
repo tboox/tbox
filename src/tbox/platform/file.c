@@ -238,12 +238,16 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+tb_bool_t tb_file_touch_nsec(tb_char_t const* path, tb_time_t atime, tb_uint32_t atime_nsec, tb_time_t mtime, tb_uint32_t mtime_nsec)
 {
     tb_trace_noimpl();
     return tb_false;
 }
 #endif
+tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+{
+    return tb_file_touch_nsec(path, atime, 0, mtime, 0);
+}
 tb_long_t tb_file_fscase(tb_char_t const* path)
 {
     // check

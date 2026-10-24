@@ -608,7 +608,7 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     CloseHandle(h);
     return tb_true;
 }
-tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+tb_bool_t tb_file_touch_nsec(tb_char_t const* path, tb_time_t atime, tb_uint32_t atime_nsec, tb_time_t mtime, tb_uint32_t mtime_nsec)
 {
     // check
     tb_assert_and_check_return_val(path, tb_false);
@@ -635,13 +635,13 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
         if (atime > 0 || mtime > 0)
         {
             FILETIME atime_ft, mtime_ft;
-            if (atime > 0) tb_time_to_filetime(atime, &atime_ft);
+            if (atime > 0) tb_time_nsec_to_filetime(atime, atime_nsec, &atime_ft);
             else
             {
                 atime_ft.dwLowDateTime = 0xffffffff;
                 atime_ft.dwHighDateTime = 0xffffffff;
             }
-            if (mtime > 0) tb_time_to_filetime(mtime, &mtime_ft);
+            if (mtime > 0) tb_time_nsec_to_filetime(mtime, mtime_nsec, &mtime_ft);
             else
             {
                 mtime_ft.dwLowDateTime = 0;

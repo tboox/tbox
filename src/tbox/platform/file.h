@@ -376,6 +376,18 @@ tb_bool_t               tb_file_access(tb_char_t const* path, tb_size_t mode);
  */
 tb_bool_t               tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime);
 
+/*! update the file time with sub-second precision, it will create a new if file not found
+ *
+ * @param path          the file path
+ * @param atime         the last access time, it will not modify this time if it's zero
+ * @param atime_nsec    the nanoseconds of the last access time, in [0, 999999999]
+ * @param mtime         the last modify time, it will not modify this time if it's zero
+ * @param mtime_nsec    the nanoseconds of the last modify time, in [0, 999999999]
+ *
+ * @return              tb_true or tb_false
+ */
+tb_bool_t               tb_file_touch_nsec(tb_char_t const* path, tb_time_t atime, tb_uint32_t atime_nsec, tb_time_t mtime, tb_uint32_t mtime_nsec);
+
 /* //////////////////////////////////////////////////////////////////////////////////////
  * extern
  */

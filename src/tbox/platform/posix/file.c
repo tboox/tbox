@@ -708,7 +708,7 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
 #endif
     return ok;
 }
-tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+tb_bool_t tb_file_touch_nsec(tb_char_t const* path, tb_time_t atime, tb_uint32_t atime_nsec, tb_time_t mtime, tb_uint32_t mtime_nsec)
 {
     // check
     tb_assert_and_check_return_val(path, tb_false);
@@ -727,13 +727,21 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
 #ifdef TB_CONFIG_POSIX_HAVE_UTIMENSAT
             struct timespec ts[2];
             tb_memset(ts, 0, sizeof(ts));
-            if (atime > 0) ts[0].tv_sec = atime;
+            if (atime > 0)
+            {
+                ts[0].tv_sec = atime;
+                ts[0].tv_nsec = atime_nsec;
+            }
             else ts[0].tv_nsec = UTIME_OMIT;
-            if (mtime > 0) ts[1].tv_sec = mtime;
+            if (mtime > 0)
+            {
+                ts[1].tv_sec = mtime;
+                ts[1].tv_nsec = mtime_nsec;
+            }
             else ts[1].tv_nsec = UTIME_OMIT;
             ok = !utimensat(AT_FDCWD, path, ts, 0);
 #else
-            // Fallback to utimes for systems without utimensat (e.g. Solaris)
+            // Fallback to utimes for systems without utimensat (e.g. Solaris), which ignores the nanoseconds
             struct utimbuf ut;
             if (atime > 0) ut.actime = atime;
             else
@@ -767,9 +775,17 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
 #ifdef TB_CONFIG_POSIX_HAVE_FUTIMENS
                 struct timespec ts[2];
                 tb_memset(ts, 0, sizeof(ts));
-                if (atime > 0) ts[0].tv_sec = atime;
+                if (atime > 0)
+                {
+                    ts[0].tv_sec = atime;
+                    ts[0].tv_nsec = atime_nsec;
+                }
                 else ts[0].tv_nsec = UTIME_OMIT;
-                if (mtime > 0) ts[1].tv_sec = mtime;
+                if (mtime > 0)
+                {
+                    ts[1].tv_sec = mtime;
+                    ts[1].tv_nsec = mtime_nsec;
+                }
                 else ts[1].tv_nsec = UTIME_OMIT;
                 ok = !futimens(tb_file2fd(file), ts);
 #else
