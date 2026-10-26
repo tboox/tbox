@@ -14,7 +14,7 @@ static tb_long_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
 
     // the modified time
     tb_tm_t mtime = {0};
-    tb_localtime(info->mtime, &mtime);
+    tb_localtime(info->time.mtime, &mtime);
 
     // trace
     tb_trace_i( "path[%c]: %s, size: %llu, mtime: %04ld-%02ld-%02ld %02ld:%02ld:%02ld"
