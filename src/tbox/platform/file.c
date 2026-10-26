@@ -238,7 +238,7 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     tb_trace_noimpl();
     return tb_false;
 }
-tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+tb_bool_t tb_file_touch(tb_char_t const* path, tb_file_time_t const* time)
 {
     tb_trace_noimpl();
     return tb_false;
@@ -267,7 +267,7 @@ tb_long_t tb_file_fscase(tb_char_t const* path)
     {
         if (tb_file_info(path_flipcase, &info_flipcase)
             && info.size == info_flipcase.size
-            && info.mtime == info_flipcase.mtime
+            && info.time.mtime == info_flipcase.time.mtime
             && info.type == info_flipcase.type
             && info.flags == info_flipcase.flags)
         {

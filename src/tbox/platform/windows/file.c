@@ -403,12 +403,12 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
         info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;
 
         // the last access time
-        info->atime = tb_filetime_to_time(&st.ftLastAccessTime);
-        info->atime_nsec = tb_filetime_to_nsec(&st.ftLastAccessTime);
+        info->time.atime = tb_filetime_to_time(&st.ftLastAccessTime);
+        info->time.atime_nsec = tb_filetime_to_nsec(&st.ftLastAccessTime);
 
         // the last modify time
-        info->mtime = tb_filetime_to_time(&st.ftLastWriteTime);
-        info->mtime_nsec = tb_filetime_to_nsec(&st.ftLastWriteTime);
+        info->time.mtime = tb_filetime_to_time(&st.ftLastWriteTime);
+        info->time.mtime_nsec = tb_filetime_to_nsec(&st.ftLastWriteTime);
     }
     return tb_true;
 }
@@ -608,10 +608,10 @@ tb_bool_t tb_file_access(tb_char_t const* path, tb_size_t mode)
     CloseHandle(h);
     return tb_true;
 }
-tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
+tb_bool_t tb_file_touch(tb_char_t const* path, tb_file_time_t const* time)
 {
     // check
-    tb_assert_and_check_return_val(path, tb_false);
+    tb_assert_and_check_return_val(path && time, tb_false);
 
     // the full path
     tb_wchar_t full[TB_PATH_MAXN];
@@ -632,16 +632,16 @@ tb_bool_t tb_file_touch(tb_char_t const* path, tb_time_t atime, tb_time_t mtime)
     else file = CreateFileW(full, GENERIC_WRITE, FILE_SHARE_READ, tb_null, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, tb_null);
     if (file && file != INVALID_HANDLE_VALUE)
     {
-        if (atime > 0 || mtime > 0)
+        if (time->atime > 0 || time->mtime > 0)
         {
             FILETIME atime_ft, mtime_ft;
-            if (atime > 0) tb_time_to_filetime(atime, &atime_ft);
+            if (time->atime > 0) tb_time_nsec_to_filetime(time->atime, time->atime_nsec, &atime_ft);
             else
             {
                 atime_ft.dwLowDateTime = 0xffffffff;
                 atime_ft.dwHighDateTime = 0xffffffff;
             }
-            if (mtime > 0) tb_time_to_filetime(mtime, &mtime_ft);
+            if (time->mtime > 0) tb_time_nsec_to_filetime(time->mtime, time->mtime_nsec, &mtime_ft);
             else
             {
                 mtime_ft.dwLowDateTime = 0;

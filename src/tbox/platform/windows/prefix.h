@@ -66,6 +66,15 @@ static __tb_inline__ tb_void_t tb_time_to_filetime(tb_time_t tm, FILETIME* pft)
     pft->dwHighDateTime = ui.HighPart;
 }
 
+// tb_time_t and its nanoseconds => FILETIME
+static __tb_inline__ tb_void_t tb_time_nsec_to_filetime(tb_time_t tm, tb_uint32_t nsec, FILETIME* pft)
+{
+    ULARGE_INTEGER ui = {{0}};
+    ui.QuadPart = (tm * 10000000ul) + (nsec / 100) + 116444736000000000ull;
+    pft->dwLowDateTime = ui.LowPart;
+    pft->dwHighDateTime = ui.HighPart;
+}
+
 // convert wide string to multibyte string with known length (avoid wcslen)
 static __tb_inline__ tb_size_t tb_wtoa_n(tb_wchar_t const* wstr, tb_size_t wlen, tb_char_t* mstr, tb_size_t maxn)
 {
