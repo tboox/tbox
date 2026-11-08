@@ -355,7 +355,16 @@ static tb_poller_process_ref_t tb_poller_process_init(tb_poller_t* main_poller)
         tb_assert_and_check_break(poller->thread);
 
         // register signal
+#ifdef TB_CONFIG_OS_SOLARIS
+        // signal() resets the handler after delivery on Solaris.
+        struct sigaction action = {0};
+        action.sa_handler = tb_poller_process_signal_handler;
+        action.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+        sigemptyset(&action.sa_mask);
+        tb_assert_and_check_break(sigaction(SIGCHLD, &action, tb_null) == 0);
+#else
         signal(SIGCHLD, tb_poller_process_signal_handler);
+#endif
         g_process_poller = poller;
 
         // ok
