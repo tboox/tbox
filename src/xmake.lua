@@ -106,12 +106,25 @@ for _, name in ipairs({"zlib", "mysql", "sqlite3", "openssl", "polarssl", "mbedt
 end
 
 -- add requires
-local groups = {nil, nil, nil, "ssl", "ssl", "ssl", "pcre", "pcre"}
-for idx, require_name in ipairs({"zlib", "sqlite3", "mysql", "mbedtls 2.13.*", "openssl 1.1.*", "polarssl", "pcre2", "pcre"}) do
-    local name = require_name:split('%s')[1]
+for _, name in ipairs({"zlib", "sqlite3", "mysql"}) do
     if has_config(name) then
-        add_requires(require_name, {optional = true, group = groups[idx]})
+        add_requires(name, {optional = true})
     end
+end
+
+-- Select one backend using the existing option priority.
+if has_config("mbedtls") then
+    add_requires("mbedtls 2.13.*", {optional = true})
+elseif has_config("openssl") then
+    add_requires("openssl 1.1.*", {optional = true})
+elseif has_config("polarssl") then
+    add_requires("polarssl", {optional = true})
+end
+
+if has_config("pcre2") then
+    add_requires("pcre2", {optional = true})
+elseif has_config("pcre") then
+    add_requires("pcre", {optional = true})
 end
 
 -- include project directories
